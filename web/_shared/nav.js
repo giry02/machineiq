@@ -77,6 +77,18 @@
         { key: 'equipreq', label: '차량신청관리', dir: 'Mgmt Vehicle Request', asis: 'mgmt-vehicle-request-asis.html', tobe: 'mgmt-vehicle-request-tobe.html', hiddenTobe: true }
       ] },
 
+    { key: 'ops', label: '운영관리', dir: 'Operations',
+      subs: [
+        { key: 'data', label: '차량 데이터 관리', tobe: 'operations-data.html' },
+        { key: 'equipment', label: '장비코드 관리', tobe: 'operations-equipment.html' },
+        { key: 'codes', label: '공통코드 관리', tobe: 'operations-codes.html' },
+        { key: 'languages', label: '다국어 관리', tobe: 'operations-languages.html' },
+        { key: 'notices', label: '공지사항 관리', tobe: 'operations-notices.html' },
+        { key: 'accounts', label: '내부 계정 관리', tobe: 'operations-accounts.html' },
+        { key: 'menus', label: '메뉴·접근권한 관리', tobe: 'operations-menus.html' },
+        { key: 'history', label: '메뉴 접속이력', tobe: 'operations-history.html' }
+      ] },
+
     { key: 'interest', label: '관심차량',
       subs: [
         { key: 'summary', label: '관심차량 현황', dir: 'Interest Vehicles', tobe: 'interest-vehicles-status-tobe.html' },
@@ -104,6 +116,8 @@
     'rpt/rptstatus': 'done', 'rpt/rptcompare': 'done', 'rpt/rptheat': 'done',
     'map/map': 'done',
     'interest/summary': 'done', 'interest/favorites': 'done',
+    'ops/data': 'done', 'ops/equipment': 'done', 'ops/codes': 'done', 'ops/languages': 'done',
+    'ops/notices': 'done', 'ops/accounts': 'done', 'ops/menus': 'done', 'ops/history': 'done',
     'mgmt/user': 'done', 'mgmt/company': 'done', 'mgmt/group': 'done', 'mgmt/geofence': 'done',
     'mgmt/vehicle': 'done', 'mgmt/acctreq': 'done', 'mgmt/equipreq': 'done',
     'myacct/account': 'done', 'login/login': 'done', 'findpw/findpw': 'done',
@@ -325,11 +339,19 @@
       shellCss.setAttribute('data-current-shell', '');
       document.head.appendChild(shellCss);
     }
+    if (VARIANT === 'tobe' && MANAGEMENT_ROLE === 'internal') {
+      body.classList.add('miq-has-operations');
+      var opsNavCss = document.createElement('link');
+      opsNavCss.rel = 'stylesheet';
+      opsNavCss.href = BASE + '_shared/operations-navigation.css';
+      document.head.appendChild(opsNavCss);
+    }
   }
 
   /* MVP 정책 필터 */
   function menuVisible(m) {
     if (m.preLogin || m.userMenu) return false;          // 상단 메뉴 줄에는 노출하지 않음
+    if (m.key === 'ops') return VARIANT === 'tobe' && MANAGEMENT_ROLE === 'internal';
     if (m.key === 'interest') return VARIANT === 'tobe' && isDealerManagementRole(MANAGEMENT_ROLE);
     if (m.key === 'equip') return VARIANT === 'asis';    // TO-BE는 요약정보로 통합되어 상단 차량관리 제거
     return !(m.asisOnly && VARIANT !== 'asis');
@@ -370,7 +392,7 @@
 
   function contextualHref(menu, sub, target) {
     var url = new URL(href(menu, sub), location.href);
-    if (VARIANT === 'tobe' && (menu.key === 'mgmt' || menu.key === 'interest' && sub.key === 'favorites')) {
+    if (VARIANT === 'tobe' && (menu.key === 'mgmt' || menu.key === 'ops' || menu.key === 'interest' && sub.key === 'favorites')) {
       url.searchParams.set('role', MANAGEMENT_ROLE);
     } else if (VARIANT === 'tobe') {
       url.search = contextualParams(target, sub.key).toString();
@@ -404,6 +426,14 @@
     var blockedGroupTarget = new URL(BASE + enc('Mgmt User') + '/mgmt-user-tobe.html', location.href);
     blockedGroupTarget.searchParams.set('role', MANAGEMENT_ROLE);
     location.replace(blockedGroupTarget.href);
+    return;
+  }
+
+  // New operations pages are isolated from the existing management policy.
+  if (ACT === 'ops' && (VARIANT !== 'tobe' || MANAGEMENT_ROLE !== 'internal')) {
+    var blockedOpsTarget = new URL(BASE + 'Dashboard/group-dashboard-tobe-v2.html', location.href);
+    blockedOpsTarget.searchParams.set('role', MANAGEMENT_ROLE);
+    location.replace(blockedOpsTarget.href);
     return;
   }
 
@@ -495,6 +525,10 @@
           });
         }
         nextUrl.searchParams.set('role', nextRole);
+        if (ACT === 'ops' && nextRole !== 'internal') {
+          nextUrl = new URL(BASE + 'Dashboard/group-dashboard-tobe-v2.html', location.href);
+          nextUrl.searchParams.set('role', nextRole);
+        }
         if (ACT === 'interest' && !isDealerManagementRole(nextRole)) {
           nextUrl = new URL(BASE + enc('Vehicle Summary') + '/vehicle-summary-tobe-3.html', location.href);
           nextUrl.searchParams.set('role', nextRole);
@@ -1926,6 +1960,13 @@
         items: [
           ['user', '사용자'], ['company', '업체'], ['group', '그룹'], ['vehicle', '차량']
         ]
+      },
+      ops: {
+        title: '운영관리',
+        items: [['data', '차량 데이터 관리'], ['equipment', '장비코드 관리'],
+          ['codes', '공통코드 관리'], ['languages', '다국어 관리'],
+          ['notices', '공지사항 관리'], ['accounts', '내부 계정 관리'],
+          ['menus', '메뉴·접근권한 관리'], ['history', '메뉴 접속이력']]
       },
       interest: {
         title: '관심차량',
