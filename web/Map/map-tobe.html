@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
 <link rel="stylesheet" href="../_shared/mockup.css?rev=d24057a14011"/>
 <link rel="stylesheet" href="../_shared/map-management-enhancements.css?v=20260905-common-header-r20&amp;rev=bc8382d9a34b"/>
-<link rel="stylesheet" href="../_shared/google-map.css?rev=7a2e59abdc5b"/>
+<link rel="stylesheet" href="../_shared/google-map.css?rev=8d304cb348cf"/>
 <style>
 /* ── 페이지 전용 : 상태 범례 · 지도 · 장비목록 ── */
 .st-lg{margin-left:auto;display:flex;gap:14px;font-size:12px;color:#555;align-items:center}
@@ -153,11 +153,12 @@
 <script src="../_mock-data/generated/fleet.generated.js?v=20260906-json-r1&amp;rev=7e813828c801"></script>
 <script src="../_shared/fleet.js?v=20260906-json-r1&amp;rev=c6c8a0208b21"></script>
 <script src="../_shared/map-positions.js?rev=d86638aec5ee"></script>
+<script src="../_shared/map-popup.js?rev=a48bddd5d062"></script>
 <script>
 /* ══════════════════════════════════════════════════════════════
    지도 인터랙션
      1) 업체 · 그룹 · 분류 · 차량 선택 범위를 지도 영역 · 집계 · 장비목록에 반영
-     2) 장비목록 선택 시 Google 지도 임베드에 해당 차량의 마지막 수집 위치 표시
+     2) Google 지도 API 연결 시 아이콘/목록 선택과 동일 팝업, GPS 이동경로 표시. 미설정 시 기본 임베드 제공
      3) 위치 · 주소 · 위치 기준 시각은 원본 캡처 사용. 시간별 가동 지표는 별도 시연 데이터.
    수집되지 않은 좌표와 이동 경로는 생성하지 않는다.
    ══════════════════════════════════════════════════════════════ */
@@ -221,27 +222,15 @@
   /* ── 위치 팝업 ── */
   function renderPop() {
     var box = document.getElementById('pop');
-    var r = state.sel && scoped().filter(function (x) { return x.vin === state.sel; })[0];
-    if (!r) { box.innerHTML = ''; return; }
-    var ST = { ok: ['정상', 'ok'], bad: ['Fault', 'bad'], off: ['미연결', 'off'], unknown: ['통신 미수집', 'unknown'] };
-    if (!r.hasPosition) {
-      box.innerHTML = "<div class='map-pop' style='left:50%;top:50%;transform:translate(-50%,-50%)'>"
-        + "<span class='map-pop__x' id='popX'>✕</span><div class='map-pop__t'>" + r.model + " <span style='font-weight:400;color:#aaa;font-size:11px'>" + r.vin + "</span></div>"
-        + "<div class='map-pop__r'>위치 정보<b>수집 전</b></div><a class='map-pop__go' href='../Vehicle%20Detail/vehicle-detail-tobe.html'>차량 상세 ›</a></div>";
-      document.getElementById('popX').addEventListener('click', function () { select(null); });
-      return;
-    }
-    box.innerHTML = "<div class='map-pop'>"
-      + "<span class='map-pop__x' id='popX'>✕</span>"
-      + "<div class='map-pop__t'>" + r.model + " <span style='font-weight:400;color:#aaa;font-size:11px'>" + r.vin + "</span></div>"
-      + "<div class='map-pop__r'>상태<b><span class='st-pill " + ST[r.st][1] + "'><i></i>" + ST[r.st][0] + "</span></b></div>"
-      + "<div class='map-pop__r'>소속 그룹<b>" + r.group + "</b></div>"
-      + "<div class='map-pop__r'>총 가동시간<b>" + (r.runH ? r.runH + 'H' : '-') + "</b></div>"
-      + "<div class='map-pop__r'>위치 기준 시간<b>" + (r.posTime || '-') + "</b></div>"
-      + "<div class='map-pop__r' style='display:block;color:#555;padding-top:6px'>" + r.addr + "</div>"
-      + "<a class='map-pop__go' href='../Vehicle%20Detail/vehicle-detail-tobe.html'>차량 상세 ›</a>"
-      + "</div>";
-    document.getElementById('popX').addEventListener('click', function () { select(null); });
+    var row = state.sel && scoped().find(function(value) { return value.vin === state.sel; });
+    box.replaceChildren();
+    if (!row) return;
+    var href = window.MIQMapData && MIQMapData.detailUrl ? MIQMapData.detailUrl(row.vin, 'map-popup') : '../Vehicle%20Detail/vehicle-detail-tobe.html?veh=' + encodeURIComponent(row.vin);
+    var popup = MIQMapPopup.createVehicle(row, {detailHref:href,onClose:function(){select(null);}});
+    var routeButton = document.createElement('button');
+    routeButton.type='button';routeButton.className='map-pop__go map-pop__route';routeButton.textContent='이동 경로 ›';
+    routeButton.addEventListener('click',function(){document.dispatchEvent(new CustomEvent('miq:map-route',{detail:{vin:row.vin}}));});
+    popup.appendChild(routeButton);box.appendChild(popup);
   }
 
   /* ── 장비목록 ── */
@@ -351,7 +340,11 @@
   document.addEventListener('visibilitychange',function(){if(!document.hidden)hourlyClock.refresh();});
 })();
 </script>
-<script src="../_shared/google-map.js?rev=1d4f9d3ef269"></script>
-<script src="../_shared/map-management-enhancements.js?v=20260907-common-logic-r42&amp;rev=71daab04fb1c"></script>
+<script src="../_shared/google-map-config.js?rev=f9982afb5b93"></script>
+<script src="../_shared/map-route-model.js?rev=4f7bb7f08c3b"></script>
+<script src="../_shared/map-route-source.js?rev=07244b2649ed"></script>
+<script src="../_shared/google-map-sdk.js?rev=27adc2197f51"></script>
+<script src="../_shared/google-map.js?rev=d61a90175765"></script>
+<script src="../_shared/map-management-enhancements.js?v=20260907-common-logic-r42&amp;rev=0f4fc1ac13b5"></script>
 </body>
 </html>
