@@ -506,6 +506,15 @@ body[data-registration-mode="app"] .aae-reg-footer {
 body[data-registration-mode="app"] .aae-reg-footer .aae-button--primary { flex: 1; height: 48px; font-size: 15px; }
 
 /* My Account */
+/* This overlay also opens on pages that do not load mockup.css. Keep its
+   existing modal geometry self-contained and scoped to My Account. */
+#myAccountModal { position: fixed; inset: 0; z-index: 200; display: none; align-items: center; justify-content: center; padding: 24px; background: rgba(0,0,0,.42); }
+#myAccountModal.open { display: flex; }
+#myAccountModal > .modal { display: flex; flex-direction: column; max-height: 88vh; background: #fff; border-radius: 8px; box-shadow: 0 12px 40px rgba(0,0,0,.22); }
+#myAccountModal .modal__head { display: flex; align-items: center; flex-shrink: 0; padding: 16px 20px; border-bottom: 1px solid var(--aae-line-soft); }
+#myAccountModal .modal__title { font-size: 16px; font-weight: 700; }
+#myAccountModal .modal__body { flex: 1; min-height: 0; padding: 20px; overflow: auto; }
+#myAccountModal .modal__foot { display: flex; flex-shrink: 0; gap: 8px; justify-content: flex-end; padding: 14px 20px; border-top: 1px solid var(--aae-line-soft); background: #fcfcfc; border-radius: 0 0 8px 8px; }
 body[data-account-page] { background: #fff; }
 body.aae-account-open { overflow: hidden; }
 .aae-account-backdrop { filter: blur(1px); opacity: .45; pointer-events: none; user-select: none; }

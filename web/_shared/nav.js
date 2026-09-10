@@ -495,7 +495,7 @@
         if (accountModalLoading) return;
         accountModalLoading = true;
         var component = document.createElement('script');
-        component.src = BASE + '_shared/account-modal-component.js?v=20260906-account-overlay';
+        component.src = BASE + '_shared/account-modal-component.js?v=20260911-account-overlay';
         component.dataset.base = BASE;
         component.addEventListener('load', function () {
           accountModalLoading = false;

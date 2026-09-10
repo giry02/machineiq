@@ -389,7 +389,7 @@
         +'<td><span class="affiliation"><strong>'+vehicle.group+'</strong><span class="vehicle-type">'+vehicle.type+(vehicle.type==='리튬'?socHtml(vehicle):'')+'</span></span></td>'
         +'<td><span class="metric-pair"><span>거리 <strong>'+valueOrDash(vehicle.cumKm,' Km')+'</strong></span><span>시간 <strong>'+valueOrDash(vehicle.cumH,' H')+'</strong></span></span></td>'
         +'<td><span class="metric-pair"><span>거리 <strong>'+num(value.km,value.km<10?1:0)+' Km</strong></span><span>시간 <strong>'+hm(value.min)+'</strong></span></span></td>'
-        +'<td><span class="performance-cell"><span>'+performance.label+'</span><strong>'+performance.value+'</strong></span></td>'
+        +'<td><span class="performance-cell"><strong>'+performance.value+'</strong></span></td>'
         +'<td class="c"><strong class="row-time">'+(times.running===null?'—':hm(times.running))+'</strong></td>'
         +'<td class="c"><strong class="row-time">'+(times.working===null?'—':hm(times.working))+'</strong></td>'
         +'</tr>'
