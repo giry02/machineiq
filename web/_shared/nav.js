@@ -343,7 +343,7 @@
       body.classList.add('miq-has-operations');
       var opsNavCss = document.createElement('link');
       opsNavCss.rel = 'stylesheet';
-      opsNavCss.href = BASE + '_shared/operations-navigation.css';
+      opsNavCss.href = BASE + '_shared/operations-navigation.css?rev=20260911-2';
       document.head.appendChild(opsNavCss);
     }
   }

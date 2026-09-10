@@ -5,5 +5,5 @@
   body.miq-current-shell.miq-has-operations .gnb__menu{min-width:0}
   body.miq-current-shell.miq-has-operations .gnb__item{min-width:76px}
   body.miq-current-shell.miq-has-operations .gnb__item>a{padding-inline:6px;white-space:nowrap}
-  body.miq-current-shell.miq-has-operations[data-variant="tobe"] .gnb__right{flex-basis:350px;min-width:350px}
+  body.miq-current-shell.miq-has-operations[data-variant="tobe"] .gnb__right{flex-basis:390px;min-width:390px}
 }
