@@ -12,8 +12,20 @@ body.miq-current-shell[data-summary-layout="title-search"] .miq-target-selector.
   border-bottom:0;
 }
 body.miq-current-shell[data-summary-layout="title-search"] .miq-target-selector.is-hierarchy .miq-target-selector__panel {
+  position:static;
+  max-height:none;
   padding-left:0;
   padding-right:0;
+  box-shadow:none;
+}
+body.miq-current-shell[data-summary-layout="title-search"] .summary-content > .miq-target-selector:has(.miq-target-selector__panel:not([hidden])) {
+  margin-bottom:16px;
+}
+body.miq-current-shell[data-summary-layout="title-search"] .miq-target-selector__results {
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));
+}
+body.miq-current-shell[data-summary-layout="title-search"] .miq-target-selector__result-head {
+  flex-wrap:wrap;
 }
 body.miq-current-shell[data-summary-layout="title-search"] .layout > .miq-side-toggle {
   position:fixed;
