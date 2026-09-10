@@ -996,6 +996,12 @@ body.miq-current-shell .miq-side-toggle {
   cursor: pointer;
 }
 body.miq-current-shell .miq-side-toggle span { font-size: 31px; font-weight: 300; transform: translateX(-2px); }
+body.miq-current-shell[data-variant="tobe"] .miq-side-toggle {
+  position: fixed;
+  z-index: 111;
+  top: 50%;
+  transform: translateY(-50%);
+}
 body.miq-current-shell .layout.miq-side-collapsed > aside.lnb { display: none; }
 body.miq-current-shell .layout.miq-side-collapsed .miq-side-toggle { left: 0; }
 body.miq-current-shell .layout > .main {
@@ -1170,6 +1176,42 @@ body.miq-current-shell .miq-target-selector.is-hierarchy .miq-target-selector__p
     flex-direction: column;
     gap: 5px;
   }
+}
+
+/* 제목·기간 아래 공통 차량 검색. 보이는 위/아래 간격은 각각 16px이다.
+   검색 행의 내부 10px + 외부 6px. 펼친 상세검색은 본문 높이를 확보한다. */
+body.miq-current-shell.miq-content-target-search .main .miq-target-search-heading {
+  margin-bottom: 6px;
+}
+body.miq-current-shell.miq-content-target-search .main .miq-target-selector {
+  margin-bottom: 6px;
+}
+body.miq-current-shell.miq-content-target-search .miq-target-selector + .mm-map-toolbar {
+  margin-top: 0;
+}
+body.miq-current-shell.miq-content-target-search .miq-target-selector.is-hierarchy .miq-target-selector__row {
+  padding-left: 0;
+  padding-right: 0;
+  border-bottom: 0;
+}
+body.miq-current-shell.miq-content-target-search .miq-target-selector.is-hierarchy .miq-target-selector__panel {
+  position: static;
+  max-height: none;
+  padding-left: 0;
+  padding-right: 0;
+  box-shadow: none;
+}
+body.miq-current-shell.miq-content-target-search .main .miq-target-selector:has(.miq-target-selector__panel:not([hidden])) {
+  margin-bottom: 16px;
+}
+body.miq-current-shell.miq-content-target-search .miq-target-selector__results {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+}
+body.miq-current-shell.miq-content-target-search .miq-target-selector__result-head {
+  flex-wrap: wrap;
+}
+body.miq-current-shell[data-variant="tobe"].miq-content-summary .kpi-strip-a {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 /* 확정된 리포트 지표 6종은 3×2로 배치해 불필요한 빈 열을 만들지 않는다. */

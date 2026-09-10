@@ -14,7 +14,7 @@
     var unmatchedSummaryQuery = new URLSearchParams(query.toString());
     unmatchedSummaryQuery.delete('veh');
     unmatchedSummaryQuery.delete('equipmentId');
-    location.replace('../Vehicle%20Summary/vehicle-summary-tobe-option-a-expand.html?' + unmatchedSummaryQuery.toString());
+    location.replace('../Vehicle%20Summary/vehicle-summary-tobe-3.html?' + unmatchedSummaryQuery.toString());
     return;
   }
   var vehicle = matchedVehicle || {
@@ -191,7 +191,7 @@
     var back = document.querySelector('.main .back-link');
     if (back) back.textContent = '‹ 이전 목록';
     if (back) back.href = MIQCommon.navigation.listReturnHref(query.get('returnTo'),
-      '../Vehicle%20Summary/vehicle-summary-tobe-option-a-expand.html?' + summaryParams.toString(), document.body.dataset.managementRole, location.href);
+      '../Vehicle%20Summary/vehicle-summary-tobe-3.html?' + summaryParams.toString(), document.body.dataset.managementRole, location.href);
     var metricLinks = document.querySelectorAll('.metrics a.metric');
     setLink(metricLinks[0], '../Shock/shock-tobe.html', { origin: 'vehicle-detail', vehicleDetailQuery: queryString() });
     setLink(metricLinks[1], '../Service/service-maintenance-tobe.html');

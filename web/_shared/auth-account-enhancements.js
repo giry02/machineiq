@@ -736,7 +736,7 @@
       }
       if (returnUrl && /^(\.\.\/|\.\/)/.test(returnUrl)) { location.href = returnUrl; return; }
       if (doc.referrer && doc.referrer !== location.href) { history.back(); return; }
-      location.href = '../Vehicle%20Summary/vehicle-summary-tobe-option-a-expand.html';
+      location.href = '../Vehicle%20Summary/vehicle-summary-tobe-3.html';
     }
     function applySmsAvailability() {
       var korean = body.dataset.accountCountry === 'KR';

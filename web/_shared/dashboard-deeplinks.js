@@ -11,7 +11,7 @@
       return !Array.isArray(company.dashboardRoles) || company.dashboardRoles.indexOf(role) > -1;
     }) : [];
   var lastCatalogCompany = companies.filter(function (company) { return !company.demo; }).slice(-1)[0];
-  var SUMMARY = '../Vehicle%20Summary/vehicle-summary-tobe-option-a-expand.html';
+  var SUMMARY = '../Vehicle%20Summary/vehicle-summary-tobe-3.html';
   var MAP = '../Map/map-tobe.html';
   var ERROR = '../Service/service-error-tobe.html';
   var SUPPLY = '../Service/service-supply-tobe.html';

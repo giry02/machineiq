@@ -32,9 +32,8 @@
 
     { key: 'anlz', label: '운행이력',
       subs: [
-        { key: 'summary', label: '요약정보', dir: 'Vehicle Summary', asis: 'vehicle-summary-asis.html', tobe: 'vehicle-summary-tobe-option-a-expand.html' },
-        { key: 'summary2', label: '요약정보 2', dir: 'Vehicle Summary', tobe: 'vehicle-summary-tobe-2.html', hidden: true },
-        { key: 'summary3', label: '요약정보 3', dir: 'Vehicle Summary', tobe: 'vehicle-summary-tobe-3.html', hidden: true },
+        { key: 'summary', label: '요약정보', dir: 'Vehicle Summary', asis: 'vehicle-summary-asis.html', tobe: 'vehicle-summary-tobe-3.html' },
+        { key: 'summary2', label: '요약정보 2', dir: 'Vehicle Summary', tobe: 'vehicle-summary-tobe-option-a-expand.html', hidden: true },
         /* 차량 상세 = 숨은 화면. 요약정보에서만 진입 */
         { key: 'detail', label: '차량 상세', dir: 'Vehicle Detail', asis: 'vehicle-detail-asis.html', tobe: 'vehicle-detail-tobe.html', hidden: true, from: '요약정보' },
         { key: 'usage', label: '운행시간', dir: 'Usage Time', asis: 'usage-time-asis.html', tobe: 'usage-time-tobe.html' },
@@ -323,7 +322,7 @@
     if (!document.querySelector('link[data-current-shell]')) {
       var shellCss = document.createElement('link');
       shellCss.rel = 'stylesheet';
-      shellCss.href = BASE + '_shared/current-shell.css?v=20260906-global-role-scope-r18';
+      shellCss.href = BASE + '_shared/current-shell.css?v=20260910-content-search-r1';
       shellCss.setAttribute('data-current-shell', '');
       document.head.appendChild(shellCss);
     }
@@ -498,7 +497,7 @@
         }
         nextUrl.searchParams.set('role', nextRole);
         if (ACT === 'interest' && !isDealerManagementRole(nextRole)) {
-          nextUrl = new URL(BASE + enc('Vehicle Summary') + '/vehicle-summary-tobe-option-a-expand.html', location.href);
+          nextUrl = new URL(BASE + enc('Vehicle Summary') + '/vehicle-summary-tobe-3.html', location.href);
           nextUrl.searchParams.set('role', nextRole);
         }
         if (ACT === 'mgmt' && ACTSUB === 'group' && isDealerManagementRole(nextRole)) {
@@ -864,7 +863,7 @@
         '<label class="miq-target-selector__control" data-target-slot="group">' + icon('group') + '<span class="miq-sr-only">그룹</span><select data-target-group aria-label="그룹 선택"></select></label>' +
         '<label class="miq-target-selector__control" data-target-slot="type">' + icon('type') + '<span class="miq-sr-only">분류</span><select data-target-type aria-label="분류 선택"></select></label>' +
         '<label class="miq-target-selector__control" data-target-slot="vehicle">' + icon('vehicle') + '<span class="miq-sr-only">차량</span><select data-target-vehicle aria-label="차량 선택"></select></label>' +
-        '<button type="button" class="miq-target-selector__detail" data-target-detail aria-expanded="false">' +
+        '<button type="button" class="miq-target-selector__detail" data-target-detail aria-label="차량 상세검색" title="차량 상세검색" aria-expanded="false">' +
           '<svg class="miq-target-selector__detail-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m15.5 15.5 5 5"></path></svg>' +
           '<span>차량 상세검색</span>' +
         '</button>' +
@@ -885,8 +884,6 @@
     if (body.getAttribute('data-summary-layout') === 'content-search') {
       var summaryLayout = document.querySelector('.layout');
       summaryLayout.insertBefore(wrap, summaryLayout.firstChild);
-    } else if (body.getAttribute('data-summary-layout') === 'title-search') {
-      document.querySelector('.summary-titlebar').insertAdjacentElement('afterend', wrap);
     }
 
     var company = wrap.querySelector('[data-target-company]');
@@ -1714,6 +1711,24 @@
     if (filterHost && filterHost !== row && filterHost !== main && !filterHost.children.length) filterHost.remove();
   }
 
+  function placeTargetSelectorBelowTitle() {
+    if (VARIANT !== 'tobe' || body.classList.contains('miq-vehicle-scoped')) return;
+    /* 이전 비교안 파일만 보존한다. 현재 메뉴의 조회 영역은 같은 배치를 사용한다. */
+    if (body.getAttribute('data-summary-layout') === 'content-search') return;
+    var main = document.querySelector('.main');
+    var selector = document.querySelector('.miq-target-selector.is-hierarchy');
+    if (!main || !selector) return;
+    var heading = main.querySelector('.summary-titlebar, .miq-service-header-row, .miq-title-period-row');
+    if (!heading) {
+      var title = main.querySelector('.page-head__title, .page-title');
+      heading = title && title.closest('.page-head');
+    }
+    if (!heading) return;
+    body.classList.add('miq-content-target-search');
+    heading.classList.add('miq-target-search-heading');
+    if (heading.nextElementSibling !== selector) heading.insertAdjacentElement('afterend', selector);
+  }
+
   function normalizeBreadcrumb() {
     if (VARIANT !== 'tobe' || ACT === 'dash') return;
 
@@ -1889,7 +1904,7 @@
         title: '운행이력',
         items: [
           ['summary', '요약정보']
-        ].concat(VARIANT === 'tobe' ? [['summary2', '요약정보 2'], ['summary3', '요약정보 3']] : []).concat([
+        ].concat(VARIANT === 'tobe' ? [['summary2', '요약정보 2']] : []).concat([
           ['usage', VARIANT === 'tobe' ? '운행시간' : '사용시간'], ['oper', '운영효율']
         ]).concat(VARIANT === 'tobe' ? [['operb', '운영효율 B안'], ['shock', '충격'], ['lithium', '리튬배터리']] : [])
       },
@@ -1967,6 +1982,7 @@
     normalizeBreadcrumb();
     enhanceAnalysisReturnLink();
     enhanceTitlePeriodHeader();
+    placeTargetSelectorBelowTitle();
     Array.prototype.forEach.call(document.querySelectorAll('[data-miq-scope-placement="title"]'), placeScopeBesideTitle);
     syncContextualNavigation(window.MIQ_TARGET_CONTEXT || null);
 
