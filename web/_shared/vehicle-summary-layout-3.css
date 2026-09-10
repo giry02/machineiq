@@ -1,9 +1,10 @@
 /* 요약정보 3: 제목·기간 조회 아래에 기존 공통 차량 검색을 배치한다. */
 body.miq-current-shell[data-summary-layout="title-search"] .summary-titlebar {
-  margin-bottom:12px;
+  /* 검색 행 내부 여백 10px + 외부 여백 6px = 보이는 간격 16px */
+  margin-bottom:6px;
 }
 body.miq-current-shell[data-summary-layout="title-search"] .summary-content > .miq-target-selector {
-  margin-bottom:12px;
+  margin-bottom:6px;
 }
 body.miq-current-shell[data-summary-layout="title-search"] .miq-target-selector.is-hierarchy .miq-target-selector__row {
   padding-left:0;
