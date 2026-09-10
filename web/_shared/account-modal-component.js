@@ -24,6 +24,8 @@
     layer.className = 'dim';
     layer.id = 'myAccountModal';
     layer.dataset.accountInline = 'true';
+    // The same Korean demo account as the standalone My Account page.
+    layer.dataset.accountCountry = document.body.dataset.accountCountry || 'KR';
     layer.setAttribute('aria-hidden', 'true');
     layer.innerHTML = `
       <div class="modal aae-account-modal" role="dialog" aria-modal="true" aria-labelledby="accountDialogTitle" aria-describedby="accountDialogDesc">
@@ -146,7 +148,7 @@
       return;
     }
     var script = document.createElement('script');
-    script.src = base + '_shared/auth-account-enhancements.js?v=20260906-account-overlay';
+    script.src = base + '_shared/auth-account-enhancements.js?v=20260911-account-country';
     script.dataset.miqAccountEnhancements = '';
     script.addEventListener('load', initialiseAndOpen, { once: true });
     document.body.appendChild(script);

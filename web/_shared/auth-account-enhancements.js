@@ -739,9 +739,10 @@
       location.href = '../Vehicle%20Summary/vehicle-summary-tobe-3.html';
     }
     function applySmsAvailability() {
-      var korean = body.dataset.accountCountry === 'KR';
+      var country = (modalLayer.dataset.accountCountry || body.dataset.accountCountry || '').trim().toUpperCase();
+      var korean = country === 'KR';
       all('[data-sms-setting]').forEach(function (input) { input.disabled = !korean; });
-      one('#smsAvailability').textContent = korean ? 'SMS · 한국 사용자' : 'SMS · 지원 국가 아님';
+      one('#smsAvailability').textContent = korean ? 'SMS · 한국 사용자' : country ? 'SMS · 지원 국가 아님' : 'SMS · 국가 정보 확인 필요';
     }
 
     restoreSaved();
