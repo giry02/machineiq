@@ -321,7 +321,7 @@
     if (!document.querySelector('link[data-current-shell]')) {
       var shellCss = document.createElement('link');
       shellCss.rel = 'stylesheet';
-      shellCss.href = BASE + '_shared/current-shell.css?v=20260910-content-search-r1';
+      shellCss.href = BASE + '_shared/current-shell.css?v=20260910-content-search-r2';
       shellCss.setAttribute('data-current-shell', '');
       document.head.appendChild(shellCss);
     }

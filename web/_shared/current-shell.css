@@ -1197,6 +1197,7 @@ body.miq-current-shell.miq-content-target-search .miq-target-selector.is-hierarc
 body.miq-current-shell.miq-content-target-search .miq-target-selector.is-hierarchy .miq-target-selector__panel {
   position: static;
   max-height: none;
+  overflow: visible;
   padding-left: 0;
   padding-right: 0;
   box-shadow: none;
