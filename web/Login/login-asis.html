@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>로그인 AS-IS (현행 Mock-up)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
+<link rel="stylesheet" href="../_shared/mockup.css"/>
+<style>
+/* 로그인 전(pre-login) 전용 · 데스크톱 웹 */
+.pre{min-height:100vh;background:#f4f5f7;display:flex;flex-direction:column}
+.pre__top{display:flex;align-items:center;height:52px;padding:0 22px;background:#fff;border-bottom:1px solid #e5e7eb}
+.pre__wm{font-size:15px;font-weight:700}
+.pre__wm .iq{font-size:10px;vertical-align:super;color:#ff3600}
+.pre__links{margin-left:auto;display:flex;gap:8px;align-items:center;font-size:12px;color:#888}
+.pre__links a{border:1px solid #dfdfdf;border-radius:20px;padding:3px 10px;color:#555}
+.pre__wrap{width:100%;max-width:620px;margin:0 auto;padding:26px 20px 44px}
+.pre__card{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:26px 28px;max-width:440px;margin:0 auto}
+.pre__title{font-size:19px;font-weight:700;text-align:center}
+.pre__desc{font-size:12px;color:#888;text-align:center;margin:4px 0 20px;line-height:1.6}
+.pre__form{display:flex;flex-direction:column;gap:12px}
+.pre__row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pre__wide{width:100%;padding:11px}
+.pre__foot{display:flex;justify-content:center;align-items:center;gap:10px;margin-top:16px;font-size:12px;color:#666}
+.pre__foot a{color:#333;font-weight:600}
+.pre__sep{color:#ddd}
+.pre__cap{text-align:center;margin-bottom:12px;font-size:12px;color:#999}
+.pre__notice{margin-top:14px;padding:9px 12px;border:1px solid #e5e7eb;border-radius:6px;background:#fafbfc;font-size:11px;color:#888;line-height:1.6}
+.pre__err{padding:8px 11px;border:1px solid #ffc9c9;border-radius:6px;background:#ffe3e3;color:#e03131;font-size:12px;line-height:1.6}
+.pre__hint{font-size:11px;color:#bbb;line-height:1.6}
+</style>
+</head>
+<body data-shell="none" data-variant="asis" data-base="../">
+
+<div class="pre">
+
+  <!-- ═══════ 상단 스트립 ═══════ -->
+  <div class="pre__top">
+    <div class="pre__wm">Bobcat MACHINE <span class="iq">IQ</span></div>
+    <div class="pre__links">
+      <span>Fleet Portal</span>
+      <a href="login-tobe.html" title="같은 화면의 TO-BE 보기">TO-BE 보기</a>
+      <a href="../index.html">사이트맵</a>
+    </div>
+  </div>
+
+  <div class="pre__wrap">
+    <div class="pre__cap"><span class="badge gray">AS-IS · 현행 로그인 화면</span></div>
+
+    <!-- ═══════ 현행 로그인 카드 ═══════ -->
+    <div class="pre__card">
+      <div class="pre__title">로그인</div>
+      <div class="pre__desc">Bobcat MachineIQ Fleet Portal<br/>등록된 이메일 아이디로 로그인하세요.</div>
+
+      <div class="pre__form">
+        <div class="fld">
+          <span class="fld__k">아이디 (이메일)<span class="req">*</span></span>
+          <input class="inp" type="text" value="fleet.admin@sejong-log.co.kr"/>
+        </div>
+        <div class="fld">
+          <span class="fld__k">비밀번호<span class="req">*</span></span>
+          <input class="inp" type="password" value="password12"/>
+        </div>
+
+        <!-- 현행: 정책 안내가 없고, 실패 후에야 오류 메시지로만 노출 -->
+        <div class="pre__err">비밀번호가 일치하지 않습니다. 비밀번호는 12자 이상, 영문·숫자·특수문자를 포함해야 합니다.</div>
+
+        <div class="pre__row">
+          <label class="chk"><input type="checkbox" checked/> 아이디 저장하기</label>
+          <span class="pre__hint">로그인 실패 5회 시 잠김</span>
+        </div>
+
+        <a class="btn btn--pri pre__wide" href="../Dashboard/group-dashboard-asis.html">로그인</a>
+      </div>
+
+      <!-- 현행: Fleet/Dealer 계정에도 2FA 문구가 그대로 노출 -->
+      <div class="pre__notice">2단계 인증(2FA)이 설정된 계정은 인증 앱의 6자리 코드를 추가로 입력해야 합니다. 인증 앱 등록은 관리자에게 문의하세요.</div>
+
+      <div class="pre__foot">
+        <a href="../Find%20Password/find-password-asis.html">비밀번호 찾기</a>
+        <span class="pre__sep">|</span>
+        <a href="../registration/web-registration-current.html">회원가입</a>
+      </div>
+
+      <!-- 현행: 언어는 로그인 후에만 변경 가능 (선택 불가 상태로 노출) -->
+      <div class="fld" style="margin-top:18px">
+        <span class="fld__k">화면 언어</span>
+        <select class="inp" disabled>
+          <option selected>한국어</option>
+          <option>English</option>
+          <option>Français</option>
+          <option>Español</option>
+          <option>Deutsch</option>
+          <option>Italiano</option>
+          <option>日本語</option>
+        </select>
+        <span class="pre__hint">7개 언어를 지원하지만 로그인 전에는 변경할 수 없습니다. (로그인 후 마이페이지에서 변경)</span>
+      </div>
+    </div>
+
+    <!-- ═══════ 현행 문제점 ═══════ -->
+    <div class="note">
+      <b>AS-IS 현황 및 개선 포인트</b>
+      <ul>
+        <li><span class="tag-asis">현행</span> <b>마지막 로그인 일시·IP가 표시되지 않아</b> 제3자의 계정 도용을 사용자가 인지할 수 없습니다. (J3.5 미구현)</li>
+        <li><span class="tag-asis">현행</span> 비밀번호 정책(12자 이상, 영문·숫자·특수문자)이 <b>로그인 실패 후 오류 메시지로만</b> 안내되어 사전에 알 수 없습니다.</li>
+        <li><span class="tag-asis">현행</span> <b>최초 로그인 시 비밀번호 변경 유도가 없고</b>, ROLE_ADMIN 90일 경과 강제 변경도 화면에 안내되지 않습니다. (J3.3)</li>
+        <li><span class="tag-asis">현행</span> 2026-04-29 이후 <b>Fleet/Dealer 계정은 2FA 미적용</b>인데도 2FA 안내 문구가 그대로 노출되어 혼란을 유발합니다. (J3.2)</li>
+        <li><span class="tag-asis">현행</span> <b>로그인 전 언어 선택이 불가</b>하여 해외 사용자는 한국어 화면에서 로그인해야 합니다. (J18.1 7개 언어)</li>
+        <li>데이터 원천 : <b>TB_USER</b>(이메일 아이디·비밀번호·권한·비밀번호 변경일) + <b>TB_USER_LOGIN_HIST</b>(로그인 일시·접속 IP · 현행 화면 미노출) + <b>TB_CODE_LANG</b>(언어 라벨)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script src="../_shared/common-logic.js?v=20260907-common-logic-r42"></script>
+<script src="../_shared/nav.js?v=20260907-common-logic-r42"></script>
+</body>
+</html>

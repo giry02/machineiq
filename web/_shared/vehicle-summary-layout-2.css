@@ -1,0 +1,46 @@
+/* 요약정보 2 전용 비교 배치. 조회 컴포넌트와 본문 디자인은 공통 화면을 재사용한다. */
+body.miq-current-shell[data-summary-layout="content-search"] .layout {
+  display:grid;
+  grid-template-columns:var(--miq-side) minmax(0,1fr);
+  grid-template-rows:auto 1fr;
+}
+body.miq-current-shell[data-summary-layout="content-search"] .layout > aside.lnb {
+  grid-column:1;
+  grid-row:1 / 3;
+}
+body.miq-current-shell[data-summary-layout="content-search"] .layout > .miq-target-selector {
+  grid-column:2;
+  grid-row:1;
+  min-width:0;
+}
+body.miq-current-shell[data-summary-layout="content-search"] .layout > .main {
+  grid-column:2;
+  grid-row:2;
+}
+body.miq-current-shell[data-summary-layout="content-search"] .miq-target-selector.is-hierarchy .miq-target-selector__row {
+  padding-left:100px;
+  padding-right:100px;
+}
+body.miq-current-shell[data-summary-layout="content-search"] .miq-target-selector.is-hierarchy .miq-target-selector__panel {
+  padding-left:100px;
+  padding-right:100px;
+}
+body.miq-current-shell[data-summary-layout="content-search"] .layout.miq-side-collapsed {
+  grid-template-columns:0 minmax(0,1fr);
+}
+body.miq-current-shell[data-summary-layout="content-search"] .layout > .miq-side-toggle {
+  position:fixed;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:111;
+}
+body.miq-current-shell[data-summary-layout="content-search"] .kpi-strip-a {
+  grid-template-columns:repeat(5,minmax(0,1fr));
+}
+@media(max-width:1450px) {
+  body.miq-current-shell[data-summary-layout="content-search"] .miq-target-selector.is-hierarchy .miq-target-selector__row,
+  body.miq-current-shell[data-summary-layout="content-search"] .miq-target-selector.is-hierarchy .miq-target-selector__panel {
+    padding-left:70px;
+    padding-right:70px;
+  }
+}

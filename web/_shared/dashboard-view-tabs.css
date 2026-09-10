@@ -1,0 +1,8 @@
+/* Reuse mockup.css .tabs styling without loading its unrelated page styles. */
+.miq-content-dashboard .dashboard-view-tabs{display:flex;gap:0;border-bottom:1px solid var(--c-line,#e0e0e0);margin-bottom:18px;flex-wrap:wrap}
+.miq-content-dashboard .dashboard-view-tabs button{border:0;background:transparent;padding:11px 18px;font-size:14px;color:#777;cursor:pointer;font-weight:500;border-bottom:2px solid transparent;margin-bottom:-1px}
+.miq-content-dashboard .dashboard-view-tabs button.active{color:var(--bobcat-red);font-weight:700;border-bottom-color:var(--bobcat-red)}
+.miq-content-dashboard .dashboard-view-tabs button:hover{color:var(--c-ink,#1a1a1a)}
+.miq-content-dashboard .dashboard-view-tabs button:focus-visible{outline:2px solid var(--bobcat-red);outline-offset:2px}
+.miq-content-dashboard .dashboard-view-tabs[hidden],
+.miq-content-dashboard [data-dashboard-view-panel][hidden]{display:none}

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>관리기능 - 차량신청관리 AS-IS (현행 Mock-up)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
+<link rel="stylesheet" href="../_shared/mockup.css"/>
+<style>
+/* AS-IS 전용 : 현행은 상태 배지 없이 텍스트, 필터/일괄처리 없음 */
+.st{font-size:12px;font-weight:600;color:#666}
+.grid-scroll{max-height:520px;overflow:auto}
+</style>
+</head>
+<body data-gnb="mgmt" data-sub="equipreq" data-variant="asis" data-base="../">
+
+<div id="gnb"></div>
+
+<div class="layout">
+  <!-- ═══════ LNB : 관리기능 메뉴 ═══════ -->
+  <aside class="lnb">
+    <div class="lnb__company">(주)세종물류중부지점</div>
+    <div class="lnb__group-title">관리기능 <span>▲</span></div>
+    <a data-label="사용자" class="lnb__item" href="../Mgmt%20User/mgmt-user-asis.html">사용자 <span class="cnt">10</span></a>
+    <a data-label="업체" class="lnb__item" href="../Mgmt%20Company/mgmt-company-asis.html">업체 <span class="cnt">5</span></a>
+    <a data-label="그룹" class="lnb__item" href="../Mgmt%20Group/mgmt-group-asis.html">그룹 <span class="cnt">4</span></a>
+    <a data-label="Geofence" class="lnb__item" href="../Mgmt%20Geofence/mgmt-geofence-asis.html">Geofence <span class="cnt">7</span></a>
+    <a data-label="차량" class="lnb__item" href="../Mgmt%20Vehicle/mgmt-vehicle-asis.html">차량 <span class="cnt">42</span></a>
+    <a data-label="계정신청관리" class="lnb__item" href="../Mgmt%20Account%20Request/mgmt-account-request-asis.html">계정신청관리 <span class="cnt">4</span></a>
+    <a data-label="차량신청관리" class="lnb__item active" href="mgmt-vehicle-request-asis.html">차량신청관리 <span class="cnt">3</span></a>
+  </aside>
+
+  <!-- ═══════ MAIN ═══════ -->
+  <main class="main">
+    <div class="page-head">
+      <div class="page-head__title">차량신청관리 <span class="sub" data-lnb-label>- 전체</span></div>
+      <div class="page-head__bc">🏠 <a href="../Mgmt%20User/mgmt-user-asis.html">관리기능</a>&gt; 차량신청관리</div>
+    </div>
+
+    <!-- 검색 : 현행은 검색어 + 조회만 (처리상태 필터 없음) -->
+    <div class="filter-bar filter-bar--left">
+      <input class="inp" style="width:280px" placeholder="차대번호 / 단말기 ID / 업체명"/>
+      <button class="btn-search">조회</button>
+      <div class="grow"></div>
+      <span style="font-size:11px;color:#999">TB_EQUIPMENT_REQUEST</span>
+    </div>
+
+    <!-- ═══════ 차량요청 목록 ═══════ -->
+    <div class="list-head">
+      <span class="list-head__count">차량요청 <b>10</b>건</span>
+    </div>
+    <div class="tbl-wrap grid-scroll">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>장비 ID</th><th>차대번호</th><th>단말기 ID</th><th>업체명</th><th>렌탈사명</th><th>딜러사명</th>
+            <th>등록자</th><th>등록일시</th><th>처리일시</th><th class="c">처리상태</th><th>처리자</th><th class="c">관리</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="strong">EQ-10423</td><td>FBH28_331470041</td><td>TERM-HI-0041</td>
+            <td>(주)세종물류중부지점</td><td>(주)한신렌탈</td><td>밥캣코리아 중부딜러</td>
+            <td>rental02@hanshin.co.kr</td><td>2026-07-06 10:05</td><td class="mute">-</td>
+            <td class="c"><span class="st">신청</span></td><td class="mute">-</td>
+            <td class="c"><button class="btn btn--sm" data-modal-open="procModal">승인처리</button></td>
+          </tr>
+          <tr>
+            <td class="strong">EQ-10422</td><td>FBD22_113920233</td><td>TERM-LM-0233</td>
+            <td>(주)세종물류중부지점</td><td class="mute">-</td><td>대영중기(주)</td>
+            <td>fleet01@sejong.co.kr</td><td>2026-07-04 14:26</td><td class="mute">-</td>
+            <td class="c"><span class="st">신청</span></td><td class="mute">-</td>
+            <td class="c"><button class="btn btn--sm" data-modal-open="procModal">승인처리</button></td>
+          </tr>
+          <tr>
+            <td class="strong">EQ-10421</td><td>FBA28_224250512</td><td>TERM-LI-0512</td>
+            <td>(주)세종물류중부지점</td><td>(주)한신렌탈</td><td>밥캣코리아 중부딜러</td>
+            <td>fleet01@sejong.co.kr</td><td>2026-07-03 09:12</td><td class="mute">-</td>
+            <td class="c"><span class="st">신청</span></td><td class="mute">-</td>
+            <td class="c"><button class="btn btn--sm" data-modal-open="procModal">승인처리</button></td>
+          </tr>
+          <tr>
+            <td class="strong">EQ-10388</td><td>FBA35_224250427</td><td>TERM-LI-0427</td>
+            <td>(주)세종물류중부지점</td><td class="mute">-</td><td>밥캣코리아 중부딜러</td>
+            <td>fleet01@sejong.co.kr</td><td>2026-06-16 11:40</td><td>2026-06-18 09:22</td>
+            <td class="c"><span class="st">승인</span></td><td>admin@sejong.co.kr</td>
+            <td class="c"><button class="btn btn--sm" disabled>승인처리</button></td>
+          </tr>
+          <tr>
+            <td class="strong">EQ-10375</td><td>FBH30_331470028</td><td>TERM-HI-0028</td>
+            <td>(주)세종물류중부지점</td><td class="mute">-</td><td>밥캣코리아 중부딜러</td>
+            <td>fleet01@sejong.co.kr</td><td>2026-06-10 09:30</td><td>2026-06-11 15:08</td>
+            <td class="c"><span class="st">승인</span></td><td>admin@sejong.co.kr</td>
+            <td class="c"><button class="btn btn--sm" disabled>승인처리</button></td>
+          </tr>
+          <tr>
+            <td class="strong">EQ-10362</td><td>FBA22_224250388</td><td>TERM-LA-0388</td>
+            <td>(주)세종물류중부지점</td><td>(주)한신렌탈</td><td>대영중기(주)</td>
+            <td>rental02@hanshin.co.kr</td><td>2026-05-27 13:12</td><td>2026-05-28 10:44</td>
+            <td class="c"><span class="st">승인</span></td><td>admin@sejong.co.kr</td>
+            <td class="c"><button class="btn btn--sm" disabled>승인처리</button></td>
+          </tr>
+          <tr>
+            <td class="strong">EQ-10344</td><td>FBA20_224250203</td><td>TERM-LI-0203</td>
+            <td>(주)세종물류중부지점</td><td class="mute">-</td><td>밥캣코리아 중부딜러</td>
+            <td>fleet01@sejong.co.kr</td><td>2026-05-13 10:05</td><td>2026-05-14 16:30</td>
+            <td class="c"><span class="st">승인</span></td><td>admin@sejong.co.kr</td>
+            <td class="c"><button class="btn btn--sm" disabled>승인처리</button></td>
+          </tr>
+          <tr>
+            <td class="strong">EQ-10330</td><td>FBD18_113920156</td><td>TERM-LM-0156</td>
+            <td>(주)세종물류중부지점</td><td>(주)한신렌탈</td><td>대영중기(주)</td>
+            <td>fleet01@sejong.co.kr</td><td>2026-04-28 15:40</td><td>2026-04-29 09:18</td>
+            <td class="c"><span class="st">승인</span></td><td>admin@sejong.co.kr</td>
+            <td class="c"><button class="btn btn--sm" disabled>승인처리</button></td>
+          </tr>
+          <tr>
+            <td class="strong">EQ-10318</td><td>FBA16_224250311</td><td>TERM-LA-0311</td>
+            <td>(주)세종물류중부지점</td><td class="mute">-</td><td>대영중기(주)</td>
+            <td>fleet01@sejong.co.kr</td><td>2026-04-14 15:03</td><td>2026-04-16 10:11</td>
+            <td class="c"><span class="st">반려</span></td><td>admin@sejong.co.kr</td>
+            <td class="c"><button class="btn btn--sm" disabled>승인처리</button></td>
+          </tr>
+          <tr>
+            <td class="strong">EQ-10301</td><td>FBD25_113920901</td><td>TERM-LM-0901</td>
+            <td>(주)세종물류중부지점</td><td class="mute">-</td><td>밥캣코리아 중부딜러</td>
+            <td>fleet01@sejong.co.kr</td><td>2026-04-01 17:22</td><td>2026-04-02 11:26</td>
+            <td class="c"><span class="st">반려</span></td><td>admin@sejong.co.kr</td>
+            <td class="c"><button class="btn btn--sm" disabled>승인처리</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="tbl__foot">처리상태가 <b>신청(REQ)</b>인 행만 승인처리 버튼이 활성화됩니다 · 반려 사유는 저장되지 않습니다</div>
+    </div>
+
+    <!-- 현행 문제점 -->
+    <div class="note">
+      <b>AS-IS 현황 및 개선 포인트</b>
+      <ul>
+        <li><span class="tag-asis">현행</span> <b>대기 건수·처리 SLA 표시가 없어</b> 며칠째 방치된 신청을 알 수 없습니다. (현재 대기 3건 중 최장 3일 경과)</li>
+        <li><span class="tag-asis">현행</span> <b>처리상태 필터가 없어</b> 10건을 눈으로 훑어 REQ만 골라내야 합니다.</li>
+        <li><span class="tag-asis">현행</span> 승인 시 <b>해당 장비의 권한(소속 업체)이 어떻게 바뀌는지 안내가 없어</b> 어느 업체가 이 차량을 모니터링하게 되는지 알 수 없습니다.</li>
+        <li><span class="tag-asis">현행</span> <b>반려 사유를 남길 수 없어</b> 신청자에게 재신청 안내를 할 수 없습니다. (단말기 중복·딜러 미보유 등)</li>
+        <li><span class="tag-asis">현행</span> <b>일괄 처리가 불가</b>하여 신청 건마다 모달을 열고 닫아야 합니다.</li>
+        <li>데이터 원천 : <b>TB_EQUIPMENT_REQUEST</b>(SEQ · EQUIPMENT_ID · TERMINAL_ID · COMPANY_ID · RENTAL_COMPANY_ID · DEALER_COMPANY_ID · REG_USER_ID · PROC_STATUS · PROC_DATETIME · PROC_USER_ID) + <b>TB_COMPANY</b>(×3 조인 : 업체·렌탈사·딜러사명) → 승인 시 <b>TB_EQUIPMENT</b>(COMPANY_ID / RENTAL_COMPANY_ID / DEALER_COMPANY_ID) 권한 연결</li>
+      </ul>
+    </div>
+  </main>
+</div>
+
+<!-- ═══════ 승인처리 모달 (현행) ═══════ -->
+<div class="dim" id="procModal">
+  <div class="modal">
+    <div class="modal__head">
+      <div class="modal__title">승인처리</div>
+      <button class="modal__x" data-modal-close>✕</button>
+    </div>
+    <div class="modal__body">
+      <div class="form-grid">
+        <div class="fld"><span class="fld__k">장비 ID</span><input class="inp" value="EQ-10423" readonly/></div>
+        <div class="fld"><span class="fld__k">차대번호</span><input class="inp" value="FBH28_331470041" readonly/></div>
+        <div class="fld"><span class="fld__k">단말기 ID</span><input class="inp" value="TERM-HI-0041" readonly/></div>
+        <div class="fld"><span class="fld__k">처리상태<span class="req">*</span></span><select class="inp"><option>승인 (APRV)</option><option>반려 (RJCT)</option></select></div>
+      </div>
+      <div class="note" style="margin-top:16px">반려를 선택해도 <b>사유 입력란이 없습니다.</b> 승인 후 권한이 어떻게 연결되는지도 표시되지 않습니다.</div>
+    </div>
+    <div class="modal__foot">
+      <button class="btn" data-modal-close>취소</button>
+      <button class="btn btn--pri" data-modal-close>확인</button>
+    </div>
+  </div>
+</div>
+
+<script src="../_shared/common-logic.js?v=20260907-common-logic-r42"></script>
+<script src="../_shared/nav.js?v=20260907-common-logic-r42"></script>
+</body>
+</html>

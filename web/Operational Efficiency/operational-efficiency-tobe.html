@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>운행이력 - 운영효율</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
+<link rel="stylesheet" href="../_shared/mockup.css"/>
+<style>
+/* ── 페이지 전용 : 평균 작업/대기시간 · 작업시간 Top5 · 운영효율 막대(hover) ── */
+.filter-bar .inp--sm{width:116px;flex:0 0 auto;text-align:center}
+.filter-bar .sep{font-size:12px;color:#999}
+
+.eff-top{display:flex;gap:14px;align-items:stretch;margin-bottom:14px}
+.eff-top__main{flex:1;min-width:0;background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:18px 20px}
+.lg{display:flex;gap:14px;font-size:12px;color:#666;margin-bottom:14px}
+.lg .li{display:inline-flex;align-items:center;gap:5px}
+.lg .sw{width:9px;height:9px;border-radius:50%}
+
+.split{height:76px;display:flex;border:1px solid #f1f3f5;border-radius:4px;overflow:hidden;background:#fafbfc}
+.split__seg{display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;transition:width .3s}
+.split__seg.work{background:#7893b3}
+.split__seg.idle{background:#dfe6ee;color:#5b6b7c}
+.pct-axis{display:flex;margin-top:6px}
+.pct-axis span{flex:1;font-size:10px;color:#aaa}
+.pct-axis span:last-child{flex:0 0 auto}
+
+.top5{width:250px;flex-shrink:0;background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:18px 20px}
+.top5__t{font-size:15px;font-weight:700;margin-bottom:12px}
+.top5 ol{margin:0;padding-left:18px}
+.top5 li{font-size:12px;color:#333;font-weight:600;padding:5px 0;border-bottom:1px solid #f6f7f8}
+.top5 li:last-child{border-bottom:none}
+.top5 li .row{display:flex;align-items:center;gap:6px}
+.top5 li .n{margin-left:auto;font-size:11px;color:#999;font-weight:500}
+
+.chart-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.chart-head__name{font-size:15px;font-weight:700}
+.chart-hint{margin-left:auto;font-size:11px;color:#999}
+/* 막대 그래프 : 화면 너비에 맞춤 (가로 스크롤 없음) · 라벨 대신 hover 툴팁 */
+.chart-wrap{position:relative;overflow:visible}
+.bar-chart{width:100%;height:330px;display:block}
+.bar-chart .grid{stroke:#f1f3f5;stroke-width:1;stroke-dasharray:3 3}
+.bar-chart .axis{stroke:#e9ecef;stroke-width:1}
+.bar-chart text{font-size:10px;fill:#aaa;font-family:'Noto Sans KR',sans-serif}
+.bar-chart .seg.work{fill:#7893b3}
+.bar-chart .seg.idle{fill:#dfe6ee}
+.bar-chart .hit{fill:transparent;cursor:pointer}
+.bar-chart .col.on .seg.work{fill:#5b7fa6}
+.bar-chart .col.on .seg.idle{fill:#c8d3df}
+.tip-box{position:absolute;pointer-events:none;display:none;background:#1a1a1a;color:#fff;border-radius:6px;
+         padding:8px 10px;font-size:11px;line-height:1.7;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:5}
+.tip-box b{font-size:12px}
+.tip-box .r{display:flex;gap:8px}
+.tip-box .r i{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.tip-box .r span{margin-left:auto;font-weight:700}
+</style>
+<link rel="stylesheet" href="../_shared/content-system.css?v=20260902-readability"/>
+<link rel="stylesheet" href="../_shared/operation-metrics-enhancements.css?v=20260905-efficiency-top-align-r1"/>
+<link rel="stylesheet" href="../_shared/chart-common.css"/>
+</head>
+<body data-period-presets="dwm" class="miq-content-system miq-operation-metrics miq-operation-efficiency" data-metrics-page="efficiency" data-gnb="anlz" data-sub="oper" data-variant="tobe" data-base="../">
+
+<div id="gnb"></div>
+
+<div class="layout">
+  <!-- ═══════ LNB : 다른 화면과 동일한 공용 컴포넌트(_shared/lnb-tree.js) ═══════ -->
+  <aside class="lnb" id="lnb"></aside>
+
+  <!-- ═══════ MAIN ═══════ -->
+  <main class="main">
+    <div class="page-head metrics-breadcrumb">
+      <div class="page-head__bc">
+        <a data-context-link href="../Vehicle%20Summary/vehicle-summary-tobe-option-a-expand.html">운행이력</a> &gt; 운영효율
+      </div>
+    </div>
+    <div class="page-head">
+      <h1 class="page-head__title miq-page-title">운영효율</h1>
+    </div>
+
+    <!-- 기간 필터 : 다른 화면과 동일하게 우측 상단 배치 -->
+    <div class="filter-bar" id="efficiencyFilter">
+      <span class="period-tabs" id="periodTabs" role="group" aria-label="조회 기간 단위">
+        <button type="button" data-period="d">일</button>
+        <button type="button" data-period="w">주</button>
+        <button class="active" type="button" data-period="m">월</button>
+        </span>
+      <input class="inp inp--sm" id="dFrom" type="date" value="2026-08-01" aria-label="조회 시작일"/>
+      <span class="sep">~</span>
+      <input class="inp inp--sm" id="dTo" type="date" value="2026-08-31" aria-label="조회 종료일"/>
+      <button class="btn btn--sm btn--dark" type="button" id="btnSearch">조회</button>
+    </div>
+    <p class="metrics-feedback" id="metricsFeedback" role="status" aria-live="polite"></p>
+    <div class="miq-analysis-scope" id="efficiencyScopeSummary" data-miq-scope-placement="title" aria-label="현재 운영효율 분석 범위" aria-live="polite"></div>
+
+    <!-- ═══════ ① 평균 작업시간 · 대기시간 ═══════ -->
+    <div class="eff-top">
+      <div class="eff-top__main">
+        <div class="metrics-section-head">
+          <div>
+            <h2>평균 작업·대기시간</h2>
+            <p>선택 범위의 대당 평균이며 가동시간을 100%로 환산합니다.</p>
+          </div>
+          <strong class="efficiency-total" id="efficiencyTotal">-</strong>
+        </div>
+        <div class="eff-top__visual">
+          <div class="lg">
+            <span class="li"><span class="sw" style="background:#ff3600"></span>작업시간</span>
+            <span class="li"><span class="sw" style="background:#4d5359"></span>대기시간</span>
+          </div>
+          <div class="split" id="split" role="img" aria-label="평균 작업시간과 대기시간 비율"></div>
+          <div class="pct-axis">
+            <span>0%</span><span>10%</span><span>20%</span><span>30%</span><span>40%</span><span>50%</span>
+            <span>60%</span><span>70%</span><span>80%</span><span>90%</span><span>100%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="top5">
+        <div class="top5__t">작업시간 Top5</div>
+        <ol id="top5List"></ol>
+      </div>
+    </div>
+
+    <!-- ═══════ ② 운영효율 (일자별 · hover 로 수치 확인) ═══════ -->
+    <div class="box">
+      <div class="chart-head">
+        <span class="chart-head__name">운영효율</span>
+        <span class="lg" style="margin-bottom:0">
+          <span class="li"><span class="sw" style="background:#ff3600"></span>작업시간</span>
+          <span class="li"><span class="sw" style="background:#4d5359"></span>대기시간</span>
+        </span>
+        <span class="chart-hint" id="chartHint"></span>
+        <span class="chart-uncollected" id="chartUncollected" hidden></span>
+      </div>
+      <div class="chart-wrap" id="chartWrap">
+        <svg class="bar-chart" viewBox="0 0 960 330" role="img" aria-label="일자별 운영효율" id="chart"></svg>
+        <div class="tip-box" id="tip"></div>
+      </div>
+      <details class="metrics-table-fallback">
+        <summary>차트 데이터 표로 보기</summary>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <caption class="miq-sr-only">기간별 작업시간, 대기시간 및 운영효율</caption>
+            <thead><tr><th scope="col">기간</th><th scope="col" class="r">작업시간</th><th scope="col" class="r">대기시간</th><th scope="col" class="r">가동시간</th><th scope="col" class="r">운영효율</th></tr></thead>
+            <tbody id="efficiencyTableBody"></tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+
+    <div class="note" hidden aria-hidden="true">
+      <b>TO-BE 개선 사항</b>
+      <ul>
+        <li><span class="tag-asis">삭제</span> <b>근로시간 · 미사용시간 개념 제거</b> — 업체별로 기입한 근로시간(예: 08:00~17:00 8.0H)을 기준으로 미사용시간을 계산하던 방식을 없앴습니다. 입력값에 따라 지표가 흔들리고 실제 운영과 어긋나는 문제가 있었습니다. TO-BE는 단말이 실제로 집계한 <b>작업시간 · 대기시간</b>만 사용합니다.</li>
+        <li><span class="tag-new">신규</span> <b>비율 기준을 가동시간(작업 + 대기)</b>으로 변경 — 근로시간이 없어도 해석이 가능한 구성입니다.</li>
+        <li><span class="tag-new">신규</span> <b>월 조회에서 가로 스크롤 제거</b> — 막대 폭을 좁혀 31일을 화면 너비에 맞춰 표시합니다.</li>
+        <li><span class="tag-new">신규</span> <b>막대 안 수치 라벨 제거 → hover 툴팁</b> — 막대에 마우스를 올리면 해당 일자의 작업 · 대기 시간과 비율을 보여줍니다.</li>
+        <li><span class="tag-keep">유지</span> 좌측 내비게이션(그룹별 · 분류별 · 차량), 우측 상단 <b>일 / 주 / 월</b> 기간 조회, <b>작업시간 Top5</b> 차량.</li>
+      </ul>
+    </div>
+  </main>
+</div>
+
+<script src="../_shared/meeting-model.js"></script>
+<script src="../_shared/common-logic.js?v=20260907-common-logic-r42"></script>
+<script src="../_shared/chart-common.js"></script>
+<script src="../_shared/nav.js?v=20260907-common-logic-r42"></script>
+<script src="../_mock-data/generated/fleet.generated.js?v=20260906-json-r1"></script>
+<script src="../_shared/fleet.js?v=20260906-json-r1"></script>
+<script src="../_shared/lnb-tree.js?v=20260905-company-group-r3"></script>
+<script type="text/plain" data-legacy-script>
+/* ══════════════════════════════════════════════════════════════
+   운영효율 Mock-up 인터랙션
+     1) LNB = 다른 화면과 같은 공용 컴포넌트. 선택 범위가 상단 요약 · Top5 · 막대에 반영
+     2) 기간 : 일 = 시간대별 / 주 · 월 = 일자별 / 사용자설정 = 주 단위
+     3) 근로시간 · 미사용시간 없음 → 가동시간(작업 + 대기) 기준 비율
+     4) 막대는 폭을 좁혀 스크롤 없이 표시하고, 수치는 hover 툴팁으로 제공
+   ══════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+
+  var PERIOD = {
+    d: { from: '2026-08-12', to: '2026-08-12' },
+    w: { from: '2026-08-06', to: '2026-08-12' },
+    m: { from: '2026-08-01', to: '2026-08-31' },
+    c: { from: '2026-06-01', to: '2026-08-12' }
+  };
+  var state = { period: 'm', rows: MIQ.FLEET_CATALOG || MIQ.FLEET, label: '전체차량' };
+
+  function seeded(key) {
+    var s = 0;
+    for (var i = 0; i < key.length; i++) s = (s * 31 + key.charCodeAt(i)) >>> 0;
+    return function () { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; };
+  }
+  function r1(n) { return Math.round(n * 10) / 10; }
+  function hrs(h) {                                     /* 0.7 → 42분 / 7.1 → 7.1hr */
+    return state.period === 'd' ? Math.round(h * 60) + '분' : r1(h) + 'hr';
+  }
+
+  /* ── 데모 데이터 : 선택 범위 차량의 작업 · 대기시간 ── */
+  function build() {
+    var p = state.period, labels = [], n, bucket = 1, i;
+    if (p === 'd') { n = 24; for (i = 0; i < 24; i++) labels.push((i < 10 ? '0' + i : i) + '시'); }
+    else if (p === 'w') { n = 7; for (i = 0; i < 7; i++) labels.push((6 + i) + '일'); }
+    else if (p === 'm') { n = 31; for (i = 0; i < 31; i++) labels.push((i + 1) + '일'); }
+    else {
+      n = 11; bucket = 7;
+      for (i = 0; i < n; i++) { var dt = new Date(2026, 5, 1 + i * 7); labels.push((dt.getMonth() + 1) + '/' + dt.getDate()); }
+    }
+    var filled = p === 'm' ? 12 : n;                    /* 월은 12일까지 집계 완료 */
+
+    var cols = [], byVeh = {}, sumW = 0, sumI = 0;
+    for (i = 0; i < n; i++) cols.push(i < filled ? { work: 0, idle: 0 } : null);
+
+    state.rows.forEach(function (v) {
+      var rnd = seeded(v.vin + p);
+      byVeh[v.vin] = { model: v.model, vin: v.vin, work: 0 };
+      for (i = 0; i < filled; i++) {
+        var w = 0, d = 0;
+        for (var b = 0; b < bucket; b++) {
+          var run = p === 'd' ? (i >= 7 && i <= 18 ? 0.6 + rnd() * 0.4 : rnd() * 0.25)   /* 시간당 가동 */
+                              : 6 + rnd() * 3.5;                                        /* 일 가동시간 */
+          var ratio = 0.6 + rnd() * 0.25;               /* 작업 비율 */
+          w += run * ratio; d += run * (1 - ratio);
+        }
+        cols[i].work += w; cols[i].idle += d;
+        byVeh[v.vin].work += w; sumW += w; sumI += d;
+      }
+    });
+
+    var cnt = state.rows.length || 1;
+    cols.forEach(function (c) {                         /* 막대 · 툴팁도 대당 평균 기준 */
+      if (!c) return;
+      c.work /= cnt; c.idle /= cnt;
+    });
+    var top = Object.keys(byVeh).map(function (k) { return byVeh[k]; })
+      .sort(function (a, b) { return b.work - a.work; }).slice(0, 5);
+
+    return {
+      labels: labels, cols: cols, top: top, filled: filled,
+      avg: { work: sumW / cnt / filled, idle: sumI / cnt / filled }   /* 대당 · 구간당 평균 */
+    };
+  }
+
+  /* ── 상단 요약 ── */
+  function renderTop(d) {
+    var w = d.avg.work, i = d.avg.idle, t = w + i;
+    var pw = t ? w / t * 100 : 0, pi = 100 - pw;
+    document.getElementById('split').innerHTML =
+      "<div class='split__seg work' style='width:" + pw.toFixed(1) + "%'>" + hrs(w) + " / " + pw.toFixed(1) + "%</div>"
+      + "<div class='split__seg idle' style='width:" + pi.toFixed(1) + "%'>" + hrs(i) + " / " + pi.toFixed(1) + "%</div>";
+
+    document.getElementById('top5List').innerHTML = d.top.map(function (v) {
+      return "<li><span class='row'>" + v.vin + "<span class='n'>" + r1(v.work) + "hr</span></span></li>";
+    }).join('');
+  }
+
+  /* ── 막대 그래프 (스크롤 없음 · hover 툴팁) ── */
+  var L = 44, T = 20, B = 288, H = 330;
+  var W = 960, R = 946;
+  function r2(n, k) { var p = Math.pow(10, k || 0); return Math.round(n * p) / p; }
+  function useWidth(el) {
+    var w = Math.round(el.getBoundingClientRect().width) || el.clientWidth || 960;
+    W = Math.max(560, w); R = W - 12;
+    el.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+  }
+
+  function renderChart(d) {
+    var el = document.getElementById('chart');
+    useWidth(el);
+    var y = function (pct) { return B - pct / 100 * (B - T); };
+    var band = (R - L) / d.labels.length;
+    var bw = Math.max(4, Math.min(20, band * 0.5));     /* 막대 폭을 좁혀 너비에 맞춤 */
+
+    var svg = '';
+    for (var t = 0; t <= 100; t += 10) {
+      svg += "<line class='grid' x1='" + L + "' y1='" + r2(y(t), 1) + "' x2='" + R + "' y2='" + r2(y(t), 1) + "'/>"
+        + "<text x='" + (L - 8) + "' y='" + r2(y(t) + 3, 1) + "' text-anchor='end'>" + t + "</text>";
+    }
+    svg += "<line class='axis' x1='" + L + "' y1='" + B + "' x2='" + R + "' y2='" + B + "'/>"
+      + "<line class='axis' x1='" + L + "' y1='" + T + "' x2='" + L + "' y2='" + B + "'/>";
+
+    d.cols.forEach(function (c, i) {
+      var cx = L + band * (i + 0.5);
+      var x = r2(cx - bw / 2, 1);
+      if (c) {
+        var tot = c.work + c.idle, pw = tot ? c.work / tot * 100 : 0;
+        var hW = r2((B - T) * pw / 100, 1), hI = r2((B - T) * (100 - pw) / 100, 1);
+        svg += "<g class='col' data-i='" + i + "'>"
+          + "<rect class='seg idle' x='" + x + "' y='" + r2(T, 1) + "' width='" + r2(bw, 1) + "' height='" + hI + "'/>"
+          + "<rect class='seg work' x='" + x + "' y='" + r2(T + hI, 1) + "' width='" + r2(bw, 1) + "' height='" + hW + "'/>"
+          + "<rect class='hit' x='" + r2(cx - band / 2, 1) + "' y='" + T + "' width='" + r2(band, 1) + "' height='" + r2(B - T, 1) + "'/>"
+          + "</g>";
+      }
+      var every = d.labels.length > 24 ? 1 : 1;
+      if (i % every === 0) svg += "<text x='" + r2(cx, 1) + "' y='" + (B + 18) + "' text-anchor='middle'>" + d.labels[i] + "</text>";
+    });
+    el.innerHTML = svg;
+
+    /* hover : 라벨 대신 툴팁 */
+    var tip = document.getElementById('tip'), wrap = document.getElementById('chartWrap');
+    Array.prototype.forEach.call(el.querySelectorAll('g.col'), function (g) {
+      var i = +g.getAttribute('data-i'), c = d.cols[i];
+      var tot = c.work + c.idle, pw = tot ? c.work / tot * 100 : 0;
+      g.addEventListener('mouseenter', function (ev) {
+        g.classList.add('on');
+        tip.innerHTML = "<b>" + d.labels[i] + "</b>"
+          + "<div class='r'><i style='background:#7893b3'></i>작업시간<span>" + hrs(c.work) + " · " + pw.toFixed(1) + "%</span></div>"
+          + "<div class='r'><i style='background:#dfe6ee'></i>대기시간<span>" + hrs(c.idle) + " · " + (100 - pw).toFixed(1) + "%</span></div>"
+          + "<div class='r'><i style='background:transparent'></i>가동시간<span>" + hrs(tot) + "</span></div>";
+        tip.style.display = 'block';
+        move(ev);
+      });
+      g.addEventListener('mousemove', move);
+      g.addEventListener('mouseleave', function () { g.classList.remove('on'); tip.style.display = 'none'; });
+      function move(ev) {
+        var box = wrap.getBoundingClientRect();
+        var x = (ev.clientX || 0) - box.left, yy = (ev.clientY || 0) - box.top;
+        tip.style.left = Math.max(0, Math.min(box.width - 190, x + 12)) + 'px';
+        tip.style.top = Math.max(0, yy - 70) + 'px';
+      }
+    });
+  }
+
+  function render() {
+    var d = build();
+    renderTop(d);
+    renderChart(d);
+    var f = document.getElementById('dFrom'), t = document.getElementById('dTo');
+    f.value = PERIOD[state.period].from; t.value = PERIOD[state.period].to;
+    f.readOnly = t.readOnly = state.period !== 'c';
+    document.getElementById('chartHint').textContent =
+      (state.period === 'd' ? 'ⓘ 시간대별 작업 · 대기시간입니다.'
+         : state.period === 'c' ? 'ⓘ 사용자설정 기간은 주 단위로 묶어 표시합니다.'
+         : 'ⓘ 일자별 작업 · 대기시간입니다.' + (state.period === 'm' ? ' 13일 이후는 집계 전입니다.' : ''))
+      + ' 값은 대당 평균이며, 막대에 마우스를 올리면 수치가 표시됩니다.';
+    Array.prototype.forEach.call(document.querySelectorAll('[data-lnb-label]'), function (el) {
+      el.textContent = '- ' + state.label;
+    });
+  }
+
+  /* ── LNB (다른 화면과 동일한 공용 컴포넌트) ── */
+  MIQ.lnbTree(document.getElementById('lnb'), {
+    hint: '그룹 · 분류 · 차량을 고르면 상단 요약 · Top5 · 운영효율 막대가 함께 바뀝니다.',
+    onChange: function (sel) {
+      state.rows = sel.vehicles;
+      state.label = sel.vehicle ? sel.vehicle.model + ' · ' + sel.vehicle.vin
+        : (sel.label === '전체' ? '전체차량' : sel.label);
+      render();
+    }
+  });
+
+  document.getElementById('periodTabs').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-period]');
+    if (!b) return;
+    state.period = b.getAttribute('data-period');
+    render();
+  });
+  document.getElementById('btnSearch').addEventListener('click', render);
+
+  var rz;
+  window.addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(render, 150); });
+
+  render();
+})();
+</script>
+<script src="../_shared/operation-metrics-enhancements.js?v=20260907-common-logic-r42"></script>
+</body>
+</html>

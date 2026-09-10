@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>대시보드 - 그룹별 대시보드</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
+<link rel="stylesheet" href="../_shared/gnb.css"/>
+<style>
+:root{--bobcat-red:#ff3600;--bobcat-red-hover:#d92e00;--bobcat-red-active:#cc2b00;--bobcat-black:#1e1e1e;--bobcat-dark:#333;--bobcat-muted:#777;--bobcat-gray:#ccc;--bobcat-steel:#d5dee3;--bobcat-light:#f1f1f1;--bobcat-positive:#158737;--bobcat-success:#0aa656;--bobcat-warning:#ff9f0a;--bobcat-danger:#992100;--bobcat-info:#17a2b8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans KR',sans-serif;font-size:14px;background:var(--bobcat-light);color:var(--bobcat-dark)}
+button,input,select{font:inherit}
+button{cursor:pointer}
+
+/* 대시보드는 별도 조회 대상 없이 전체 관제 현황을 제공한다. */
+body.miq-content-dashboard[data-gnb="dash"][data-sub="group"]>.miq-target-selector{display:none!important}
+
+.dashboard-main{min-width:0}
+.dashboard-content{max-width:none!important;container-name:dashboard-content;container-type:inline-size}
+.dashboard-titlebar{display:flex;align-items:center;min-height:40px;margin-bottom:16px;gap:10px}
+.dashboard-titlebar .miq-page-title{font-size:24px}
+.live-chip{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 9px;border-radius:12px;background:rgba(255,54,0,.08);color:var(--bobcat-red-active);font-size:11px;font-weight:700;letter-spacing:.02em}
+.live-chip::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--bobcat-red);animation:livePulse 1.4s ease-in-out infinite}
+.dashboard-updated{color:var(--bobcat-muted);font-size:12px;font-weight:500;line-height:18px;white-space:nowrap}
+
+.dashboard-stack{display:grid;gap:22px}
+.dashboard-section{display:grid;gap:12px;min-width:0}
+.section-heading{display:flex;align-items:center;gap:12px;min-height:30px}
+.section-heading h2{display:flex;align-items:center;gap:8px;color:var(--bobcat-dark);font-size:18px;line-height:26px}
+.section-heading h2::before{content:'';width:3px;height:18px;flex:0 0 3px;border-radius:2px;background:var(--bobcat-red)}
+.section-heading p{color:var(--bobcat-muted);font-size:12px;line-height:18px}
+.section-heading__actions{margin-left:auto}
+
+.dashboard-panel{overflow:hidden;background:#fff;border:1px solid var(--bobcat-steel);border-radius:8px}
+.panel-heading{display:flex;align-items:center;min-height:42px;padding:0 18px;border-bottom:1px solid var(--bobcat-steel);background:var(--bobcat-light)}
+.panel-heading h3{color:var(--bobcat-dark);font-size:15px;line-height:22px}
+.panel-heading p{margin-left:10px;color:var(--bobcat-muted);font-size:12px;line-height:18px}
+.panel-heading__meta{margin-left:auto;color:var(--bobcat-muted);font-size:12px;line-height:18px}
+
+/* 실시간 전체 현황 */
+.live-summary{display:grid;grid-template-columns:minmax(155px,.68fr) repeat(2,minmax(220px,1fr)) minmax(300px,1.25fr);min-width:0;border-top:2px solid var(--bobcat-red)}
+.live-summary>div{min-width:0;padding:16px 20px}
+.live-summary>div+div{border-left:1px solid var(--bobcat-steel)}
+.fleet-total__label,.status-metric__label,.maintenance__label{display:block;color:var(--bobcat-dark);font-size:13px;font-weight:700;line-height:18px;white-space:nowrap}
+.fleet-total__value{display:flex;align-items:baseline;gap:4px;margin-top:5px;color:var(--bobcat-dark)}
+.fleet-total__value strong{font-size:32px;line-height:1;font-weight:700;letter-spacing:-.03em}
+.fleet-total__value span{font-size:13px;font-weight:600}
+.fleet-total__meta{display:block;margin-top:7px;color:var(--bobcat-muted);font-size:12px;line-height:18px}
+.status-metric__head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.status-metric__rate{color:var(--bobcat-dark);font-size:22px;font-weight:700;line-height:28px}
+.status-metric__track{height:8px;margin:9px 0 8px;overflow:hidden;border-radius:4px;background:var(--bobcat-light)}
+.status-metric__track i{display:block;width:calc(var(--value) * 100%);height:100%;border-radius:inherit;background:var(--bobcat-dark);transform:scaleX(1);transform-origin:left center;transition:transform .58s cubic-bezier(.2,.75,.25,1)}
+.status-metric__track i.on{background:var(--bobcat-success)}
+.status-metric__track i.run{background:var(--bobcat-red)}
+.dashboard-content.is-ready .status-metric__track i{transform:scaleX(1)}
+.status-metric__details{display:flex;align-items:center;gap:14px;color:var(--bobcat-muted);font-size:12px;line-height:18px}
+.status-metric__details span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.status-metric__details b{color:var(--bobcat-dark);font-size:14px}
+.status-metric__details .muted b{color:var(--bobcat-muted)}
+.maintenance__items{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:8px}
+.maintenance-item{position:relative;min-width:0;padding:0 10px}
+.maintenance-item:first-child{padding-left:0}
+.maintenance-item+.maintenance-item{border-left:1px solid var(--bobcat-steel)}
+.maintenance-item__value{display:flex;align-items:center;gap:6px;color:var(--bobcat-dark);font-size:22px;font-weight:700;line-height:28px}
+.maintenance-item__dot{width:6px;height:6px;border-radius:50%;background:var(--bobcat-danger)}
+.maintenance-item.soon .maintenance-item__dot{background:var(--bobcat-warning)}
+.maintenance-item__name{display:block;margin-top:2px;color:var(--bobcat-dark);font-size:12px;font-weight:600;line-height:18px;word-break:keep-all;white-space:nowrap}
+.maintenance-item__meta{display:block;color:var(--bobcat-muted);font-size:12px;line-height:18px}
+
+/* 그룹 실시간 비교 행렬 */
+.group-matrix{width:100%;table-layout:fixed;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.group-matrix col:first-child{width:19%}
+.group-matrix th,.group-matrix td{height:52px;padding:0 10px;text-align:center;border-bottom:1px solid var(--bobcat-steel)}
+.group-matrix thead th{height:36px;color:var(--bobcat-muted);background:var(--bobcat-light);font-size:13px;font-weight:600;line-height:18px;white-space:nowrap}
+.group-matrix thead tr:first-child th{height:34px;color:var(--bobcat-dark);border-bottom:1px solid var(--bobcat-steel);background:var(--bobcat-light);font-size:14px;font-weight:700}
+.group-matrix thead th+th{border-left:1px solid var(--bobcat-steel)}
+.group-matrix tbody tr:last-child th,.group-matrix tbody tr:last-child td{border-bottom:0}
+.group-matrix tbody tr:hover{background:var(--bobcat-light)}
+.group-matrix tbody th{padding-left:18px;text-align:left}
+.group-name{display:block;color:var(--bobcat-dark);font-size:14px;font-weight:700;line-height:20px;white-space:nowrap}
+.group-name small{margin-left:5px;color:var(--bobcat-muted);font-size:12px;font-weight:500}
+.matrix-number{display:inline-flex;align-items:center;justify-content:center;gap:6px;color:var(--bobcat-dark);font-size:14px;font-weight:700}
+.matrix-signal{width:6px;height:6px;border-radius:50%;background:var(--bobcat-danger)}
+.matrix-signal.warning{background:var(--bobcat-warning)}
+.matrix-rate{display:flex;align-items:center;justify-content:center;gap:8px}
+.matrix-rate b{min-width:34px;color:var(--bobcat-dark);font-size:14px}
+.matrix-rate__track{width:52px;height:6px;overflow:hidden;border-radius:3px;background:var(--bobcat-light)}
+.matrix-rate__track i{display:block;width:calc(var(--value) * 100%);height:100%;border-radius:inherit;background:var(--bobcat-dark);transform:scaleX(1);transform-origin:left;transition:transform .48s cubic-bezier(.2,.75,.25,1)}
+.dashboard-content.is-ready .matrix-rate__track i{transform:scaleX(1)}
+
+/* 기간 필터 */
+.period-heading{align-items:center}
+.filter-bar{display:flex;align-items:center;gap:6px}
+.period-tabs{display:flex;overflow:hidden;border:1px solid var(--bobcat-steel);border-radius:4px;background:#fff}
+.period-tabs button{height:40px;padding:0 16px;border:0;border-right:1px solid var(--bobcat-steel);background:#fff;color:var(--bobcat-muted);font-size:13px}
+.period-tabs button:last-child{border-right:0}
+.period-tabs button:hover{background:var(--bobcat-light);color:var(--bobcat-dark)}
+.period-tabs button.active{background:var(--bobcat-black);color:#fff;font-weight:700}
+.date-range{display:flex;align-items:center;gap:5px;height:40px;padding:0 12px;border:1px solid var(--bobcat-steel);border-radius:4px;background:#fff;color:var(--bobcat-muted);font-size:13px;white-space:nowrap}
+.date-range input{width:130px;height:34px;padding:0 5px;border:0;background:transparent;color:var(--bobcat-dark);font-size:13px;outline:0}
+.dashboard-period .btn-search{height:40px!important;min-height:40px!important;padding:0 18px!important;border:1px solid var(--bobcat-red-hover)!important;border-radius:4px;background:var(--bobcat-red-hover)!important;color:#fff;font-size:14px;font-weight:700}
+.dashboard-period .btn-search:hover{border-color:var(--bobcat-red-active)!important;background:var(--bobcat-red-active)!important}
+.dashboard-period .btn-search:active{border-color:#bf2900!important;background:#bf2900!important}
+.period-tabs button:focus-visible,.date-range input:focus-visible,.dashboard-period .btn-search:focus-visible{outline:2px solid var(--bobcat-red);outline-offset:2px}
+
+/* 전체 기간 비교 */
+.usage-compare-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.compare-metric{min-width:0;padding:16px 18px}
+.compare-metric+.compare-metric{border-left:1px solid var(--bobcat-steel)}
+.compare-metric__head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.compare-metric__label{color:var(--bobcat-dark);font-size:13px;font-weight:700;line-height:18px;white-space:nowrap}
+.compare-metric__delta{padding:2px 7px;border-radius:10px;background:var(--bobcat-light);color:var(--bobcat-muted);font-size:12px;font-style:normal;font-weight:700;line-height:18px;white-space:nowrap}
+.compare-metric__delta.is-improved,.efficiency-item__delta.is-improved,.pair-value em.is-improved,.eff-delta.is-improved{color:var(--bobcat-positive);background:rgba(21,135,55,.09)}
+.compare-metric__delta.is-worsened,.efficiency-item__delta.is-worsened,.pair-value em.is-worsened,.eff-delta.is-worsened{color:var(--bobcat-danger);background:rgba(153,33,0,.08)}
+.compare-metric__delta.is-flat,.efficiency-item__delta.is-flat,.pair-value em.is-flat,.eff-delta.is-flat{color:var(--bobcat-muted);background:var(--bobcat-light)}
+.compare-metric__current{margin:6px 0 10px;color:var(--bobcat-dark);font-size:26px;font-weight:700;line-height:32px;letter-spacing:-.02em;white-space:nowrap}
+.compare-metric__current small{margin-left:4px;color:var(--bobcat-muted);font-size:12px;font-weight:500}
+.compare-track{display:grid;grid-template-columns:36px minmax(40px,1fr) 50px;align-items:center;gap:7px;height:22px;color:var(--bobcat-muted);font-size:12px}
+.compare-track b{text-align:right;color:var(--bobcat-muted);font-size:12px;font-weight:600}
+.compare-track__rail{height:6px;overflow:hidden;border-radius:3px;background:var(--bobcat-light)}
+.compare-track__rail i{display:block;width:calc(var(--value) * 100%);height:100%;border-radius:inherit;background:var(--bobcat-gray);transform:scaleX(1);transform-origin:left;transition:transform .5s cubic-bezier(.2,.75,.25,1)}
+.compare-track.cur .compare-track__rail i{background:var(--bobcat-red)}
+.compare-track.cur b{color:var(--bobcat-dark)}
+.dashboard-content.is-ready .compare-track__rail i{transform:scaleX(1)}
+
+.efficiency-band{display:grid;grid-template-columns:140px repeat(5,minmax(0,1fr));border-top:1px solid var(--bobcat-steel)}
+.efficiency-title{display:flex;flex-direction:column;justify-content:center;padding:13px 18px}
+.efficiency-title strong{color:var(--bobcat-dark);font-size:14px;line-height:20px}
+.efficiency-title span{margin-top:2px;color:var(--bobcat-muted);font-size:12px;line-height:18px}
+.efficiency-item{min-width:0;padding:12px 14px;border-left:1px solid var(--bobcat-steel)}
+.efficiency-item__label{display:block;overflow:hidden;color:var(--bobcat-dark);font-size:12px;font-weight:600;line-height:18px;text-overflow:ellipsis;white-space:nowrap}
+.efficiency-item__pair{display:flex;align-items:baseline;gap:4px;margin-top:4px;color:var(--bobcat-muted);font-size:12px;line-height:18px;white-space:nowrap}
+.efficiency-item__pair strong{color:var(--bobcat-red-active);font-size:16px}
+.efficiency-item__pair i{color:var(--bobcat-gray);font-style:normal}
+.efficiency-item__delta{display:inline-flex;margin-top:2px;padding:1px 6px;border-radius:10px;color:var(--bobcat-muted);font-size:12px;font-style:normal;font-weight:600;line-height:18px}
+
+/* 그룹별 기간 성과 */
+.performance-subsection+.performance-subsection{border-top:1px solid var(--bobcat-steel)}
+.performance-subhead{display:flex;align-items:center;min-height:40px;padding:0 18px;border-bottom:1px solid var(--bobcat-steel);background:var(--bobcat-light)}
+.performance-subhead h4{color:var(--bobcat-dark);font-size:14px;line-height:20px}
+.performance-subhead span{margin-left:9px;color:var(--bobcat-muted);font-size:12px;line-height:18px}
+.performance-table{width:100%;table-layout:fixed;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.performance-table col:first-child{width:19%}
+.performance-table th,.performance-table td{height:64px;padding:8px 14px;border-bottom:1px solid var(--bobcat-steel);text-align:left}
+.performance-table thead th{height:40px;padding-top:0;padding-bottom:0;background:var(--bobcat-light);color:var(--bobcat-muted);font-size:13px;font-weight:600;line-height:18px;white-space:nowrap}
+.performance-table thead th:not(:first-child),.performance-table tbody td{border-left:1px solid var(--bobcat-steel)}
+.performance-table tbody tr:last-child th,.performance-table tbody tr:last-child td{border-bottom:0}
+.performance-table tbody tr:hover{background:var(--bobcat-light)}
+.performance-table tbody th{padding-left:18px}
+.performance-table .group-name small{display:block;margin:2px 0 0}
+.pair-value{display:flex;align-items:baseline;gap:5px;color:var(--bobcat-muted);font-size:12px;line-height:18px;white-space:nowrap}
+.pair-value strong{color:var(--bobcat-dark);font-size:14px}
+.pair-value i{color:var(--bobcat-gray);font-style:normal}
+.pair-value small{color:var(--bobcat-muted);font-size:12px}
+.pair-value em{margin-left:auto;padding:1px 6px;border-radius:10px;background:var(--bobcat-light);color:var(--bobcat-muted);font-size:12px;font-style:normal;font-weight:700;line-height:18px}
+.micro-compare{display:grid;gap:3px;margin-top:6px}
+.micro-compare span{height:4px;overflow:hidden;border-radius:2px;background:var(--bobcat-light)}
+.micro-compare i{display:block;width:calc(var(--value) * 100%);height:100%;border-radius:inherit;background:var(--bobcat-gray);transform:scaleX(1);transform-origin:left;transition:transform .5s cubic-bezier(.2,.75,.25,1)}
+.micro-compare .cur i{background:var(--bobcat-red)}
+.dashboard-content.is-ready .micro-compare i{transform:scaleX(1)}
+.eff-pair{display:flex;align-items:baseline;gap:5px;color:var(--bobcat-muted);font-size:12px;line-height:18px;white-space:nowrap}
+.eff-pair strong{color:var(--bobcat-dark);font-size:14px}
+.eff-pair i{color:var(--bobcat-gray);font-style:normal}
+.eff-pair small{color:var(--bobcat-muted);font-size:12px}
+.eff-delta{display:inline-flex;margin-top:4px;padding:1px 6px;border-radius:10px;color:var(--bobcat-muted);font-size:12px;font-weight:600;line-height:18px;white-space:nowrap}
+
+.dashboard-content.is-animating:not(.is-ready) .status-metric__track i,
+.dashboard-content.is-animating:not(.is-ready) .matrix-rate__track i,
+.dashboard-content.is-animating:not(.is-ready) .compare-track__rail i,
+.dashboard-content.is-animating:not(.is-ready) .micro-compare i{transform:scaleX(0)}
+.motion-row{opacity:1;transform:none}
+.dashboard-content.is-animating:not(.is-ready) .motion-row{opacity:.72;transform:translateY(3px)}
+.dashboard-content.is-ready .motion-row{opacity:1;transform:none;transition:opacity .22s ease var(--delay,0s),transform .22s ease var(--delay,0s)}
+
+@keyframes livePulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+@container dashboard-content (max-width:1100px){
+  .live-summary{grid-template-columns:140px repeat(2,minmax(0,1fr))}
+  .live-summary .maintenance{display:grid;grid-column:1/-1;grid-template-columns:140px minmax(0,1fr);align-items:center;border-top:1px solid var(--bobcat-steel);border-left:0}
+  .live-summary .maintenance__items{margin-top:0}
+  .usage-compare-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .compare-metric:nth-child(3){border-top:1px solid var(--bobcat-steel);border-left:0}
+  .compare-metric:nth-child(4){border-top:1px solid var(--bobcat-steel)}
+  .efficiency-band{grid-template-columns:120px repeat(5,minmax(0,1fr))}
+  .efficiency-item{padding-inline:10px}
+  .group-matrix col:first-child,.performance-table col:first-child{width:17%}
+  .group-matrix th,.group-matrix td{padding-inline:6px}
+  .performance-table th,.performance-table td{padding-inline:9px}
+}
+
+@container dashboard-content (max-width:820px){
+  .dashboard-titlebar{flex-wrap:wrap}
+  .section-heading{align-items:flex-start;flex-direction:column}
+  .section-heading__actions{width:100%;margin-left:0}
+  .filter-bar{flex-wrap:wrap}
+  .live-summary{grid-template-columns:1fr}
+  .live-summary>div+div{border-top:1px solid var(--bobcat-steel);border-left:0}
+  .live-summary .maintenance{grid-column:auto}
+  .usage-compare-grid{grid-template-columns:1fr}
+  .compare-metric+.compare-metric{border-top:1px solid var(--bobcat-steel);border-left:0}
+  .efficiency-band{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .efficiency-title{grid-column:1/-1;border-bottom:1px solid var(--bobcat-steel)}
+  .efficiency-item:nth-child(even){border-left:0}
+  .dashboard-panel--scroll{overflow-x:auto}
+  .group-matrix,.performance-table{min-width:860px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .live-chip::before{animation:none}
+  .motion-row{opacity:1;transform:none}
+}
+</style>
+<link rel="stylesheet" href="../_shared/content-system.css?v=20260902-readability"/>
+<link rel="stylesheet" href="../_shared/dashboard-deeplinks.css?v=20260902"/>
+<link rel="stylesheet" href="../_shared/chart-common.css"/>
+<link rel="stylesheet" href="../_shared/dashboard-view-tabs.css"/>
+<link rel="stylesheet" href="../_shared/dashboard-company-browser.css"/>
+</head>
+<body data-period-presets="dwm" class="miq-content-system miq-content-dashboard" data-gnb="dash" data-sub="group" data-variant="tobe" data-base="../">
+
+<div id="gnb"></div>
+
+<div class="layout">
+  <main class="main dashboard-main">
+    <div class="dashboard-content miq-content-frame is-ready" id="dashboardContent">
+      <header class="dashboard-titlebar">
+        <h1 class="miq-page-title">대시보드</h1>
+        <span class="live-chip">LIVE</span>
+        <span class="dashboard-updated">2026-07-06 14:30 기준</span>
+      </header>
+
+      <div class="tabs dashboard-view-tabs" role="tablist" aria-label="대시보드 보기" hidden>
+        <button type="button" id="dashboardLiveTab" role="tab" data-dashboard-view="live" aria-controls="dashboardLivePanel" aria-selected="true" tabindex="0" class="active">실시간</button>
+        <button type="button" id="dashboardPeriodTab" role="tab" data-dashboard-view="period" aria-controls="dashboardPeriodPanel" aria-selected="false" tabindex="-1">기간별 누적현황</button>
+      </div>
+
+      <div class="dashboard-stack">
+        <section class="dashboard-section dashboard-live" aria-labelledby="liveHeading">
+          <div class="section-heading">
+            <h2 id="liveHeading">금일 실시간 현황</h2>
+            <p>전체 보유 차량의 연결·가동·정비 상태</p>
+          </div>
+
+          <div class="dashboard-panel live-summary miq-overview-grid motion-row" style="--delay:.02s">
+            <div class="fleet-total miq-metric-group">
+              <span class="fleet-total__label">전체 보유 차량</span>
+              <div class="fleet-total__value"><strong class="miq-number">42</strong><span>대</span></div>
+              <span class="fleet-total__meta">3개 그룹 합계</span>
+            </div>
+
+            <div class="status-metric miq-metric-group">
+              <div class="status-metric__head">
+                <span class="status-metric__label">통신 연결</span>
+                <strong class="status-metric__rate miq-number">86%</strong>
+              </div>
+              <div class="status-metric__track" aria-label="42대 중 36대 연결"><i class="on" style="--value:.86"></i></div>
+              <div class="status-metric__details">
+                <span><b class="miq-number">36</b> 연결</span>
+                <span class="muted"><b class="miq-number">6</b> 미연결</span>
+              </div>
+            </div>
+
+            <div class="status-metric miq-metric-group">
+              <div class="status-metric__head">
+                <span class="status-metric__label">차량 가동</span>
+                <strong class="status-metric__rate miq-number">66%</strong>
+              </div>
+              <div class="status-metric__track" aria-label="36대 중 24대 정상 가동"><i class="run rate" style="--value:.66"></i></div>
+              <div class="status-metric__details">
+                <span><b class="miq-number">24</b> 정상 가동</span>
+                <span class="muted"><b class="miq-number">12</b> 유휴</span>
+              </div>
+            </div>
+
+            <div class="maintenance miq-metric-group">
+              <span class="maintenance__label">정비 현황</span>
+              <div class="maintenance__items">
+                <div class="maintenance-item fault">
+                  <div class="maintenance-item__value"><span class="maintenance-item__dot"></span><strong class="miq-number">2</strong></div>
+                  <span class="maintenance-item__name">고장 현황</span>
+                  <span class="maintenance-item__meta">즉시 확인</span>
+                </div>
+                <div class="maintenance-item need">
+                  <div class="maintenance-item__value"><span class="maintenance-item__dot"></span><strong class="miq-number">3</strong></div>
+                  <span class="maintenance-item__name">교체 필요</span>
+                  <span class="maintenance-item__meta">소모품</span>
+                </div>
+                <div class="maintenance-item soon">
+                  <div class="maintenance-item__value"><span class="maintenance-item__dot"></span><strong class="miq-number">5</strong></div>
+                  <span class="maintenance-item__name">교체 임박</span>
+                  <span class="maintenance-item__meta">소모품</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboard-panel dashboard-panel--scroll motion-row" style="--delay:.06s">
+            <table class="group-matrix" aria-label="그룹별 실시간 차량 현황">
+              <colgroup>
+                <col/><col/><col/><col/><col/><col/><col/><col/><col/><col/>
+              </colgroup>
+              <thead>
+                <tr>
+                  <th rowspan="2" scope="col">그룹</th>
+                  <th colspan="3" scope="colgroup">통신</th>
+                  <th colspan="3" scope="colgroup">가동</th>
+                  <th colspan="3" scope="colgroup">정비</th>
+                </tr>
+                <tr>
+                  <th scope="col">보유</th>
+                  <th scope="col">연결</th>
+                  <th scope="col">미연결</th>
+                  <th scope="col">가동</th>
+                  <th scope="col">유휴</th>
+                  <th scope="col">가동율</th>
+                  <th scope="col">고장</th>
+                  <th scope="col">교체 필요</th>
+                  <th scope="col">교체 임박</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row"><span class="group-name">그룹1 <small>기본그룹</small></span></th>
+                  <td><span class="matrix-number miq-number">18</span></td>
+                  <td><span class="matrix-number on miq-number">16</span></td>
+                  <td><span class="matrix-number off miq-number">2</span></td>
+                  <td><span class="matrix-number run miq-number">11</span></td>
+                  <td><span class="matrix-number idle miq-number">5</span></td>
+                  <td><span class="matrix-rate rate"><b class="miq-number">69%</b><span class="matrix-rate__track"><i style="--value:.69"></i></span></span></td>
+                  <td><span class="matrix-number fault"><i class="matrix-signal"></i><b class="miq-number">1</b></span></td>
+                  <td><span class="matrix-number need"><i class="matrix-signal"></i><b class="miq-number">2</b></span></td>
+                  <td><span class="matrix-number soon"><i class="matrix-signal warning"></i><b class="miq-number">2</b></span></td>
+                </tr>
+                <tr>
+                  <th scope="row"><span class="group-name">그룹2 <small>테스트그룹</small></span></th>
+                  <td><span class="matrix-number miq-number">14</span></td>
+                  <td><span class="matrix-number on miq-number">12</span></td>
+                  <td><span class="matrix-number off miq-number">2</span></td>
+                  <td><span class="matrix-number run miq-number">8</span></td>
+                  <td><span class="matrix-number idle miq-number">4</span></td>
+                  <td><span class="matrix-rate rate"><b class="miq-number">67%</b><span class="matrix-rate__track"><i style="--value:.67"></i></span></span></td>
+                  <td><span class="matrix-number fault"><i class="matrix-signal"></i><b class="miq-number">1</b></span></td>
+                  <td><span class="matrix-number need"><i class="matrix-signal"></i><b class="miq-number">1</b></span></td>
+                  <td><span class="matrix-number soon"><i class="matrix-signal warning"></i><b class="miq-number">2</b></span></td>
+                </tr>
+                <tr>
+                  <th scope="row"><span class="group-name">그룹3 <small>물류1팀</small></span></th>
+                  <td><span class="matrix-number miq-number">10</span></td>
+                  <td><span class="matrix-number on miq-number">8</span></td>
+                  <td><span class="matrix-number off miq-number">2</span></td>
+                  <td><span class="matrix-number run miq-number">5</span></td>
+                  <td><span class="matrix-number idle miq-number">3</span></td>
+                  <td><span class="matrix-rate rate"><b class="miq-number">62%</b><span class="matrix-rate__track"><i style="--value:.62"></i></span></span></td>
+                  <td><span class="matrix-number fault"><b class="miq-number">0</b></span></td>
+                  <td><span class="matrix-number need"><b class="miq-number">0</b></span></td>
+                  <td><span class="matrix-number soon"><i class="matrix-signal warning"></i><b class="miq-number">1</b></span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="dashboard-section dashboard-period" aria-labelledby="periodHeading">
+          <div class="section-heading period-heading">
+            <div>
+              <h2 id="periodHeading">기간별 누적 현황</h2>
+            </div>
+            <div class="section-heading__actions filter-bar">
+              <div class="period-tabs" role="group" aria-label="조회 기간 단위">
+                <button type="button">일</button>
+                <button type="button">주</button>
+                <button type="button" class="active">월</button>
+                </div>
+              <div class="date-range">2026-07-01 ~ 2026-07-06</div>
+              <button type="button" class="btn-search miq-button miq-button--primary">조회</button>
+            </div>
+          </div>
+
+          <div class="dashboard-panel motion-row" style="--delay:.08s">
+            <div class="panel-heading">
+              <h3>전체 보유 차량</h3>
+              <p>전월 대비 금월 누적값</p>
+              <span class="panel-heading__meta">단위별 절대값 비교</span>
+            </div>
+
+            <div class="usage-compare-grid">
+              <article class="compare-metric">
+                <div class="compare-metric__head">
+                  <span class="compare-metric__label">운행거리</span>
+                  <em class="compare-metric__delta up is-improved">+14.8%</em>
+                </div>
+                <div class="compare-metric__current miq-number">3,420<small>Km</small></div>
+                <div class="compare-track prev"><span>전월</span><span class="compare-track__rail"><i style="--value:.72"></i></span><b class="miq-number">2,980</b></div>
+                <div class="compare-track cur"><span>금월</span><span class="compare-track__rail"><i style="--value:.88"></i></span><b class="miq-number">3,420</b></div>
+              </article>
+              <article class="compare-metric">
+                <div class="compare-metric__head">
+                  <span class="compare-metric__label">운행시간</span>
+                  <em class="compare-metric__delta up is-improved">+3.3%</em>
+                </div>
+                <div class="compare-metric__current miq-number">2,170<small>H</small></div>
+                <div class="compare-track prev"><span>전월</span><span class="compare-track__rail"><i style="--value:.80"></i></span><b class="miq-number">2,100</b></div>
+                <div class="compare-track cur"><span>금월</span><span class="compare-track__rail"><i style="--value:.84"></i></span><b class="miq-number">2,170</b></div>
+              </article>
+              <article class="compare-metric">
+                <div class="compare-metric__head">
+                  <span class="compare-metric__label">연료소비량</span>
+                  <em class="compare-metric__delta down is-improved">−12.9%</em>
+                </div>
+                <div class="compare-metric__current miq-number">1,080<small>ℓ</small></div>
+                <div class="compare-track prev"><span>전월</span><span class="compare-track__rail"><i style="--value:.90"></i></span><b class="miq-number">1,240</b></div>
+                <div class="compare-track cur"><span>금월</span><span class="compare-track__rail"><i style="--value:.78"></i></span><b class="miq-number">1,080</b></div>
+              </article>
+              <article class="compare-metric">
+                <div class="compare-metric__head">
+                  <span class="compare-metric__label">배터리소비량</span>
+                  <em class="compare-metric__delta up is-worsened">+12.5%</em>
+                </div>
+                <div class="compare-metric__current miq-number">720<small>kWh</small></div>
+                <div class="compare-track prev"><span>전월</span><span class="compare-track__rail"><i style="--value:.60"></i></span><b class="miq-number">640</b></div>
+                <div class="compare-track cur"><span>금월</span><span class="compare-track__rail"><i style="--value:.68"></i></span><b class="miq-number">720</b></div>
+              </article>
+            </div>
+
+            <div class="efficiency-band">
+              <div class="efficiency-title">
+                <strong>대당 효율</strong>
+                <span>전월 → 금월</span>
+              </div>
+              <div class="efficiency-item">
+                <span class="efficiency-item__label">대당 이동거리</span>
+                <span class="efficiency-item__pair prev"><span>77</span><i>→</i><strong class="cur">81</strong><span>Km</span></span>
+                <em class="efficiency-item__delta up is-improved">▲ 5.2%</em>
+              </div>
+              <div class="efficiency-item">
+                <span class="efficiency-item__label">대당 가동시간</span>
+                <span class="efficiency-item__pair prev"><span>50</span><i>→</i><strong class="cur">51</strong><span>H</span></span>
+                <em class="efficiency-item__delta up is-improved">▲ 1.8%</em>
+              </div>
+              <div class="efficiency-item">
+                <span class="efficiency-item__label">대당 연료소비량</span>
+                <span class="efficiency-item__pair prev"><span>42</span><i>→</i><strong class="cur">41</strong><span>ℓ</span></span>
+                <em class="efficiency-item__delta down is-improved">▼ 3.1%</em>
+              </div>
+              <div class="efficiency-item">
+                <span class="efficiency-item__label">대당 배터리소비량</span>
+                <span class="efficiency-item__pair prev"><span>44</span><i>→</i><strong class="cur">45</strong><span>kWh</span></span>
+                <em class="efficiency-item__delta up is-worsened">▲ 2.4%</em>
+              </div>
+              <div class="efficiency-item hl">
+                <span class="efficiency-item__label">평균 운영효율</span>
+                <span class="efficiency-item__pair prev"><span>66</span><i>→</i><strong class="cur">67</strong><span>%</span></span>
+                <em class="efficiency-item__delta up is-improved">▲ 1.2%p</em>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboard-panel dashboard-panel--scroll motion-row" style="--delay:.12s">
+            <div class="performance-subsection">
+              <div class="performance-subhead"><h4>누적 사용량</h4><span>막대 위: 전월 · 아래: 금월</span></div>
+              <table class="performance-table" aria-label="그룹별 누적 사용량">
+                <colgroup><col/><col/><col/><col/><col/></colgroup>
+                <thead>
+                  <tr>
+                    <th scope="col">그룹</th>
+                    <th scope="col">운행거리</th>
+                    <th scope="col">운행시간</th>
+                    <th scope="col">연료소비량</th>
+                    <th scope="col">배터리소비량</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row"><span class="group-name">그룹1 <small>기본그룹</small></span></th>
+                    <td><div class="pair-value"><span>1,300</span><i>→</i><strong>1,480</strong><small>Km</small><em class="up is-improved">+13.8%</em></div><div class="micro-compare"><span class="prev"><i style="--value:.75"></i></span><span class="cur"><i style="--value:.86"></i></span></div></td>
+                    <td><div class="pair-value"><span>920</span><i>→</i><strong>960</strong><small>H</small><em class="up is-improved">+4.3%</em></div><div class="micro-compare"><span class="prev"><i style="--value:.82"></i></span><span class="cur"><i style="--value:.86"></i></span></div></td>
+                    <td><div class="pair-value"><span>560</span><i>→</i><strong>500</strong><small>ℓ</small><em class="down is-improved">−10.7%</em></div><div class="micro-compare"><span class="prev"><i style="--value:.88"></i></span><span class="cur"><i style="--value:.78"></i></span></div></td>
+                    <td><div class="pair-value"><span>280</span><i>→</i><strong>320</strong><small>kWh</small><em class="up is-worsened">+14.3%</em></div><div class="micro-compare"><span class="prev"><i style="--value:.62"></i></span><span class="cur"><i style="--value:.70"></i></span></div></td>
+                  </tr>
+                  <tr>
+                    <th scope="row"><span class="group-name">그룹2 <small>테스트그룹</small></span></th>
+                    <td><div class="pair-value"><span>980</span><i>→</i><strong>1,120</strong><small>Km</small><em class="up is-improved">+14.3%</em></div><div class="micro-compare"><span class="prev"><i style="--value:.70"></i></span><span class="cur"><i style="--value:.84"></i></span></div></td>
+                    <td><div class="pair-value"><span>720</span><i>→</i><strong>740</strong><small>H</small><em class="up is-improved">+2.8%</em></div><div class="micro-compare"><span class="prev"><i style="--value:.78"></i></span><span class="cur"><i style="--value:.82"></i></span></div></td>
+                    <td><div class="pair-value"><span>440</span><i>→</i><strong>400</strong><small>ℓ</small><em class="down is-improved">−9.1%</em></div><div class="micro-compare"><span class="prev"><i style="--value:.90"></i></span><span class="cur"><i style="--value:.80"></i></span></div></td>
+                    <td><div class="pair-value"><span>240</span><i>→</i><strong>280</strong><small>kWh</small><em class="up is-worsened">+16.7%</em></div><div class="micro-compare"><span class="prev"><i style="--value:.58"></i></span><span class="cur"><i style="--value:.66"></i></span></div></td>
+                  </tr>
+                  <tr>
+                    <th scope="row"><span class="group-name">그룹3 <small>물류1팀</small></span></th>
+                    <td><div class="pair-value"><span>700</span><i>→</i><strong>820</strong><small>Km</small><em class="up is-improved">+17.1%</em></div><div class="micro-compare"><span class="prev"><i style="--value:.74"></i></span><span class="cur"><i style="--value:.86"></i></span></div></td>
+                    <td><div class="pair-value"><span>460</span><i>→</i><strong>470</strong><small>H</small><em class="up is-improved">+2.2%</em></div><div class="micro-compare"><span class="prev"><i style="--value:.80"></i></span><span class="cur"><i style="--value:.82"></i></span></div></td>
+                    <td><div class="pair-value"><span>240</span><i>→</i><strong>180</strong><small>ℓ</small><em class="down is-improved">−25.0%</em></div><div class="micro-compare"><span class="prev"><i style="--value:.85"></i></span><span class="cur"><i style="--value:.64"></i></span></div></td>
+                    <td><div class="pair-value"><span>120</span><i>→</i><strong>120</strong><small>kWh</small><em class="flat is-flat">동일 0.0%</em></div><div class="micro-compare" role="img" aria-label="그룹3 배터리소비량은 전월과 금월 모두 120킬로와트시로 동일"><span class="prev"><i style="--value:.55"></i></span><span class="cur"><i style="--value:.55"></i></span></div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="performance-subsection">
+              <div class="performance-subhead"><h4>대당 효율</h4><span>증감 방향은 원본 집계값 유지</span></div>
+              <table class="performance-table efficiency-table" aria-label="그룹별 대당 효율">
+                <colgroup><col/><col/><col/><col/><col/><col/></colgroup>
+                <thead>
+                  <tr>
+                    <th scope="col">그룹</th>
+                    <th scope="col">대당 이동거리</th>
+                    <th scope="col">대당 가동시간</th>
+                    <th scope="col">대당 연료소비량</th>
+                    <th scope="col">대당 배터리소비량</th>
+                    <th scope="col">평균 운영효율</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row"><span class="group-name">그룹1 <small>기본그룹</small></span></th>
+                    <td><div class="eff-pair"><span>77</span><i>→</i><strong>82</strong><small>Km</small></div><div class="eff-delta up is-improved">▲ 6.0%</div></td>
+                    <td><div class="eff-pair"><span>52</span><i>→</i><strong>53</strong><small>H</small></div><div class="eff-delta up is-improved">▲ 2.1%</div></td>
+                    <td><div class="eff-pair"><span>41</span><i>→</i><strong>39</strong><small>ℓ</small></div><div class="eff-delta down is-improved">▼ 4.0%</div></td>
+                    <td><div class="eff-pair"><span>43</span><i>→</i><strong>44</strong><small>kWh</small></div><div class="eff-delta up is-worsened">▲ 1.6%</div></td>
+                    <td class="hl"><div class="eff-pair"><span>67</span><i>→</i><strong>69</strong><small>%</small></div><div class="eff-delta up is-improved">▲ 2.0%p</div></td>
+                  </tr>
+                  <tr>
+                    <th scope="row"><span class="group-name">그룹2 <small>테스트그룹</small></span></th>
+                    <td><div class="eff-pair"><span>76</span><i>→</i><strong>80</strong><small>Km</small></div><div class="eff-delta up is-improved">▲ 4.5%</div></td>
+                    <td><div class="eff-pair"><span>52</span><i>→</i><strong>53</strong><small>H</small></div><div class="eff-delta up is-improved">▲ 1.2%</div></td>
+                    <td><div class="eff-pair"><span>44</span><i>→</i><strong>43</strong><small>ℓ</small></div><div class="eff-delta down is-improved">▼ 2.4%</div></td>
+                    <td><div class="eff-pair"><span>46</span><i>→</i><strong>47</strong><small>kWh</small></div><div class="eff-delta up is-worsened">▲ 3.0%</div></td>
+                    <td class="hl"><div class="eff-pair"><span>67.4</span><i>→</i><strong>66.9</strong><small>%</small></div><div class="eff-delta down is-worsened">▼ 0.5%p</div></td>
+                  </tr>
+                  <tr>
+                    <th scope="row"><span class="group-name">그룹3 <small>물류1팀</small></span></th>
+                    <td><div class="eff-pair"><span>76</span><i>→</i><strong>82</strong><small>Km</small></div><div class="eff-delta up is-improved">▲ 7.1%</div></td>
+                    <td><div class="eff-pair"><span>46.9</span><i>→</i><strong>47.3</strong><small>H</small></div><div class="eff-delta up is-improved">▲ 0.8%</div></td>
+                    <td><div class="eff-pair"><span>38</span><i>→</i><strong>36</strong><small>ℓ</small></div><div class="eff-delta down is-improved">▼ 5.0%</div></td>
+                    <td><div class="eff-pair"><span>40</span><i>→</i><strong>40</strong><small>kWh</small></div><div class="eff-delta flat is-flat">동일 0.0%</div></td>
+                    <td class="hl"><div class="eff-pair"><span>61</span><i>→</i><strong>62</strong><small>%</small></div><div class="eff-delta up is-improved">▲ 0.9%p</div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../_mock-data/generated/fleet.generated.js?v=20260906-dashboard-role-company-r1"></script>
+<script src="../_shared/meeting-model.js"></script>
+<script src="../_shared/common-logic.js?v=20260907-common-logic-r42"></script>
+<script src="../_shared/chart-common.js"></script>
+<script src="../_shared/nav.js?v=20260907-common-logic-r42"></script>
+<script src="../_shared/dashboard-deeplinks.js?v=20260907-common-logic-r42"></script>
+<script>
+(function(){
+  var content=document.getElementById('dashboardContent');
+  if(!content)return;
+  function play(){
+    content.classList.add('is-animating');
+    content.classList.remove('is-ready');
+    void content.offsetWidth;
+    setTimeout(function(){content.classList.add('is-ready')},24);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',play,{once:true});
+  else play();
+  window.addEventListener('miq:period-change',play);
+})();
+</script>
+<script src="../_shared/dashboard-hourly.js"></script>
+<script src="../_shared/dashboard-chart-details.js"></script>
+<script src="../_shared/dashboard-view-tabs.js"></script>
+<script src="../_shared/dashboard-company-model.js"></script>
+<script src="../_shared/dashboard-company-browser.js"></script>
+</body>
+</html>

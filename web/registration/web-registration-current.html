@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>회원가입 (Web Fleet Portal) - 현재 버전 AS-IS</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&amp;display=swap"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{font-size:1px}
+body{font-family:'Noto Sans KR',sans-serif;font-size:16px;background:#f5f5f5;color:#000;min-height:100vh}
+button,input,select,textarea{font-family:'Noto Sans KR',sans-serif}
+
+/* === GNB Header === */
+.gnb{height:56px;background:#ff3600;display:flex;align-items:center;padding:0 24px;gap:16px;position:sticky;top:0;z-index:100}
+.gnb__logo{color:#fff;font-size:18px;font-weight:700;letter-spacing:1px}
+.gnb__logo svg{fill:#fff;vertical-align:middle;margin-right:8px}
+.gnb__spacer{flex:1}
+.gnb__lang{background:none;border:1px solid rgba(255,255,255,0.5);color:#fff;font-size:12px;padding:4px 10px;border-radius:3px;cursor:pointer}
+
+/* === Layout === */
+.layout{display:flex;min-height:calc(100vh - 56px)}
+.content-area{flex:1;padding:40px;overflow-y:auto}
+.content-inner{max-width:1000px;margin:0 auto}
+
+/* === AS-IS Banner === */
+.asis-banner{background:#fff8e1;border:1px solid #ffe082;border-radius:4px;padding:10px 16px;margin-bottom:32px;font-size:13px;color:#795548;display:flex;align-items:center;gap:8px}
+.asis-badge{background:#795548;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:3px;white-space:nowrap}
+
+/* === Section Top === */
+.section-top{margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #000}
+.section-top__title{font-size:16px;font-weight:700;color:#000}
+
+/* === NForm Grid === */
+.n-form{display:grid;gap:16px 24px;margin-bottom:24px}
+.n-form.col-2{grid-template-columns:1fr 1fr}
+.n-form.col-1{grid-template-columns:1fr}
+.n-form__item{display:flex;flex-direction:column;gap:6px}
+.n-form__item.span-2{grid-column:span 2}
+.n-form__label{font-size:13px;font-weight:600;color:#333}
+.n-form__control{display:flex;gap:8px;align-items:center}
+.n-form__message{font-size:12px;color:#0185fc;margin-top:2px}
+
+/* === NInput === */
+.n-input{display:flex;align-items:center;height:36px;border:1px solid #dfdfdf;border-radius:4px;background:#fff;overflow:hidden;flex:1;transition:border-color 0.15s}
+.n-input:hover{border-color:#000}
+.n-input:focus-within{border-color:#c02801}
+.n-input input{flex:1;height:100%;padding:0 12px;border:none;outline:none;background:transparent;font-size:14px;color:#000}
+.n-input input::placeholder{color:#999}
+.n-input.disabled{background:#f3f3f3;border-color:#dfdfdf}
+.n-input.disabled input{color:#ccc}
+
+/* === 사업자번호 3-2-5 === */
+.regno-wrap{display:flex;align-items:center;gap:4px;flex:1}
+.regno-sep{color:#666;font-size:14px;font-weight:600}
+.n-input.regno{width:80px;flex:none}
+.n-input.regno2{width:60px;flex:none}
+.n-input.regno3{width:100px;flex:none}
+
+/* === CustomButton === */
+.custom-btn{display:inline-flex;align-items:center;justify-content:center;border:none;border-radius:4px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;transition:background 0.15s;font-size:14px;height:36px;padding:0 16px}
+.custom-btn.sm{height:32px;padding:0 12px;font-size:13px}
+.custom-btn.black{background:#000;color:#fff}
+.custom-btn.black:hover{background:#333}
+.custom-btn.gray-lined{background:#fff;border:1px solid #dfdfdf;color:#333}
+.custom-btn.gray-lined:hover{border-color:#000}
+.custom-btn.gray-lined:disabled{background:#f3f3f3;color:#ccc;cursor:not-allowed;border-color:#dfdfdf}
+.custom-btn.black-lined{background:#fff;border:1px solid #000;color:#000}
+.custom-btn.black-lined:hover{background:#f5f5f5}
+
+/* === NCheckBox === */
+.n-checkbox{display:inline-flex;align-items:flex-start;gap:8px;cursor:pointer;font-size:14px;line-height:1.5}
+.n-checkbox input[type=checkbox]{position:absolute;opacity:0;width:0;height:0}
+.n-checkbox__box{width:20px;height:20px;flex-shrink:0;border:1px solid #dfdfdf;border-radius:3px;background:#fff;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:background 0.15s,border-color 0.15s}
+.n-checkbox input:checked+.n-checkbox__box{background:#ff3600;border-color:#ff3600}
+.n-checkbox input:checked+.n-checkbox__box::after{content:'';display:block;width:10px;height:6px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translateY(-1px)}
+.n-checkbox__text{flex:1}
+.n-checkbox__text.bold{font-weight:700}
+
+/* === Agree Items === */
+.agree-all{margin-bottom:8px;padding:14px 16px;background:#f9f9f9;border-radius:4px}
+.agree-items{border-top:1px solid #000;margin-top:12px}
+.agree-item{border-bottom:1px solid #eaeaea}
+.agree-item__title{display:flex;align-items:center;justify-content:space-between;padding:14px 16px}
+.agree-item__toggle{background:none;border:none;cursor:pointer;font-size:13px;color:#333;display:flex;align-items:center;gap:4px;white-space:nowrap}
+.agree-item__toggle svg{transition:transform 0.2s}
+.agree-item[data-opened=true] .agree-item__toggle svg{transform:rotate(180deg)}
+.agree-item__content{display:none;padding:16px 20px;background:#f9f9f9;font-size:13px;color:#666;line-height:1.7;border-top:1px solid #eaeaea}
+.agree-item[data-opened=true] .agree-item__content{display:block}
+.agree-item__content strong{display:block;margin-bottom:8px;color:#333;font-size:14px}
+.agree-item__content p{margin-bottom:10px}
+.agree-item__content dt{font-weight:600;color:#333;margin-top:8px;padding-left:10px;position:relative}
+.agree-item__content dt::before{content:'';position:absolute;left:0;top:8px;width:3px;height:3px;background:#666;border-radius:50%}
+.agree-item__content dd{padding-left:10px;color:#666}
+
+/* === Radio Group === */
+.radio-group{display:flex;flex-wrap:wrap;gap:8px}
+.radio-item{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;padding:8px 14px;border:1px solid #dfdfdf;border-radius:4px;transition:border-color 0.15s,background 0.15s}
+.radio-item:hover{border-color:#000}
+.radio-item input[type=radio]{position:absolute;opacity:0;width:0;height:0}
+.radio-item.checked{border-color:#ff3600;background:#fff5f3;color:#c02801;font-weight:600}
+
+/* === Address === */
+.address-wrap{display:flex;flex-direction:column;gap:8px;flex:1}
+
+/* === Page Tabs === */
+.page-tabs{display:flex;gap:0;margin-bottom:32px;border-bottom:2px solid #eaeaea}
+.page-tab{padding:12px 24px;font-size:14px;font-weight:600;color:#999;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color 0.15s}
+.page-tab.active{color:#ff3600;border-bottom-color:#ff3600}
+.page-tab:hover{color:#333}
+
+/* === Join Article === */
+.join-article+.join-article{margin-top:48px;padding-top:48px;border-top:1px solid #eaeaea}
+
+/* === Foot === */
+.join-foot{display:flex;gap:8px;justify-content:center;margin-top:40px;padding-top:24px;border-top:1px solid #eaeaea}
+.agree-foot{display:flex;gap:8px;justify-content:center;margin-top:24px}
+
+/* === InputTelNumber === */
+.tel-input{display:flex;align-items:center;height:36px;border:1px solid #dfdfdf;border-radius:4px;background:#fff;overflow:hidden;flex:1;transition:border-color 0.15s}
+.tel-input:hover{border-color:#000}
+.tel-input:focus-within{border-color:#c02801}
+.tel-input input{flex:1;height:100%;padding:0 12px;border:none;outline:none;background:transparent;font-size:14px;color:#000}
+.tel-input input::placeholder{color:#999}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- GNB -->
+<header class="gnb">
+  <div class="gnb__logo">
+    <svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="white"/><path d="M8 12l3 3 5-5" stroke="#ff3600" stroke-width="2" fill="none"/></svg>
+    MachineIQ
+  </div>
+  <div class="gnb__spacer"></div>
+  <button class="gnb__lang">KO</button>
+</header>
+
+<div class="layout">
+  <!-- Content -->
+  <div class="content-area">
+    <div class="content-inner">
+
+      <!-- AS-IS 배너 -->
+      <div class="asis-banner">
+        <span class="asis-badge">AS-IS (Web)</span>
+        현재 Fleet Portal 회원가입 — 한국 전용 (Daum Postcode, 사업자번호 3-2-5, 한국 전화번호)
+      </div>
+
+      <!-- 페이지 탭: 약관동의 / 회원가입 -->
+      <div class="page-tabs">
+        <div class="page-tab active" onclick="showTab('agree')">약관 동의</div>
+        <div class="page-tab" onclick="showTab('join')">회원가입 폼</div>
+      </div>
+
+      <!-- ========== TAB 1: 약관 동의 (AgreeView) ========== -->
+      <div id="tab-agree">
+        <div class="section-top">
+          <p class="section-top__title">약관 동의</p>
+        </div>
+
+        <!-- 전체동의 -->
+        <div class="agree-all">
+          <label class="n-checkbox">
+            <input type="checkbox" id="agreeAll" onchange="toggleAll(this.checked)"/>
+            <span class="n-checkbox__box"></span>
+            <span class="n-checkbox__text bold">[전체동의] 회원가입 약관에 모두 동의합니다.</span>
+          </label>
+        </div>
+
+        <!-- 약관 목록 -->
+        <div class="agree-items">
+          <div class="agree-item" id="t1-wrap">
+            <div class="agree-item__title">
+              <label class="n-checkbox">
+                <input type="checkbox" class="term-chk" data-key="t1" onchange="onTermChange()"/>
+                <span class="n-checkbox__box"></span>
+                <span class="n-checkbox__text">개인정보 수집 및 이용 (필수)</span>
+              </label>
+              <button class="agree-item__toggle" onclick="toggleTerm('t1')">
+                열기 <svg width="16" height="16" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z" fill="#333"/></svg>
+              </button>
+            </div>
+            <div class="agree-item__content">
+              <strong>개인정보 수집 및 이용 (필수)</strong>
+              <p>두산밥캣코리아 주식회사가 제공하는 Machine IQ 서비스와 관련하여 개인정보의 수집·이용·위탁 등과 관련된 내용을 안내 드립니다.</p>
+              <dl><dt>수집 및 이용항목</dt><dd>성명, 연락처, 차대번호, 물류장비의 운행 및 상태 관련 정보, 위치정보</dd>
+              <dt>수집 및 이용목적</dt><dd>TMS서비스 이용계약 체결, 서비스 제공, 고객문의 응대</dd>
+              <dt>보유 및 이용기간</dt><dd>TMS 서비스 계약 종료 후 3개월까지</dd></dl>
+            </div>
+          </div>
+
+          <div class="agree-item" id="t2-wrap">
+            <div class="agree-item__title">
+              <label class="n-checkbox">
+                <input type="checkbox" class="term-chk" data-key="t2" onchange="onTermChange()"/>
+                <span class="n-checkbox__box"></span>
+                <span class="n-checkbox__text">개인 (위치) 정보의 제3자 제공 (필수)</span>
+              </label>
+              <button class="agree-item__toggle" onclick="toggleTerm('t2')">열기 <svg width="16" height="16" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z" fill="#333"/></svg></button>
+            </div>
+            <div class="agree-item__content"><strong>개인(위치) 정보의 제3자 제공 (필수)</strong><p>서비스 제공을 위하여 최소한의 개인정보 수집 및 이용 동의가 필요합니다.</p></div>
+          </div>
+
+          <div class="agree-item" id="t3-wrap">
+            <div class="agree-item__title">
+              <label class="n-checkbox">
+                <input type="checkbox" class="term-chk" data-key="t3" onchange="onTermChange()"/>
+                <span class="n-checkbox__box"></span>
+                <span class="n-checkbox__text">개인 (위치) 정보의 처리위탁 (필수)</span>
+              </label>
+              <button class="agree-item__toggle" onclick="toggleTerm('t3')">열기 <svg width="16" height="16" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z" fill="#333"/></svg></button>
+            </div>
+            <div class="agree-item__content"><strong>개인(위치)정보의 처리위탁 (필수)</strong><p>당사는 서비스 제공을 위해 개인(위치)정보를 위탁하고 있습니다.</p></div>
+          </div>
+
+          <div class="agree-item" id="t4-wrap">
+            <div class="agree-item__title">
+              <label class="n-checkbox">
+                <input type="checkbox" class="term-chk" data-key="t4" onchange="onTermChange()"/>
+                <span class="n-checkbox__box"></span>
+                <span class="n-checkbox__text">개인위치 정보의 제3자 제공 통지 방법 (필수)</span>
+              </label>
+              <button class="agree-item__toggle" onclick="toggleTerm('t4')">열기 <svg width="16" height="16" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z" fill="#333"/></svg></button>
+            </div>
+            <div class="agree-item__content"><strong>개인위치 정보의 제3자 제공 통지 방법 (필수)</strong><p>이용자의 개인위치정보를 제3자에게 제공하는 경우 30회 단위로 30일간 모아서 통지합니다.</p></div>
+          </div>
+
+          <div class="agree-item" id="t5-wrap">
+            <div class="agree-item__title">
+              <label class="n-checkbox">
+                <input type="checkbox" class="term-chk" data-key="t5" onchange="onTermChange()"/>
+                <span class="n-checkbox__box"></span>
+                <span class="n-checkbox__text">개인정보 수집 및 이용 (선택)</span>
+              </label>
+              <button class="agree-item__toggle" onclick="toggleTerm('t5')">열기 <svg width="16" height="16" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z" fill="#333"/></svg></button>
+            </div>
+            <div class="agree-item__content"><strong>개인정보 수집 및 이용 (선택)</strong><p>마케팅 및 프로모션 정보 제공을 위한 선택 동의입니다.</p></div>
+          </div>
+
+          <div class="agree-item" id="t6-wrap">
+            <div class="agree-item__title">
+              <label class="n-checkbox">
+                <input type="checkbox" class="term-chk" data-key="t6" onchange="onTermChange()"/>
+                <span class="n-checkbox__box"></span>
+                <span class="n-checkbox__text">마케팅 목적 일반 개인정보 이용 (선택)</span>
+              </label>
+              <button class="agree-item__toggle" onclick="toggleTerm('t6')">열기 <svg width="16" height="16" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z" fill="#333"/></svg></button>
+            </div>
+            <div class="agree-item__content"><strong>마케팅 목적 일반 개인정보 이용 (선택)</strong><p>마케팅 정보 수신 동의는 선택 사항입니다.</p></div>
+          </div>
+        </div>
+
+        <div class="agree-foot">
+          <button class="custom-btn black" onclick="showTab('join')">동의</button>
+          <button class="custom-btn black-lined" onclick="alert('취소')">취소</button>
+        </div>
+      </div>
+
+      <!-- ========== TAB 2: 회원가입 폼 (JoinView) ========== -->
+      <div id="tab-join" style="display:none">
+
+        <!-- 계정 정보 -->
+        <div class="join-article">
+          <div class="section-top"><p class="section-top__title">계정 정보</p></div>
+          <div class="n-form col-2">
+            <div class="n-form__item">
+              <p class="n-form__label">사용자 ID</p>
+              <div class="n-form__control">
+                <div class="n-input"><input type="text" placeholder="사용자 ID를 입력하세요"/></div>
+                <button class="custom-btn gray-lined sm">중복확인</button>
+              </div>
+              <p class="n-form__message">* 6자 이상, 특수문자 및 한글 사용 불가</p>
+            </div>
+            <div class="n-form__item">
+              <p class="n-form__label">이름</p>
+              <div class="n-form__control"><div class="n-input"><input type="text" placeholder="이름을 입력하세요"/></div></div>
+            </div>
+            <div class="n-form__item">
+              <p class="n-form__label">이메일</p>
+              <div class="n-form__control"><div class="n-input"><input type="email" placeholder="이메일을 입력하세요"/></div></div>
+            </div>
+            <div class="n-form__item">
+              <p class="n-form__label">전화번호</p>
+              <div class="n-form__control">
+                <div class="tel-input"><input type="tel" placeholder="'-' 없이 숫자만 입력하세요"/></div>
+              </div>
+            </div>
+            <div class="n-form__item">
+              <p class="n-form__label">비밀번호</p>
+              <div class="n-form__control"><div class="n-input"><input type="password"/></div></div>
+              <p class="n-form__message">* 숫자+영문+특수문자 조합 8자리 이상</p>
+            </div>
+            <div class="n-form__item">
+              <p class="n-form__label">비밀번호 확인</p>
+              <div class="n-form__control"><div class="n-input"><input type="password"/></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 역할 정보 -->
+        <div class="join-article">
+          <div class="section-top"><p class="section-top__title">역할 정보</p></div>
+          <div class="n-form col-1">
+            <div class="n-form__item">
+              <p class="n-form__label">역할 / 구분</p>
+              <div class="radio-group">
+                <label class="radio-item checked"><input type="radio" name="role" checked/> Fleet - 오너</label>
+                <label class="radio-item"><input type="radio" name="role"/> Fleet - 직원</label>
+                <label class="radio-item"><input type="radio" name="role"/> Dealer - 직원</label>
+              </div>
+            </div>
+            <div class="n-form__item">
+              <p class="n-form__label">소속회사</p>
+              <div class="n-form__control">
+                <div class="n-input"><input type="text" placeholder="소속회사를 검색하세요" list="company-list"/></div>
+                <datalist id="company-list">
+                  <option value="Seoul Logistics"/>
+                  <option value="Busan Transport"/>
+                  <option value="Incheon Warehouse"/>
+                </datalist>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 업체 정보 -->
+        <div class="join-article">
+          <div class="section-top"><p class="section-top__title">업체 정보</p></div>
+          <div class="n-form col-2">
+            <div class="n-form__item">
+              <p class="n-form__label">업체명</p>
+              <div class="n-form__control"><div class="n-input"><input type="text" placeholder="업체명"/></div></div>
+            </div>
+            <div class="n-form__item">
+              <p class="n-form__label">대표자명</p>
+              <div class="n-form__control"><div class="n-input"><input type="text" placeholder="대표자명"/></div></div>
+            </div>
+            <div class="n-form__item span-2">
+              <p class="n-form__label">사업자등록번호</p>
+              <div class="n-form__control">
+                <div class="regno-wrap">
+                  <div class="n-input regno"><input type="text" maxlength="3" placeholder="000"/></div>
+                  <span class="regno-sep">-</span>
+                  <div class="n-input regno2"><input type="text" maxlength="2" placeholder="00"/></div>
+                  <span class="regno-sep">-</span>
+                  <div class="n-input regno3"><input type="text" maxlength="5" placeholder="00000"/></div>
+                </div>
+                <button class="custom-btn gray-lined sm" onclick="alert('인증 되었습니다.')">인증</button>
+              </div>
+            </div>
+            <div class="n-form__item span-2">
+              <p class="n-form__label">주소</p>
+              <div class="n-form__control">
+                <div class="n-input disabled"><input type="text" placeholder="주소를 검색하세요" disabled/></div>
+                <button class="custom-btn gray-lined sm" onclick="alert('Daum Postcode 팝업이 열립니다.')">주소찾기</button>
+              </div>
+              <div class="n-form__control" style="margin-top:8px">
+                <div class="n-input"><input type="text" placeholder="상세주소를 입력하세요"/></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 하단 버튼 -->
+        <div class="join-foot">
+          <button class="custom-btn black" onclick="alert('회원가입 하시겠습니까?')">가입신청</button>
+          <button class="custom-btn black-lined" onclick="alert('취소')">취소</button>
+        </div>
+
+      </div><!-- /tab-join -->
+
+    </div><!-- /content-inner -->
+  </div><!-- /content-area -->
+</div><!-- /layout -->
+</div><!-- /wrap -->
+
+<script>
+/* Tab 전환 */
+function showTab(tab) {
+  document.getElementById('tab-agree').style.display = tab === 'agree' ? '' : 'none';
+  document.getElementById('tab-join').style.display = tab === 'join' ? '' : 'none';
+  document.querySelectorAll('.page-tab').forEach((el, i) => {
+    el.classList.toggle('active', (i === 0 && tab === 'agree') || (i === 1 && tab === 'join'));
+  });
+}
+
+/* 약관 토글 */
+function toggleTerm(key) {
+  const wrap = document.getElementById(key + '-wrap');
+  const isOpen = wrap.getAttribute('data-opened') === 'true';
+  document.querySelectorAll('.agree-item').forEach(el => el.removeAttribute('data-opened'));
+  if (!isOpen) wrap.setAttribute('data-opened', 'true');
+}
+
+/* 전체동의 */
+function toggleAll(checked) {
+  document.querySelectorAll('.term-chk').forEach(cb => { cb.checked = checked; });
+}
+
+/* 개별 약관 변경 */
+function onTermChange() {
+  const all = document.querySelectorAll('.term-chk');
+  document.getElementById('agreeAll').checked = Array.from(all).every(cb => cb.checked);
+}
+
+/* 라디오 선택 */
+document.querySelectorAll('.radio-item').forEach(item => {
+  item.addEventListener('click', function() {
+    document.querySelectorAll('.radio-item').forEach(r => r.classList.remove('checked'));
+    this.classList.add('checked');
+    this.querySelector('input').checked = true;
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>관리기능 - 업체</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
+<link rel="stylesheet" href="../_shared/mockup.css"/>
+<link rel="stylesheet" href="../_shared/map-management-enhancements.css?v=20260907-search-width-r40"/>
+</head>
+<body data-gnb="mgmt" data-sub="company" data-variant="tobe" data-base="../">
+
+<div id="gnb"></div>
+
+<div class="layout">
+  <main class="main miq-mgmt-page" style="width:100%">
+    <div class="page-head">
+    <div class="page-head__title" data-mgmt-page-title>업체</div>
+      <div class="page-head__bc"><a href="../Mgmt%20User/mgmt-user-tobe.html">관리기능</a>&gt; 업체</div>
+    </div>
+
+    <div class="filter-bar filter-bar--left" data-mgmt-list-controls></div>
+
+    <section class="miq-mgmt-pane miq-mgmt-pane--readonly">
+      <div class="list-head miq-mgmt-list-head"><span class="list-head__count">총 <b id="companyCount">5</b>개 업체 <span class="mm-list-summary__secondary">보유 차량 <b id="companyVehicleCount">106</b>대</span></span></div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr><th>업체</th><th>대표자 ID</th><th class="r">보유 차량</th><th>등록일자</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="strong">(주)세종물류중부지점</td><td>admin@sejonglog.co.kr</td><td class="r strong">42</td><td>2024-03-11</td></tr>
+            <tr><td class="strong">(주)한성렌탈</td><td>ops@hansung-rent.co.kr</td><td class="r">26</td><td>2024-09-02</td></tr>
+            <tr><td class="strong">대영중공업(주)</td><td>sales@daeyoung-hi.co.kr</td><td class="r">18</td><td>2024-11-18</td></tr>
+            <tr><td class="strong">Bobcat Vietnam Dist.</td><td>vn.admin@bobcat-vn.com</td><td class="r">11</td><td>2025-02-27</td></tr>
+            <tr><td class="strong">세종물류남부지점</td><td>south@sejonglog.co.kr</td><td class="r">9</td><td>2025-06-09</td></tr>
+          </tbody>
+        </table>
+        <div class="tbl__foot">
+          <span class="mm-a11y-status" id="companyFoot" role="status" aria-live="polite">조회 결과 5개 업체 · 보유 차량 106대</span>
+          <div class="pager"><button>‹</button><button class="on">1</button><button>›</button></div>
+        </div>
+      </div>
+    </section>
+    <div class="note miq-mgmt-help"><strong>업체 관리 안내</strong><span>권한 범위에 포함된 업체를 조회하는 읽기 전용 화면입니다.</span></div>
+  </main>
+</div>
+
+<script src="../_shared/meeting-model.js"></script>
+<script src="../_shared/common-logic.js?v=20260907-common-logic-r42"></script>
+<script src="../_shared/nav.js?v=20260907-common-logic-r42"></script>
+<script src="../_shared/management-list-header.js?v=20260907-common-logic-r42"></script>
+<script src="../_shared/map-management-enhancements.js?v=20260907-common-logic-r42"></script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>운행이력 - 리튬배터리 목록</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
+<link rel="stylesheet" href="../_shared/mockup.css"/>
+<link rel="stylesheet" href="../_shared/content-system.css?v=20260902-readability"/>
+<link rel="stylesheet" href="../_shared/chart-common.css"/>
+<link rel="stylesheet" href="../_shared/lithium-list.css"/>
+</head>
+<body class="miq-content-system miq-lithium-list" data-lithium-list="true" data-target-profile="full" data-gnb="anlz" data-sub="lithium" data-variant="tobe" data-base="../">
+<div id="gnb"></div>
+<div class="layout">
+  <aside class="lnb" id="lnb"></aside>
+  <main class="main">
+    <div class="page-head">
+      <div class="page-head__bc">운행이력 &gt; 리튬배터리</div>
+    </div>
+    <div class="miq-title-period-row li-list-title-row">
+      <h1 class="page-head__title">리튬배터리</h1>
+      <div class="miq-analysis-scope" id="lithiumListScope" data-miq-scope-placement="title" aria-label="현재 조회 범위"></div>
+      <label class="li-list-abnormal"><input id="lithiumAbnormal" type="checkbox"/> 상태이상만 보기</label>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl li-list-table" aria-label="리튬배터리 차량 목록">
+        <colgroup><col style="width:20%"/><col style="width:14%"/><col style="width:14%"/><col style="width:11%"/><col style="width:11%"/><col style="width:10%"/><col style="width:20%"/></colgroup>
+        <thead><tr>
+          <th aria-sort="none"><button type="button" class="table-sort" data-sort-key="vin" aria-pressed="false">호기<span class="sort-ind" aria-hidden="true">↕</span></button></th>
+          <th class="c" aria-sort="none"><button type="button" class="table-sort" data-sort-key="soc" aria-pressed="false">배터리 잔량 (SOC)<span class="sort-ind" aria-hidden="true">↕</span></button></th>
+          <th class="c" aria-sort="none"><button type="button" class="table-sort" data-sort-key="soh" aria-pressed="false">성능 최대치 (SOH)<span class="sort-ind" aria-hidden="true">↕</span></button></th>
+          <th class="c" aria-sort="none"><button type="button" class="table-sort" data-sort-key="workMinutes" aria-pressed="false">작업 예상시간<span class="sort-ind" aria-hidden="true">↕</span></button></th>
+          <th class="c" aria-sort="none"><button type="button" class="table-sort" data-sort-key="chargeMinutes" aria-pressed="false">예상 충전시간<span class="sort-ind" aria-hidden="true">↕</span></button></th>
+          <th class="c" aria-sort="none"><button type="button" class="table-sort" data-sort-key="smartCharge" aria-pressed="false">스마트 충전<span class="sort-ind" aria-hidden="true">↕</span></button></th>
+          <th class="c" aria-sort="none"><button type="button" class="table-sort" data-sort-key="status" aria-pressed="false">상태<span class="sort-ind" aria-hidden="true">↕</span></button></th>
+        </tr></thead>
+        <tbody id="lithiumListBody"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+<script src="../_shared/meeting-model.js"></script>
+<script src="../_shared/common-logic.js?v=20260907-common-logic-r42"></script>
+<script src="../_shared/chart-common.js"></script>
+<script src="../_shared/nav.js?v=20260907-common-logic-r42"></script>
+<script src="../_mock-data/generated/fleet.generated.js?v=20260906-json-r1"></script>
+<script src="../_shared/fleet.js?v=20260906-json-r1"></script>
+<script src="../_shared/lnb-tree.js?v=20260905-company-group-r3"></script>
+<script src="../_shared/lithium-list-model.js"></script>
+<script src="../_shared/lithium-list.js"></script>
+</body>
+</html>

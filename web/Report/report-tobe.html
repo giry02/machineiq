@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>리포트 - 업체별 현황·비교·히트맵 TO-BE (Mock-up)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
+<link rel="stylesheet" href="../_shared/mockup.css"/>
+<style>
+/* 페이지 전용 : 히트맵 격자 컬럼 + 5단계 색상 스케일(#ff3600 농도) */
+.hm{grid-template-columns:126px repeat(30,minmax(0,1fr))}
+.h1{background:rgba(255,54,0,.14);color:#8a3a28}
+.h2{background:rgba(255,54,0,.32);color:#7a2a14}
+.h3{background:rgba(255,54,0,.52)}
+.h4{background:rgba(255,54,0,.74)}
+.h5{background:rgba(255,54,0,.94)}
+.h0{background:#f1f3f5;color:#c9cdd2}
+/* pill 탭을 콘텐츠 탭 엔진에 연결(.tabs 기본 테두리 제거) */
+.pill-tabs.tabs{border-bottom:none;margin-bottom:0;display:inline-flex}
+.pill-tabs.tabs button{border-bottom:none;margin-bottom:0}
+/* 업체 비교 그룹 막대 */
+.cmp-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:11px;color:#666}
+.cmp-row .k{width:118px;color:#555;font-weight:600}
+.cmp-row .track{flex:1;min-width:0}
+.cmp-row .track .rate-bar{display:block;margin-top:0}
+.cmp-row .v{width:78px;text-align:right;font-weight:700;color:#1a1a1a}
+.web-only{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#3b5bdb;background:#eef2ff;border-radius:20px;padding:2px 9px}
+.trend-k{font-size:12px;font-weight:600;color:#555;display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.trend-k .tail{margin-left:auto;font-size:10px;color:#aaa;font-weight:400}
+</style>
+</head>
+<body data-period-presets="dwm" data-gnb="rpt" data-sub="report" data-variant="tobe" data-base="../">
+
+<div id="gnb"></div>
+
+<div class="layout">
+  <!-- ═══════ LNB ═══════ -->
+  <aside class="lnb">
+    <div class="lnb__company">(주)세종물류중부지점</div>
+    <div class="lnb__search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+      <input placeholder="그룹 또는 차량"/>
+    </div>
+    <div class="lnb__group-title">그룹별 <span>▲</span></div>
+    <div class="lnb__item active" data-label="기본그룹">기본그룹 <span class="cnt">18</span></div>
+    <div class="lnb__item" data-label="테스트그룹">테스트그룹 <span class="cnt">14</span></div>
+    <div class="lnb__item" data-label="물류1팀">물류1팀 <span class="cnt">10</span></div>
+    <div class="lnb__group-title">차량 <span>▲</span></div>
+    <a class="lnb__item" data-label="B30S-7" href="../Vehicle%20Detail/vehicle-detail-tobe.html">B30S-7 <span class="cnt">리튬</span></a>
+    <a class="lnb__item" data-label="D25S-9" href="../Vehicle%20Detail/vehicle-detail-tobe.html">D25S-9 <span class="cnt">엔진</span></a>
+    <a class="lnb__item" data-label="B18S-7" href="../Vehicle%20Detail/vehicle-detail-tobe.html">B18S-7 <span class="cnt">납산</span></a>
+    <div class="lnb__hint">리포트는 <b>업체(Company) 단위</b> 집계입니다. 그룹/차량 선택은 하위 분해 보기에만 반영됩니다.</div>
+  </aside>
+
+  <!-- ═══════ MAIN ═══════ -->
+  <main class="main">
+    <div class="page-head">
+    <div class="page-head__title">리포트 <span class="sub" data-lnb-label hidden>- 기본그룹</span></div>
+      <div class="page-head__bc"><a href="report-tobe.html">리포트</a>&gt; 업체별 현황 · 비교 · 히트맵</div>
+    </div>
+    <div class="page-desc">
+      업체별 <b>현황(기간 비교)</b> · <b>비교(업체 간)</b> · <b>히트맵(업체 × 일자)</b>을 한 화면 3개 탭으로 통합했습니다.
+      <span class="web-only">Web 전용 · App 미제공</span>
+    </div>
+
+    <!-- ═══════ 조회 필터 ═══════ -->
+    <div class="filter-bar filter-bar--left" data-period-target="#periodLabel">
+      <select class="inp" style="width:210px">
+        <option>(주)세종물류중부지점</option>
+        <option>(주)한성로지스</option>
+        <option>대명유통(주)</option>
+        <option>(주)동방물류</option>
+        <option>신영로지스틱스</option>
+      </select>
+      <div class="period-tabs">
+        <button data-range="2026-07-05 ~ 2026-07-05">일</button>
+        <button data-range="2026-06-29 ~ 2026-07-05">주</button>
+        <button class="active" data-range="2026-06-01 ~ 2026-06-30">월</button>
+        </div>
+      <div class="date-range">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span id="periodLabel">2026-06-01 ~ 2026-06-30</span>
+      </div>
+      <span class="badge gray">완료된 월</span>
+      <label class="chk"><input type="checkbox" checked/> 직전기간(2026-05) 함께 보기</label>
+      <div class="grow"></div>
+      <button class="btn-search">조회</button>
+      <button class="btn" data-modal-open="expModal">내보내기</button>
+    </div>
+
+    <!-- ═══════ 탭 (현황 / 비교 / 히트맵) ═══════ -->
+    <div class="tabs">
+      <button class="active" data-tab="tabStatus">업체별 현황</button>
+      <button data-tab="tabCompare">업체별 비교</button>
+      <button data-tab="tabHeat">업체별 히트맵</button>
+    </div>
+
+    <!-- ─────────── TAB 1 : 업체별 현황 ─────────── -->
+    <div class="tab-pane active" id="tabStatus">
+
+      <div class="box total">
+        <div class="box__head">
+          <span class="box__name tot">(주)세종물류중부지점 · 2026년 6월</span>
+          <span class="box__badge">기준기간(STD)</span>
+          <span class="box__badge gray">직전기간(PREV) 2026-05</span>
+          <div class="box__tools"><span style="font-size:11px;color:#999">차량 42대 · 근무일 22일 · 계획 8H/일</span></div>
+        </div>
+
+        <div class="stat-group">
+          <div class="stat-group__label">운영 지표</div>
+          <div class="stat-cells c4">
+            <div class="cell hl"><div class="cell__v">86.6<small>%</small></div><div class="cell__k">운영률
+              <span class="tip">?<span class="tip__box">(작업+대기) ÷ 계획가동시간 × 100</span></span></div>
+              <div class="rate-bar pri"><em style="width:86.6%"></em></div><div class="cell__d up">▲ 2.1%p (84.5%)</div></div>
+            <div class="cell rate"><div class="cell__v">75.7<small>%</small></div><div class="cell__k">운영효율
+              <span class="tip">?<span class="tip__box">작업 ÷ (작업+대기) × 100</span></span></div>
+              <div class="rate-bar"><em style="width:75.7%"></em></div><div class="cell__d up">▲ 2.9%p (72.8%)</div></div>
+            <div class="cell fault"><div class="cell__v">17.7<small>건</small></div><div class="cell__k">충격횟수 (L3~5)</div><div class="cell__d up">▼ 4.3건 (22.0건)</div></div>
+            <div class="cell"><div class="cell__v">152.5<small>H</small></div><div class="cell__k">운행시간 (작업+대기)</div><div class="cell__d up">▲ 3.8H (148.7H)</div></div>
+          </div>
+        </div>
+
+        <div class="stat-group">
+          <div class="stat-group__label">연료 · 배터리 · 주행</div>
+          <div class="stat-cells c4">
+            <div class="cell"><div class="cell__v" style="color:#3b5bdb">3.72<small>L/H</small></div><div class="cell__k">연료소비량 (엔진)</div><div class="cell__d up">▼ 0.22 (3.94)</div></div>
+            <div class="cell"><div class="cell__v" style="color:#0ca678">78.4<small>%</small></div><div class="cell__k">배터리충전량 (리튬·납산)</div><div class="cell__d up">▲ 2.3%p (76.1%)</div></div>
+            <div class="cell"><div class="cell__v">3,420<small>Km</small></div><div class="cell__k">운행거리</div><div class="cell__d up">▲ 440Km (2,980Km)</div></div>
+            <div class="cell"><div class="cell__v" style="color:#e8590c">214<small>회</small></div><div class="cell__k">배터리충전횟수</div><div class="cell__d up">▲ 16회 (198회)</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8지표 STD / PREV / DIFF -->
+      <div class="box">
+        <div class="box__head">
+          <span class="box__name">8개 지표 기준기간 vs 직전기간</span>
+          <div class="box__tools">
+            <span class="chip"><span style="width:9px;height:9px;border-radius:2px;background:#c8c8c8;display:inline-block"></span>직전 2026-05</span>
+            <span class="chip on"><span style="width:9px;height:9px;border-radius:2px;background:#ff3600;display:inline-block"></span>기준 2026-06</span>
+          </div>
+        </div>
+        <div class="eff-grid">
+          <div class="eff hl"><div class="eff__k">운영률</div><div class="eff__rows">
+            <div class="eff__row prev"><span class="tag"><span class="sw" style="background:#c8c8c8"></span>직전</span><span class="val">84.5%</span></div>
+            <div class="eff__row cur"><span class="tag"><span class="sw" style="background:#ff3600"></span>기준</span><span class="val">86.6%</span></div>
+          </div><div class="eff__diff up">▲ 2.1%p</div></div>
+
+          <div class="eff"><div class="eff__k">운영효율</div><div class="eff__rows">
+            <div class="eff__row prev"><span class="tag"><span class="sw" style="background:#c8c8c8"></span>직전</span><span class="val">72.8%</span></div>
+            <div class="eff__row cur"><span class="tag"><span class="sw" style="background:#ff3600"></span>기준</span><span class="val">75.7%</span></div>
+          </div><div class="eff__diff up">▲ 2.9%p</div></div>
+
+          <div class="eff"><div class="eff__k">충격횟수</div><div class="eff__rows">
+            <div class="eff__row prev"><span class="tag"><span class="sw" style="background:#c8c8c8"></span>직전</span><span class="val">22.0건</span></div>
+            <div class="eff__row cur"><span class="tag"><span class="sw" style="background:#ff3600"></span>기준</span><span class="val">17.7건</span></div>
+          </div><div class="eff__diff up">▼ 4.3건 (-19.5%)</div></div>
+
+          <div class="eff"><div class="eff__k">연료소비량 (L/H)</div><div class="eff__rows">
+            <div class="eff__row prev"><span class="tag"><span class="sw" style="background:#c8c8c8"></span>직전</span><span class="val">3.94</span></div>
+            <div class="eff__row cur"><span class="tag"><span class="sw" style="background:#ff3600"></span>기준</span><span class="val">3.72</span></div>
+          </div><div class="eff__diff up">▼ 0.22 (-5.6%)</div></div>
+
+          <div class="eff"><div class="eff__k">배터리충전량</div><div class="eff__rows">
+            <div class="eff__row prev"><span class="tag"><span class="sw" style="background:#c8c8c8"></span>직전</span><span class="val">76.1%</span></div>
+            <div class="eff__row cur"><span class="tag"><span class="sw" style="background:#ff3600"></span>기준</span><span class="val">78.4%</span></div>
+          </div><div class="eff__diff up">▲ 2.3%p</div></div>
+
+          <div class="eff"><div class="eff__k">운행거리</div><div class="eff__rows">
+            <div class="eff__row prev"><span class="tag"><span class="sw" style="background:#c8c8c8"></span>직전</span><span class="val">2,980Km</span></div>
+            <div class="eff__row cur"><span class="tag"><span class="sw" style="background:#ff3600"></span>기준</span><span class="val">3,420Km</span></div>
+          </div><div class="eff__diff up">▲ 440Km (+14.8%)</div></div>
+
+          <div class="eff"><div class="eff__k">운행시간</div><div class="eff__rows">
+            <div class="eff__row prev"><span class="tag"><span class="sw" style="background:#c8c8c8"></span>직전</span><span class="val">148.7H</span></div>
+            <div class="eff__row cur"><span class="tag"><span class="sw" style="background:#ff3600"></span>기준</span><span class="val">152.5H</span></div>
+          </div><div class="eff__diff up">▲ 3.8H (+2.6%)</div></div>
+
+          <div class="eff"><div class="eff__k">배터리충전횟수</div><div class="eff__rows">
+            <div class="eff__row prev"><span class="tag"><span class="sw" style="background:#c8c8c8"></span>직전</span><span class="val">198회</span></div>
+            <div class="eff__row cur"><span class="tag"><span class="sw" style="background:#ff3600"></span>기준</span><span class="val">214회</span></div>
+          </div><div class="eff__diff up">▲ 16회 (+8.1%)</div></div>
+        </div>
+      </div>
+
+      <!-- 기간별 추이 -->
+      <div class="box">
+        <div class="box__head">
+          <span class="box__name">기간별 추이 <span style="font-size:11px;color:#999;font-weight:400">2026-01 ~ 2026-06 (월)</span></span>
+          <div class="box__tools"><button class="btn btn--sm" data-modal-open="expModal">그래프 데이터 내보내기</button></div>
+        </div>
+
+        <div class="trend-k">운영률 · 운영효율 추이 <span class="tail">단위 %</span></div>
+        <svg class="line-chart" viewBox="0 0 600 200" preserveAspectRatio="none" role="img" aria-label="운영률·운영효율 6개월 추이">
+          <line class="grid" x1="30" y1="20" x2="580" y2="20"/>
+          <line class="grid" x1="30" y1="60" x2="580" y2="60"/>
+          <line class="grid" x1="30" y1="100" x2="580" y2="100"/>
+          <line class="grid" x1="30" y1="140" x2="580" y2="140"/>
+          <line class="axis" x1="30" y1="180" x2="580" y2="180"/>
+          <text x="4" y="24">100</text><text x="6" y="64">90</text><text x="6" y="104">80</text><text x="6" y="144">70</text><text x="6" y="184">60</text>
+          <polygon class="ar" points="40,95.2 140,90.4 240,85.6 340,87.6 440,82 540,73.6 540,180 40,180"/>
+          <polyline class="ln cur" points="40,95.2 140,90.4 240,85.6 340,87.6 440,82 540,73.6"/>
+          <polyline class="ln prev" points="40,140.8 140,138 240,132.4 340,135.2 440,128.8 540,117.2"/>
+          <circle class="pt" cx="40" cy="95.2" r="3"/><circle class="pt" cx="140" cy="90.4" r="3"/>
+          <circle class="pt" cx="240" cy="85.6" r="3"/><circle class="pt" cx="340" cy="87.6" r="3"/>
+          <circle class="pt" cx="440" cy="82" r="3"/><circle class="pt" cx="540" cy="73.6" r="3"/>
+          <text x="40" y="90" text-anchor="middle" style="fill:#ff3600;font-weight:700">81.2</text>
+          <text x="140" y="85" text-anchor="middle" style="fill:#ff3600;font-weight:700">82.4</text>
+          <text x="240" y="80" text-anchor="middle" style="fill:#ff3600;font-weight:700">83.6</text>
+          <text x="340" y="82" text-anchor="middle" style="fill:#ff3600;font-weight:700">83.1</text>
+          <text x="440" y="76" text-anchor="middle" style="fill:#ff3600;font-weight:700">84.5</text>
+          <text x="540" y="68" text-anchor="middle" style="fill:#ff3600;font-weight:700">86.6</text>
+          <text x="40" y="156" text-anchor="middle">69.8</text><text x="140" y="153" text-anchor="middle">70.5</text>
+          <text x="240" y="147" text-anchor="middle">71.9</text><text x="340" y="150" text-anchor="middle">71.2</text>
+          <text x="440" y="144" text-anchor="middle">72.8</text><text x="540" y="132" text-anchor="middle">75.7</text>
+          <text x="40" y="195" text-anchor="middle">1월</text><text x="140" y="195" text-anchor="middle">2월</text>
+          <text x="240" y="195" text-anchor="middle">3월</text><text x="340" y="195" text-anchor="middle">4월</text>
+          <text x="440" y="195" text-anchor="middle">5월</text><text x="540" y="195" text-anchor="middle">6월</text>
+        </svg>
+        <div class="usage-legend">
+          <span class="li"><span class="sw" style="background:#ff3600"></span>운영률 (실선)</span>
+          <span class="li"><span class="sw" style="background:#c8c8c8"></span>운영효율 (점선)</span>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="card-grid c3">
+          <div>
+            <div class="trend-k">충격횟수 <span class="tail">건 / 대</span></div>
+            <div class="stack-chart" style="height:110px">
+              <div class="stk"><span class="stk__cap">26.4</span><div class="stk__seg prev" style="height:100%"></div></div>
+              <div class="stk"><span class="stk__cap">25.1</span><div class="stk__seg prev" style="height:95%"></div></div>
+              <div class="stk"><span class="stk__cap">24.0</span><div class="stk__seg prev" style="height:91%"></div></div>
+              <div class="stk"><span class="stk__cap">23.2</span><div class="stk__seg prev" style="height:88%"></div></div>
+              <div class="stk"><span class="stk__cap">22.0</span><div class="stk__seg prev" style="height:83%"></div></div>
+              <div class="stk"><span class="stk__cap">17.7</span><div class="stk__seg pri" style="height:67%"></div></div>
+            </div>
+            <div class="stack-x"><span>1월</span><span>2월</span><span>3월</span><span>4월</span><span>5월</span><span>6월</span></div>
+          </div>
+          <div>
+            <div class="trend-k">연료소비량 <span class="tail">L/H</span></div>
+            <div class="stack-chart" style="height:110px">
+              <div class="stk"><span class="stk__cap">4.18</span><div class="stk__seg prev" style="height:100%"></div></div>
+              <div class="stk"><span class="stk__cap">4.10</span><div class="stk__seg prev" style="height:98%"></div></div>
+              <div class="stk"><span class="stk__cap">4.02</span><div class="stk__seg prev" style="height:96%"></div></div>
+              <div class="stk"><span class="stk__cap">3.98</span><div class="stk__seg prev" style="height:95%"></div></div>
+              <div class="stk"><span class="stk__cap">3.94</span><div class="stk__seg prev" style="height:94%"></div></div>
+              <div class="stk"><span class="stk__cap">3.72</span><div class="stk__seg pri" style="height:89%"></div></div>
+            </div>
+            <div class="stack-x"><span>1월</span><span>2월</span><span>3월</span><span>4월</span><span>5월</span><span>6월</span></div>
+          </div>
+          <div>
+            <div class="trend-k">배터리충전량 <span class="tail">%</span></div>
+            <div class="stack-chart" style="height:110px">
+              <div class="stk"><span class="stk__cap">73.2</span><div class="stk__seg prev" style="height:93%"></div></div>
+              <div class="stk"><span class="stk__cap">74.0</span><div class="stk__seg prev" style="height:94%"></div></div>
+              <div class="stk"><span class="stk__cap">74.8</span><div class="stk__seg prev" style="height:95%"></div></div>
+              <div class="stk"><span class="stk__cap">75.4</span><div class="stk__seg prev" style="height:96%"></div></div>
+              <div class="stk"><span class="stk__cap">76.1</span><div class="stk__seg prev" style="height:97%"></div></div>
+              <div class="stk"><span class="stk__cap">78.4</span><div class="stk__seg pri" style="height:100%"></div></div>
+            </div>
+            <div class="stack-x"><span>1월</span><span>2월</span><span>3월</span><span>4월</span><span>5월</span><span>6월</span></div>
+          </div>
+          <div>
+            <div class="trend-k">운행거리 <span class="tail">Km</span></div>
+            <div class="stack-chart" style="height:110px">
+              <div class="stk"><span class="stk__cap">2,540</span><div class="stk__seg prev" style="height:74%"></div></div>
+              <div class="stk"><span class="stk__cap">2,690</span><div class="stk__seg prev" style="height:79%"></div></div>
+              <div class="stk"><span class="stk__cap">2,780</span><div class="stk__seg prev" style="height:81%"></div></div>
+              <div class="stk"><span class="stk__cap">2,850</span><div class="stk__seg prev" style="height:83%"></div></div>
+              <div class="stk"><span class="stk__cap">2,980</span><div class="stk__seg prev" style="height:87%"></div></div>
+              <div class="stk"><span class="stk__cap">3,420</span><div class="stk__seg pri" style="height:100%"></div></div>
+            </div>
+            <div class="stack-x"><span>1월</span><span>2월</span><span>3월</span><span>4월</span><span>5월</span><span>6월</span></div>
+          </div>
+          <div>
+            <div class="trend-k">운행시간 <span class="tail">H</span></div>
+            <div class="stack-chart" style="height:110px">
+              <div class="stk"><span class="stk__cap">141.2</span><div class="stk__seg prev" style="height:93%"></div></div>
+              <div class="stk"><span class="stk__cap">143.6</span><div class="stk__seg prev" style="height:94%"></div></div>
+              <div class="stk"><span class="stk__cap">145.0</span><div class="stk__seg prev" style="height:95%"></div></div>
+              <div class="stk"><span class="stk__cap">146.8</span><div class="stk__seg prev" style="height:96%"></div></div>
+              <div class="stk"><span class="stk__cap">148.7</span><div class="stk__seg prev" style="height:98%"></div></div>
+              <div class="stk"><span class="stk__cap">152.5</span><div class="stk__seg pri" style="height:100%"></div></div>
+            </div>
+            <div class="stack-x"><span>1월</span><span>2월</span><span>3월</span><span>4월</span><span>5월</span><span>6월</span></div>
+          </div>
+          <div>
+            <div class="trend-k">배터리충전횟수 <span class="tail">회</span></div>
+            <div class="stack-chart" style="height:110px">
+              <div class="stk"><span class="stk__cap">172</span><div class="stk__seg prev" style="height:80%"></div></div>
+              <div class="stk"><span class="stk__cap">180</span><div class="stk__seg prev" style="height:84%"></div></div>
+              <div class="stk"><span class="stk__cap">186</span><div class="stk__seg prev" style="height:87%"></div></div>
+              <div class="stk"><span class="stk__cap">191</span><div class="stk__seg prev" style="height:89%"></div></div>
+              <div class="stk"><span class="stk__cap">198</span><div class="stk__seg prev" style="height:93%"></div></div>
+              <div class="stk"><span class="stk__cap">214</span><div class="stk__seg pri" style="height:100%"></div></div>
+            </div>
+            <div class="stack-x"><span>1월</span><span>2월</span><span>3월</span><span>4월</span><span>5월</span><span>6월</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─────────── TAB 2 : 업체별 비교 ─────────── -->
+    <div class="tab-pane" id="tabCompare">
+
+      <div class="box total">
+        <div class="box__head">
+          <span class="box__name tot">업체 간 비교 · 2026년 6월</span>
+          <span class="box__badge">3개 업체 · 동일 기간</span>
+          <div class="box__tools"><span style="font-size:11px;color:#999">최대 8개 업체까지 동시 비교</span></div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          <span class="chip on">(주)세종물류중부지점 <span class="x">✕</span></span>
+          <span class="chip on">(주)한성로지스 <span class="x">✕</span></span>
+          <span class="chip on">대명유통(주) <span class="x">✕</span></span>
+          <button class="btn btn--sm btn--ghost" data-modal-open="cmpModal">+ 업체 추가</button>
+          <span style="font-size:11px;color:#999;margin-left:6px">칩 삭제/추가 시 <b>해당 업체 행만</b> 부분 갱신</span>
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="box__head"><span class="box__name">지표별 비교 표</span>
+          <div class="box__tools"><button class="btn btn--sm" data-modal-open="expModal">내보내기</button></div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>업체명</th><th class="c">차량</th><th class="r">운영률</th><th class="r">운영효율</th>
+                <th class="r">충격횟수</th><th class="r">연료소비량</th><th class="r">배터리충전량</th>
+                <th class="r">운행거리</th><th class="r">운행시간</th><th class="r">배터리충전횟수</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="sel">
+                <td class="strong">(주)세종물류중부지점 <span class="badge pri">기준</span></td><td class="c">42</td>
+                <td class="r strong">86.6%</td><td class="r">75.7%</td><td class="r">17.7건</td><td class="r">3.72 L/H</td>
+                <td class="r">78.4%</td><td class="r">3,420Km</td><td class="r">152.5H</td><td class="r">214회</td>
+              </tr>
+              <tr>
+                <td class="strong">(주)한성로지스</td><td class="c">31</td>
+                <td class="r" style="color:#e03131">79.2%</td><td class="r">71.4%</td><td class="r" style="color:#e03131">24.3건</td><td class="r">4.15 L/H</td>
+                <td class="r">74.2%</td><td class="r">2,860Km</td><td class="r">138.4H</td><td class="r">176회</td>
+              </tr>
+              <tr>
+                <td class="strong">대명유통(주)</td><td class="c">56</td>
+                <td class="r" style="color:#2b8a3e">91.3%</td><td class="r" style="color:#2b8a3e">80.6%</td><td class="r">12.4건</td><td class="r">3.41 L/H</td>
+                <td class="r">82.6%</td><td class="r">4,105Km</td><td class="r">168.2H</td><td class="r">248회</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="tbl__foot">
+            <span>3개 업체 · 기간 2026-06-01 ~ 2026-06-30 · 소스 <b>TB_EQUIPMENT_DAILY_OPERATION</b></span>
+            <span style="margin-left:auto">단위 : 운영률/운영효율/배터리충전량 %, 충격 건(대당), 연료 L/H, 거리 Km, 시간 H</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="box__head"><span class="box__name">지표별 그룹 막대 비교</span>
+          <div class="box__tools">
+            <span class="chip"><span style="width:9px;height:9px;border-radius:2px;background:#ff3600;display:inline-block"></span>세종물류</span>
+            <span class="chip"><span style="width:9px;height:9px;border-radius:2px;background:#3b5bdb;display:inline-block"></span>한성로지스</span>
+            <span class="chip"><span style="width:9px;height:9px;border-radius:2px;background:#0ca678;display:inline-block"></span>대명유통</span>
+          </div>
+        </div>
+
+        <div class="sub-head">운영률 <span class="tail">실측 % 기준</span></div>
+        <div class="cmp-row"><span class="k">세종물류중부지점</span><span class="track"><span class="rate-bar pri" style="margin-top:0"><em style="width:86.6%"></em></span></span><span class="v">86.6%</span></div>
+        <div class="cmp-row"><span class="k">한성로지스</span><span class="track"><span class="rate-bar" style="margin-top:0"><em style="width:79.2%"></em></span></span><span class="v">79.2%</span></div>
+        <div class="cmp-row"><span class="k">대명유통</span><span class="track"><span class="rate-bar ok" style="margin-top:0"><em style="width:91.3%"></em></span></span><span class="v">91.3%</span></div>
+
+        <div class="sub-head">운영효율 <span class="tail">실측 % 기준</span></div>
+        <div class="cmp-row"><span class="k">세종물류중부지점</span><span class="track"><span class="rate-bar pri" style="margin-top:0"><em style="width:75.7%"></em></span></span><span class="v">75.7%</span></div>
+        <div class="cmp-row"><span class="k">한성로지스</span><span class="track"><span class="rate-bar" style="margin-top:0"><em style="width:71.4%"></em></span></span><span class="v">71.4%</span></div>
+        <div class="cmp-row"><span class="k">대명유통</span><span class="track"><span class="rate-bar ok" style="margin-top:0"><em style="width:80.6%"></em></span></span><span class="v">80.6%</span></div>
+
+        <div class="sub-head">충격횟수 <span class="tail">최댓값(24.3건) = 100% 정규화 · 낮을수록 우수</span></div>
+        <div class="cmp-row"><span class="k">세종물류중부지점</span><span class="track"><span class="rate-bar warn" style="margin-top:0"><em style="width:72.8%"></em></span></span><span class="v">17.7건</span></div>
+        <div class="cmp-row"><span class="k">한성로지스</span><span class="track"><span class="rate-bar bad" style="margin-top:0"><em style="width:100%"></em></span></span><span class="v">24.3건</span></div>
+        <div class="cmp-row"><span class="k">대명유통</span><span class="track"><span class="rate-bar ok" style="margin-top:0"><em style="width:51%"></em></span></span><span class="v">12.4건</span></div>
+
+        <div class="sub-head">연료소비량 <span class="tail">최댓값(4.15 L/H) = 100% 정규화 · 낮을수록 우수</span></div>
+        <div class="cmp-row"><span class="k">세종물류중부지점</span><span class="track"><span class="rate-bar warn" style="margin-top:0"><em style="width:89.6%"></em></span></span><span class="v">3.72</span></div>
+        <div class="cmp-row"><span class="k">한성로지스</span><span class="track"><span class="rate-bar bad" style="margin-top:0"><em style="width:100%"></em></span></span><span class="v">4.15</span></div>
+        <div class="cmp-row"><span class="k">대명유통</span><span class="track"><span class="rate-bar ok" style="margin-top:0"><em style="width:82.2%"></em></span></span><span class="v">3.41</span></div>
+
+        <div class="sub-head">운행거리 <span class="tail">최댓값(4,105Km) = 100% 정규화</span></div>
+        <div class="cmp-row"><span class="k">세종물류중부지점</span><span class="track"><span class="rate-bar pri" style="margin-top:0"><em style="width:83.3%"></em></span></span><span class="v">3,420Km</span></div>
+        <div class="cmp-row"><span class="k">한성로지스</span><span class="track"><span class="rate-bar" style="margin-top:0"><em style="width:69.7%"></em></span></span><span class="v">2,860Km</span></div>
+        <div class="cmp-row"><span class="k">대명유통</span><span class="track"><span class="rate-bar ok" style="margin-top:0"><em style="width:100%"></em></span></span><span class="v">4,105Km</span></div>
+
+        <div class="sub-head">운행시간 <span class="tail">최댓값(168.2H) = 100% 정규화</span></div>
+        <div class="cmp-row"><span class="k">세종물류중부지점</span><span class="track"><span class="rate-bar pri" style="margin-top:0"><em style="width:90.7%"></em></span></span><span class="v">152.5H</span></div>
+        <div class="cmp-row"><span class="k">한성로지스</span><span class="track"><span class="rate-bar" style="margin-top:0"><em style="width:82.3%"></em></span></span><span class="v">138.4H</span></div>
+        <div class="cmp-row"><span class="k">대명유통</span><span class="track"><span class="rate-bar ok" style="margin-top:0"><em style="width:100%"></em></span></span><span class="v">168.2H</span></div>
+
+        <div class="sub-head">배터리충전량 / 배터리충전횟수 <span class="tail">충전량은 실측 %, 횟수는 최댓값(248회) 정규화</span></div>
+        <div class="cmp-row"><span class="k">세종 · 충전량</span><span class="track"><span class="rate-bar pri" style="margin-top:0"><em style="width:78.4%"></em></span></span><span class="v">78.4%</span></div>
+        <div class="cmp-row"><span class="k">한성 · 충전량</span><span class="track"><span class="rate-bar" style="margin-top:0"><em style="width:74.2%"></em></span></span><span class="v">74.2%</span></div>
+        <div class="cmp-row"><span class="k">대명 · 충전량</span><span class="track"><span class="rate-bar ok" style="margin-top:0"><em style="width:82.6%"></em></span></span><span class="v">82.6%</span></div>
+        <div class="cmp-row"><span class="k">세종 · 충전횟수</span><span class="track"><span class="rate-bar pri" style="margin-top:0"><em style="width:86.3%"></em></span></span><span class="v">214회</span></div>
+        <div class="cmp-row"><span class="k">한성 · 충전횟수</span><span class="track"><span class="rate-bar" style="margin-top:0"><em style="width:71%"></em></span></span><span class="v">176회</span></div>
+        <div class="cmp-row"><span class="k">대명 · 충전횟수</span><span class="track"><span class="rate-bar ok" style="margin-top:0"><em style="width:100%"></em></span></span><span class="v">248회</span></div>
+      </div>
+    </div>
+
+    <!-- ─────────── TAB 3 : 업체별 히트맵 ─────────── -->
+    <div class="tab-pane" id="tabHeat">
+
+      <div class="box total">
+        <div class="box__head">
+          <span class="box__name tot">업체 × 일자 히트맵 · 2026-06-01 ~ 2026-06-30</span>
+          <span class="box__badge">5개 업체 · 30일</span>
+          <div class="box__tools"><span style="font-size:11px;color:#999">업체 수 제한 없이 추가 가능 · 시간축 : 주·월 = 일자, 일 = 24시간대, 년 = 12개월</span></div>
+        </div>
+        <div class="stat-cells c5">
+          <div class="cell hl"><div class="cell__v">86.6<small>%</small></div><div class="cell__k">세종물류중부지점</div><div class="cell__d up">▲ 2.1%p</div></div>
+          <div class="cell"><div class="cell__v">79.2<small>%</small></div><div class="cell__k">한성로지스</div><div class="cell__d down">▼ 0.6%p</div></div>
+          <div class="cell on"><div class="cell__v">91.3<small>%</small></div><div class="cell__k">대명유통</div><div class="cell__d up">▲ 1.4%p</div></div>
+          <div class="cell"><div class="cell__v">82.7<small>%</small></div><div class="cell__k">동방물류</div><div class="cell__d up">▲ 0.9%p</div></div>
+          <div class="cell idle"><div class="cell__v">75.8<small>%</small></div><div class="cell__k">신영로지스틱스</div><div class="cell__d down">▼ 1.2%p</div></div>
+        </div>
+      </div>
+
+      <div>
+      <div class="filter-bar filter-bar--left">
+        <span style="font-size:12px;font-weight:600;color:#555">지표 선택</span>
+        <div class="pill-tabs tabs">
+          <button class="active" data-tab="hmRate">운영률</button>
+          <button data-tab="hmEff">운영효율</button>
+        </div>
+        <span style="font-size:11px;color:#999">토글 시 동일 격자에서 셀 색상값(operatingRate ↔ efficiencyRate)만 전환됩니다</span>
+      </div>
+
+      <!-- 운영률 히트맵 -->
+      <div class="tab-pane active" id="hmRate">
+        <div class="box">
+          <div class="box__head"><span class="box__name">운영률 히트맵</span>
+            <div class="box__tools"><span style="font-size:11px;color:#999">셀 = 해당 업체·해당 일자 운영률(%) · 주말/휴일은 계획가동시간 0 → 집계 제외</span></div>
+          </div>
+          <div class="heat hm" style="overflow-x:auto">
+            <div class="heat__col-label"></div>
+            <div class="heat__col-label">1</div><div class="heat__col-label">2</div><div class="heat__col-label">3</div><div class="heat__col-label">4</div><div class="heat__col-label">5</div><div class="heat__col-label">6</div><div class="heat__col-label">7</div><div class="heat__col-label">8</div><div class="heat__col-label">9</div><div class="heat__col-label">10</div><div class="heat__col-label">11</div><div class="heat__col-label">12</div><div class="heat__col-label">13</div><div class="heat__col-label">14</div><div class="heat__col-label">15</div><div class="heat__col-label">16</div><div class="heat__col-label">17</div><div class="heat__col-label">18</div><div class="heat__col-label">19</div><div class="heat__col-label">20</div><div class="heat__col-label">21</div><div class="heat__col-label">22</div><div class="heat__col-label">23</div><div class="heat__col-label">24</div><div class="heat__col-label">25</div><div class="heat__col-label">26</div><div class="heat__col-label">27</div><div class="heat__col-label">28</div><div class="heat__col-label">29</div><div class="heat__col-label">30</div>
+
+            <div class="heat__row-label">세종물류중부지점</div>
+            <div class="heat__cell h3" title="06-01 84.2%">84</div><div class="heat__cell h3" title="06-02 87.1%">87</div><div class="heat__cell h3" title="06-03 85.6%">86</div><div class="heat__cell h4" title="06-04 92.4%">92</div><div class="heat__cell h4" title="06-05 88.0%">88</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h4" title="06-08 89.3%">89</div><div class="heat__cell h4" title="06-09 94.1%">94</div><div class="heat__cell h3" title="06-10 82.5%">83</div><div class="heat__cell h1" title="06-11 68.4%">68</div><div class="heat__cell h4" title="06-12 90.2%">90</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h4" title="06-15 88.7%">89</div><div class="heat__cell h5" title="06-16 96.5%">97</div><div class="heat__cell h3" title="06-17 83.1%">83</div><div class="heat__cell h3" title="06-18 86.0%">86</div><div class="heat__cell h2" title="06-19 71.6%">72</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h4" title="06-22 93.4%">93</div><div class="heat__cell h4" title="06-23 91.8%">92</div><div class="heat__cell h5" title="06-24 97.2%">97</div><div class="heat__cell h2" title="06-25 79.5%">80</div><div class="heat__cell h3" title="06-26 87.3%">87</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h3" title="06-29 84.5%">85</div><div class="heat__cell h3" title="06-30 83.8%">84</div>
+
+            <div class="heat__row-label">한성로지스</div>
+            <div class="heat__cell h2">79</div><div class="heat__cell h3">82</div><div class="heat__cell h3">82</div><div class="heat__cell h3">83</div><div class="heat__cell h2">79</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h3">81</div><div class="heat__cell h3">85</div><div class="heat__cell h2">80</div><div class="heat__cell h1">64</div><div class="heat__cell h3">80</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h2">80</div><div class="heat__cell h3">86</div><div class="heat__cell h2">76</div><div class="heat__cell h2">79</div><div class="heat__cell h1">68</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h3">84</div><div class="heat__cell h3">82</div><div class="heat__cell h3">86</div><div class="heat__cell h2">73</div><div class="heat__cell h2">79</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h2">78</div><div class="heat__cell h2">77</div>
+
+            <div class="heat__row-label">대명유통</div>
+            <div class="heat__cell h4">89</div><div class="heat__cell h4">92</div><div class="heat__cell h4">91</div><div class="heat__cell h5">95</div><div class="heat__cell h4">93</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h4">94</div><div class="heat__cell h5">97</div><div class="heat__cell h4">89</div><div class="heat__cell h2">78</div><div class="heat__cell h4">94</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h4">93</div><div class="heat__cell h5">99</div><div class="heat__cell h4">89</div><div class="heat__cell h4">91</div><div class="heat__cell h3">81</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h5">96</div><div class="heat__cell h4">95</div><div class="heat__cell h5">99</div><div class="heat__cell h3">86</div><div class="heat__cell h4">93</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h4">88</div><div class="heat__cell h3">88</div>
+
+            <div class="heat__row-label">동방물류</div>
+            <div class="heat__cell h3">81</div><div class="heat__cell h3">83</div><div class="heat__cell h3">82</div><div class="heat__cell h3">86</div><div class="heat__cell h3">84</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h3">85</div><div class="heat__cell h4">89</div><div class="heat__cell h2">80</div><div class="heat__cell h1">67</div><div class="heat__cell h3">87</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h3">84</div><div class="heat__cell h4">91</div><div class="heat__cell h3">80</div><div class="heat__cell h3">83</div><div class="heat__cell h1">69</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h4">89</div><div class="heat__cell h3">87</div><div class="heat__cell h4">92</div><div class="heat__cell h2">76</div><div class="heat__cell h3">83</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h3">81</div><div class="heat__cell h3">81</div>
+
+            <div class="heat__row-label">신영로지스틱스</div>
+            <div class="heat__cell h2">74</div><div class="heat__cell h2">76</div><div class="heat__cell h2">75</div><div class="heat__cell h2">79</div><div class="heat__cell h2">77</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h2">78</div><div class="heat__cell h3">82</div><div class="heat__cell h2">73</div><div class="heat__cell h1">61</div><div class="heat__cell h2">79</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h2">77</div><div class="heat__cell h3">84</div><div class="heat__cell h2">73</div><div class="heat__cell h2">76</div><div class="heat__cell h1">63</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h3">81</div><div class="heat__cell h3">80</div><div class="heat__cell h3">84</div><div class="heat__cell h1">70</div><div class="heat__cell h2">76</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h2">75</div><div class="heat__cell h2">75</div>
+          </div>
+
+          <div class="heat-legend">
+            <span><b>운영률 색상 범례</b></span>
+            <span>낮음</span>
+            <span class="scale"><i class="h1"></i><i class="h2"></i><i class="h3"></i><i class="h4"></i><i class="h5"></i></span>
+            <span>높음</span>
+            <span>&lt;70% · 70~79% · 80~87% · 88~94% · ≥95%</span>
+            <span class="scale" style="margin-left:8px"><i class="h0"></i></span><span>주말/휴일 (집계 제외)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 운영효율 히트맵 -->
+      <div class="tab-pane" id="hmEff">
+        <div class="box">
+          <div class="box__head"><span class="box__name">운영효율 히트맵</span>
+            <div class="box__tools"><span style="font-size:11px;color:#999">셀 = 작업 ÷ (작업+대기) × 100</span></div>
+          </div>
+          <div class="heat hm" style="overflow-x:auto">
+            <div class="heat__col-label"></div>
+            <div class="heat__col-label">1</div><div class="heat__col-label">2</div><div class="heat__col-label">3</div><div class="heat__col-label">4</div><div class="heat__col-label">5</div><div class="heat__col-label">6</div><div class="heat__col-label">7</div><div class="heat__col-label">8</div><div class="heat__col-label">9</div><div class="heat__col-label">10</div><div class="heat__col-label">11</div><div class="heat__col-label">12</div><div class="heat__col-label">13</div><div class="heat__col-label">14</div><div class="heat__col-label">15</div><div class="heat__col-label">16</div><div class="heat__col-label">17</div><div class="heat__col-label">18</div><div class="heat__col-label">19</div><div class="heat__col-label">20</div><div class="heat__col-label">21</div><div class="heat__col-label">22</div><div class="heat__col-label">23</div><div class="heat__col-label">24</div><div class="heat__col-label">25</div><div class="heat__col-label">26</div><div class="heat__col-label">27</div><div class="heat__col-label">28</div><div class="heat__col-label">29</div><div class="heat__col-label">30</div>
+
+            <div class="heat__row-label">세종물류중부지점</div>
+            <div class="heat__cell h2" title="06-01 73.1%">73</div><div class="heat__cell h2">76</div><div class="heat__cell h2">75</div><div class="heat__cell h3">80</div><div class="heat__cell h2">78</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h2">78</div><div class="heat__cell h3">83</div><div class="heat__cell h2">71</div><div class="heat__cell h1">60</div><div class="heat__cell h2">79</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h2">78</div><div class="heat__cell h3">84</div><div class="heat__cell h2">73</div><div class="heat__cell h2">75</div><div class="heat__cell h1">64</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h3">82</div><div class="heat__cell h3">80</div><div class="heat__cell h3">85</div><div class="heat__cell h1">70</div><div class="heat__cell h2">76</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h2">73</div><div class="heat__cell h2">72</div>
+
+            <div class="heat__row-label">한성로지스</div>
+            <div class="heat__cell h2">72</div><div class="heat__cell h2">74</div><div class="heat__cell h2">75</div><div class="heat__cell h2">74</div><div class="heat__cell h2">72</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h2">72</div><div class="heat__cell h2">76</div><div class="heat__cell h2">71</div><div class="heat__cell h1">58</div><div class="heat__cell h2">72</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h2">71</div><div class="heat__cell h2">79</div><div class="heat__cell h1">69</div><div class="heat__cell h2">71</div><div class="heat__cell h1">63</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h2">75</div><div class="heat__cell h2">74</div><div class="heat__cell h2">77</div><div class="heat__cell h1">66</div><div class="heat__cell h2">71</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h1">70</div><div class="heat__cell h1">70</div>
+
+            <div class="heat__row-label">대명유통</div>
+            <div class="heat__cell h2">78</div><div class="heat__cell h3">81</div><div class="heat__cell h2">80</div><div class="heat__cell h3">85</div><div class="heat__cell h3">82</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h3">83</div><div class="heat__cell h3">86</div><div class="heat__cell h2">78</div><div class="heat__cell h1">68</div><div class="heat__cell h3">84</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h3">82</div><div class="heat__cell h3">88</div><div class="heat__cell h2">78</div><div class="heat__cell h3">80</div><div class="heat__cell h2">71</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h3">86</div><div class="heat__cell h3">84</div><div class="heat__cell h4">88</div><div class="heat__cell h2">75</div><div class="heat__cell h3">82</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h2">78</div><div class="heat__cell h2">78</div>
+
+            <div class="heat__row-label">동방물류</div>
+            <div class="heat__cell h2">72</div><div class="heat__cell h2">75</div><div class="heat__cell h2">73</div><div class="heat__cell h2">78</div><div class="heat__cell h2">76</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h2">77</div><div class="heat__cell h3">81</div><div class="heat__cell h2">71</div><div class="heat__cell h1">59</div><div class="heat__cell h2">78</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h2">76</div><div class="heat__cell h3">82</div><div class="heat__cell h2">72</div><div class="heat__cell h2">74</div><div class="heat__cell h1">61</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h2">80</div><div class="heat__cell h2">78</div><div class="heat__cell h3">83</div><div class="heat__cell h1">69</div><div class="heat__cell h2">75</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h2">70</div><div class="heat__cell h2">70</div>
+
+            <div class="heat__row-label">신영로지스틱스</div>
+            <div class="heat__cell h1">67</div><div class="heat__cell h1">70</div><div class="heat__cell h1">68</div><div class="heat__cell h2">72</div><div class="heat__cell h2">70</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h2">71</div><div class="heat__cell h2">76</div><div class="heat__cell h1">66</div><div class="heat__cell h1">54</div><div class="heat__cell h2">72</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h2">70</div><div class="heat__cell h2">77</div><div class="heat__cell h1">66</div><div class="heat__cell h1">69</div><div class="heat__cell h1">57</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h2">75</div><div class="heat__cell h2">73</div><div class="heat__cell h2">77</div><div class="heat__cell h1">63</div><div class="heat__cell h1">69</div>
+            <div class="heat__cell h0">–</div><div class="heat__cell h0">–</div>
+            <div class="heat__cell h1">67</div><div class="heat__cell h1">67</div>
+          </div>
+
+          <div class="heat-legend">
+            <span><b>운영효율 색상 범례</b></span>
+            <span>낮음</span>
+            <span class="scale"><i class="h1"></i><i class="h2"></i><i class="h3"></i><i class="h4"></i><i class="h5"></i></span>
+            <span>높음</span>
+            <span>&lt;70% · 70~79% · 80~87% · 88~94% · ≥95%</span>
+            <span class="scale" style="margin-left:8px"><i class="h0"></i></span><span>주말/휴일 (집계 제외)</span>
+          </div>
+        </div>
+      </div>
+      </div><!-- /.hm-wrap -->
+
+      <div class="box">
+        <div class="sub-head">히트맵에서 읽히는 패턴</div>
+        <div style="font-size:12px;color:#666;line-height:1.9">
+          · <b>6/11 · 6/19 · 6/25</b> 열이 5개 업체 전부 낮습니다 → 개별 업체 이슈가 아닌 <b>공통 요인(우천/물량 감소)</b> 가능성.<br/>
+          · <b>신영로지스틱스</b> 행 전체가 옅습니다 → 특정 일자가 아닌 <b>상시 저운영</b>. 근로시간 설정(계획가동시간) 재확인 필요.<br/>
+          · <b>대명유통</b>은 6/16 · 6/24에 99%로 포화 → 초과근무 가능성, 배차 분산 검토.
+        </div>
+      </div>
+    </div>
+
+    <!-- 범례 -->
+    <div class="legend">
+      <span><b>범례</b></span>
+      <span class="li"><span class="sw" style="background:#ff3600"></span>기준기간(STD) 2026-06</span>
+      <span class="li"><span class="sw" style="background:#c8c8c8"></span>직전기간(PREV) 2026-05</span>
+      <span class="li"><span class="up">▲</span> 개선 / <span class="down">▼</span> 악화 (충격·연료는 감소가 개선)</span>
+      <span class="li"><span class="sw h3"></span>히트맵 색 농도 = 지표값</span>
+      <span class="li"><span class="web-only">Web 전용</span> 리포트는 App에서 제공되지 않습니다</span>
+      <span style="margin-left:auto;color:#999">기간 단위 : 일 = TB_WORKING_HOUR / 주·월 = TB_EQUIPMENT_DAILY_OPERATION</span>
+    </div>
+
+    <div class="note">
+      <b>TO-BE 개선 사항</b>
+      <ul>
+        <li><span class="tag-new">신규</span> <b>현황 · 비교 · 히트맵 3화면을 한 페이지 탭으로 통합</b> — 업체/기간 필터를 공유하므로 같은 지표를 다시 조회할 필요가 없습니다.</li>
+        <li><span class="tag-new">신규</span> 증감을 <b>방향(▲▼) + 색 + 막대 비율</b>로 동시 표기(<b>.eff</b> 직전/기준 2행 + DIFF)해 크기까지 즉시 인지.</li>
+        <li><span class="tag-new">신규</span> 히트맵에 <b>5단계 색상 범례</b>와 주말/휴일(집계 제외) 표기를 추가하고, <b>운영률 ↔ 운영효율 토글</b>을 제공.</li>
+        <li><span class="tag-new">신규</span> 비교 대상 업체를 <b>칩(chip) 추가/삭제</b>로 관리하여 해당 업체 행만 부분 갱신(전체 재조회 제거).</li>
+        <li><span class="tag-new">신규</span> <b>내보내기(Excel/CSV)</b> — 지표·기간·업체 범위를 선택해 다운로드.</li>
+        <li><span class="tag-new">신규</span> 8개 지표 <b>기간별 추이 그래프</b>를 현황 탭에 함께 배치(운영률·운영효율 라인 + 6지표 막대).</li>
+        <li><span class="tag-keep">유지</span> STD / PREV / DIFF 3종 응답 구조, 업체 권한 범위(authorizedCompanyIds) 제한, 리포트는 <b>Web 전용</b>(App 미제공).</li>
+        <li>데이터 원천 : <b>TB_EQUIPMENT_DAILY_OPERATION</b>(주·월 집계) + <b>TB_WORKING_HOUR</b>(일 raw) + <b>TB_DATE_SEQ</b>(히트맵 셀 격자) + <b>TB_COMPANY</b>/<b>TB_GROUP</b>(업체·그룹명) + <b>TB_EQUIPMENT</b>/<b>TB_EQUIPMENT_CODE</b>(권한·연료타입) + <b>TB_WORKING_TIME</b>(계획가동시간)</li>
+      </ul>
+    </div>
+  </main>
+</div>
+
+<!-- ═══════ 내보내기 모달 ═══════ -->
+<div class="dim" id="expModal">
+  <div class="modal">
+    <div class="modal__head">
+      <div class="modal__title">리포트 내보내기</div>
+      <button class="modal__x" data-modal-close>✕</button>
+    </div>
+    <div class="modal__body">
+      <div class="form-grid">
+        <div class="fld"><span class="fld__k">파일 형식</span>
+          <select class="inp"><option>Excel (.xlsx)</option><option>CSV (.csv)</option></select></div>
+        <div class="fld"><span class="fld__k">기간</span>
+          <input class="inp" value="2026-06-01 ~ 2026-06-30" readonly/></div>
+        <div class="fld col-2"><span class="fld__k">포함 지표<span class="req">*</span></span>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <label class="chk"><input type="checkbox" checked/> 운영률</label>
+            <label class="chk"><input type="checkbox" checked/> 운영효율</label>
+            <label class="chk"><input type="checkbox" checked/> 충격횟수</label>
+            <label class="chk"><input type="checkbox" checked/> 연료소비량</label>
+            <label class="chk"><input type="checkbox" checked/> 배터리충전량</label>
+            <label class="chk"><input type="checkbox" checked/> 운행거리</label>
+            <label class="chk"><input type="checkbox" checked/> 운행시간</label>
+            <label class="chk"><input type="checkbox" checked/> 배터리충전횟수</label>
+          </div>
+        </div>
+        <div class="fld col-2"><span class="fld__k">포함 시트</span>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <label class="chk"><input type="checkbox" checked/> 업체별 현황(STD/PREV/DIFF)</label>
+            <label class="chk"><input type="checkbox" checked/> 업체별 비교</label>
+            <label class="chk"><input type="checkbox" checked/> 업체별 히트맵(일자별 원본값)</label>
+          </div>
+        </div>
+      </div>
+      <div class="note" style="margin-top:14px">내보내기 데이터는 화면과 동일한 <b>TB_EQUIPMENT_DAILY_OPERATION</b> 집계 결과입니다. 히트맵 시트는 <b>TB_DATE_SEQ</b>로 채운 빈 일자(0)를 포함합니다.</div>
+    </div>
+    <div class="modal__foot">
+      <button class="btn" data-modal-close>취소</button>
+      <button class="btn btn--pri">다운로드</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ 비교 업체 추가 모달 ═══════ -->
+<div class="dim" id="cmpModal">
+  <div class="modal sm">
+    <div class="modal__head">
+      <div class="modal__title">비교 업체 추가</div>
+      <button class="modal__x" data-modal-close>✕</button>
+    </div>
+    <div class="modal__body">
+      <div class="lnb__search" style="margin:0 0 12px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg><input placeholder="업체명 검색"/></div>
+      <label class="chk" style="display:flex;padding:8px 0"><input type="checkbox" checked disabled/> (주)세종물류중부지점 <span class="badge pri" style="margin-left:auto">기준</span></label>
+      <label class="chk" style="display:flex;padding:8px 0"><input type="checkbox" checked/> (주)한성로지스</label>
+      <label class="chk" style="display:flex;padding:8px 0"><input type="checkbox" checked/> 대명유통(주)</label>
+      <label class="chk" style="display:flex;padding:8px 0"><input type="checkbox"/> (주)동방물류</label>
+      <label class="chk" style="display:flex;padding:8px 0"><input type="checkbox"/> 신영로지스틱스</label>
+      <div class="note" style="margin-top:10px">권한 범위(<b>authorizedCompanyIds</b>) 내 업체만 표시됩니다. 딜러 계정은 관리 고객사만 선택할 수 있습니다.</div>
+    </div>
+    <div class="modal__foot">
+      <button class="btn" data-modal-close>취소</button>
+      <button class="btn btn--pri" data-modal-close>적용 (선택 업체만 갱신)</button>
+    </div>
+  </div>
+</div>
+
+<script src="../_shared/meeting-model.js"></script>
+<script src="../_shared/common-logic.js?v=20260907-common-logic-r42"></script>
+<script src="../_shared/nav.js?v=20260907-common-logic-r42"></script>
+</body>
+</html>

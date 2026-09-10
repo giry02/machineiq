@@ -1,0 +1,8 @@
+#googleMapCanvas{position:absolute;inset:0;width:100%;height:100%}
+#googleMapCanvas iframe{display:block;width:100%;height:100%;border:0}
+#map #markers,#map #pop{display:none}
+#map[data-map-provider="google-embed"] #pop{display:block;position:absolute;right:12px;top:65px;z-index:6}
+#map[data-map-provider="google-embed"] #pop .map-pop{position:relative;left:auto!important;top:auto!important;transform:none!important}
+#mapHourlyBasis{margin:0;color:#667085;font-size:12px;font-weight:400;line-height:18px}
+.miq-map-status{position:absolute;z-index:6;left:50%;top:50%;transform:translate(-50%,-50%);max-width:90%;padding:10px 14px;border:1px solid #dfe3e8;border-radius:5px;background:#fff;color:#555;font:400 12px/18px 'Noto Sans KR',sans-serif}
+.miq-map-status[hidden]{display:none}

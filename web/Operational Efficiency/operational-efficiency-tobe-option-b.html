@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>운행이력 - 운영효율 B안</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
+<link rel="stylesheet" href="../_shared/mockup.css"/>
+<link rel="stylesheet" href="../_shared/content-system.css?v=20260902-readability"/>
+<link rel="stylesheet" href="../_shared/operation-metrics-enhancements.css?v=20260905-efficiency-top-align-r1"/>
+<link rel="stylesheet" href="../_shared/operation-efficiency-option-b.css?v=20260905-efficiency-b-r2"/>
+<link rel="stylesheet" href="../_shared/chart-common.css"/>
+</head>
+<body data-period-presets="dwm" class="miq-content-system miq-operation-metrics miq-operation-efficiency miq-operation-efficiency-b" data-metrics-page="efficiency" data-efficiency-view="daily-rows" data-target-profile="full" data-gnb="anlz" data-sub="operb" data-variant="tobe" data-base="../">
+
+<div id="gnb"></div>
+
+<div class="layout">
+  <aside class="lnb" id="lnb"></aside>
+
+  <main class="main">
+    <div class="page-head metrics-breadcrumb">
+      <div class="page-head__bc">
+        <a data-context-link href="../Vehicle%20Summary/vehicle-summary-tobe-option-a-expand.html">운행이력</a> &gt; 운영효율 B안
+      </div>
+    </div>
+    <div class="page-head">
+      <h1 class="page-head__title miq-page-title">운영효율 B안</h1>
+    </div>
+
+    <div class="filter-bar" id="efficiencyFilter">
+      <span class="period-tabs" id="periodTabs" role="group" aria-label="조회 기간 단위">
+        <button type="button" data-period="d">일</button>
+        <button type="button" data-period="w">주</button>
+        <button class="active" type="button" data-period="m">월</button>
+        </span>
+      <input class="inp inp--sm" id="dFrom" type="date" value="2026-08-01" aria-label="조회 시작일"/>
+      <span class="sep">~</span>
+      <input class="inp inp--sm" id="dTo" type="date" value="2026-08-31" aria-label="조회 종료일"/>
+      <button class="btn btn--sm btn--dark" type="button" id="btnSearch">조회</button>
+    </div>
+    <p class="metrics-feedback" id="metricsFeedback" role="status" aria-live="polite"></p>
+    <div class="miq-analysis-scope" id="efficiencyScopeSummary" data-miq-scope-placement="title" aria-label="현재 운영효율 분석 범위" aria-live="polite"></div>
+
+    <div class="eff-top">
+      <section class="eff-top__main" aria-labelledby="efficiencyAverageTitle">
+        <div class="metrics-section-head">
+          <div>
+            <h2 id="efficiencyAverageTitle">평균 작업·대기시간</h2>
+            <p>선택 범위의 대당 평균이며 가동시간을 100%로 환산합니다.</p>
+          </div>
+          <strong class="efficiency-total" id="efficiencyTotal">-</strong>
+        </div>
+        <div class="eff-top__visual">
+          <div class="lg" aria-label="범례">
+            <span class="li"><span class="sw" style="background:#ff3600"></span>작업시간</span>
+            <span class="li"><span class="sw" style="background:#4d5359"></span>대기시간</span>
+          </div>
+          <div class="split" id="split" role="img" aria-label="평균 작업시간과 대기시간 비율"></div>
+          <div class="pct-axis" aria-hidden="true">
+            <span>0%</span><span>10%</span><span>20%</span><span>30%</span><span>40%</span><span>50%</span>
+            <span>60%</span><span>70%</span><span>80%</span><span>90%</span><span>100%</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="top5" aria-labelledby="efficiencyTop5Title">
+        <h2 class="top5__t" id="efficiencyTop5Title">작업시간 Top5</h2>
+        <ol id="top5List"></ol>
+      </section>
+    </div>
+
+    <section class="box efficiency-daily-panel" aria-labelledby="efficiencyDailyTitle">
+      <div class="chart-head">
+        <h2 class="chart-head__name" id="efficiencyDailyTitle">운영효율</h2>
+        <span class="lg" style="margin-bottom:0" aria-label="범례">
+          <span class="li"><span class="sw" style="background:#ff3600"></span>작업시간</span>
+          <span class="li"><span class="sw" style="background:#4d5359"></span>대기시간</span>
+          <span class="li"><span class="sw" style="background:#d9dde1"></span>미사용시간</span>
+        </span>
+        <span class="chart-hint" id="chartHint"></span>
+        <span class="chart-uncollected" id="chartUncollected" hidden></span>
+      </div>
+
+      <div class="efficiency-daily-summary" aria-label="선택 기간 운영효율 요약">
+        <div class="efficiency-daily-summary__item">
+          <span class="efficiency-daily-summary__label">선택 기간</span>
+          <strong class="efficiency-daily-summary__value" id="efficiencyDailyPeriod">2026-08-01 ~ 2026-08-31</strong>
+        </div>
+        <div class="efficiency-daily-summary__item">
+          <span class="efficiency-daily-summary__label">기간 평균 운영효율</span>
+          <strong class="efficiency-daily-summary__value" id="efficiencyDailyAverage">-</strong>
+        </div>
+        <div class="efficiency-daily-summary__item">
+          <span class="efficiency-daily-summary__label">대당 누적 작업시간</span>
+          <strong class="efficiency-daily-summary__value" id="efficiencyDailyWork">-</strong>
+        </div>
+      </div>
+
+      <div class="efficiency-daily-axis" aria-hidden="true">
+        <span id="efficiencyDailyAxisLabel">일자</span>
+        <span class="efficiency-daily-axis__scale"><span>0</span><span>25</span><span>50</span><span>75</span><span>100%</span></span>
+        <span class="efficiency-daily-axis__metrics">작업 · 대기 · 미사용</span>
+        <span class="efficiency-daily-axis__actual">실제 작업시간</span>
+      </div>
+      <div class="chart-wrap" id="chartWrap">
+        <div class="efficiency-daily-list" id="chart" role="list" aria-label="기간별 운영효율"></div>
+        <div class="tip-box" id="tip" role="tooltip"></div>
+      </div>
+      <p class="efficiency-daily-note">※ 미사용시간은 현재 원본 필드가 없어 일 10H 기준에서 작업·대기시간을 제외한 프로토타입 파생값입니다.</p>
+
+      <details class="metrics-table-fallback">
+        <summary>차트 데이터 표로 보기</summary>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <caption class="miq-sr-only">기간별 작업시간, 대기시간, 미사용시간 및 운영효율</caption>
+            <thead><tr><th scope="col">기간</th><th scope="col" class="r">작업시간</th><th scope="col" class="r">대기시간</th><th scope="col" class="r">미사용시간</th><th scope="col" class="r">가동시간</th><th scope="col" class="r">운영효율</th></tr></thead>
+            <tbody id="efficiencyTableBody"></tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+  </main>
+</div>
+
+<script src="../_shared/meeting-model.js"></script>
+<script src="../_shared/common-logic.js?v=20260907-common-logic-r42"></script>
+<script src="../_shared/chart-common.js"></script>
+<script src="../_shared/nav.js?v=20260907-common-logic-r42"></script>
+<script src="../_mock-data/generated/fleet.generated.js?v=20260906-json-r1"></script>
+<script src="../_shared/fleet.js?v=20260906-json-r1"></script>
+<script src="../_shared/lnb-tree.js?v=20260905-company-group-r3"></script>
+<script src="../_shared/operation-metrics-enhancements.js?v=20260907-common-logic-r42"></script>
+</body>
+</html>

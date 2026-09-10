@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>회원가입 - App</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
+<link rel="stylesheet" href="../_shared/mockup.css"/>
+<link rel="stylesheet" href="../_shared/auth-account-enhancements.css"/>
+</head>
+<body data-shell="none" data-variant="tobe" data-base="../" data-auth-page="registration" data-registration-mode="app">
+<div class="aae-shell">
+  <header class="aae-app-header">
+    <button class="aae-app-back" id="registrationAppBack" type="button" aria-label="이전 화면">‹</button>
+    <h1>회원가입</h1>
+    <select class="aae-app-language" data-language-select aria-label="언어 선택">
+      <option value="ko">KO</option><option value="en">EN</option><option value="fr">FR</option><option value="es">ES</option><option value="de">DE</option><option value="it">IT</option><option value="ja">JA</option>
+    </select>
+  </header>
+
+  <main class="aae-main">
+    <div class="aae-registration" data-registration-flow>
+      <div class="aae-page-heading">
+        <h1>회원가입</h1>
+        <p>Web과 동일한 가입 정보를 모바일에 맞는 한 열 구성으로 입력합니다.</p>
+      </div>
+      <nav class="aae-reg-nav" aria-label="회원가입 단계">
+        <button type="button" data-registration-step="agreement" aria-current="step">1. 약관 동의</button>
+        <button type="button" data-registration-step="details" disabled>2. 정보 입력</button>
+      </nav>
+
+      <section id="registrationAgreement" aria-labelledby="appAgreementTitle">
+        <div class="aae-reg-section">
+          <h2 id="appAgreementTitle">약관 동의</h2>
+          <p class="aae-card__desc" style="margin-bottom:14px">Machine IQ 서비스 이용을 위해 필수 약관에 동의해 주세요.</p>
+          <div class="aae-agree-all">
+            <label class="aae-check"><input type="checkbox" id="registrationAgreeAll"/><span><strong>[전체동의]</strong> 회원가입 약관에 모두 동의합니다.</span></label>
+          </div>
+          <div class="aae-agreements">
+            <article class="aae-agreement"><div class="aae-agreement__head"><label class="aae-check"><input type="checkbox" data-term data-term-required="true"/><span>개인정보 수집 및 이용 (필수)</span></label><button class="aae-agreement-toggle" type="button" aria-expanded="false" aria-controls="appTerm1">열기</button></div><div class="aae-agreement__content" id="appTerm1" hidden>Machine IQ 서비스 제공을 위해 성명, 연락처, 장비 및 위치정보를 수집합니다.</div></article>
+            <article class="aae-agreement"><div class="aae-agreement__head"><label class="aae-check"><input type="checkbox" data-term data-term-required="true"/><span>개인(위치)정보의 제3자 제공 (필수)</span></label><button class="aae-agreement-toggle" type="button" aria-expanded="false" aria-controls="appTerm2">열기</button></div><div class="aae-agreement__content" id="appTerm2" hidden>서비스 제공을 위해 필요한 범위에서 개인 및 위치정보를 지정된 제3자에게 제공합니다.</div></article>
+            <article class="aae-agreement"><div class="aae-agreement__head"><label class="aae-check"><input type="checkbox" data-term data-term-required="true"/><span>개인(위치)정보의 처리위탁 (필수)</span></label><button class="aae-agreement-toggle" type="button" aria-expanded="false" aria-controls="appTerm3">열기</button></div><div class="aae-agreement__content" id="appTerm3" hidden>서비스 운영을 위해 개인정보 처리 업무를 수탁사에 위탁합니다.</div></article>
+            <article class="aae-agreement"><div class="aae-agreement__head"><label class="aae-check"><input type="checkbox" data-term data-term-required="true"/><span>개인위치정보 제3자 제공 통지 (필수)</span></label><button class="aae-agreement-toggle" type="button" aria-expanded="false" aria-controls="appTerm4">열기</button></div><div class="aae-agreement__content" id="appTerm4" hidden>개인위치정보 제3자 제공 내역을 정해진 기준과 방법으로 통지합니다.</div></article>
+            <article class="aae-agreement"><div class="aae-agreement__head"><label class="aae-check"><input type="checkbox" data-term/><span>개인정보 수집 및 이용 (선택)</span></label><button class="aae-agreement-toggle" type="button" aria-expanded="false" aria-controls="appTerm5">열기</button></div><div class="aae-agreement__content" id="appTerm5" hidden>마케팅 목적의 개인정보 수집 및 이용은 선택 사항입니다.</div></article>
+            <article class="aae-agreement"><div class="aae-agreement__head"><label class="aae-check"><input type="checkbox" data-term/><span>마케팅 목적 일반 개인정보 이용 (선택)</span></label><button class="aae-agreement-toggle" type="button" aria-expanded="false" aria-controls="appTerm6">열기</button></div><div class="aae-agreement__content" id="appTerm6" hidden>신제품과 서비스 안내를 위한 개인정보 이용은 선택 사항입니다.</div></article>
+          </div>
+          <div class="aae-alert" id="agreementStatus" role="status" aria-live="polite" hidden></div>
+          <button class="aae-button aae-button--primary aae-button--wide" id="registrationContinue" type="button" style="margin-top:16px" disabled>동의하고 정보 입력</button>
+        </div>
+      </section>
+
+      <section id="registrationDetails" aria-labelledby="appDetailsTitle" hidden>
+        <form id="registrationForm" novalidate>
+          <div class="aae-reg-section">
+            <h2 id="appDetailsTitle">계정 정보</h2>
+            <div class="aae-reg-grid">
+              <div class="aae-field"><label class="aae-label" for="registrationName">이름 <span class="aae-required">*</span></label><input class="aae-control" id="registrationName" name="name" type="text" autocomplete="name" data-required="true"/><span class="aae-error" data-error-for="registrationName"></span></div>
+              <div class="aae-field"><label class="aae-label" for="registrationUserId">사용자 ID <span class="aae-required">*</span></label><div class="aae-control-row"><input class="aae-control" id="registrationUserId" name="userId" type="text" placeholder="영문·숫자 6자 이상" autocomplete="username" data-required="true"/><button class="aae-button" id="registrationCheckId" type="button">중복확인</button></div><span class="aae-error" data-error-for="registrationUserId"></span><div class="aae-alert" id="registrationUserIdStatus" role="status" aria-live="polite" hidden></div></div>
+              <div class="aae-field"><label class="aae-label" for="registrationEmail">인증 이메일 <span class="aae-required">*</span></label><div class="aae-control-row"><input class="aae-control" id="registrationEmail" name="email" type="email" autocomplete="email" data-required="true"/><button class="aae-button" id="registrationSendEmail" type="button">코드 발송</button></div><span class="aae-error" data-error-for="registrationEmail"></span></div>
+              <div class="aae-field"><label class="aae-label" for="registrationEmailCode">인증 코드 <span class="aae-required">*</span></label><div class="aae-control-row"><input class="aae-control" id="registrationEmailCode" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code" disabled/><button class="aae-button" id="registrationVerifyEmail" type="button" disabled>확인</button><button class="aae-button" id="registrationResendEmail" type="button" disabled>재발송</button></div><span class="aae-help">남은 시간 <strong id="registrationEmailTimer">03:00</strong></span><span class="aae-error" data-error-for="registrationEmailCode"></span><div class="aae-alert" id="registrationEmailStatus" role="status" aria-live="polite" hidden></div></div>
+              <div class="aae-field"><label class="aae-label" for="registrationPassword">비밀번호 <span class="aae-required">*</span></label><div class="aae-control-wrap"><input class="aae-control" id="registrationPassword" name="password" type="password" autocomplete="new-password" data-required="true"/><button class="aae-password-toggle" type="button" data-password-toggle="registrationPassword" aria-pressed="false">표시</button></div><span class="aae-help">12자 이상 · 영문 + 숫자 + 특수문자</span><span class="aae-error" data-error-for="registrationPassword"></span></div>
+              <div class="aae-field"><label class="aae-label" for="registrationPasswordConfirm">비밀번호 확인 <span class="aae-required">*</span></label><div class="aae-control-wrap"><input class="aae-control" id="registrationPasswordConfirm" name="passwordConfirm" type="password" autocomplete="new-password" data-required="true"/><button class="aae-password-toggle" type="button" data-password-toggle="registrationPasswordConfirm" aria-pressed="false">표시</button></div><span class="aae-error" data-error-for="registrationPasswordConfirm"></span></div>
+            </div>
+          </div>
+
+          <div class="aae-reg-section">
+            <h2>국가 · 연락처 · 주소</h2>
+            <div class="aae-reg-grid">
+              <div class="aae-field"><label class="aae-label" for="registrationCountry">국가 <span class="aae-required">*</span></label><select class="aae-select" id="registrationCountry" name="country" data-required="true"><option value="">국가를 선택하세요</option><option value="KR" selected>대한민국 (Korea)</option><option value="US">미국 (United States)</option><option value="CN">중국 (China)</option><option value="JP">일본 (Japan)</option><option value="DE">독일 (Germany)</option><option value="AU">호주 (Australia)</option><option value="GB">영국 (United Kingdom)</option><option value="FR">프랑스 (France)</option></select><span class="aae-error" data-error-for="registrationCountry"></span></div>
+              <div class="aae-field"><label class="aae-label" for="registrationPhone">전화번호 <span class="aae-required">*</span></label><div class="aae-tel"><span class="aae-tel__prefix" id="registrationTelPrefix">+82</span><input class="aae-control" id="registrationPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="국가번호 제외 숫자" data-required="true"/></div><span class="aae-error" data-error-for="registrationPhone"></span></div>
+              <div class="aae-field"><label class="aae-label" for="registrationState">주 / 도</label><input class="aae-control" id="registrationState" name="state" type="text" autocomplete="address-level1" placeholder="State / Province (선택)"/></div>
+              <div class="aae-field"><label class="aae-label" for="registrationCity">도시 <span class="aae-required">*</span></label><input class="aae-control" id="registrationCity" name="city" type="text" autocomplete="address-level2" data-required="true"/><span class="aae-error" data-error-for="registrationCity"></span></div>
+              <div class="aae-field"><label class="aae-label" for="registrationAddress">상세주소 <span class="aae-required">*</span></label><input class="aae-control" id="registrationAddress" name="addressDetail" type="text" autocomplete="street-address" placeholder="도로명, 건물명, 상세 위치" data-required="true"/><span class="aae-error" data-error-for="registrationAddress"></span></div>
+            </div>
+          </div>
+
+          <div class="aae-reg-section">
+            <h2>소속 · 역할</h2>
+            <div class="aae-reg-grid">
+              <fieldset class="aae-field" style="border:0;padding:0"><legend class="aae-label">역할 / 구분 <span class="aae-required">*</span></legend><div class="aae-role-group"><label class="aae-role"><input type="radio" name="registrationRole" value="customer-owner" checked/>고객사 - 대표</label><label class="aae-role"><input type="radio" name="registrationRole" value="customer-employee"/>고객사 - 직원</label><label class="aae-role"><input type="radio" name="registrationRole" value="dealer-employee"/>딜러 - 직원</label></div></fieldset>
+              <div class="aae-field" data-registration-roles="customer-owner,dealer-employee"><label class="aae-label" for="registrationRegion">지역 <span class="aae-required">*</span></label><select class="aae-select" id="registrationRegion" name="region" data-required="true"><option value="">지역을 선택하세요</option><option value="ALAO">ALAO</option><option value="EMEA">EMEA</option></select><span class="aae-error" data-error-for="registrationRegion"></span></div>
+              <div class="aae-field" data-registration-roles="customer-owner,dealer-employee"><label class="aae-label" for="registrationDealer">소속 딜러 <span class="aae-required">*</span></label><select class="aae-select" id="registrationDealer" name="dealer" data-required="true"><option value="">딜러를 선택하세요</option></select><span class="aae-help" id="registrationDealerHelp">지역을 먼저 선택해 주세요.</span><span class="aae-error" data-error-for="registrationDealer"></span></div>
+              <div class="aae-field" data-registration-roles="customer-owner,customer-employee"><label class="aae-label" for="registrationCompany"><span id="registrationCompanyLabel">신규 업체명</span> <span class="aae-required">*</span></label><div class="aae-autocomplete"><input class="aae-control" id="registrationCompany" name="company" type="text" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="registrationCompanyList" aria-expanded="false" data-required="true"/><div class="aae-autocomplete-list" id="registrationCompanyList" role="listbox" hidden></div></div><span class="aae-help" id="registrationCompanyHelp"></span><span class="aae-error" data-error-for="registrationCompany"></span></div>
+              <div class="aae-field" data-registration-roles="customer-owner"><label class="aae-label" for="registrationRepresentative">대표자명 <span class="aae-required">*</span></label><input class="aae-control" id="registrationRepresentative" name="representative" type="text" data-required="true"/><span class="aae-error" data-error-for="registrationRepresentative"></span></div>
+            </div>
+          </div>
+
+          <div class="aae-reg-section">
+            <h2>장비 연결 정보</h2>
+            <div class="aae-reg-grid">
+              <div class="aae-field"><label class="aae-label" for="registrationEquipmentSerial">장비 Serial <span class="aae-required">*</span></label><input class="aae-control" id="registrationEquipmentSerial" name="equipmentSerial" type="text" autocomplete="off" placeholder="장비 고유번호" data-required="true"/><span class="aae-error" data-error-for="registrationEquipmentSerial"></span></div>
+              <div class="aae-field"><label class="aae-label" for="registrationTerminalSerial">단말기 Serial <span class="aae-required">*</span></label><input class="aae-control" id="registrationTerminalSerial" name="terminalSerial" type="text" inputmode="numeric" autocomplete="off" placeholder="단말기 고유번호" data-required="true"/><span class="aae-error" data-error-for="registrationTerminalSerial"></span></div>
+              <p class="aae-help">Serial 형식과 길이 규칙은 백엔드 확정 전이므로 이 프로토타입에서는 필수 입력 여부만 검사합니다.</p>
+            </div>
+          </div>
+
+          <div class="aae-alert" id="registrationStatus" role="status" aria-live="polite" hidden></div>
+          <div class="aae-reg-footer">
+            <button class="aae-button" type="button" data-registration-cancel>취소</button>
+            <button class="aae-button aae-button--primary" id="registrationSubmit" type="submit">가입 신청</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </main>
+</div>
+<script src="../_shared/auth-account-enhancements.js?v=20260903-a-default"></script>
+</body>
+</html>

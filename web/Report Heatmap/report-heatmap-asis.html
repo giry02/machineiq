@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>업체별 히트맵 AS-IS (현행 Mock-up)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
+<link rel="stylesheet" href="../_shared/mockup.css"/>
+<style>
+/* AS-IS 전용 : 현행 히트맵 = 색상 3단 + 범례 없음 + 수치 미표기 */
+.hm-asis{grid-template-columns:118px repeat(30,minmax(0,1fr));gap:2px}
+.q1{background:#e03131}
+.q2{background:#f59f00}
+.q3{background:#2b8a3e}
+.q0{background:#f1f3f5}
+.hm-asis .heat__cell{height:22px;border-radius:0}
+.sep-note{font-size:11px;color:#aaa;margin:-6px 0 8px}
+</style>
+</head>
+<body data-gnb="rpt" data-sub="rptheat" data-variant="asis" data-base="../">
+
+<div id="gnb"></div>
+
+<div class="layout">
+  <!-- ═══════ LNB ═══════ -->
+  <aside class="lnb">
+    <div class="lnb__company">(주)세종물류중부지점</div>
+    <div class="lnb__search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+      <input placeholder="그룹 또는 차량"/>
+    </div>
+    <div class="lnb__group-title">그룹별 <span>▲</span></div>
+    <div class="lnb__item active" data-label="기본그룹">기본그룹 <span class="cnt">18</span></div>
+    <div class="lnb__item" data-label="테스트그룹">테스트그룹 <span class="cnt">14</span></div>
+    <div class="lnb__item" data-label="물류1팀">물류1팀 <span class="cnt">10</span></div>
+    <div class="lnb__group-title">차량 <span>▲</span></div>
+    <a class="lnb__item" data-label="B30S-7" href="../Vehicle%20Detail/vehicle-detail-asis.html">B30S-7 <span class="cnt">리튬</span></a>
+    <a class="lnb__item" data-label="D25S-9" href="../Vehicle%20Detail/vehicle-detail-asis.html">D25S-9 <span class="cnt">엔진</span></a>
+    <a class="lnb__item" data-label="B18S-7" href="../Vehicle%20Detail/vehicle-detail-asis.html">B18S-7 <span class="cnt">납산</span></a>
+    <div class="lnb__hint">리포트는 <b>업체(Company) 단위</b> 집계입니다. 그룹/차량 선택은 하위 분해 보기에만 반영됩니다.</div>
+  </aside>
+
+  <!-- ═══════ MAIN ═══════ -->
+  <main class="main">
+    <div class="page-head">
+      <div class="page-head__title">업체별 히트맵 <span class="sub" data-lnb-label>- 기본그룹</span></div>
+      <div class="page-head__bc">리포트 &gt; 업체별 히트맵</div>
+    </div>
+
+    <!-- 화면 이동 : 현행도 리포트는 3개 화면으로 분리되어 있다 -->
+    <div class="filter-bar filter-bar--left">
+      <span style="font-size:12px;font-weight:600;color:#555">리포트 화면</span>
+      <a class="btn" href="../Report%20Status/report-status-asis.html">업체별 현황</a>
+      <a class="btn" href="../Report%20Comparison/report-comparison-asis.html">업체별 비교</a>
+      <span class="badge gray">업체별 히트맵</span>
+      <div class="grow"></div>
+      <span style="font-size:11px;color:#999">※ 리포트는 Web 전용 기능입니다 (App 미제공)</span>
+    </div>
+
+    <!-- 조회 필터 : 업체 다중 선택 없음 · 지표 셀렉트 -->
+    <div class="filter-bar">
+      <select class="inp" style="width:200px">
+        <option>(주)세종물류중부지점</option>
+        <option>(주)한성로지스</option>
+        <option>대명유통(주)</option>
+      </select>
+      <select class="inp" style="width:120px"><option>운영률</option><option>운영효율</option></select>
+      <select class="inp" style="width:96px"><option>월</option><option>주</option><option>일</option></select>
+      <div class="grow"></div>
+      <div class="date-range">2026-06-01 ~ 2026-06-30</div>
+      <button class="btn-search">조회</button>
+    </div>
+
+    <!-- ═══════ 업체별 히트맵 : 범례 없음 · 수치 미표기 ═══════ -->
+    <div class="box">
+      <div class="box__head">
+        <span class="box__name">업체별 히트맵</span>
+        <span class="box__badge gray">3개 업체 · 30일</span>
+        <div class="box__tools"><span style="font-size:11px;color:#999">2026-06-01 ~ 2026-06-30 · 운영률</span></div>
+      </div>
+      <div class="heat hm-asis" style="overflow-x:auto">
+        <div class="heat__col-label"></div>
+        <div class="heat__col-label">1</div><div class="heat__col-label">2</div><div class="heat__col-label">3</div><div class="heat__col-label">4</div><div class="heat__col-label">5</div><div class="heat__col-label">6</div><div class="heat__col-label">7</div><div class="heat__col-label">8</div><div class="heat__col-label">9</div><div class="heat__col-label">10</div><div class="heat__col-label">11</div><div class="heat__col-label">12</div><div class="heat__col-label">13</div><div class="heat__col-label">14</div><div class="heat__col-label">15</div><div class="heat__col-label">16</div><div class="heat__col-label">17</div><div class="heat__col-label">18</div><div class="heat__col-label">19</div><div class="heat__col-label">20</div><div class="heat__col-label">21</div><div class="heat__col-label">22</div><div class="heat__col-label">23</div><div class="heat__col-label">24</div><div class="heat__col-label">25</div><div class="heat__col-label">26</div><div class="heat__col-label">27</div><div class="heat__col-label">28</div><div class="heat__col-label">29</div><div class="heat__col-label">30</div>
+
+        <div class="heat__row-label">(주)세종물류중부지점</div>
+        <div class="heat__cell q2"></div><div class="heat__cell q2"></div><div class="heat__cell q2"></div><div class="heat__cell q3"></div><div class="heat__cell q3"></div>
+        <div class="heat__cell q0"></div><div class="heat__cell q0"></div>
+        <div class="heat__cell q3"></div><div class="heat__cell q3"></div><div class="heat__cell q2"></div><div class="heat__cell q1"></div><div class="heat__cell q3"></div>
+        <div class="heat__cell q0"></div><div class="heat__cell q0"></div>
+        <div class="heat__cell q3"></div><div class="heat__cell q3"></div><div class="heat__cell q2"></div><div class="heat__cell q2"></div><div class="heat__cell q1"></div>
+        <div class="heat__cell q0"></div><div class="heat__cell q0"></div>
+        <div class="heat__cell q3"></div><div class="heat__cell q3"></div><div class="heat__cell q3"></div><div class="heat__cell q2"></div><div class="heat__cell q2"></div>
+        <div class="heat__cell q0"></div><div class="heat__cell q0"></div>
+        <div class="heat__cell q2"></div><div class="heat__cell q2"></div>
+
+        <div class="heat__row-label">(주)한성로지스</div>
+        <div class="heat__cell q2"></div><div class="heat__cell q2"></div><div class="heat__cell q2"></div><div class="heat__cell q2"></div><div class="heat__cell q2"></div>
+        <div class="heat__cell q0"></div><div class="heat__cell q0"></div>
+        <div class="heat__cell q2"></div><div class="heat__cell q2"></div><div class="heat__cell q2"></div><div class="heat__cell q1"></div><div class="heat__cell q2"></div>
+        <div class="heat__cell q0"></div><div class="heat__cell q0"></div>
+        <div class="heat__cell q2"></div><div class="heat__cell q2"></div><div class="heat__cell q2"></div><div class="heat__cell q2"></div><div class="heat__cell q1"></div>
+        <div class="heat__cell q0"></div><div class="heat__cell q0"></div>
+        <div class="heat__cell q2"></div><div class="heat__cell q2"></div><div class="heat__cell q2"></div><div class="heat__cell q1"></div><div class="heat__cell q2"></div>
+        <div class="heat__cell q0"></div><div class="heat__cell q0"></div>
+        <div class="heat__cell q2"></div><div class="heat__cell q2"></div>
+
+        <div class="heat__row-label">대명유통(주)</div>
+        <div class="heat__cell q3"></div><div class="heat__cell q3"></div><div class="heat__cell q3"></div><div class="heat__cell q3"></div><div class="heat__cell q3"></div>
+        <div class="heat__cell q0"></div><div class="heat__cell q0"></div>
+        <div class="heat__cell q3"></div><div class="heat__cell q3"></div><div class="heat__cell q3"></div><div class="heat__cell q2"></div><div class="heat__cell q3"></div>
+        <div class="heat__cell q0"></div><div class="heat__cell q0"></div>
+        <div class="heat__cell q3"></div><div class="heat__cell q3"></div><div class="heat__cell q3"></div><div class="heat__cell q3"></div><div class="heat__cell q2"></div>
+        <div class="heat__cell q0"></div><div class="heat__cell q0"></div>
+        <div class="heat__cell q3"></div><div class="heat__cell q3"></div><div class="heat__cell q3"></div><div class="heat__cell q2"></div><div class="heat__cell q3"></div>
+        <div class="heat__cell q0"></div><div class="heat__cell q0"></div>
+        <div class="heat__cell q3"></div><div class="heat__cell q3"></div>
+      </div>
+      <div class="sep-note" style="margin-top:10px">※ 색상이 어떤 값(%) 구간을 의미하는지 화면에 안내가 없습니다. 셀에 수치도 표기되지 않아 마우스를 올려야 값을 알 수 있습니다.</div>
+    </div>
+
+    <!-- 참고 : 업체 월 평균은 별도 화면에서 확인 -->
+    <div class="box">
+      <div class="box__head">
+        <span class="box__name">업체 월 평균 (참고)</span>
+        <div class="box__tools"><span style="font-size:11px;color:#999">히트맵 화면에는 표시되지 않아 업체별 현황 화면에서 따로 확인해야 합니다</span></div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>업체명</th><th class="r">운영률</th><th class="r">운영효율</th></tr></thead>
+          <tbody>
+            <tr><td>(주)세종물류중부지점</td><td class="r">86.6</td><td class="r">75.7</td></tr>
+            <tr><td>(주)한성로지스</td><td class="r">79.2</td><td class="r">71.4</td></tr>
+            <tr><td>대명유통(주)</td><td class="r">91.3</td><td class="r">80.6</td></tr>
+            <tr><td>(주)동방물류</td><td class="r">82.7</td><td class="r">74.1</td></tr>
+            <tr><td>신영로지스틱스</td><td class="r">75.8</td><td class="r">68.9</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="sep-note" style="margin-top:8px">※ 현행 히트맵은 선택한 업체만 격자로 표시되며, 위와 같은 업체 요약 스트립이 없습니다.</div>
+    </div>
+
+    <!-- 현행 문제점 -->
+    <div class="note">
+      <b>AS-IS 현황 및 개선 포인트</b>
+      <ul>
+        <li><span class="tag-asis">현행</span> 히트맵에 <b>색상 범례가 없습니다.</b> 셀 색(적/황/녹 3단)이 어떤 % 구간인지 화면에서 알 수 없습니다.</li>
+        <li><span class="tag-asis">현행</span> 셀에 <b>수치가 표기되지 않아</b> 마우스를 올려야 값을 확인할 수 있고, 캡처·인쇄 시 값이 사라집니다.</li>
+        <li><span class="tag-asis">현행</span> <b>운영률 / 운영효율 전환이 상단 셀렉트 + 재조회</b>로만 가능해 두 지표를 번갈아 보기 번거롭습니다.</li>
+        <li><span class="tag-asis">현행</span> <b>주말/휴일(계획가동시간 0)</b> 셀이 집계 제외인지 안내가 없어 값이 0인 날과 구분되지 않습니다.</li>
+        <li><span class="tag-asis">현행</span> 업체 <b>요약(월 평균) 스트립과 패턴 해석 정보가 없어</b> 공통 저조일·상시 저운영 업체를 육안으로 찾아야 합니다.</li>
+        <li><span class="tag-asis">현행</span> <b>리포트는 Web 전용(App 미제공)</b> 이며, 일자별 원본값을 <b>내보내기(Excel/CSV)</b> 할 수 없습니다.</li>
+        <li>데이터 원천 : <b>TB_EQUIPMENT_DAILY_OPERATION</b>(운영률·운영효율 일 집계) + <b>TB_WORKING_HOUR</b>(일 조회 시 시간대별 raw) + <b>TB_DATE_SEQ</b>(히트맵 시간축 셀 생성) + <b>TB_COMPANY</b>(히트맵 행 업체명) + <b>TB_EQUIPMENT</b>/<b>TB_EQUIPMENT_CODE</b>(권한·장비)</li>
+      </ul>
+    </div>
+  </main>
+</div>
+
+<script src="../_shared/common-logic.js?v=20260907-common-logic-r42"></script>
+<script src="../_shared/nav.js?v=20260907-common-logic-r42"></script>
+</body>
+</html>

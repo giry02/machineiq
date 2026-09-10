@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>운행이력 - 충격 AS-IS (현행 Mock-up)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
+<link rel="stylesheet" href="../_shared/mockup.css"/>
+<style>
+/* AS-IS 전용 : 현행은 범례·임계값 안내 없는 단순 막대 + 표 */
+.plain-chart{background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:16px 18px 10px;margin-bottom:14px}
+.plain-chart__t{font-size:13px;font-weight:600;color:#555;margin-bottom:10px}
+.asis-y{font-size:11px;color:#999;margin-bottom:4px}
+.two-col{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:14px;align-items:start}
+</style>
+</head>
+<body data-gnb="anlz" data-sub="shock" data-variant="asis" data-base="../">
+
+<div id="gnb"></div>
+
+<div class="layout">
+  <!-- ═══════ LNB ═══════ -->
+  <aside class="lnb">
+    <div class="lnb__company">(주)세종물류중부지점</div>
+    <div class="lnb__search">🔍<input placeholder="그룹 또는 차량"/></div>
+    <div class="lnb__group-title">그룹별 <span>▲</span></div>
+    <div class="lnb__item active" data-label="기본그룹">기본그룹</div>
+    <div class="lnb__item" data-label="테스트그룹">테스트그룹</div>
+    <div class="lnb__item" data-label="물류1팀">물류1팀</div>
+    <div class="lnb__group-title">차량 <span>▼</span></div>
+    <a class="lnb__item" data-label="B30S-7" href="../Vehicle%20Detail/vehicle-detail-asis.html">B30S-7</a>
+    <a class="lnb__item" data-label="D25S-9" href="../Vehicle%20Detail/vehicle-detail-asis.html">D25S-9</a>
+    <a class="lnb__item" data-label="B18S-7" href="../Vehicle%20Detail/vehicle-detail-asis.html">B18S-7</a>
+  </aside>
+
+  <!-- ═══════ MAIN ═══════ -->
+  <main class="main">
+    <div class="page-head">
+      <div class="page-head__title">충격 <span class="sub" data-lnb-label>- 기본그룹</span></div>
+      <div class="page-head__bc">🏠 <a href="../Vehicle%20Summary/vehicle-summary-asis.html">운행이력</a>&gt; 충격</div>
+    </div>
+
+    <!-- 조회 필터 : 일/주/월은 있으나 어떤 데이터를 보는지 표시 없음 -->
+    <div class="filter-bar">
+      <div class="period-tabs">
+        <button>일</button><button>주</button><button class="active">월</button>
+      </div>
+      <div class="grow"></div>
+      <div class="date-range">📅 2026-06-01 ~ 2026-06-30</div>
+      <button class="btn-search">조회</button>
+    </div>
+
+    <!-- ═══════ 요약 : 대당 평균만, 전월 대비 없음 ═══════ -->
+    <div class="summary-card">
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>구분</th><th>민감</th><th>주의</th><th>경고</th><th>충격 합계</th><th>장비수</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>대당 평균 (건)</td>
+            <td>12.4</td>
+            <td>4.1</td>
+            <td>1.2</td>
+            <td>17.7</td>
+            <td>18대</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="two-col">
+      <section>
+        <!-- ═══════ 현행 그래프 : 범례/값/툴팁 없음 ═══════ -->
+        <div class="plain-chart">
+          <div class="plain-chart__t">일자별 충격량</div>
+          <div class="asis-y">(단위 : 건, 그룹 합계)</div>
+          <div class="stack-chart">
+            <div class="stk"><div class="stk__seg s3" style="height:35.7%"></div><div class="stk__seg s4" style="height:10.7%"></div><div class="stk__seg s5" style="height:3.6%"></div></div>
+            <div class="stk"><div class="stk__seg s3" style="height:32.1%"></div><div class="stk__seg s4" style="height:7.1%"></div></div>
+            <div class="stk"><div class="stk__seg s3" style="height:35.7%"></div><div class="stk__seg s4" style="height:14.3%"></div><div class="stk__seg s5" style="height:3.6%"></div></div>
+            <div class="stk"><div class="stk__seg s3" style="height:35.7%"></div><div class="stk__seg s4" style="height:10.7%"></div></div>
+            <div class="stk"><div class="stk__seg s3" style="height:32.1%"></div><div class="stk__seg s4" style="height:10.7%"></div><div class="stk__seg s5" style="height:3.6%"></div></div>
+            <div class="stk"><div class="stk__seg s3" style="height:35.7%"></div><div class="stk__seg s4" style="height:10.7%"></div><div class="stk__seg s5" style="height:3.6%"></div></div>
+            <div class="stk"><div class="stk__seg s3" style="height:35.7%"></div><div class="stk__seg s4" style="height:14.3%"></div><div class="stk__seg s5" style="height:3.6%"></div></div>
+            <div class="stk"><div class="stk__seg s3" style="height:32.1%"></div><div class="stk__seg s4" style="height:10.7%"></div><div class="stk__seg s5" style="height:3.6%"></div></div>
+            <div class="stk"><div class="stk__seg s3" style="height:25.0%"></div><div class="stk__seg s4" style="height:7.1%"></div></div>
+            <div class="stk"><div class="stk__seg s3" style="height:35.7%"></div><div class="stk__seg s4" style="height:10.7%"></div><div class="stk__seg s5" style="height:3.6%"></div></div>
+            <div class="stk"><div class="stk__seg s3" style="height:39.3%"></div><div class="stk__seg s4" style="height:14.3%"></div><div class="stk__seg s5" style="height:3.6%"></div></div>
+            <div class="stk"><div class="stk__seg s3" style="height:60.7%"></div><div class="stk__seg s4" style="height:25.0%"></div><div class="stk__seg s5" style="height:10.7%"></div></div>
+            <div class="stk"><div class="stk__seg s3" style="height:39.3%"></div><div class="stk__seg s4" style="height:14.3%"></div><div class="stk__seg s5" style="height:3.6%"></div></div>
+            <div class="stk"><div class="stk__seg s3" style="height:35.7%"></div><div class="stk__seg s4" style="height:10.7%"></div></div>
+            <div class="stk"><div class="stk__seg s3" style="height:21.4%"></div><div class="stk__seg s4" style="height:7.1%"></div><div class="stk__seg s5" style="height:3.6%"></div></div>
+            <div class="stk"><div class="stk__seg s3" style="height:35.7%"></div><div class="stk__seg s4" style="height:10.7%"></div><div class="stk__seg s5" style="height:3.6%"></div></div>
+            <div class="stk"><div class="stk__seg s3" style="height:35.7%"></div><div class="stk__seg s4" style="height:10.7%"></div><div class="stk__seg s5" style="height:3.6%"></div></div>
+            <div class="stk"><div class="stk__seg s3" style="height:53.6%"></div><div class="stk__seg s4" style="height:21.4%"></div><div class="stk__seg s5" style="height:7.1%"></div></div>
+            <div class="stk"><div class="stk__seg s3" style="height:32.1%"></div><div class="stk__seg s4" style="height:10.7%"></div><div class="stk__seg s5" style="height:3.6%"></div></div>
+            <div class="stk"><div class="stk__seg s3" style="height:35.7%"></div><div class="stk__seg s4" style="height:10.7%"></div><div class="stk__seg s5" style="height:3.6%"></div></div>
+            <div class="stk"><div class="stk__seg s3" style="height:35.7%"></div><div class="stk__seg s4" style="height:10.7%"></div><div class="stk__seg s5" style="height:3.6%"></div></div>
+            <div class="stk"><div class="stk__seg s3" style="height:35.7%"></div><div class="stk__seg s4" style="height:10.7%"></div><div class="stk__seg s5" style="height:3.6%"></div></div>
+          </div>
+          <div class="stack-x">
+            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+            <span>8</span><span>9</span><span>10</span><span>11</span><span>12</span>
+            <span>15</span><span>16</span><span>17</span><span>18</span><span>19</span>
+            <span>22</span><span>23</span><span>24</span><span>25</span><span>26</span>
+            <span>29</span><span>30</span>
+          </div>
+          <div style="font-size:11px;color:#bbb;margin-top:6px">※ 충격이 없는 일자(주말·공휴일)는 축에서 빠짐</div>
+        </div>
+
+        <!-- ═══════ 일자별 표 ═══════ -->
+        <div class="list-head">
+          <span class="list-head__count">일자별 내역 <b>22</b>건</span>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr><th>일자</th><th class="r">민감</th><th class="r">주의</th><th class="r">경고</th><th class="r">합계</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>2026-06-01</td><td class="r">10</td><td class="r">3</td><td class="r">1</td><td class="r">14</td></tr>
+              <tr><td>2026-06-02</td><td class="r">9</td><td class="r">2</td><td class="r">0</td><td class="r">11</td></tr>
+              <tr><td>2026-06-03</td><td class="r">10</td><td class="r">4</td><td class="r">1</td><td class="r">15</td></tr>
+              <tr><td>2026-06-04</td><td class="r">10</td><td class="r">3</td><td class="r">0</td><td class="r">13</td></tr>
+              <tr><td>2026-06-05</td><td class="r">9</td><td class="r">3</td><td class="r">1</td><td class="r">13</td></tr>
+              <tr><td>2026-06-08</td><td class="r">10</td><td class="r">3</td><td class="r">1</td><td class="r">14</td></tr>
+              <tr><td>2026-06-09</td><td class="r">10</td><td class="r">4</td><td class="r">1</td><td class="r">15</td></tr>
+              <tr><td>2026-06-10</td><td class="r">9</td><td class="r">3</td><td class="r">1</td><td class="r">13</td></tr>
+              <tr><td>2026-06-11</td><td class="r">7</td><td class="r">2</td><td class="r">0</td><td class="r">9</td></tr>
+              <tr><td>2026-06-12</td><td class="r">10</td><td class="r">3</td><td class="r">1</td><td class="r">14</td></tr>
+              <tr><td>2026-06-15</td><td class="r">11</td><td class="r">4</td><td class="r">1</td><td class="r">16</td></tr>
+              <tr><td>2026-06-16</td><td class="r">17</td><td class="r">7</td><td class="r">3</td><td class="r">27</td></tr>
+              <tr><td>2026-06-17</td><td class="r">11</td><td class="r">4</td><td class="r">1</td><td class="r">16</td></tr>
+              <tr><td>2026-06-18</td><td class="r">10</td><td class="r">3</td><td class="r">0</td><td class="r">13</td></tr>
+              <tr><td>2026-06-19</td><td class="r">6</td><td class="r">2</td><td class="r">1</td><td class="r">9</td></tr>
+              <tr><td>2026-06-22</td><td class="r">10</td><td class="r">3</td><td class="r">1</td><td class="r">14</td></tr>
+              <tr><td>2026-06-23</td><td class="r">10</td><td class="r">3</td><td class="r">1</td><td class="r">14</td></tr>
+              <tr><td>2026-06-24</td><td class="r">15</td><td class="r">6</td><td class="r">2</td><td class="r">23</td></tr>
+              <tr><td>2026-06-25</td><td class="r">9</td><td class="r">3</td><td class="r">1</td><td class="r">13</td></tr>
+              <tr><td>2026-06-26</td><td class="r">10</td><td class="r">3</td><td class="r">1</td><td class="r">14</td></tr>
+              <tr><td>2026-06-29</td><td class="r">10</td><td class="r">3</td><td class="r">1</td><td class="r">14</td></tr>
+              <tr><td>2026-06-30</td><td class="r">10</td><td class="r">3</td><td class="r">1</td><td class="r">14</td></tr>
+            </tbody>
+          </table>
+          <div class="tbl__foot">합계 : 민감 223 / 주의 74 / 경고 21 / 전체 318건 (대당 17.7건)</div>
+        </div>
+      </section>
+
+      <!-- ═══════ 현행 랭킹 : Top5, 레벨 구분 없음 ═══════ -->
+      <aside>
+        <div class="box">
+          <div class="box__head"><span class="box__name">충격 순위 (Top 5)</span></div>
+          <div class="tbl-wrap" style="border:none">
+            <table class="tbl">
+              <thead><tr><th class="c">순위</th><th>차량</th><th class="r">충격</th></tr></thead>
+              <tbody>
+                <tr><td class="c">1</td><td>D25S-9</td><td class="r">37</td></tr>
+                <tr><td class="c">2</td><td>B18S-7</td><td class="r">32</td></tr>
+                <tr><td class="c">3</td><td>D18S-9</td><td class="r">28</td></tr>
+                <tr><td class="c">4</td><td>B14S-7</td><td class="r">26</td></tr>
+                <tr><td class="c">5</td><td>B22S-7</td><td class="r">23</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="font-size:11px;color:#bbb;margin-top:10px;line-height:1.7">
+            ※ 레벨별 내역·임계값 확인·차량 상세로의 이동은 제공되지 않습니다.
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- 현행 문제점 -->
+    <div class="note">
+      <b>AS-IS 현황 및 개선 포인트</b>
+      <ul>
+        <li><span class="tag-asis">현행</span> <b>집계 레벨 범위가 화면에 표기되지 않습니다.</b> 이 화면의 "충격 합계 17.7건"은 <b>레벨3~5(민감/주의/경고)</b>만 합산한 값인데, <b>요약정보 화면의 차량별 "충격 횟수"는 레벨1~5 전체 합산</b>이라 같은 차량·같은 기간인데도 두 화면의 건수가 크게 달라 보입니다.</li>
+        <li><span class="tag-asis">현행</span> <b>충격 임계값을 화면에서 확인할 수 없습니다.</b> 레벨 구분 기준은 <b>TB_GROUP.SHOCK1~5</b> / <b>TB_EQUIPMENT.SHOCK1~5</b> 설정값이며 단말기가 이 기준으로 레벨별 카운트를 집계해 전송하는데, "몇 g부터 주의(레벨4)인지" 알 수 없어 수치 해석이 불가능합니다.</li>
+        <li><span class="tag-asis">현행</span> <b>전월(2026-05) 대비 증감이 없습니다.</b> 실제로는 대당 22.0건 → 17.7건으로 <b>19.5% 개선</b>되었으나 화면에서는 확인할 수 없습니다.</li>
+        <li><span class="tag-asis">현행</span> 스파이크 일자(<b>6/16 27건 · 경고 3건</b>, <b>6/24 23건 · 경고 2건</b>)에 대한 강조·드릴다운이 없고, <b>시간대·요일 패턴</b>을 볼 수단이 없어 원인(교대 시간, 특정 구역)을 좁힐 수 없습니다.</li>
+        <li><span class="tag-asis">현행</span> <b>개별 충격 이벤트(TB_EVENT_SHOCK)는 조회되지 않습니다.</b> 모든 수치는 미리 집계된 SHOCK3~5_CNT 컬럼이므로 "언제·어디서" 발생했는지 확인할 수 없는데 화면에 그 한계 안내가 없습니다.</li>
+        <li><span class="tag-asis">현행</span> <b>일 / 주·월 조회의 데이터 원천이 다른데 표시가 없습니다.</b> 일 조회는 <b>TB_WORKING_HOUR.SHOCK3~5_CNT</b>(시간 raw), 주·월 조회는 <b>TB_EQUIPMENT_DAILY_OPERATION.SHOCK3~5_CNT</b>(일 배치 집계)를 사용합니다.</li>
+        <li>데이터 원천 : <b>TB_WORKING_HOUR</b>(일 조회 · SHOCK3~5_CNT) / <b>TB_EQUIPMENT_DAILY_OPERATION</b>(주·월 조회 · SHOCK3~5_CNT) + <b>TB_GROUP</b>(SHOCK1~5 임계값 · 그룹명) · <b>TB_COMPANY</b> + <b>TB_EQUIPMENT</b>(SHOCK1~5 개별 임계값) · <b>TB_EQUIPMENT_CODE</b> — <b>TB_EVENT_SHOCK</b>(개별 충격 이벤트)는 미사용</li>
+      </ul>
+    </div>
+  </main>
+</div>
+
+<script src="../_shared/common-logic.js?v=20260907-common-logic-r42"></script>
+<script src="../_shared/nav.js?v=20260907-common-logic-r42"></script>
+</body>
+</html>

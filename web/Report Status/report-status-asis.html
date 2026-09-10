@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>업체별 현황 AS-IS (현행 Mock-up)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
+<link rel="stylesheet" href="../_shared/mockup.css"/>
+<style>
+/* AS-IS 전용 */
+.sep-note{font-size:11px;color:#aaa;margin:-6px 0 8px}
+.web-only{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#3b5bdb;background:#eef2ff;border-radius:20px;padding:2px 9px}
+</style>
+</head>
+<body data-gnb="rpt" data-sub="rptstatus" data-variant="asis" data-base="../">
+
+<div id="gnb"></div>
+
+<div class="layout">
+  <!-- ═══════ LNB ═══════ -->
+  <aside class="lnb">
+    <div class="lnb__company">(주)세종물류중부지점</div>
+    <div class="lnb__search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+      <input placeholder="그룹 또는 차량"/>
+    </div>
+    <div class="lnb__group-title">그룹별 <span>▲</span></div>
+    <div class="lnb__item active" data-label="기본그룹">기본그룹 <span class="cnt">18</span></div>
+    <div class="lnb__item" data-label="테스트그룹">테스트그룹 <span class="cnt">14</span></div>
+    <div class="lnb__item" data-label="물류1팀">물류1팀 <span class="cnt">10</span></div>
+    <div class="lnb__group-title">차량 <span>▲</span></div>
+    <a class="lnb__item" data-label="B30S-7" href="../Vehicle%20Detail/vehicle-detail-asis.html">B30S-7 <span class="cnt">리튬</span></a>
+    <a class="lnb__item" data-label="D25S-9" href="../Vehicle%20Detail/vehicle-detail-asis.html">D25S-9 <span class="cnt">엔진</span></a>
+    <a class="lnb__item" data-label="B18S-7" href="../Vehicle%20Detail/vehicle-detail-asis.html">B18S-7 <span class="cnt">납산</span></a>
+    <div class="lnb__hint">리포트는 <b>업체(Company) 단위</b> 집계입니다. 그룹/차량 선택은 하위 분해 보기에만 반영됩니다.</div>
+  </aside>
+
+  <!-- ═══════ MAIN ═══════ -->
+  <main class="main">
+    <div class="page-head">
+      <div class="page-head__title">업체별 현황 <span class="sub" data-lnb-label>- 기본그룹</span></div>
+      <div class="page-head__bc">리포트 &gt; 업체별 현황</div>
+    </div>
+
+    <!-- 화면 이동 : 현행도 리포트는 3개 화면으로 분리되어 있다 -->
+    <div class="filter-bar filter-bar--left">
+      <span style="font-size:12px;font-weight:600;color:#555">리포트 화면</span>
+      <span class="badge gray">업체별 현황</span>
+      <a class="btn" href="../Report%20Comparison/report-comparison-asis.html">업체별 비교</a>
+      <a class="btn" href="../Report%20Heatmap/report-heatmap-asis.html">업체별 히트맵</a>
+      <div class="grow"></div>
+      <span style="font-size:11px;color:#999">※ 리포트는 Web 전용 기능입니다 (App 미제공)</span>
+    </div>
+
+    <!-- 조회 필터 : 업체 1개 + 기간 -->
+    <div class="filter-bar">
+      <select class="inp" style="width:200px">
+        <option>(주)세종물류중부지점</option>
+        <option>(주)한성로지스</option>
+        <option>대명유통(주)</option>
+      </select>
+      <select class="inp" style="width:96px"><option>월</option><option>주</option><option>일</option></select>
+      <div class="grow"></div>
+      <div class="date-range">2026-06-01 ~ 2026-06-30</div>
+      <button class="btn-search">조회</button>
+    </div>
+
+    <!-- ═══════ 지표 요약 : 숫자 표만 ═══════ -->
+    <div class="summary-card">
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>지표</th>
+            <th>기준기간 (2026-06)</th>
+            <th>직전기간 (2026-05)</th>
+            <th>증감</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>운영률 (%)</td><td>86.6</td><td>84.5</td><td>+2.1</td></tr>
+          <tr><td>운영효율 (%)</td><td>75.7</td><td>72.8</td><td>+2.9</td></tr>
+          <tr><td>충격횟수 (건)</td><td>17.7</td><td>22.0</td><td>-4.3</td></tr>
+          <tr><td>연료소비량 (L/H)</td><td>3.72</td><td>3.94</td><td>-0.22</td></tr>
+          <tr><td>배터리충전량 (%)</td><td>78.4</td><td>76.1</td><td>+2.3</td></tr>
+          <tr><td>운행거리 (Km)</td><td>3,420</td><td>2,980</td><td>+440</td></tr>
+          <tr><td>운행시간 (H)</td><td>152.5</td><td>148.7</td><td>+3.8</td></tr>
+          <tr><td>배터리충전횟수 (회)</td><td>214</td><td>198</td><td>+16</td></tr>
+          <tr><td>수소충전량 (%)</td><td style="color:#aaa">0</td><td style="color:#aaa">0</td><td style="color:#aaa">0</td></tr>
+          <tr><td>차량 대수 (대)</td><td>42</td><td>42</td><td>0</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="sep-note">※ 증감은 숫자만 제공됩니다. 방향 표시(▲▼)·색상·막대 비교가 없습니다.</div>
+
+    <!-- ═══════ 기간별 추이 : 지표를 하나씩만 선택 ═══════ -->
+    <div class="box">
+      <div class="box__head">
+        <span class="box__name">기간별 추이</span>
+        <div class="box__tools">
+          <select class="inp inp--sm" style="width:150px">
+            <option>운영률</option><option>충격횟수</option><option>연료소비량</option>
+            <option>배터리충전량</option><option>운행거리</option><option>운행시간</option>
+          </select>
+          <button class="btn btn--sm">적용</button>
+        </div>
+      </div>
+      <div class="stack-chart" style="height:150px">
+        <div class="stk"><div class="stk__seg prev" style="height:81.2%"></div></div>
+        <div class="stk"><div class="stk__seg prev" style="height:82.4%"></div></div>
+        <div class="stk"><div class="stk__seg prev" style="height:83.6%"></div></div>
+        <div class="stk"><div class="stk__seg prev" style="height:83.1%"></div></div>
+        <div class="stk"><div class="stk__seg prev" style="height:84.5%"></div></div>
+        <div class="stk"><div class="stk__seg prev" style="height:86.6%"></div></div>
+      </div>
+      <div class="stack-x">
+        <span>2026-01</span><span>2026-02</span><span>2026-03</span><span>2026-04</span><span>2026-05</span><span>2026-06</span>
+      </div>
+      <div class="sep-note" style="margin-top:8px">81.2 / 82.4 / 83.6 / 83.1 / 84.5 / 86.6 (%) — 값은 그래프 아래 텍스트로만 확인 가능</div>
+    </div>
+
+    <!-- 현행 문제점 -->
+    <div class="note">
+      <b>AS-IS 현황 및 개선 포인트</b>
+      <ul>
+        <li><span class="tag-asis">현행</span> 증감이 <b>숫자만(+2.1 / -4.3)</b> 표시되어 방향(개선/악화)과 크기를 직관적으로 인지하기 어렵습니다. 충격·연료처럼 <b>감소가 개선</b>인 지표도 구분되지 않습니다.</li>
+        <li><span class="tag-asis">현행</span> 기간별 추이는 <b>지표를 하나씩 선택</b>해야 하고, 값이 그래프에 표기되지 않아 별도 텍스트로 읽어야 합니다.</li>
+        <li><span class="tag-asis">현행</span> 표에 <b>미구현 지표(수소충전량 = 0 고정)</b>가 그대로 노출되어 실제 값이 있는 지표와 구분되지 않습니다.</li>
+        <li><span class="tag-asis">현행</span> <b>차량 42대 · 근무일 22일 · 계획 8H/일</b> 같은 산출 기준(계획가동시간)이 화면에 표기되지 않아 운영률 수치를 검증할 수 없습니다.</li>
+        <li><span class="tag-asis">현행</span> <b>내보내기(Excel/CSV) 기능이 없어</b> 보고서 작성 시 화면 값을 수동으로 옮겨 적어야 합니다.</li>
+        <li><span class="tag-asis">현행</span> <b>리포트는 Web 전용(App 미제공)</b> 이며, 업체별 비교·히트맵은 각각 별도 화면에서만 조회할 수 있습니다.</li>
+        <li>데이터 원천 : <b>TB_EQUIPMENT_DAILY_OPERATION</b>(주·월 집계 · 8개 지표 전부) + <b>TB_WORKING_HOUR</b>(일 조회 raw) + <b>TB_COMPANY</b>/<b>TB_GROUP</b>(업체·그룹명) + <b>TB_EQUIPMENT</b>/<b>TB_EQUIPMENT_CODE</b>(권한·연료타입) + <b>TB_WORKING_TIME</b>(근로시간·계획가동시간)</li>
+      </ul>
+    </div>
+  </main>
+</div>
+
+<script src="../_shared/common-logic.js?v=20260907-common-logic-r42"></script>
+<script src="../_shared/nav.js?v=20260907-common-logic-r42"></script>
+</body>
+</html>

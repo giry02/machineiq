@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>관리기능 - 사용자 AS-IS (현행 Mock-up)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
+<link rel="stylesheet" href="../_shared/mockup.css"/>
+<style>
+/* AS-IS 전용: 현행 관리 화면의 단순 격자 테이블 · 단일 검색줄 */
+.tbl-plain{width:100%;background:#fff;border:1px solid #ddd;font-size:12px}
+.tbl-plain th{background:#f2f2f2;border:1px solid #ddd;padding:7px 8px;font-weight:600;color:#444;text-align:center;white-space:nowrap}
+.tbl-plain td{border:1px solid #eee;padding:7px 8px;color:#555;text-align:center}
+.tbl-plain td.l{text-align:left}
+.tbl-plain .lnk{color:#3b5bdb;text-decoration:underline;cursor:pointer}
+.srch-asis{display:flex;gap:6px;align-items:center;background:#fff;border:1px solid #e5e7eb;border-radius:4px;padding:10px 12px;margin-bottom:12px}
+.srch-asis input{border:1px solid #dfdfdf;border-radius:3px;padding:6px 9px;font-size:13px;width:230px}
+.srch-asis .tail{margin-left:auto;font-size:12px;color:#999}
+.form-asis{display:flex;flex-direction:column;gap:9px}
+.form-asis .row{display:flex;align-items:center;gap:10px;font-size:12px}
+.form-asis .row>label{width:96px;color:#666;flex-shrink:0}
+.form-asis .row input,.form-asis .row select{border:1px solid #dfdfdf;border-radius:3px;padding:6px 8px;font-size:12px;flex:1}
+.form-asis .grp{border-top:1px solid #eee;margin-top:6px;padding-top:10px;font-size:12px;color:#888;font-weight:600}
+.cnt-asis{font-size:12px;color:#666;margin-bottom:8px}
+</style>
+</head>
+<body data-gnb="mgmt" data-sub="user" data-variant="asis" data-base="../">
+
+<div id="gnb"></div>
+
+<div class="layout">
+  <!-- ═══════ LNB : 관리기능 메뉴 ═══════ -->
+  <aside class="lnb">
+    <div class="lnb__company">(주)세종물류중부지점</div>
+    <div class="lnb__group-title">관리기능 <span>▲</span></div>
+    <a class="lnb__item active" data-label="사용자" href="mgmt-user-asis.html">사용자 <span class="cnt">10</span></a>
+    <a class="lnb__item" data-label="업체" href="../Mgmt%20Company/mgmt-company-asis.html">업체 <span class="cnt">5</span></a>
+    <a class="lnb__item" data-label="그룹" href="../Mgmt%20Group/mgmt-group-asis.html">그룹 <span class="cnt">4</span></a>
+    <a class="lnb__item" data-label="Geofence" href="../Mgmt%20Geofence/mgmt-geofence-asis.html">Geofence <span class="cnt">7</span></a>
+    <a class="lnb__item" data-label="차량" href="../Mgmt%20Vehicle/mgmt-vehicle-asis.html">차량 <span class="cnt">42</span></a>
+    <a class="lnb__item" data-label="계정신청관리" href="../Mgmt%20Account%20Request/mgmt-account-request-asis.html">계정신청관리 <span class="cnt">4</span></a>
+    <a class="lnb__item" data-label="차량신청관리" href="../Mgmt%20Vehicle%20Request/mgmt-vehicle-request-asis.html">차량신청관리 <span class="cnt">3</span></a>
+  </aside>
+
+  <!-- ═══════ MAIN ═══════ -->
+  <main class="main">
+    <div class="page-head">
+      <div class="page-head__title">사용자 <span class="sub" data-lnb-label>- (주)세종물류중부지점</span></div>
+      <div class="page-head__bc">🏠 <a href="mgmt-user-asis.html">관리기능</a>&gt; 사용자</div>
+    </div>
+
+    <!-- 현행 : 이름/ID 단일 검색만 제공 -->
+    <div class="srch-asis">
+      <span style="font-size:12px;color:#666">검색</span>
+      <input placeholder="사용자명 또는 사용자 ID"/>
+      <button class="btn-search">조회</button>
+      <button class="btn">사용자 등록</button>
+      <span class="tail">기준일시 2026-07-06 14:30</span>
+    </div>
+
+    <div class="cnt-asis">총 <b>10</b>건</div>
+
+    <!-- ═══════ 현행 사용자 목록 ═══════ -->
+    <table class="tbl-plain">
+      <thead>
+        <tr>
+          <th style="width:200px">사용자 ID</th>
+          <th style="width:82px">사용자명</th>
+          <th style="width:86px">그룹명</th>
+          <th style="width:132px">권한</th>
+          <th style="width:74px">메뉴그룹</th>
+          <th style="width:112px">연락처</th>
+          <th style="width:116px">등록일시</th>
+          <th style="width:116px">수정일시</th>
+          <th style="width:96px">관리</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="l">admin@sejonglog.co.kr</td><td>김정수</td><td>전체</td><td>ROLE_ADMIN</td><td>관리자</td>
+          <td>010-****-1234</td><td>2024-03-11 09:12</td><td>2026-06-28 14:05</td>
+          <td><span class="lnk" data-modal-open="editModal">수정</span> / <span class="lnk">삭제</span></td>
+        </tr>
+        <tr>
+          <td class="l">cs.lee@sejonglog.co.kr</td><td>이철수</td><td>전체</td><td>ROLE_ADMIN</td><td>관리자</td>
+          <td>010-****-2201</td><td>2024-05-02 10:41</td><td>2026-05-19 11:22</td>
+          <td><span class="lnk" data-modal-open="editModal">수정</span> / <span class="lnk">삭제</span></td>
+        </tr>
+        <tr>
+          <td class="l">fleet.park@sejonglog.co.kr</td><td>박민아</td><td>기본그룹</td><td>ROLE_FLEET</td><td>운영자</td>
+          <td>010-****-3345</td><td>2024-07-15 13:20</td><td>2026-06-30 09:48</td>
+          <td><span class="lnk" data-modal-open="editModal">수정</span> / <span class="lnk">삭제</span></td>
+        </tr>
+        <tr>
+          <td class="l">fleet.choi@sejonglog.co.kr</td><td>최유진</td><td>기본그룹</td><td>ROLE_FLEET</td><td>운영자</td>
+          <td>010-****-4417</td><td>2025-01-08 08:55</td><td>2026-06-12 16:31</td>
+          <td><span class="lnk" data-modal-open="editModal">수정</span> / <span class="lnk">삭제</span></td>
+        </tr>
+        <tr>
+          <td class="l">fleet.jung@sejonglog.co.kr</td><td>정도현</td><td>테스트그룹</td><td>ROLE_FLEET</td><td>운영자</td>
+          <td>010-****-5502</td><td>2025-02-20 15:07</td><td>2026-04-27 10:12</td>
+          <td><span class="lnk" data-modal-open="editModal">수정</span> / <span class="lnk">삭제</span></td>
+        </tr>
+        <tr>
+          <td class="l">grp.kang@sejonglog.co.kr</td><td>강서연</td><td>기본그룹</td><td>ROLE_FLEET_GROUP</td><td>조회자</td>
+          <td>010-****-6613</td><td>2025-04-03 11:33</td><td>2026-06-22 13:59</td>
+          <td><span class="lnk" data-modal-open="editModal">수정</span> / <span class="lnk">삭제</span></td>
+        </tr>
+        <tr>
+          <td class="l">grp.yoon@sejonglog.co.kr</td><td>윤태호</td><td>테스트그룹</td><td>ROLE_FLEET_GROUP</td><td>조회자</td>
+          <td>010-****-7724</td><td>2025-05-27 09:02</td><td>2026-03-11 17:40</td>
+          <td><span class="lnk" data-modal-open="editModal">수정</span> / <span class="lnk">삭제</span></td>
+        </tr>
+        <tr>
+          <td class="l">grp.shin@sejonglog.co.kr</td><td>신동욱</td><td>물류1팀</td><td>ROLE_FLEET_GROUP</td><td>운영자</td>
+          <td>010-****-8830</td><td>2025-08-14 10:15</td><td>2026-06-05 08:27</td>
+          <td><span class="lnk" data-modal-open="editModal">수정</span> / <span class="lnk">삭제</span></td>
+        </tr>
+        <tr>
+          <td class="l">grp.oh@sejonglog.co.kr</td><td>오하늘</td><td>물류1팀</td><td>ROLE_FLEET_GROUP</td><td>조회자</td>
+          <td>010-****-9941</td><td>2025-11-02 16:48</td><td>2026-02-18 12:03</td>
+          <td><span class="lnk" data-modal-open="editModal">수정</span> / <span class="lnk">삭제</span></td>
+        </tr>
+        <tr>
+          <td class="l">grp.lim@sejonglog.co.kr</td><td>임재현</td><td>테스트그룹</td><td>ROLE_FLEET_GROUP</td><td>조회자</td>
+          <td>010-****-1057</td><td>2026-01-19 14:22</td><td>2026-06-18 10:36</td>
+          <td><span class="lnk" data-modal-open="editModal">수정</span> / <span class="lnk">삭제</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 현행 문제점 -->
+    <div class="note">
+      <b>AS-IS 현황 및 개선 포인트</b>
+      <ul>
+        <li><span class="tag-asis">현행</span> <b>사용자명/ID 검색만</b> 제공되어 권한(ROLE)·그룹으로 걸러볼 수 없습니다. 사용자가 늘어나면 목록을 눈으로 훑어야 합니다.</li>
+        <li><span class="tag-asis">현행</span> 알림 수신·앱 푸시 설정이 <b>수정 모달 최하단에만</b> 존재해, 목록에서는 누가 어떤 알림을 받는지 확인할 수 없습니다.</li>
+        <li><span class="tag-asis">현행</span> 삭제가 실제로는 <b>USE_YN='N' 논리삭제</b>인데 화면에 아무 안내가 없어, 관리자가 완전 삭제로 오인합니다. 확인 단계도 없습니다.</li>
+        <li><span class="tag-asis">현행</span> <b>ROLE_ADMIN이 아닌 사용자에게도 "사용자 등록" 버튼이 노출</b>되어, 클릭 후 권한 오류를 보게 됩니다.</li>
+        <li><span class="tag-asis">현행</span> 변경 이력이 <b>TB_USER_HISTORY에 적재되지만 조회 화면이 없어</b> 누가 언제 권한을 바꿨는지 추적할 수 없습니다.</li>
+        <li>데이터 원천 : <b>TB_USER</b>(이름/권한/그룹/메뉴그룹/연락처/알림설정) + <b>TB_USER_APP</b>(앱 푸시 설정) + <b>TB_GROUP</b>(그룹명) + <b>TB_USER_HISTORY</b>(변경 이력, 화면 미연동)</li>
+      </ul>
+    </div>
+  </main>
+</div>
+
+<!-- ═══════ 현행 사용자 수정 모달 : 한 줄씩 나열, 알림 설정은 맨 아래 ═══════ -->
+<div class="dim" id="editModal">
+  <div class="modal">
+    <div class="modal__head">
+      <div class="modal__title">사용자 수정</div>
+      <button class="modal__x" data-modal-close>✕</button>
+    </div>
+    <div class="modal__body">
+      <div class="form-asis">
+        <div class="row"><label>사용자 ID</label><input value="fleet.park@sejonglog.co.kr" readonly/></div>
+        <div class="row"><label>사용자명</label><input value="박민아"/></div>
+        <div class="row"><label>권한</label>
+          <select><option>ROLE_FLEET</option><option>ROLE_FLEET_GROUP</option><option>ROLE_ADMIN</option></select></div>
+        <div class="row"><label>그룹</label>
+          <select><option>기본그룹</option><option>테스트그룹</option><option>물류1팀</option><option>전체</option></select></div>
+        <div class="row"><label>메뉴그룹</label>
+          <select><option>운영자</option><option>관리자</option><option>조회자</option></select></div>
+        <div class="row"><label>연락처</label><input value="010-2345-3345"/></div>
+        <div class="row"><label>이메일</label><input value="fleet.park@sejonglog.co.kr"/></div>
+
+        <div class="grp">알림 수신 설정</div>
+        <div class="row"><label>MESSAGE_SHOCK_YN</label><select><option>Y</option><option>N</option></select></div>
+        <div class="row"><label>MESSAGE_ERROR_YN</label><select><option>Y</option><option>N</option></select></div>
+        <div class="row"><label>EMAIL_REPORT_YN</label><select><option>N</option><option>Y</option></select></div>
+
+        <div class="grp">앱 푸시 설정 (TB_USER_APP)</div>
+        <div class="row"><label>PUSH_ALARM_YN</label><select><option>Y</option><option>N</option></select></div>
+        <div class="row"><label>SHOCK_WARNING_YN</label><select><option>Y</option><option>N</option></select></div>
+        <div class="row"><label>VEHICLE_WARNING_YN</label><select><option>Y</option><option>N</option></select></div>
+        <div class="row"><label>BATTERY_WARNING_YN</label><select><option>N</option><option>Y</option></select></div>
+        <div class="row"><label>MARKETING_YN</label><select><option>N</option><option>Y</option></select></div>
+      </div>
+    </div>
+    <div class="modal__foot">
+      <button class="btn" data-modal-close>취소</button>
+      <button class="btn btn--dark">저장</button>
+    </div>
+  </div>
+</div>
+
+<script src="../_shared/common-logic.js?v=20260907-common-logic-r42"></script>
+<script src="../_shared/nav.js?v=20260907-common-logic-r42"></script>
+</body>
+</html>

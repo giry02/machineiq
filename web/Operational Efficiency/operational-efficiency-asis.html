@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>운행이력 - 운영효율 AS-IS (현행 Mock-up)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
+<link rel="stylesheet" href="../_shared/mockup.css"/>
+<style>
+/* AS-IS 전용 : 현행은 범례·툴팁 없는 단색 막대 + 텍스트 표 */
+.wt-header{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:12px 18px;margin-bottom:14px;font-size:13px;color:#555}
+.wt-header b{color:#1a1a1a}
+.plain-chart{background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:16px 18px 10px;margin-bottom:14px}
+.plain-chart__t{font-size:13px;font-weight:600;color:#555;margin-bottom:10px}
+.asis-y{font-size:11px;color:#999;margin-bottom:4px}
+.two-col{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;align-items:start}
+</style>
+</head>
+<body data-gnb="anlz" data-sub="oper" data-variant="asis" data-base="../">
+
+<div id="gnb"></div>
+
+<div class="layout">
+  <!-- ═══════ LNB ═══════ -->
+  <aside class="lnb">
+    <div class="lnb__company">(주)세종물류중부지점</div>
+    <div class="lnb__search">🔍<input placeholder="그룹 또는 차량"/></div>
+    <div class="lnb__group-title">그룹별 <span>▲</span></div>
+    <div class="lnb__item active" data-label="기본그룹">기본그룹</div>
+    <div class="lnb__item" data-label="테스트그룹">테스트그룹</div>
+    <div class="lnb__item" data-label="물류1팀">물류1팀</div>
+    <div class="lnb__group-title">차량 <span>▼</span></div>
+    <a class="lnb__item" data-label="B30S-7" href="../Vehicle%20Detail/vehicle-detail-asis.html">B30S-7</a>
+    <a class="lnb__item" data-label="D25S-9" href="../Vehicle%20Detail/vehicle-detail-asis.html">D25S-9</a>
+    <a class="lnb__item" data-label="B18S-7" href="../Vehicle%20Detail/vehicle-detail-asis.html">B18S-7</a>
+  </aside>
+
+  <!-- ═══════ MAIN ═══════ -->
+  <main class="main">
+    <div class="page-head">
+      <div class="page-head__title">운영효율 <span class="sub" data-lnb-label>- 기본그룹</span></div>
+      <div class="page-head__bc">🏠 <a href="../Vehicle%20Summary/vehicle-summary-asis.html">운행이력</a>&gt; 운영효율</div>
+    </div>
+
+    <!-- 근로시간 설정 헤더 -->
+    <div class="wt-header">
+      <span>근로시간 : <b>09:00 ~ 18:00 (8H)</b></span>
+      <span>휴게시간 : <b>60분</b></span>
+      <span>설정 단위 : <b>그룹(G)</b></span>
+      <span style="margin-left:auto;color:#999">TB_WORKING_TIME 기준</span>
+    </div>
+
+    <!-- 조회 필터 : 일/주/월은 있으나 어떤 데이터를 보는지 표시 없음 -->
+    <div class="filter-bar">
+      <div class="period-tabs">
+        <button>일</button><button>주</button><button class="active">월</button>
+      </div>
+      <div class="grow"></div>
+      <div class="date-range">📅 2026-06-01 ~ 2026-06-30</div>
+      <button class="btn-search">조회</button>
+    </div>
+
+    <!-- ═══════ 요약 : 숫자만, 전월 대비 없음 ═══════ -->
+    <div class="summary-card">
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>구분</th><th>작업시간</th><th>대기시간</th><th>미사용시간</th>
+            <th>가동시간</th><th>운영효율</th><th>계획가동시간</th><th>장비수</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>대당 평균</td>
+            <td>115H 24M</td>
+            <td>37H 06M</td>
+            <td>24H 36M</td>
+            <td>152H 30M</td>
+            <td>75.7%</td>
+            <td>176H 00M</td>
+            <td>18대</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="two-col">
+      <section>
+        <!-- ═══════ 현행 그래프 : 범례/축라벨/툴팁 없음 ═══════ -->
+        <div class="plain-chart">
+          <div class="plain-chart__t">기간별 작업 / 대기 / 미사용 시간</div>
+          <div class="asis-y">(단위 : 대당 시간)</div>
+          <div class="stack-chart">
+            <div class="stk"><div class="stk__seg work" style="height:61.2%"></div><div class="stk__seg idle" style="height:18.8%"></div><div class="stk__seg off" style="height:14.1%"></div></div>
+            <div class="stk"><div class="stk__seg work" style="height:65.9%"></div><div class="stk__seg idle" style="height:16.5%"></div><div class="stk__seg off" style="height:11.8%"></div></div>
+            <div class="stk"><div class="stk__seg work" style="height:56.5%"></div><div class="stk__seg idle" style="height:23.5%"></div><div class="stk__seg off" style="height:14.1%"></div></div>
+            <div class="stk"><div class="stk__seg work" style="height:71.8%"></div><div class="stk__seg idle" style="height:15.3%"></div><div class="stk__seg off" style="height:7.1%"></div></div>
+            <div class="stk"><div class="stk__seg work" style="height:58.8%"></div><div class="stk__seg idle" style="height:21.2%"></div><div class="stk__seg off" style="height:14.1%"></div></div>
+            <div class="stk"><div class="stk__seg work" style="height:4.7%"></div><div class="stk__seg idle" style="height:2.4%"></div></div>
+            <div class="stk"><div class="stk__seg work" style="height:63.5%"></div><div class="stk__seg idle" style="height:20.0%"></div><div class="stk__seg off" style="height:10.6%"></div></div>
+            <div class="stk"><div class="stk__seg work" style="height:75.3%"></div><div class="stk__seg idle" style="height:18.8%"></div></div>
+            <div class="stk"><div class="stk__seg work" style="height:49.4%"></div><div class="stk__seg idle" style="height:28.2%"></div><div class="stk__seg off" style="height:16.5%"></div></div>
+            <div class="stk"><div class="stk__seg work" style="height:36.5%"></div><div class="stk__seg idle" style="height:14.1%"></div><div class="stk__seg off" style="height:43.5%"></div></div>
+            <div class="stk"><div class="stk__seg work" style="height:68.2%"></div><div class="stk__seg idle" style="height:17.6%"></div><div class="stk__seg off" style="height:8.2%"></div></div>
+            <div class="stk"><div class="stk__seg work" style="height:60.0%"></div><div class="stk__seg idle" style="height:24.7%"></div><div class="stk__seg off" style="height:9.4%"></div></div>
+            <div class="stk"><div class="stk__seg work" style="height:77.6%"></div><div class="stk__seg idle" style="height:22.4%"></div></div>
+            <div class="stk"><div class="stk__seg work" style="height:57.6%"></div><div class="stk__seg idle" style="height:20.0%"></div><div class="stk__seg off" style="height:16.5%"></div></div>
+            <div class="stk"><div class="stk__seg work" style="height:64.7%"></div><div class="stk__seg idle" style="height:16.5%"></div><div class="stk__seg off" style="height:12.9%"></div></div>
+            <div class="stk"><div class="stk__seg work" style="height:30.6%"></div><div class="stk__seg idle" style="height:11.8%"></div><div class="stk__seg off" style="height:51.8%"></div></div>
+            <div class="stk"><div class="stk__seg work" style="height:69.4%"></div><div class="stk__seg idle" style="height:18.8%"></div><div class="stk__seg off" style="height:5.9%"></div></div>
+            <div class="stk"><div class="stk__seg work" style="height:61.2%"></div><div class="stk__seg idle" style="height:25.9%"></div><div class="stk__seg off" style="height:7.1%"></div></div>
+            <div class="stk"><div class="stk__seg work" style="height:70.6%"></div><div class="stk__seg idle" style="height:21.2%"></div><div class="stk__seg off" style="height:2.4%"></div></div>
+            <div class="stk"><div class="stk__seg work" style="height:51.8%"></div><div class="stk__seg idle" style="height:23.5%"></div><div class="stk__seg off" style="height:18.8%"></div></div>
+            <div class="stk"><div class="stk__seg work" style="height:67.1%"></div><div class="stk__seg idle" style="height:15.3%"></div><div class="stk__seg off" style="height:11.8%"></div></div>
+            <div class="stk"><div class="stk__seg work" style="height:62.4%"></div><div class="stk__seg idle" style="height:22.4%"></div><div class="stk__seg off" style="height:9.4%"></div></div>
+            <div class="stk"><div class="stk__seg work" style="height:72.9%"></div><div class="stk__seg idle" style="height:17.6%"></div><div class="stk__seg off" style="height:3.5%"></div></div>
+          </div>
+          <div class="stack-x">
+            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span>
+            <span>8</span><span>9</span><span>10</span><span>11</span><span>12</span>
+            <span>15</span><span>16</span><span>17</span><span>18</span><span>19</span>
+            <span>22</span><span>23</span><span>24</span><span>25</span><span>26</span>
+            <span>29</span><span>30</span>
+          </div>
+          <div style="font-size:11px;color:#bbb;margin-top:6px">※ 데이터가 없는 일자(주말)는 축에서 빠짐</div>
+        </div>
+
+        <!-- ═══════ 일자별 표 ═══════ -->
+        <div class="list-head">
+          <span class="list-head__count">일자별 내역 <b>23</b>건</span>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr><th>일자</th><th class="r">작업시간</th><th class="r">대기시간</th><th class="r">미사용시간</th><th class="r">가동시간</th><th class="r">운영효율</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>2026-06-01</td><td class="r">5H 12M</td><td class="r">1H 36M</td><td class="r">1H 12M</td><td class="r">6H 48M</td><td class="r">76.5%</td></tr>
+              <tr><td>2026-06-02</td><td class="r">5H 36M</td><td class="r">1H 24M</td><td class="r">1H 00M</td><td class="r">7H 00M</td><td class="r">80.0%</td></tr>
+              <tr><td>2026-06-03</td><td class="r">4H 48M</td><td class="r">2H 00M</td><td class="r">1H 12M</td><td class="r">6H 48M</td><td class="r">70.6%</td></tr>
+              <tr><td>2026-06-04</td><td class="r">6H 06M</td><td class="r">1H 18M</td><td class="r">0H 36M</td><td class="r">7H 24M</td><td class="r">82.4%</td></tr>
+              <tr><td>2026-06-05</td><td class="r">5H 00M</td><td class="r">1H 48M</td><td class="r">1H 12M</td><td class="r">6H 48M</td><td class="r">73.5%</td></tr>
+              <tr><td>2026-06-06</td><td class="r">0H 24M</td><td class="r">0H 12M</td><td class="r">0H 00M</td><td class="r">0H 36M</td><td class="r">66.7%</td></tr>
+              <tr><td>2026-06-08</td><td class="r">5H 24M</td><td class="r">1H 42M</td><td class="r">0H 54M</td><td class="r">7H 06M</td><td class="r">76.1%</td></tr>
+              <tr><td>2026-06-09</td><td class="r">6H 24M</td><td class="r">1H 36M</td><td class="r">0H 00M</td><td class="r">8H 00M</td><td class="r">80.0%</td></tr>
+              <tr><td>2026-06-10</td><td class="r">4H 12M</td><td class="r">2H 24M</td><td class="r">1H 24M</td><td class="r">6H 36M</td><td class="r">63.6%</td></tr>
+              <tr><td>2026-06-11</td><td class="r">3H 06M</td><td class="r">1H 12M</td><td class="r">3H 42M</td><td class="r">4H 18M</td><td class="r">72.1%</td></tr>
+              <tr><td>2026-06-12</td><td class="r">5H 48M</td><td class="r">1H 30M</td><td class="r">0H 42M</td><td class="r">7H 18M</td><td class="r">79.5%</td></tr>
+              <tr><td>2026-06-15</td><td class="r">5H 06M</td><td class="r">2H 06M</td><td class="r">0H 48M</td><td class="r">7H 12M</td><td class="r">70.8%</td></tr>
+              <tr><td>2026-06-16</td><td class="r">6H 36M</td><td class="r">1H 54M</td><td class="r">0H 00M</td><td class="r">8H 30M</td><td class="r">77.6%</td></tr>
+              <tr><td>2026-06-17</td><td class="r">4H 54M</td><td class="r">1H 42M</td><td class="r">1H 24M</td><td class="r">6H 36M</td><td class="r">74.2%</td></tr>
+              <tr><td>2026-06-18</td><td class="r">5H 30M</td><td class="r">1H 24M</td><td class="r">1H 06M</td><td class="r">6H 54M</td><td class="r">79.7%</td></tr>
+              <tr><td>2026-06-19</td><td class="r">2H 36M</td><td class="r">1H 00M</td><td class="r">4H 24M</td><td class="r">3H 36M</td><td class="r">72.2%</td></tr>
+              <tr><td>2026-06-22</td><td class="r">5H 54M</td><td class="r">1H 36M</td><td class="r">0H 30M</td><td class="r">7H 30M</td><td class="r">78.7%</td></tr>
+              <tr><td>2026-06-23</td><td class="r">5H 12M</td><td class="r">2H 12M</td><td class="r">0H 36M</td><td class="r">7H 24M</td><td class="r">70.3%</td></tr>
+              <tr><td>2026-06-24</td><td class="r">6H 00M</td><td class="r">1H 48M</td><td class="r">0H 12M</td><td class="r">7H 48M</td><td class="r">76.9%</td></tr>
+              <tr><td>2026-06-25</td><td class="r">4H 24M</td><td class="r">2H 00M</td><td class="r">1H 36M</td><td class="r">6H 24M</td><td class="r">68.8%</td></tr>
+              <tr><td>2026-06-26</td><td class="r">5H 42M</td><td class="r">1H 18M</td><td class="r">1H 00M</td><td class="r">7H 00M</td><td class="r">81.4%</td></tr>
+              <tr><td>2026-06-29</td><td class="r">5H 18M</td><td class="r">1H 54M</td><td class="r">0H 48M</td><td class="r">7H 12M</td><td class="r">73.6%</td></tr>
+              <tr><td>2026-06-30</td><td class="r">6H 12M</td><td class="r">1H 30M</td><td class="r">0H 18M</td><td class="r">7H 42M</td><td class="r">80.5%</td></tr>
+            </tbody>
+          </table>
+          <div class="tbl__foot">합계 : 작업 115H 24M / 대기 37H 06M / 미사용 24H 36M / 가동 152H 30M</div>
+        </div>
+      </section>
+
+      <!-- ═══════ 현행 랭킹 : Top5만 ═══════ -->
+      <aside>
+        <div class="box">
+          <div class="box__head"><span class="box__name">운영효율 순위 (Top 5)</span></div>
+          <div class="tbl-wrap" style="border:none">
+            <table class="tbl">
+              <thead><tr><th class="c">순위</th><th>차량</th><th class="r">운영효율</th></tr></thead>
+              <tbody>
+                <tr><td class="c">1</td><td>B30S-7</td><td class="r">80.5%</td></tr>
+                <tr><td class="c">2</td><td>B25S-7</td><td class="r">80.0%</td></tr>
+                <tr><td class="c">3</td><td>D30S-9</td><td class="r">79.4%</td></tr>
+                <tr><td class="c">4</td><td>B20S-7</td><td class="r">78.7%</td></tr>
+                <tr><td class="c">5</td><td>B18S-7</td><td class="r">78.3%</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="font-size:11px;color:#bbb;margin-top:10px;line-height:1.7">
+            ※ 하위 차량(개선 대상) 목록은 제공되지 않으며, 차량명을 클릭해도 상세로 이동하지 않습니다.
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- 현행 문제점 -->
+    <div class="note">
+      <b>AS-IS 현황 및 개선 포인트</b>
+      <ul>
+        <li><span class="tag-asis">현행</span> <b>일 / 주·월 조회의 데이터 원천이 다른데 화면에 표시가 없습니다.</b> 일 조회는 <b>TB_WORKING_HOUR</b>(시간 단위 raw 실시간 집계), 주·월 조회는 <b>TB_EQUIPMENT_DAILY_OPERATION</b>(일 배치 집계)을 사용하므로 같은 날을 두 방식으로 보면 값이 달라질 수 있으나, 사용자는 지금 무엇을 보는지 알 수 없습니다.</li>
+        <li><span class="tag-asis">현행</span> <b>"운영효율"과 사용시간 화면의 "운영률"이 구분되지 않습니다.</b> 운영효율=작업÷(작업+대기), 운영률=(작업+대기)÷(계획가동−휴게)로 정의가 다른데 화면에 설명·툴팁이 없습니다.</li>
+        <li><span class="tag-asis">현행</span> <b>전월(2026-05) 대비 증감이 없어</b> 75.7%가 개선된 수치인지 악화된 수치인지 판단할 수 없습니다.</li>
+        <li><span class="tag-asis">현행</span> 누적 막대에 <b>범례·값 라벨·툴팁이 없고</b> 데이터가 없는 주말 일자는 축에서 아예 빠져(TB_DATE_SEQ 미사용) 날짜 간격이 왜곡돼 보입니다.</li>
+        <li><span class="tag-asis">현행</span> 미사용시간 합계(24H 36M)가 <b>계획−가동(176H−152H 30M=23H 30M)과 일치하지 않습니다.</b> 일별 음수 클램프(GREATEST(…,0)) 때문이지만 화면에 안내가 없어 오류로 오인됩니다.</li>
+        <li><span class="tag-asis">현행</span> 랭킹이 <b>Top5만</b> 제공되어 개선이 필요한 하위 차량을 찾을 수 없고, 차량 클릭 시 <b>시간대별 상세로 진입할 수 없습니다.</b></li>
+        <li>데이터 원천 : <b>TB_WORKING_HOUR</b>(일 조회 · 시간 raw) / <b>TB_EQUIPMENT_DAILY_OPERATION</b>(주·월 조회 · 일 집계) + <b>TB_WORKING_TIME</b>(근로시간 헤더) + <b>TB_EQUIPMENT</b> · <b>TB_EQUIPMENT_CODE</b>(장비·연료타입) + <b>TB_GROUP</b> · <b>TB_COMPANY</b>(그룹/업체명)</li>
+      </ul>
+    </div>
+  </main>
+</div>
+
+<script src="../_shared/common-logic.js?v=20260907-common-logic-r42"></script>
+<script src="../_shared/nav.js?v=20260907-common-logic-r42"></script>
+</body>
+</html>

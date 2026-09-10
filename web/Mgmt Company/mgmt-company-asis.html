@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>관리기능 - 업체 AS-IS (현행 Mock-up)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
+<link rel="stylesheet" href="../_shared/mockup.css"/>
+<style>
+/* AS-IS 전용: 단순 격자 테이블 · 한 줄 폼 · 공휴일 단건 입력 */
+.tbl-plain{width:100%;background:#fff;border:1px solid #ddd;font-size:12px}
+.tbl-plain th{background:#f2f2f2;border:1px solid #ddd;padding:7px 8px;font-weight:600;color:#444;text-align:center;white-space:nowrap}
+.tbl-plain td{border:1px solid #eee;padding:7px 8px;color:#555;text-align:center}
+.tbl-plain td.l{text-align:left}
+.tbl-plain tr.on td{background:#f7f7f7}
+.tbl-plain .lnk{color:#3b5bdb;text-decoration:underline;cursor:pointer}
+.srch-asis{display:flex;gap:6px;align-items:center;background:#fff;border:1px solid #e5e7eb;border-radius:4px;padding:10px 12px;margin-bottom:12px}
+.srch-asis input{border:1px solid #dfdfdf;border-radius:3px;padding:6px 9px;font-size:13px;width:230px}
+.srch-asis .tail{margin-left:auto;font-size:12px;color:#999}
+.panel-asis{background:#fff;border:1px solid #ddd;padding:14px 16px;margin-top:14px}
+.panel-asis h3{font-size:13px;font-weight:700;color:#333;margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid #eee}
+.form-asis{display:flex;flex-direction:column;gap:9px}
+.form-asis .row{display:flex;align-items:center;gap:10px;font-size:12px}
+.form-asis .row>label{width:118px;color:#666;flex-shrink:0}
+.form-asis .row input,.form-asis .row select{border:1px solid #dfdfdf;border-radius:3px;padding:6px 8px;font-size:12px}
+.form-asis .row input.w{flex:1}
+.form-asis .grp{border-top:1px solid #eee;margin-top:6px;padding-top:10px;font-size:12px;color:#888;font-weight:600}
+.hol-asis{font-size:12px;color:#555;line-height:1.9}
+.cnt-asis{font-size:12px;color:#666;margin-bottom:8px}
+</style>
+</head>
+<body data-gnb="mgmt" data-sub="company" data-variant="asis" data-base="../">
+
+<div id="gnb"></div>
+
+<div class="layout">
+  <!-- ═══════ LNB : 관리기능 메뉴 ═══════ -->
+  <aside class="lnb">
+    <div class="lnb__company">(주)세종물류중부지점</div>
+    <div class="lnb__group-title">관리기능 <span>▲</span></div>
+    <a class="lnb__item" data-label="사용자" href="../Mgmt%20User/mgmt-user-asis.html">사용자 <span class="cnt">10</span></a>
+    <a class="lnb__item active" data-label="업체" href="mgmt-company-asis.html">업체 <span class="cnt">5</span></a>
+    <a class="lnb__item" data-label="그룹" href="../Mgmt%20Group/mgmt-group-asis.html">그룹 <span class="cnt">4</span></a>
+    <a class="lnb__item" data-label="Geofence" href="../Mgmt%20Geofence/mgmt-geofence-asis.html">Geofence <span class="cnt">7</span></a>
+    <a class="lnb__item" data-label="차량" href="../Mgmt%20Vehicle/mgmt-vehicle-asis.html">차량 <span class="cnt">42</span></a>
+    <a class="lnb__item" data-label="계정신청관리" href="../Mgmt%20Account%20Request/mgmt-account-request-asis.html">계정신청관리 <span class="cnt">4</span></a>
+    <a class="lnb__item" data-label="차량신청관리" href="../Mgmt%20Vehicle%20Request/mgmt-vehicle-request-asis.html">차량신청관리 <span class="cnt">3</span></a>
+  </aside>
+
+  <!-- ═══════ MAIN ═══════ -->
+  <main class="main">
+    <div class="page-head">
+      <div class="page-head__title">업체 <span class="sub" data-lnb-label>- (주)세종물류중부지점</span></div>
+      <div class="page-head__bc">🏠 <a href="../Mgmt%20User/mgmt-user-asis.html">관리기능</a>&gt; 업체</div>
+    </div>
+
+    <!-- 현행 : 업체명 단일 검색 -->
+    <div class="srch-asis">
+      <span style="font-size:12px;color:#666">검색</span>
+      <input placeholder="업체명"/>
+      <button class="btn-search">조회</button>
+      <span class="tail">기준일시 2026-07-06 14:30</span>
+    </div>
+
+    <div class="cnt-asis">총 <b>5</b>건</div>
+
+    <!-- ═══════ 현행 업체 목록 ═══════ -->
+    <table class="tbl-plain">
+      <thead>
+        <tr>
+          <th style="width:180px">업체명</th>
+          <th style="width:76px">업체분류</th>
+          <th style="width:200px">대표 사용자 ID</th>
+          <th style="width:120px">Timezone</th>
+          <th style="width:66px">보유차량</th>
+          <th style="width:88px">만료일</th>
+          <th style="width:116px">등록일시</th>
+          <th style="width:116px">수정일시</th>
+          <th style="width:56px">관리</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="on">
+          <td class="l">(주)세종물류중부지점</td><td>fleet</td><td class="l">admin@sejonglog.co.kr</td><td>Asia/Seoul</td>
+          <td>42</td><td>2027-12-31</td><td>2024-03-11 09:05</td><td>2026-06-28 14:05</td>
+          <td><span class="lnk" data-modal-open="editModal">수정</span></td>
+        </tr>
+        <tr>
+          <td class="l">(주)한성렌탈</td><td>rental</td><td class="l">ops@hansung-rent.co.kr</td><td>Asia/Seoul</td>
+          <td>26</td><td>2026-12-31</td><td>2024-09-02 11:20</td><td>2026-05-14 09:31</td>
+          <td><span class="lnk" data-modal-open="editModal">수정</span></td>
+        </tr>
+        <tr>
+          <td class="l">대영중공업(주)</td><td>dealer</td><td class="l">sales@daeyoung-hi.co.kr</td><td>Asia/Seoul</td>
+          <td>18</td><td>2027-06-30</td><td>2024-11-18 15:44</td><td>2026-04-02 16:12</td>
+          <td><span class="lnk" data-modal-open="editModal">수정</span></td>
+        </tr>
+        <tr>
+          <td class="l">Bobcat Vietnam Dist.</td><td>dealer</td><td class="l">vn.admin@bobcat-vn.com</td><td>Asia/Ho_Chi_Minh</td>
+          <td>11</td><td>2026-09-30</td><td>2025-02-27 10:08</td><td>2026-06-11 13:50</td>
+          <td><span class="lnk" data-modal-open="editModal">수정</span></td>
+        </tr>
+        <tr>
+          <td class="l">세종물류남부지점</td><td>fleet</td><td class="l">south@sejonglog.co.kr</td><td>Asia/Seoul</td>
+          <td>9</td><td>2026-07-31</td><td>2025-06-09 09:00</td><td>2026-03-25 11:07</td>
+          <td><span class="lnk" data-modal-open="editModal">수정</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ═══════ 현행 상세 패널 : 목록 아래 단순 폼 ═══════ -->
+    <div class="panel-asis">
+      <h3>업체 상세 — (주)세종물류중부지점</h3>
+      <div class="form-asis">
+        <div class="row"><label>업체명</label><input class="w" value="(주)세종물류중부지점"/></div>
+        <div class="row"><label>업체분류</label><select><option>fleet</option><option>rental</option><option>dealer</option></select></div>
+        <div class="row"><label>대표 사용자 ID</label><input class="w" value="admin@sejonglog.co.kr"/><span style="color:#aaa">직접 입력</span></div>
+        <div class="row"><label>Timezone</label><input class="w" value="Asia/Seoul"/></div>
+        <div class="row"><label>만료일</label><input value="2027-12-31"/></div>
+
+        <div class="grp">일일 조업시간</div>
+        <div class="row"><label>시작시간</label><input value="09:00"/><label style="width:auto">종료시간</label><input value="18:00"/><label style="width:auto">휴게시간(분)</label><input value="60"/></div>
+        <div class="row"><label>휴일근무</label><select><option>미적용</option><option>적용</option></select></div>
+
+        <div class="grp">공휴일</div>
+        <div class="row"><label>공휴일 추가</label><input value="2026-08-15"/><input class="w" value="광복절"/><button class="btn btn--sm">추가</button></div>
+        <div class="hol-asis">
+          2026-01-01 신정 <span class="lnk">삭제</span><br/>
+          2026-03-01 삼일절 <span class="lnk">삭제</span><br/>
+          2026-05-05 어린이날 <span class="lnk">삭제</span><br/>
+          2026-06-06 현충일 <span class="lnk">삭제</span><br/>
+          2026-08-15 광복절 <span class="lnk">삭제</span>
+        </div>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:6px;justify-content:flex-end">
+        <button class="btn">취소</button><button class="btn btn--dark">저장</button>
+      </div>
+    </div>
+
+    <!-- 현행 문제점 -->
+    <div class="note">
+      <b>AS-IS 현황 및 개선 포인트</b>
+      <ul>
+        <li><span class="tag-asis">현행</span> <b>조업시간(시작/종료/휴게)을 바꾸면 운행이력의 계획 가동시간(OPER_OPERATING_TIME)이 함께 바뀌어 운영률·미사용시간이 재계산</b>되는데, 화면에는 그 안내가 전혀 없습니다. 관리자가 영향 범위를 모른 채 저장합니다.</li>
+        <li><span class="tag-asis">현행</span> 공휴일이 <b>한 건씩만 추가/삭제</b> 가능하고 연간 공휴일 일괄 등록·복사 기능이 없어, 매년 10건 이상을 수동 입력합니다.</li>
+        <li><span class="tag-asis">현행</span> <b>대표 사용자 ID를 텍스트로 직접 입력</b>해 오타·존재하지 않는 계정 지정이 발생하고, 저장 후에야 오류를 확인합니다.</li>
+        <li><span class="tag-asis">현행</span> <b>Timezone 변경 시</b> 기존 운행이력의 일자 경계(REG_DATETIME_TZ 환산)가 달라진다는 안내가 없습니다.</li>
+        <li><span class="tag-asis">현행</span> 변경 이력이 <b>TB_COMPANY_HISTROY에 적재되지만 조회 화면이 없어</b> 누가 언제 조업시간을 변경했는지 추적할 수 없습니다.</li>
+        <li>데이터 원천 : <b>TB_COMPANY</b>(업체명/분류/대표ID/Timezone/만료일) + <b>TB_WORKING_TIME</b>(시작·종료·휴게·휴일근무, GROUP_ID=-1 · SETTING_TYPE_CODE='S') + <b>TB_HOLIDAY</b>(공휴일, WORKING_TIME_ID 조인) + <b>TB_COMPANY_HISTROY</b>(변경 이력, 화면 미연동)</li>
+      </ul>
+    </div>
+  </main>
+</div>
+
+<!-- ═══════ 현행 업체 수정 모달 (목록 '수정' 링크) ═══════ -->
+<div class="dim" id="editModal">
+  <div class="modal">
+    <div class="modal__head">
+      <div class="modal__title">업체 수정</div>
+      <button class="modal__x" data-modal-close>✕</button>
+    </div>
+    <div class="modal__body">
+      <div class="form-asis">
+        <div class="row"><label>업체명</label><input class="w" value="(주)세종물류중부지점"/></div>
+        <div class="row"><label>업체분류</label><select><option>fleet</option><option>rental</option><option>dealer</option></select></div>
+        <div class="row"><label>대표 사용자 ID</label><input class="w" value="admin@sejonglog.co.kr"/></div>
+        <div class="row"><label>Timezone</label><input class="w" value="Asia/Seoul"/></div>
+        <div class="row"><label>만료일</label><input value="2027-12-31"/></div>
+        <div class="grp">일일 조업시간</div>
+        <div class="row"><label>시작 / 종료</label><input value="09:00"/><input value="18:00"/></div>
+        <div class="row"><label>휴게시간(분)</label><input value="60"/></div>
+        <div class="row"><label>휴일근무</label><select><option>미적용</option><option>적용</option></select></div>
+      </div>
+    </div>
+    <div class="modal__foot">
+      <button class="btn" data-modal-close>취소</button>
+      <button class="btn btn--dark">저장</button>
+    </div>
+  </div>
+</div>
+
+<script src="../_shared/common-logic.js?v=20260907-common-logic-r42"></script>
+<script src="../_shared/nav.js?v=20260907-common-logic-r42"></script>
+</body>
+</html>

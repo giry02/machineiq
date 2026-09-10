@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>글로벌 회원가입 — 옵션 비교</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans KR',sans-serif;font-size:16px;background:#f9f9f9;color:#000;min-height:100vh}
+.wrap{max-width:480px;margin:0 auto;background:#fff;min-height:100vh;display:flex;flex-direction:column}
+
+/* 헤더 */
+.page-header{position:sticky;top:0;z-index:20;display:flex;gap:16px;align-items:center;justify-content:center;height:56px;padding:0 16px;background:#ff3600;color:#fff}
+.page-header__title{font-size:20px;font-weight:700;color:#fff}
+
+/* 바디 */
+.page-body{padding:24px 16px;flex:1;display:flex;flex-direction:column;gap:16px}
+
+.intro-text{font-size:14px;color:#666;line-height:1.6;padding-bottom:16px;border-bottom:1px solid #eaeaea}
+.intro-text strong{color:#000;font-weight:700}
+
+/* 옵션 카드 */
+.option-card{border:1px solid #eaeaea;border-radius:4px;overflow:hidden}
+.option-card__header{padding:16px;display:flex;align-items:flex-start;gap:12px}
+.option-badge{display:inline-flex;align-items:center;justify-content:center;min-width:72px;height:24px;border-radius:2px;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0;padding:0 8px}
+.badge-a{background:#000;color:#fff}
+.badge-b{background:#666;color:#fff}
+.badge-c{background:#ff3600;color:#fff}
+.option-card__title{font-size:15px;font-weight:700;color:#000;line-height:1.4}
+.option-card__desc{font-size:13px;color:#666;margin-top:4px;line-height:1.5}
+.option-card__body{padding:0 16px 16px}
+.pros-cons{display:flex;flex-direction:column;gap:6px}
+.pros-cons__item{font-size:13px;color:#333;line-height:1.5;padding-left:16px;position:relative}
+.pros-cons__item::before{position:absolute;left:0;font-weight:700}
+.pros-cons__item.pro::before{content:'✓';color:#158737}
+.pros-cons__item.con::before{content:'✗';color:#ff3600}
+.option-card__foot{padding:12px 16px;border-top:1px solid #f3f3f3}
+
+/* 버튼 */
+.custom-button{display:inline-flex;align-items:center;justify-content:center;border:none;border-radius:4px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;text-decoration:none;transition:background 0.15s}
+.custom-button.size-md{height:40px;padding:0 16px;font-size:14px}
+.custom-button.blocked{width:100%}
+.custom-button.color-black{background:#000;color:#fff}
+.custom-button.color-black:hover{background:#333}
+.custom-button.color-red{background:#ff3600;color:#fff}
+.custom-button.color-red:hover{background:#c02801}
+.custom-button.color-default.lined{background:#fff;border:1px solid #dfdfdf;color:#000}
+.custom-button.color-default.lined:hover{border-color:#000}
+
+/* 비교 테이블 */
+.compare-section{margin-top:8px}
+.compare-title{font-size:14px;font-weight:700;color:#000;margin-bottom:12px}
+.compare-table{width:100%;border-collapse:collapse;font-size:12px}
+.compare-table th{background:#f3f3f3;padding:8px 10px;text-align:left;font-weight:700;color:#333;border-bottom:1px solid #eaeaea}
+.compare-table td{padding:8px 10px;border-bottom:1px solid #f3f3f3;color:#333;vertical-align:top;line-height:1.4}
+.compare-table td:first-child{font-weight:600;color:#000;white-space:nowrap}
+.td-a{color:#000}
+.td-b{color:#666}
+.td-c{color:#ff3600;font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="page-header">
+    <p class="page-header__title">글로벌 회원가입 UI 옵션</p>
+  </header>
+
+  <div class="page-body">
+
+    <p class="intro-text">
+      개발자 논의용 프로토타입입니다.<br/>
+      <strong>주소 입력 방식</strong>의 차이를 중심으로 3가지 옵션을 비교합니다.<br/>
+      Daum Postcode API는 모든 옵션에서 제거됩니다.
+    </p>
+
+    <p class="intro-text" style="border:1px dashed #ff3600;border-bottom:1px dashed #ff3600;padding:12px;border-radius:4px;color:#c02801">
+      <strong>업데이트</strong> — 아래 A / B / C 옵션 검토 결과는 이후 실제 화면 개정판
+      <strong>TO-BE v1 → v2 → v3</strong>으로 통합되었습니다.
+      각 옵션 버튼은 대응하는 개정판 화면으로 연결됩니다. 최종안은 <strong>v3</strong> 입니다.<br/>
+      전체 화면 목업은 <a href="../index.html" style="color:#ff3600;font-weight:700;text-decoration:underline">'26 통합 사이트맵</a> 에서 확인하세요.
+    </p>
+
+    <!-- 현재 버전 -->
+    <div class="option-card" style="border-color:#795548">
+      <div class="option-card__header">
+        <span class="option-badge" style="background:#795548">AS-IS</span>
+        <div>
+          <p class="option-card__title">현재 버전 (한국 전용)</p>
+          <p class="option-card__desc">약관 동의 → 폼 입력 (Daum Postcode, 한국 전화번호)</p>
+        </div>
+      </div>
+      <div class="option-card__body">
+        <div class="pros-cons">
+          <p class="pros-cons__item con">한국 전화번호 형식만 허용</p>
+          <p class="pros-cons__item con">Daum Postcode API (한국 주소만 검색)</p>
+          <p class="pros-cons__item con">타 국가 사용자 가입 불가</p>
+        </div>
+      </div>
+      <div class="option-card__foot">
+        <a href="web-registration-current.html" class="custom-button size-md blocked" style="background:#795548;color:#fff;text-decoration:none">현재 버전 보기 →</a>
+      </div>
+    </div>
+
+    <div style="border-top:1px solid #eaeaea;padding-top:16px;font-size:12px;color:#999;text-align:center">↓ 아래는 글로벌 지원을 위한 개선 옵션들입니다 ↓</div>
+
+    <!-- Option A -->
+    <div class="option-card">
+      <div class="option-card__header">
+        <span class="option-badge badge-a">Option A</span>
+        <div>
+          <p class="option-card__title">드롭다운 계층형</p>
+          <p class="option-card__desc">국가 선택 시 State/Province 목록 자동 연동</p>
+        </div>
+      </div>
+      <div class="option-card__body">
+        <div class="pros-cons">
+          <p class="pros-cons__item pro">주/도 입력 오타 없음, 데이터 표준화</p>
+          <p class="pros-cons__item pro">사용자 입력 부담 감소</p>
+          <p class="pros-cons__item con">국가별 주/도 목록 사전 구축 필요</p>
+          <p class="pros-cons__item con">목록 미지원 국가 별도 처리 필요</p>
+        </div>
+      </div>
+      <div class="option-card__foot">
+        <span class="custom-button size-md color-black blocked">Option A · 시안 파일 정리됨 (Option C 확정)</span>
+      </div>
+    </div>
+
+    <!-- Option B -->
+    <div class="option-card">
+      <div class="option-card__header">
+        <span class="option-badge badge-b">Option B</span>
+        <div>
+          <p class="option-card__title">자유 텍스트 구조화</p>
+          <p class="option-card__desc">State/Province · City 모두 직접 입력</p>
+        </div>
+      </div>
+      <div class="option-card__body">
+        <div class="pros-cons">
+          <p class="pros-cons__item pro">모든 국가 즉시 지원, 구현 단순</p>
+          <p class="pros-cons__item pro">목록 관리 불필요</p>
+          <p class="pros-cons__item con">오타·비표준 입력 가능</p>
+          <p class="pros-cons__item con">주소 데이터 분석/필터 어려움</p>
+        </div>
+      </div>
+      <div class="option-card__foot">
+        <span class="custom-button size-md color-default lined blocked">Option B · 시안 파일 정리됨 (Option C 확정)</span>
+      </div>
+    </div>
+
+    <!-- Option C -->
+    <div class="option-card" style="border-color:#ff3600">
+      <div class="option-card__header">
+        <span class="option-badge badge-c">Option C ★</span>
+        <div>
+          <p class="option-card__title">혼합형 (권장)</p>
+          <p class="option-card__desc">주요 국가 드롭다운 + 기타 자유 텍스트 전환</p>
+        </div>
+      </div>
+      <div class="option-card__body">
+        <div class="pros-cons">
+          <p class="pros-cons__item pro">KR/US/CN/JP 등 주요 국가 드롭다운 제공</p>
+          <p class="pros-cons__item pro">기타 국가는 자유 텍스트로 즉시 지원</p>
+          <p class="pros-cons__item pro">"직접 입력" 토글로 유연성 확보</p>
+          <p class="pros-cons__item con">A·B 대비 구현 복잡도 약간 높음</p>
+        </div>
+      </div>
+      <div class="option-card__foot">
+        <a href="web-registration-tobe-v3.html" class="custom-button size-md color-red blocked">Option C → TO-BE v3 최종안 보기 →</a>
+      </div>
+    </div>
+
+    <!-- 비교 테이블 -->
+    <div class="compare-section">
+      <p class="compare-title">옵션별 상세 비교</p>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>항목</th>
+            <th class="td-a">A</th>
+            <th class="td-b">B</th>
+            <th class="td-c">C</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>State 입력</td>
+            <td class="td-a">드롭다운</td>
+            <td class="td-b">자유 텍스트</td>
+            <td class="td-c">드롭다운+폴백</td>
+          </tr>
+          <tr>
+            <td>Daum API</td>
+            <td colspan="3" style="color:#158737;font-weight:600">모두 제거 ✓</td>
+          </tr>
+          <tr>
+            <td>구현 난이도</td>
+            <td class="td-a">중</td>
+            <td class="td-b">하</td>
+            <td class="td-c">중</td>
+          </tr>
+          <tr>
+            <td>데이터 품질</td>
+            <td class="td-a">높음</td>
+            <td class="td-b">낮음</td>
+            <td class="td-c">중~높음</td>
+          </tr>
+          <tr>
+            <td>국가 확장성</td>
+            <td class="td-a">목록 추가 필요</td>
+            <td class="td-b">즉시 지원</td>
+            <td class="td-c">점진적 확장</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

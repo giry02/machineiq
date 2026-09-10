@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>지오펜스 관리 | MACHINE IQ</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
+<link rel="stylesheet" href="../_shared/mockup.css"/>
+<style>
+.geo-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}
+.map-h{height:500px}
+.wkt{font-family:Consolas,'Courier New',monospace;font-size:11px;color:#555;background:#f7f8f9;border:1px solid #e5e7eb;border-radius:4px;padding:8px 10px;word-break:break-all;line-height:1.65}
+.zone-item{display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid #f0f0f0;border-radius:6px;margin-bottom:6px;font-size:12px;cursor:pointer}
+.zone-item:hover{border-color:#ffd0c4}
+.zone-item.on{background:#fff5f3;border-color:#ffd0c4}
+.zone-item .nm{font-weight:700;color:#1a1a1a}
+.zone-item .ev{margin-left:auto;font-weight:700}
+.ev-row{display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:9px}
+.ev-row .k{width:92px;color:#555;font-weight:600}
+.ev-row .track{flex:1;height:8px;background:#eef0f2;border-radius:4px;overflow:hidden}
+.ev-row .track i{display:block;height:100%;background:#ff3600;border-radius:4px}
+.ev-row .v{width:74px;text-align:right;font-weight:700;color:#1a1a1a}
+.danger-box{background:#ffe3e3;border:1px solid #ffc9c9;border-radius:6px;padding:12px 14px;font-size:12px;color:#c92a2a;line-height:1.7}
+.zone-hint{position:absolute;left:12px;bottom:12px;background:rgba(255,255,255,.94);border:1px solid #e0e0e0;border-radius:4px;padding:6px 10px;font-size:11px;color:#666;z-index:5}
+</style>
+<link rel="stylesheet" href="../_shared/mgmt-secondary-enhancements.css"/>
+</head>
+<body data-gnb="mgmt" data-sub="geofence" data-variant="tobe" data-base="../">
+
+<div id="gnb"></div>
+
+<div class="layout">
+  <!-- ═══════ LNB : 관리기능 메뉴 ═══════ -->
+  <aside class="lnb">
+    <div class="lnb__company">(주)세종물류중부지점</div>
+    <div class="lnb__search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+      <input placeholder="관리 메뉴 검색"/>
+    </div>
+    <div class="lnb__group-title">관리기능 <span>▲</span></div>
+    <a data-label="사용자" class="lnb__item" href="../Mgmt%20User/mgmt-user-tobe.html">사용자 <span class="cnt">10</span></a>
+    <a data-label="업체" class="lnb__item" href="../Mgmt%20Company/mgmt-company-tobe.html">업체 <span class="cnt">5</span></a>
+    <a data-label="그룹" class="lnb__item" href="../Mgmt%20Group/mgmt-group-tobe.html">그룹 <span class="cnt">4</span></a>
+    <a data-label="Geofence" class="lnb__item active" href="mgmt-geofence-tobe.html">Geofence <span class="cnt">7</span></a>
+    <a data-label="차량" class="lnb__item" href="../Mgmt%20Vehicle/mgmt-vehicle-tobe.html">차량 <span class="cnt">42</span></a>
+    <a data-label="계정신청관리" class="lnb__item" href="../Mgmt%20Account%20Request/mgmt-account-request-tobe.html">계정신청관리 <span class="cnt">4</span></a>
+    <a data-label="차량신청관리" class="lnb__item" href="../Mgmt%20Vehicle%20Request/mgmt-vehicle-request-tobe.html">차량신청관리 <span class="cnt">3</span></a>
+    <div class="lnb__hint">Geofence는 <b>그룹 단위</b>로 등록됩니다. 좌표는 <b>WKT + SRID 3857</b>로 저장됩니다.</div>
+  </aside>
+
+  <!-- ═══════ MAIN ═══════ -->
+  <main class="main">
+    <div class="page-head">
+    <div class="page-head__title">지오펜스 <span class="sub" data-lnb-label hidden>- 기본그룹</span></div>
+      <div class="page-head__bc"><a href="../Mgmt%20User/mgmt-user-tobe.html">관리기능</a>&gt; Geofence</div>
+    </div>
+
+    <!-- 검색 / 필터 -->
+    <div class="filter-bar filter-bar--left">
+      <select class="inp" style="width:170px">
+        <option>기본그룹 (18대)</option><option>테스트그룹 (14대)</option><option>물류1팀 (10대)</option>
+      </select>
+      <select class="inp" style="width:130px">
+        <option>유형 전체</option><option>circle</option><option>polygon</option>
+      </select>
+      <input class="inp" style="width:220px" placeholder="구역명 · 연결 장비 검색"/>
+      <button class="btn-search">조회</button>
+      <div class="grow"></div>
+      <span class="badge gray">기준 2026-07-06 14:30</span>
+      <button class="btn btn--pri" data-modal-open="zoneModal">＋ 구역 등록</button>
+    </div>
+
+    <!-- ═══════ ① 요약 스트립 (신규) ═══════ -->
+    <div class="box total">
+      <div class="box__head">
+        <span class="box__name tot">기본그룹 지오펜스 요약</span>
+        <span class="box__badge">2026-06 기준</span>
+        <div class="box__tools"><span style="font-size:11px;color:#999">진출입 건수 원천 : TB_GEOFENCE_RESULT (참조 표시)</span></div>
+      </div>
+      <div class="stat-cells c6">
+        <div class="cell hl"><div class="cell__v">4<small>개</small></div><div class="cell__k">등록 구역</div><div class="cell__d up">▲ 1개 (전월 3개)</div></div>
+        <div class="cell"><div class="cell__v">2<small>개</small></div><div class="cell__k">다각형 (polygon)</div><div class="cell__d flat">— 전월 동일</div></div>
+        <div class="cell"><div class="cell__v">2<small>개</small></div><div class="cell__k">원형 (circle)</div><div class="cell__d up">▲ 1개 (전월 1개)</div></div>
+        <div class="cell rate"><div class="cell__v">4<small>대</small></div><div class="cell__k">연결 장비 (18대 중 22.2%)</div>
+          <div class="rate-bar"><em style="width:22.2%"></em></div><div class="cell__d up">▲ 1대</div></div>
+        <div class="cell"><div class="cell__v">128<small>건</small></div><div class="cell__k">6월 진출입 이벤트</div><div class="cell__d up">▲ 14.3% (전월 112건)</div></div>
+        <div class="cell soon"><div class="cell__v">52<small>건</small></div><div class="cell__k">최다 발생 · 자재 하역장</div>
+          <div class="rate-bar warn"><em style="width:40.6%"></em></div><div class="cell__d up">전체의 40.6%</div></div>
+      </div>
+    </div>
+
+    <!-- ═══════ ② 탭 : 지도 / 진출입 현황 ═══════ -->
+    <div class="tabs">
+      <button class="active" data-tab="tabMap">지도 · 구역 관리</button>
+      <button data-tab="tabEvent">구역별 진출입 현황</button>
+    </div>
+
+    <!-- 지도 탭 -->
+    <div class="tab-pane active" id="tabMap">
+      <div class="geo-layout">
+        <section>
+          <div class="map-mock map-h">
+            <div class="map-mock__grid"></div>
+            <div class="map-mock__road" style="left:0;right:0;top:196px;height:26px"></div>
+            <div class="map-mock__road" style="top:0;bottom:0;left:352px;width:26px"></div>
+            <div class="map-mock__water" style="right:24px;bottom:20px;width:150px;height:96px"></div>
+
+            <div class="map-type">
+              <button class="active">일반</button><button>위성</button><button>지형</button>
+            </div>
+            <div class="map-ctl">
+              <button title="확대">＋</button><button title="축소">－</button><button title="선택 구역으로 이동">◎</button>
+            </div>
+
+            <!-- polygon 2 + circle 2 -->
+            <div class="geo-zone" style="left:56px;top:56px;width:246px;height:126px;border-style:solid">
+              <span class="geo-zone__label">본사 야드 A · polygon · 정점 6</span>
+            </div>
+            <div class="geo-zone circle" style="left:430px;top:74px;width:152px;height:152px;border-color:#e03131;background:rgba(224,49,49,.09)">
+              <span class="geo-zone__label" style="background:#e03131">자재 하역장 · circle · R120m · 52건</span>
+            </div>
+            <div class="geo-zone" style="left:112px;top:300px;width:204px;height:120px">
+              <span class="geo-zone__label">출하 대기 구역 · polygon · 정점 4</span>
+            </div>
+            <div class="geo-zone circle" style="left:568px;top:312px;width:112px;height:112px">
+              <span class="geo-zone__label">정비고 주변 · circle · R80m</span>
+            </div>
+
+            <!-- 차량 마커 -->
+            <div class="marker on" style="left:160px;top:150px"><span class="marker__pin ok"><svg viewBox="0 0 24 24"><path d="M4 17h12l3-5h-5V7H4z"/></svg></span></div>
+            <div class="marker" style="left:506px;top:170px"><span class="marker__pin ok"><svg viewBox="0 0 24 24"><path d="M4 17h12l3-5h-5V7H4z"/></svg></span></div>
+            <div class="marker" style="left:214px;top:392px"><span class="marker__pin warn"><svg viewBox="0 0 24 24"><path d="M4 17h12l3-5h-5V7H4z"/></svg></span></div>
+            <div class="marker" style="left:624px;top:392px"><span class="marker__pin off"><svg viewBox="0 0 24 24"><path d="M4 17h12l3-5h-5V7H4z"/></svg></span></div>
+
+            <div class="zone-hint">구역 4개 · 목록/지도 <b>양방향 연동</b> — 행 선택 시 해당 구역으로 이동·강조</div>
+          </div>
+        </section>
+
+        <!-- 우측 : 선택 구역 상세 + 좌표 -->
+        <aside>
+          <div class="box">
+            <div class="sub-head">구역 선택 <span class="tail">지도와 연동</span></div>
+            <div class="zone-item on"><span class="nm">본사 야드 A</span><span class="badge info">polygon</span><span class="ev">38건</span></div>
+            <div class="zone-item"><span class="nm">자재 하역장</span><span class="badge pri">circle</span><span class="ev">52건</span></div>
+            <div class="zone-item"><span class="nm">출하 대기 구역</span><span class="badge info">polygon</span><span class="ev">24건</span></div>
+            <div class="zone-item"><span class="nm">정비고 주변</span><span class="badge pri">circle</span><span class="ev">14건</span></div>
+            <div class="hr"></div>
+            <div class="sub-head">좌표 (WKT · SRID 3857)</div>
+            <div class="wkt">POLYGON((14139021.6 4508776.2,<br/>14139241.8 4508776.2,<br/>14139241.8 4508612.4,<br/>14139138.5 4508540.9,<br/>14138990.3 4508601.7,<br/>14139021.6 4508776.2))</div>
+            <div style="font-size:11px;color:#888;line-height:1.7;margin-top:8px">
+              저장 시 <b>ST_GeomFromText(WKT, 3857, 'axis-order=long-lat')</b>,
+              조회 시 <b>ST_AsText</b>로 변환됩니다.
+            </div>
+            <div class="hr"></div>
+            <div class="v-row3" style="gap:14px">
+              <div class="v-field"><span class="v-field__k">연결 장비</span><span class="v-field__v">B30S-7</span></div>
+              <div class="v-field"><span class="v-field__k">진출입 유형</span><span class="v-field__v">OUT (진출)</span></div>
+              <div class="v-field"><span class="v-field__k">등록자</span><span class="v-field__v">admin@sejong.co.kr</span></div>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:14px">
+              <button class="btn btn--ghost btn--sm" style="flex:1" data-modal-open="zoneModal">수정</button>
+              <button class="btn btn--danger btn--sm" style="flex:1" data-modal-open="delModal">삭제</button>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <!-- 지오펜스 목록 -->
+      <div class="list-head" style="margin-top:16px">
+        <span class="list-head__count">지오펜스 <b>4</b>건 <span style="color:#aaa">(기본그룹 · USE_YN='Y')</span></span>
+        <div class="tools">
+          <button class="btn btn--sm">내보내기</button>
+          <button class="btn btn--pri btn--sm" data-modal-open="zoneModal">＋ 구역 등록</button>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>구역명</th><th class="c">유형</th><th class="c">반경 / 정점수</th><th>그룹</th>
+              <th>연결 장비</th><th class="c">진출입 유형</th><th class="r">6월 이벤트</th>
+              <th>등록자</th><th>등록일시</th><th class="c">관리</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="sel">
+              <td class="strong">본사 야드 A</td><td class="c"><span class="badge info">polygon</span></td><td class="c">정점 6</td><td>기본그룹</td>
+              <td>B30S-7 <span class="mute">FBA32_224250271</span></td><td class="c"><span class="badge gray">OUT 진출</span></td>
+              <td class="r strong">38</td><td>admin@sejong.co.kr</td><td>2026-03-12 10:24</td>
+              <td class="c"><button class="btn btn--sm" data-modal-open="zoneModal">수정</button> <button class="btn btn--sm btn--danger" data-modal-open="delModal">삭제</button></td>
+            </tr>
+            <tr>
+              <td class="strong">자재 하역장</td><td class="c"><span class="badge pri">circle</span></td><td class="c">반경 120m</td><td>기본그룹</td>
+              <td>D25S-9 <span class="mute">FBD25_113920044</span></td><td class="c"><span class="badge gray">OUT 진출</span></td>
+              <td class="r strong" style="color:#e03131">52</td><td>admin@sejong.co.kr</td><td>2026-04-02 09:15</td>
+              <td class="c"><button class="btn btn--sm" data-modal-open="zoneModal">수정</button> <button class="btn btn--sm btn--danger" data-modal-open="delModal">삭제</button></td>
+            </tr>
+            <tr>
+              <td class="strong">출하 대기 구역</td><td class="c"><span class="badge info">polygon</span></td><td class="c">정점 4</td><td>기본그룹</td>
+              <td>B18S-7 <span class="mute">FBA18_224250094</span></td><td class="c"><span class="badge gray">OUT 진출</span></td>
+              <td class="r strong">24</td><td>fleet01@sejong.co.kr</td><td>2026-05-11 16:40</td>
+              <td class="c"><button class="btn btn--sm" data-modal-open="zoneModal">수정</button> <button class="btn btn--sm btn--danger" data-modal-open="delModal">삭제</button></td>
+            </tr>
+            <tr>
+              <td class="strong">정비고 주변</td><td class="c"><span class="badge pri">circle</span></td><td class="c">반경 80m</td><td>기본그룹</td>
+              <td>B25S-7 <span class="mute">FBA25_224250118</span></td><td class="c"><span class="badge gray">OUT 진출</span></td>
+              <td class="r strong">14</td><td>fleet01@sejong.co.kr</td><td>2026-06-08 11:07</td>
+              <td class="c"><button class="btn btn--sm" data-modal-open="zoneModal">수정</button> <button class="btn btn--sm btn--danger" data-modal-open="delModal">삭제</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="tbl__foot">
+          <span>합계 <b style="color:#1a1a1a">128건</b> (38+52+24+14)</span>
+          <span class="badge bad">삭제 = 물리 삭제(DELETE) · 복구 불가</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 진출입 현황 탭 -->
+    <div class="tab-pane" id="tabEvent">
+      <div class="box">
+        <div class="box__head">
+          <span class="box__name">구역별 진출입 이벤트 (2026-06)</span>
+          <div class="box__tools"><span style="font-size:11px;color:#999">총 128건 · 전월 112건</span></div>
+        </div>
+        <div class="ev-row"><span class="k">자재 하역장</span><span class="track"><i style="width:40.6%"></i></span><span class="v">52건 40.6%</span></div>
+        <div class="ev-row"><span class="k">본사 야드 A</span><span class="track"><i style="width:29.7%"></i></span><span class="v">38건 29.7%</span></div>
+        <div class="ev-row"><span class="k">출하 대기 구역</span><span class="track"><i style="width:18.8%"></i></span><span class="v">24건 18.8%</span></div>
+        <div class="ev-row"><span class="k">정비고 주변</span><span class="track"><i style="width:10.9%"></i></span><span class="v">14건 10.9%</span></div>
+        <div class="hr"></div>
+        <div class="sub-head">월별 진출입 이벤트 추이 <span class="tail">건</span></div>
+        <div class="stack-chart" style="height:150px">
+          <div class="stk"><span class="stk__cap">86</span><div class="stk__seg prev" style="height:67%"></div></div>
+          <div class="stk"><span class="stk__cap">94</span><div class="stk__seg prev" style="height:73%"></div></div>
+          <div class="stk"><span class="stk__cap">103</span><div class="stk__seg prev" style="height:80%"></div></div>
+          <div class="stk"><span class="stk__cap">112</span><div class="stk__seg prev" style="height:88%"></div></div>
+          <div class="stk"><span class="stk__cap">128</span><div class="stk__seg pri" style="height:100%"></div></div>
+        </div>
+        <div class="stack-x"><span>2026-02</span><span>2026-03</span><span>2026-04</span><span>2026-05</span><span>2026-06</span></div>
+        <div style="font-size:11px;color:#888;margin-top:10px;line-height:1.7">
+          이 화면은 <b>구역 등록·관리</b>가 주 기능이며, 진출입 판정 결과는 컬렉터가 <b>TB_GEOFENCE_RESULT</b>에 적재합니다.
+          위 집계는 등록 구역이 실제로 사용되는지 확인하기 위한 <b>참조 지표</b>입니다.
+        </div>
+      </div>
+    </div>
+
+    <!-- 범례 -->
+    <div class="legend">
+      <span><b>범례</b></span>
+      <span class="li"><span class="sw" style="background:rgba(255,54,0,.35);border:1px solid #ff3600"></span>등록 구역 (polygon / circle)</span>
+      <span class="li"><span class="sw" style="background:rgba(224,49,49,.35);border:1px solid #e03131"></span>이벤트 최다 구역</span>
+      <span class="li"><span class="sw" style="background:#2b8a3e"></span>가동 차량</span>
+      <span class="li"><span class="sw" style="background:#f59f00"></span>대기 차량</span>
+      <span class="li"><span class="sw" style="background:#adb5bd"></span>미가동 차량</span>
+      <span style="margin-left:auto;color:#999">목록 행 클릭 → 지도 이동 · 좌표(WKT) 표시</span>
+    </div>
+
+    <div class="note" aria-hidden="true">
+      <b>TO-BE 개선 사항</b>
+      <ul>
+        <li><span class="tag-new">신규</span> <b>삭제 확인 모달</b> — 삭제가 <b>물리 삭제(DELETE FROM TB_GEOFENCE)</b>이며 <b>되돌릴 수 없음</b>을 경고하고 구역명 입력 확인 절차를 추가.</li>
+        <li><span class="tag-new">신규</span> <b>진출입 유형(INOUT_TYPE_CODE) 선택</b> — 현행 'OUT' 고정에서 <b>IN / OUT / INOUT</b> 선택으로 확장하여 진입 알림 설정 가능.</li>
+        <li><span class="tag-new">신규</span> <b>좌표(WKT) 미리보기·직접 수정</b> — POINT/POLYGON 문자열과 반경(m)을 수치로 확인·보정. 저장은 <b>ST_GeomFromText(SRID 3857)</b>, 조회는 <b>ST_AsText</b>.</li>
+        <li><span class="tag-new">신규</span> <b>구역별 진출입 이벤트 현황</b> 탭 — TB_GEOFENCE_RESULT 집계를 참조 지표로 노출해 미사용 구역을 식별.</li>
+        <li><span class="tag-new">신규</span> <b>목록 ↔ 지도 양방향 연동</b> — 행 선택 시 해당 구역으로 이동·강조, 지도 클릭 시 목록 행 선택.</li>
+        <li><span class="tag-keep">유지</span> 그룹 단위 구역 등록(TB_GEOFENCE.GROUP_ID), circle/polygon 두 유형, USE_YN='Y' 목록 필터, 연결 장비 표시.</li>
+      </ul>
+    </div>
+  </main>
+</div>
+
+<!-- ═══════ 등록/수정 모달 ═══════ -->
+<div class="dim" id="zoneModal">
+  <div class="modal lg">
+    <div class="modal__head">
+      <div class="modal__title">지오펜스 등록 / 수정</div>
+      <button class="modal__x" data-modal-close>✕</button>
+    </div>
+    <div class="modal__body">
+      <div class="form-grid">
+        <div class="fld"><span class="fld__k">구역명<span class="req">*</span></span><input class="inp" value="본사 야드 A"/></div>
+        <div class="fld"><span class="fld__k">그룹<span class="req">*</span></span><select class="inp"><option>기본그룹</option><option>테스트그룹</option><option>물류1팀</option></select></div>
+        <div class="fld"><span class="fld__k">구역 유형<span class="req">*</span></span><select class="inp"><option>polygon (다각형)</option><option>circle (원형)</option></select></div>
+        <div class="fld"><span class="fld__k">반경 (m) · 원형만</span><input class="inp" value="120" placeholder="원형 선택 시 활성화"/></div>
+        <div class="fld"><span class="fld__k">연결 장비</span><select class="inp"><option>B30S-7 (FBA32_224250271)</option><option>D25S-9 (FBD25_113920044)</option><option>B18S-7 (FBA18_224250094)</option></select></div>
+        <div class="fld"><span class="fld__k">진출입 유형 <span class="badge pri">신규 선택 가능</span></span>
+          <select class="inp"><option>OUT — 구역 진출 시 알림</option><option>IN — 구역 진입 시 알림</option><option>INOUT — 진입·진출 모두</option></select></div>
+        <div class="fld col-2"><span class="fld__k">좌표 WKT 미리보기 (SRID 3857 · axis-order=long-lat)</span>
+          <div class="wkt">POLYGON((14139021.6 4508776.2, 14139241.8 4508776.2, 14139241.8 4508612.4, 14139138.5 4508540.9, 14138990.3 4508601.7, 14139021.6 4508776.2))</div>
+        </div>
+        <div class="fld col-2"><span class="fld__k">원형 선택 시 중심 좌표</span>
+          <div class="wkt">POINT(14139412.7 4508705.4) &nbsp;·&nbsp; RADIUS = 120 m</div>
+        </div>
+      </div>
+      <div class="note" style="margin-top:16px">
+        저장 시 <b>ST_GeomFromText(WKT, 3857)</b>로 <b>TB_GEOFENCE.GEOFENCE_LOCATION</b>(polygon) 또는
+        <b>GEOFENCE_CENTER + RADIUS</b>(circle)에 기록되고, 조회 시 <b>ST_AsText</b>로 다시 WKT로 반환됩니다.
+        <b>USE_YN</b>은 등록 시 'Y'로 고정됩니다.
+      </div>
+    </div>
+    <div class="modal__foot">
+      <button class="btn" data-modal-close>취소</button>
+      <button class="btn btn--pri" data-modal-close>저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ 삭제 확인 모달 (신규) ═══════ -->
+<div class="dim" id="delModal">
+  <div class="modal sm">
+    <div class="modal__head">
+      <div class="modal__title" style="color:#e03131">구역 삭제 — 복구 불가</div>
+      <button class="modal__x" data-modal-close>✕</button>
+    </div>
+    <div class="modal__body">
+      <div class="danger-box">
+        <b>이 삭제는 물리 삭제입니다.</b><br/>
+        <b>DELETE FROM TB_GEOFENCE WHERE GEOFENCE_ID = 1042</b> 로 행이 실제 제거되며,
+        사용자·업체 관리 화면의 논리삭제(USE_YN='N')와 달리 <b>되돌릴 수 없습니다.</b>
+      </div>
+      <div class="fld" style="margin-top:16px">
+        <span class="fld__k">삭제할 구역</span>
+        <div class="inp" readonly>본사 야드 A · polygon · 정점 6 · 기본그룹</div>
+      </div>
+      <div class="fld" style="margin-top:12px">
+        <span class="fld__k">확인을 위해 구역명을 입력하세요<span class="req">*</span></span>
+        <input class="inp" placeholder="본사 야드 A"/>
+      </div>
+      <div style="font-size:11px;color:#888;margin-top:10px;line-height:1.7">
+        이 구역의 진출입 판정 이력(TB_GEOFENCE_RESULT 38건)은 삭제되지 않지만, 구역 정보가 사라져 이력 해석이 어려워집니다.
+      </div>
+    </div>
+    <div class="modal__foot">
+      <button class="btn" data-modal-close>취소</button>
+      <button class="btn btn--pri" style="background:#e03131;border-color:#e03131" data-modal-close>영구 삭제</button>
+    </div>
+  </div>
+</div>
+
+<script src="../_shared/meeting-model.js"></script>
+<script src="../_shared/common-logic.js?v=20260907-common-logic-r42"></script>
+<script src="../_shared/nav.js?v=20260907-common-logic-r42"></script>
+<script src="../_shared/mgmt-secondary-enhancements.js"></script>
+</body>
+</html>

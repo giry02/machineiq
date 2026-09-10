@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>운행이력 - 요약정보 AS-IS (현행 Mock-up)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
+<link rel="stylesheet" href="../_shared/gnb.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans KR',sans-serif;font-size:14px;background:#f4f5f7;color:#1a1a1a}
+button,input,select{font-family:'Noto Sans KR',sans-serif}
+
+/* ── 상단 GNB (현행: 다크 배경) ── */
+.gnb{display:flex;align-items:center;height:52px;background:#1a1a1a;color:#fff;padding:0 20px;gap:28px}
+.gnb__logo{display:flex;align-items:center;gap:6px;font-weight:700;font-size:16px}
+.gnb__logo .bob{color:#ff3600}
+.gnb__logo .iq{color:#ff3600;font-size:11px;vertical-align:super}
+.gnb__menu{display:flex;gap:24px;font-size:14px;font-weight:500}
+.gnb__menu span{cursor:pointer;opacity:0.85;padding:16px 0}
+.gnb__menu span.active{opacity:1;font-weight:700;border-bottom:2px solid #ff3600}
+.gnb__right{margin-left:auto;display:flex;gap:16px;font-size:12px;opacity:0.8}
+
+/* ── 레이아웃 ── */
+.layout{display:flex;min-height:calc(100vh - 52px)}
+.lnb{width:230px;background:#fff;border-right:1px solid #e5e7eb;flex-shrink:0;padding:20px 0}
+.lnb__company{font-size:15px;font-weight:700;padding:0 20px 16px;border-bottom:1px solid #eee;margin-bottom:12px}
+.lnb__search{margin:0 16px 16px;display:flex;align-items:center;height:36px;border:1px solid #dfdfdf;border-radius:4px;padding:0 10px;gap:6px}
+.lnb__search input{border:none;outline:none;flex:1;font-size:13px}
+.lnb__group-title{padding:10px 20px;font-size:13px;font-weight:600;color:#333;display:flex;justify-content:space-between;cursor:pointer}
+.lnb__item{padding:8px 32px;font-size:13px;color:#666;cursor:pointer}
+.lnb__item.active{color:#ff3600;font-weight:600;background:#fff5f3}
+.lnb__item:hover{background:#f8f8f8}
+
+.main{flex:1;padding:24px 28px;min-width:0}
+
+/* ── 페이지 헤더 ── */
+.page-head{display:flex;align-items:center;margin-bottom:16px}
+.page-head__title{font-size:22px;font-weight:700}
+.page-head__title .sub{color:#ff3600}
+.page-head__bc{margin-left:auto;font-size:12px;color:#999}
+.filter-bar{display:flex;align-items:center;gap:6px;margin-bottom:16px;justify-content:flex-end}
+.period-tabs{display:flex;border:1px solid #dfdfdf;border-radius:4px;overflow:hidden}
+.period-tabs button{border:none;background:#fff;padding:7px 16px;font-size:13px;cursor:pointer;border-right:1px solid #dfdfdf}
+.period-tabs button:last-child{border-right:none}
+.period-tabs button.active{background:#1a1a1a;color:#fff;font-weight:600}
+.date-range{display:flex;align-items:center;gap:4px;font-size:13px;color:#555;border:1px solid #dfdfdf;border-radius:4px;padding:6px 10px;background:#fff}
+.btn-search{background:#ff3600;color:#fff;border:none;border-radius:4px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer}
+
+/* ── 상단 요약 테이블 (현행: 운영률 + 운영효율 모두 존재) ── */
+.summary-card{background:#fff;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:20px}
+.summary-table{width:100%;border-collapse:collapse;text-align:center}
+.summary-table th{background:#fafafa;font-size:12px;font-weight:600;color:#666;padding:12px 6px;border-bottom:1px solid #eee;border-right:1px solid #f0f0f0}
+.summary-table th:first-child{width:30%}
+.summary-table td{font-size:14px;font-weight:600;padding:14px 6px;border-right:1px solid #f5f5f5;color:#1a1a1a}
+.summary-table td:first-child{font-size:12px;font-weight:500;color:#555;background:#fcfcfc}
+.summary-table .help{color:#bbb;font-size:11px;margin-left:2px}
+
+/* ── 차량 리스트 (현행 GoodsSummary: 이미지 + 카드 정보) ── */
+.vehicle-list{display:flex;flex-direction:column;gap:12px}
+.vehicle-card{display:flex;align-items:flex-start;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:20px 24px;gap:24px;cursor:pointer;transition:border-color .15s}
+.vehicle-card:hover{border-color:#ff3600}
+.vehicle-card__img{width:150px;height:110px;flex-shrink:0;position:relative;display:flex;align-items:center;justify-content:center;background:#fff}
+.vehicle-card__img img{max-width:100%;max-height:100%}
+.loc-badge{position:absolute;top:6px;left:6px;width:30px;height:30px;border-radius:50%;background:#f1f3f5;border:1px solid #e0e0e0;display:flex;align-items:center;justify-content:center;color:#868e96}
+.vehicle-card__body{flex:1;min-width:0}
+.v-title{font-size:22px;font-weight:700;color:#1a1a1a;margin-bottom:16px}
+.v-info-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px 12px}
+.v-info{display:flex;flex-direction:column;gap:4px}
+.v-info__k{font-size:12px;color:#999}
+.v-info__v{font-size:14px;color:#333;font-weight:600}
+
+.note{margin-top:18px;padding:12px 16px;background:#fff;border:1px dashed #d0d0d0;border-radius:8px;font-size:12px;color:#666;line-height:1.7}
+.note b{color:#1a1a1a}
+.tag-asis{display:inline-block;background:#555;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:2px;margin-right:4px;vertical-align:middle}
+
+/* 이미지 자리 placeholder (실제 장비 사진 대체) */
+.equip-illust{width:130px;height:96px;display:flex;align-items:center;justify-content:center}
+.equip-illust svg{width:120px;height:90px}
+</style>
+</head>
+<body data-gnb="anlz" data-sub="summary" data-variant="asis" data-base="../">
+
+<!-- ═══════ GNB ═══════ -->
+<div id="gnb"></div>
+
+<div class="layout">
+  <!-- ═══════ LNB ═══════ -->
+  <aside class="lnb">
+    <div class="lnb__company">(주)세종물류중부지점</div>
+    <div class="lnb__search">🔍<input placeholder="그룹 또는 차량"/></div>
+    <div class="lnb__group-title">그룹별 <span>▲</span></div>
+    <div class="lnb__item active">기본그룹</div>
+    <div class="lnb__item">테스트그룹</div>
+    <div class="lnb__group-title">차량 <span>▼</span></div>
+  </aside>
+
+  <!-- ═══════ MAIN ═══════ -->
+  <main class="main">
+    <div class="page-head">
+      <div class="page-head__title">요약정보 <span class="sub">- 기본그룹</span></div>
+      <div class="page-head__bc">🏠 <a href="vehicle-summary-asis.html">운행이력</a>&gt; 요약정보</div>
+    </div>
+
+    <!-- 기간 필터 -->
+    <div class="filter-bar">
+      <div class="period-tabs">
+        <button>일</button>
+        <button>주</button>
+        <button class="active">월</button>
+        <button>사용자설정</button>
+      </div>
+      <div class="date-range">📅 2026-07-01 ~ 2026-07-03</div>
+      <button class="btn-search">조회</button>
+    </div>
+
+    <!-- ═══════ 상단 요약 테이블 (현행: 운영률·운영효율 둘 다) ═══════ -->
+    <div class="summary-card">
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>차량</th>
+            <th>운영률 <span class="help">?</span></th>
+            <th>운영효율 <span class="help">?</span></th>
+            <th>충격 횟수</th>
+            <th>거리 <span class="help">?</span></th>
+            <th>시간</th>
+            <th>평균연료소비량</th>
+            <th>평균배터리소비량</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>엔진 0대 / 납축 0대 / 리튬 16대 / 수소 0대</td>
+            <td>73.2%</td>
+            <td>64.7%</td>
+            <td>6</td>
+            <td>147Km</td>
+            <td>107H</td>
+            <td>0 ℓ/H</td>
+            <td>0kWh</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ═══════ 차량 리스트 (현행 GoodsSummary) ═══════ -->
+    <div class="vehicle-list">
+
+      <!-- 차량 1 : 리튬 -->
+      <div class="vehicle-card">
+        <div class="vehicle-card__img">
+          <span class="loc-badge">📍</span>
+          <div class="equip-illust">
+            <svg viewBox="0 0 120 90" fill="none">
+              <rect x="20" y="30" width="46" height="34" rx="3" fill="#ff6a00"/>
+              <rect x="66" y="20" width="8" height="44" fill="#333"/>
+              <rect x="74" y="18" width="6" height="46" fill="#555"/>
+              <rect x="26" y="38" width="20" height="14" rx="2" fill="#fff"/>
+              <circle cx="34" cy="70" r="9" fill="#222"/><circle cx="34" cy="70" r="4" fill="#888"/>
+              <circle cx="58" cy="70" r="9" fill="#222"/><circle cx="58" cy="70" r="4" fill="#888"/>
+              <rect x="80" y="58" width="14" height="6" fill="#333"/>
+            </svg>
+          </div>
+        </div>
+        <div class="vehicle-card__body">
+          <div class="v-title">B30S-7 (FBA32_224250271)</div>
+          <div class="v-info-grid">
+            <div class="v-info"><span class="v-info__k">모델명</span><span class="v-info__v">B30S-7</span></div>
+            <div class="v-info"><span class="v-info__k">분류</span><span class="v-info__v">리튬</span></div>
+            <div class="v-info"><span class="v-info__k">운영률</span><span class="v-info__v">48.0%</span></div>
+            <div class="v-info"><span class="v-info__k">운영효율</span><span class="v-info__v">93.2%</span></div>
+            <div class="v-info"><span class="v-info__k">충격 횟수</span><span class="v-info__v">0</span></div>
+            <div class="v-info"><span class="v-info__k">거리</span><span class="v-info__v">16Km</span></div>
+            <div class="v-info"><span class="v-info__k">시간</span><span class="v-info__v">7H 41M</span></div>
+            <div class="v-info"><span class="v-info__k">평균배터리소비량</span><span class="v-info__v">0kWh</span></div>
+            <div class="v-info"><span class="v-info__k">배터리충전횟수</span><span class="v-info__v">0</span></div>
+            <div class="v-info"><span class="v-info__k">배터리정보</span><span class="v-info__v">80</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 차량 2 : 리튬 -->
+      <div class="vehicle-card">
+        <div class="vehicle-card__img">
+          <span class="loc-badge">📍</span>
+          <div class="equip-illust">
+            <svg viewBox="0 0 120 90" fill="none">
+              <rect x="20" y="30" width="46" height="34" rx="3" fill="#ff6a00"/>
+              <rect x="66" y="20" width="8" height="44" fill="#333"/>
+              <rect x="74" y="18" width="6" height="46" fill="#555"/>
+              <rect x="26" y="38" width="20" height="14" rx="2" fill="#fff"/>
+              <circle cx="34" cy="70" r="9" fill="#222"/><circle cx="34" cy="70" r="4" fill="#888"/>
+              <circle cx="58" cy="70" r="9" fill="#222"/><circle cx="58" cy="70" r="4" fill="#888"/>
+              <rect x="80" y="58" width="14" height="6" fill="#333"/>
+            </svg>
+          </div>
+        </div>
+        <div class="vehicle-card__body">
+          <div class="v-title">B30S-7 (FBA32_224250383)</div>
+          <div class="v-info-grid">
+            <div class="v-info"><span class="v-info__k">모델명</span><span class="v-info__v">B30S-7</span></div>
+            <div class="v-info"><span class="v-info__k">분류</span><span class="v-info__v">리튬</span></div>
+            <div class="v-info"><span class="v-info__k">운영률</span><span class="v-info__v">0.3%</span></div>
+            <div class="v-info"><span class="v-info__k">운영효율</span><span class="v-info__v">98.9%</span></div>
+            <div class="v-info"><span class="v-info__k">충격 횟수</span><span class="v-info__v">0</span></div>
+            <div class="v-info"><span class="v-info__k">거리</span><span class="v-info__v">0Km</span></div>
+            <div class="v-info"><span class="v-info__k">시간</span><span class="v-info__v">0H 2M</span></div>
+            <div class="v-info"><span class="v-info__k">평균배터리소비량</span><span class="v-info__v">0kWh</span></div>
+            <div class="v-info"><span class="v-info__k">배터리충전횟수</span><span class="v-info__v">0</span></div>
+            <div class="v-info"><span class="v-info__k">배터리정보</span><span class="v-info__v">67</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 차량 3 : 리튬 -->
+      <div class="vehicle-card">
+        <div class="vehicle-card__img">
+          <span class="loc-badge">📍</span>
+          <div class="equip-illust">
+            <svg viewBox="0 0 120 90" fill="none">
+              <rect x="20" y="30" width="46" height="34" rx="3" fill="#ff6a00"/>
+              <rect x="66" y="20" width="8" height="44" fill="#333"/>
+              <rect x="74" y="18" width="6" height="46" fill="#555"/>
+              <rect x="26" y="38" width="20" height="14" rx="2" fill="#fff"/>
+              <circle cx="34" cy="70" r="9" fill="#222"/><circle cx="34" cy="70" r="4" fill="#888"/>
+              <circle cx="58" cy="70" r="9" fill="#222"/><circle cx="58" cy="70" r="4" fill="#888"/>
+              <rect x="80" y="58" width="14" height="6" fill="#333"/>
+            </svg>
+          </div>
+        </div>
+        <div class="vehicle-card__body">
+          <div class="v-title">B30S-7 (FBA32_224250094)</div>
+          <div class="v-info-grid">
+            <div class="v-info"><span class="v-info__k">모델명</span><span class="v-info__v">B30S-7</span></div>
+            <div class="v-info"><span class="v-info__k">분류</span><span class="v-info__v">리튬</span></div>
+            <div class="v-info"><span class="v-info__k">운영률</span><span class="v-info__v">104.2%</span></div>
+            <div class="v-info"><span class="v-info__k">운영효율</span><span class="v-info__v">64.4%</span></div>
+            <div class="v-info"><span class="v-info__k">충격 횟수</span><span class="v-info__v">0</span></div>
+            <div class="v-info"><span class="v-info__k">거리</span><span class="v-info__v">15Km</span></div>
+            <div class="v-info"><span class="v-info__k">시간</span><span class="v-info__v">16H 40M</span></div>
+            <div class="v-info"><span class="v-info__k">평균배터리소비량</span><span class="v-info__v">0kWh</span></div>
+            <div class="v-info"><span class="v-info__k">배터리충전횟수</span><span class="v-info__v">0</span></div>
+            <div class="v-info"><span class="v-info__k">배터리정보</span><span class="v-info__v">81</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- AS-IS 설명 -->
+    <div class="note">
+      <div><span class="tag-asis">AS-IS</span><b>현행 요약정보 페이지 구조</b> (실제 코드 <code>AnlzSummaryView.vue</code> 기준)</div>
+      <div>• 상단 요약 테이블: <b>운영률 · 운영효율 · 충격횟수 · 거리 · 시간 · 평균연료소비량 · 평균배터리소비량</b> (운영률/운영효율 둘 다 존재)</div>
+      <div>• 차량 카드(GoodsSummary): 좌측 <b>장비 이미지</b>(<code>imageUrl</code>) + 위치 배지, 우측에 <b>모델명/분류/운영률/운영효율/충격횟수/거리/시간</b> 나열</div>
+      <div>• 배터리(리튬·납산) 차량은 추가로 <b>평균배터리소비량 / 배터리충전횟수 / 배터리정보</b>, 엔진 차량은 <b>평균연료소비량</b> 표시</div>
+      <div>• 분류는 텍스트(<code>fuelTypeCodeName</code>), 통신 연결여부·잔여 배터리·소속그룹·연식·누적거리/시간·단말Serial 항목은 <b>현행 카드에는 없음</b></div>
+    </div>
+  </main>
+</div>
+
+<script src="../_shared/common-logic.js?v=20260907-common-logic-r42"></script>
+<script src="../_shared/nav.js?v=20260907-common-logic-r42"></script>
+</body>
+</html>
