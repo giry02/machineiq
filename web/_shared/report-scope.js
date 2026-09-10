@@ -1,12 +1,13 @@
 (function(){
   'use strict';
   var role=document.body.dataset.managementRole||MIQCommon.roles.resolve(new URLSearchParams(location.search).get('role'));
+  var policy=MIQCommon.roles.targetPolicy(role);
   var source=window.MIQ_MOCK_DATA&&MIQ_MOCK_DATA.fleet;
-  var companies=(source&&source.dashboardCompanies||[]).filter(function(c){return !c.dashboardRoles||c.dashboardRoles.indexOf(role)>=0;}).map(function(c){return c.companyName;});
+  var companies=(source&&source.dashboardCompanies||[]).filter(function(c){return (!c.dashboardRoles||c.dashboardRoles.indexOf(role)>=0)&&(!policy.companyIds||policy.companyIds.indexOf(String(c.companyId))>=0);}).map(function(c){return c.companyName;});
   // These are the current customer management mock's three configured groups.
   // A server adapter must replace this with the authenticated company's group list.
   var groups=['기본그룹','테스트그룹','물류1팀'];
-  var scope=window.MIQReportScope=MIQMeeting.reportScope(role,companies,groups,'물류1팀');
+  var scope=window.MIQReportScope=MIQMeeting.reportScope(role,companies,groups,policy.group);
   function translate(s){return scope.customer?s.replace(/업체/g,'그룹').replace(scope.readOnly?/비교/g:/$^/g,'현황'):s;}
   function labels(){
     var main=document.querySelector('.main');if(!main)return;

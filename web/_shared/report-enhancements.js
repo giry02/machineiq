@@ -175,6 +175,10 @@
     if (from && from.value) params.set('from', from.value);
     if (to && to.value) params.set('to', to.value);
     params.delete('company');
+    if (reportPolicy.group) {
+      params.set('companyId', reportPolicy.companyId);
+      params.set('group', reportPolicy.group);
+    }
     return params;
   }
 
@@ -386,6 +390,10 @@
   }
 
   function applyCompanyQuery(params) {
+    if (reportPolicy.group) {
+      selectOption(document.getElementById('coSel'), reportPolicy.group);
+      return;
+    }
     var requestedId = params.get('companyId');
     var exactCompanyName = !MIQCommon.roles.isCustomer(reportRole) && REPORT_COMPANY_IDS[requestedId];
     var single = exactCompanyName || params.get('company') || REPORT_COMPANY_IDS[requestedId] || requestedId || '';

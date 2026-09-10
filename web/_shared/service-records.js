@@ -75,6 +75,7 @@
     if (companyId && companyId !== 'all' && companyId !== record.companyId) return false;
     if (vehicle && normalize(vehicle) !== normalize(record.vin)) return false;
     if (filter.group && normalize(record.group).indexOf(normalize(filter.group)) < 0) return false;
+    if (filter.group && filter.exactGroup && record.group !== filter.group) return false;
     if (filter.type && normalize(record.type) !== normalize(filter.type)) return false;
     if (record.kind === 'supply' && record.supplyState !== 'need' && record.supplyState !== 'soon') return false;
     if (record.kind === 'supply' && filter.supplyState && record.supplyState !== filter.supplyState) return false;

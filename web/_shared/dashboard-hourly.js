@@ -2,7 +2,7 @@
   'use strict';
   var source=window.MIQ_MOCK_DATA&&MIQ_MOCK_DATA.fleet;if(!source)return;
   var role=document.body.dataset.managementRole,policy=MIQCommon.roles.targetPolicy(role),query=new URLSearchParams(location.search);
-  var fleet=source.vehicles.filter(function(v){return (!policy.companyIds||policy.companyIds.indexOf(v.companyId)>=0)&&(!MIQCommon.roles.isCustomer(role)||v.companyId==='1933')&&(role!=='customer_staff'||v.group==='물류1팀');});
+  var fleet=MIQCommon.roles.filterVehicles(role,source.vehicles);
   var panel=document.createElement('div');panel.className='dashboard-panel';panel.innerHTML='<div class="panel-heading"><h3>금일 누적 현황</h3><p id="hourlyRange"></p></div><div class="usage-compare-grid" id="hourlyValues"></div>';
   document.querySelector('.dashboard-live .live-summary').insertAdjacentElement('afterend',panel);
   var selected={companyId:query.get('companyId'),group:query.get('group'),type:query.get('type')};

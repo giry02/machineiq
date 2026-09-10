@@ -4,11 +4,13 @@
   var roleRules = window.MIQCommon.roles;
   var role = roleRules.resolve(document.body.dataset.managementRole || new URLSearchParams(location.search).get('role'));
   var companyDimension = roleRules.dashboardDimension(role) === 'company';
-  var dealerStaffScope = roleRules.hideDashboardComparison(role);
+  var assignedGroupScope = roleRules.hideDashboardComparison(role);
+  var policy = roleRules.targetPolicy(role);
   var mockFleet = window.MIQ_MOCK_DATA && window.MIQ_MOCK_DATA.fleet;
   var companies = mockFleet && Array.isArray(mockFleet.dashboardCompanies)
     ? mockFleet.dashboardCompanies.filter(function (company) {
-      return !Array.isArray(company.dashboardRoles) || company.dashboardRoles.indexOf(role) > -1;
+      return (!policy.companyIds || policy.companyIds.indexOf(company.companyId) > -1) &&
+        (!Array.isArray(company.dashboardRoles) || company.dashboardRoles.indexOf(role) > -1);
     }) : [];
   var lastCatalogCompany = companies.filter(function (company) { return !company.demo; }).slice(-1)[0];
   var SUMMARY = '../Vehicle%20Summary/vehicle-summary-tobe-3.html';
@@ -20,6 +22,41 @@
   var navigationLinks = [];
   var summaryLinks = null;
   var committedReportPeriod = initialReportPeriod();
+  var groupVehicles = assignedGroupScope ? roleRules.filterVehicles(role, mockFleet && mockFleet.vehicles || []) : [];
+  if (assignedGroupScope) companies = [assignedGroupSummary()];
+
+  function assignedGroupSummary() {
+    // The authenticated company and assigned group must intersect. A same-named
+    // group at another company must never supply this employee's example data.
+    var windowNow = MIQMeeting.hourlyWindow(new Date(), 'Asia/Seoul');
+    var samples = groupVehicles.map(function (vehicle) { return MIQMeeting.hourlyVehicle(vehicle, windowNow); });
+    function count(key) { return samples.filter(function (sample) { return sample[key]; }).length; }
+    function detailCount(key) { return groupVehicles.reduce(function (total, vehicle) { return total + (Number((vehicle.summaryDetail || {})[key]) || 0); }, 0); }
+    var from = MIQCommon.dates.parse(committedReportPeriod.from), to = MIQCommon.dates.parse(committedReportPeriod.to);
+    var days = MIQCommon.dates.dayCount(from, to);
+    function periodMetrics(start) {
+      var totals = [0, 0, 0, 0];
+      for (var day = 0; day < days; day++) {
+        var date = MIQCommon.dates.format(MIQCommon.dates.addDays(start, day));
+        var dailyWindow = { date: date, hours: 24, slots: Array.from({ length: 24 }, function (_, hour) { return { from: hour, to: hour + 1 }; }) };
+        groupVehicles.forEach(function (vehicle) {
+          var sample = MIQMeeting.hourlyVehicle(vehicle, dailyWindow);
+          ['km', 'runH', 'fuel', 'battery'].forEach(function (key, index) { totals[index] += Number(sample[key]) || 0; });
+        });
+      }
+      return totals;
+    }
+    var previous = periodMetrics(MIQCommon.dates.addDays(from, -days)), current = periodMetrics(from), metrics = {};
+    ['distance', 'time', 'fuel', 'battery'].forEach(function (key, index) { metrics[key] = [previous[index], current[index]]; });
+    var efficiency = previous.map(function (value, index) { return groupVehicles.length ? [value / groupVehicles.length, current[index] / groupVehicles.length] : [0, 0]; });
+    var knownEfficiency = groupVehicles.filter(function (vehicle) { return typeof vehicle.efficiencyRate === 'number' || vehicle.type !== '엔진' && typeof vehicle.eff === 'number'; });
+    var operatingEfficiency = knownEfficiency.length ? knownEfficiency.reduce(function (total, vehicle) { return total + (vehicle.efficiencyRate == null ? vehicle.eff : vehicle.efficiencyRate); }, 0) / knownEfficiency.length : 0;
+    efficiency.push([operatingEfficiency, operatingEfficiency]);
+    return { companyId: policy.companyId, companyName: policy.group, assignedGroup: true, vehicleCount: groupVehicles.length,
+      connected: count('connected'), disconnected: samples.filter(function (sample) { return sample.known && !sample.connected; }).length,
+      running: count('running'), idle: count('idle'), fault: detailCount('activeErrorCount'), replacementNeeded: detailCount('supplyDueCount'),
+      replacementSoon: detailCount('supplySoonCount'), metrics: metrics, efficiency: efficiency };
+  }
 
   function initialReportPeriod() {
     var query = new URLSearchParams(location.search);
@@ -53,6 +90,15 @@
       if (key === 'companyId') return;
       if (values[key] !== null && values[key] !== undefined && values[key] !== '') params.set(key, values[key]);
     });
+    if (assignedGroupScope) {
+      params.set('companyId', policy.companyId);
+      params.set('group', policy.group);
+      if (values.period) {
+        params.set('period', committedReportPeriod.period);
+        params.set('from', committedReportPeriod.from);
+        params.set('to', committedReportPeriod.to);
+      }
+    }
     return base + '?' + params.toString();
   }
 
@@ -131,6 +177,7 @@
   }
 
   function companyMetricSeed(company, index) {
+    if (company.assignedGroup) return company.metrics;
     if (company.demo) index %= 5;
     var count = Number(company.vehicleCount) || 0;
     var distance = Math.round(count * 81.4 + index * 9);
@@ -146,6 +193,7 @@
   }
 
   function companyEfficiencySeed(company, index) {
+    if (company.assignedGroup) return company.efficiency;
     if (company.demo) index %= 5;
     var rate = percent(company.running, company.connected);
     var flatBattery = company.demo ? index === 4 : lastCatalogCompany && company.companyId === lastCatalogCompany.companyId;
@@ -188,7 +236,7 @@
   }
 
   function renderCompanyTotals(selected) {
-    if (!companyDimension || !companies.length) return;
+    if ((!companyDimension && !assignedGroupScope) || !companies.length) return;
     var scoped = selected || companies;
     function sum(key) { return scoped.reduce(function (total, company) { return total + (Number(company[key]) || 0); }, 0); }
     var total = sum('vehicleCount');
@@ -197,14 +245,15 @@
     var running = sum('running');
     var idle = sum('idle');
     var periodTitle = document.querySelector('.dashboard-period .dashboard-panel .panel-heading h3');
-    if (periodTitle) periodTitle.textContent = scoped.length === companies.length ? '전체 보유 차량' : '조회 대상 차량';
+    var totalScopeLabel = role === 'dealer_staff' ? '담당 업체 보유 차량' : '전체 보유 차량';
+    if (periodTitle) periodTitle.textContent = scoped.length === companies.length ? totalScopeLabel : '조회 대상 차량';
     var liveDescription = document.querySelector('.dashboard-live .section-heading p');
-    if (liveDescription) liveDescription.textContent = (scoped.length === companies.length ? '전체 보유' : '조회 대상') + ' 차량의 연결·가동·정비 상태';
+    if (liveDescription) liveDescription.textContent = (scoped.length === companies.length ? totalScopeLabel : '조회 대상 차량') + '의 연결·가동·정비 상태';
     var fleetTotal = document.querySelector('.fleet-total');
     if (fleetTotal) {
       fleetTotal.querySelector('strong').textContent = format(total);
-      fleetTotal.querySelector('.fleet-total__meta').textContent = scoped.length + '개 업체 합계';
-      fleetTotal.querySelector('.fleet-total__label').textContent = scoped.length === companies.length ? '전체 보유 차량' : '조회 대상 차량';
+      fleetTotal.querySelector('.fleet-total__meta').textContent = (role === 'dealer_staff' ? '담당 ' : '') + scoped.length + '개 업체 합계';
+      fleetTotal.querySelector('.fleet-total__label').textContent = scoped.length === companies.length ? totalScopeLabel : '조회 대상 차량';
     }
     var status = document.querySelectorAll('.live-summary .status-metric');
     if (status[0]) {
@@ -281,14 +330,14 @@
         url.searchParams.set('from', committedReportPeriod.from); url.searchParams.set('to', committedReportPeriod.to);
       }
       node.dataset.dashboardHref = url.pathname + '?' + url.searchParams.toString();
-      var label = node.classList.contains('fleet-total') ? (all ? '전체 보유 차량 ' : '조회 대상 차량 ') + format(total) + '대 요약정보 보기' : item.label;
+      var label = node.classList.contains('fleet-total') ? node.querySelector('.fleet-total__label').textContent + ' ' + format(total) + '대 요약정보 보기' : item.label;
       node.classList.add('miq-dashboard-link'); node.setAttribute('role', 'link'); node.setAttribute('tabindex', '0');
       node.setAttribute('aria-label', label); node.setAttribute('title', label);
     });
   }
 
-  function applyDealerStaffScope() {
-    if (!dealerStaffScope) return;
+  function applyAssignedGroupScope() {
+    if (!assignedGroupScope) return;
     document.body.dataset.dashboardDimension = 'assigned-group';
 
     var matrix = document.querySelector('.group-matrix');
@@ -299,15 +348,23 @@
       if (!panel) return;
       panel.hidden = true;
       panel.setAttribute('aria-hidden', 'true');
-      panel.setAttribute('data-role-hidden', 'dealer_staff');
+      panel.setAttribute('data-role-hidden', 'customer_staff');
+      panel.querySelectorAll('tbody').forEach(function (body) { body.replaceChildren(); });
     });
 
     var liveDescription = document.querySelector('.dashboard-live .section-heading p');
-    if (liveDescription) liveDescription.textContent = '담당 그룹 전체 차량의 연결·가동·정비 상태';
+    if (liveDescription) liveDescription.textContent = groupVehicles.length ? '배정 그룹 차량의 연결·가동·정비 상태' : policy.group + '에 등록된 차량이 없습니다.';
     var totalLabel = document.querySelector('.fleet-total__label');
-    if (totalLabel) totalLabel.textContent = '담당 그룹 보유 차량';
+    if (totalLabel) totalLabel.textContent = '배정 그룹 보유 차량';
     var totalMeta = document.querySelector('.fleet-total__meta');
-    if (totalMeta) totalMeta.textContent = '담당 그룹 전체';
+    if (totalMeta) totalMeta.textContent = policy.group;
+    var periodTitle = document.querySelector('.dashboard-period .dashboard-panel .panel-heading h3');
+    if (periodTitle) periodTitle.textContent = policy.group + ' · 배정 그룹 차량';
+    if (!groupVehicles.length) {
+      document.querySelectorAll('.status-metric__rate').forEach(function (node) { node.textContent = '-'; });
+      document.querySelectorAll('.compare-metric__delta, .efficiency-item__delta').forEach(function (node) { node.textContent = '-'; });
+      document.querySelectorAll('.efficiency-item__pair > span:first-child, .efficiency-item__pair > strong').forEach(function (node) { node.textContent = '-'; });
+    }
   }
 
   function entityForRow(row) {
@@ -326,7 +383,7 @@
   function linkReportName(row) {
     var entity = entityForRow(row);
     // The existing customer-staff report only permits the assigned group.
-    if (role === 'customer_staff' && entity.group !== '물류1팀') return;
+    if (assignedGroupScope && entity.group !== policy.group) return;
     var name = row.querySelector('th .group-name');
     if (!name) return;
     var anchor = document.createElement('a');
@@ -345,6 +402,7 @@
     var dates = MIQCommon.dates;
     if (['d', 'w', 'm'].indexOf(period) < 0 || !dates.parse(detail.startDate) || !dates.parse(detail.endDate) || detail.startDate > detail.endDate) return;
     committedReportPeriod = { period: period, from: detail.startDate, to: period === 'd' ? detail.startDate : detail.endDate };
+    if (assignedGroupScope) { companies = [assignedGroupSummary()]; renderCompanyTotals(); applyAssignedGroupScope(); }
     reportLinks.forEach(function (item) { item.anchor.href = reportHref(item.entity); });
   }
 
@@ -372,13 +430,13 @@
   renderCompanyTotals();
   renderCompanyMatrix();
   renderCompanyPerformance();
-  applyDealerStaffScope();
+  applyAssignedGroupScope();
   window.MIQDashboardCompanyView = { role: role, companies: companies, updateSummary: renderCompanyTotals };
   Array.prototype.forEach.call(document.querySelectorAll('.group-matrix tbody tr, .performance-table tbody tr'), linkReportName);
 
   var totalNode = document.querySelector('.fleet-total');
   var totalCount = totalNode && totalNode.querySelector('strong') ? totalNode.querySelector('strong').textContent.trim() : '42';
-  link(totalNode, href(SUMMARY, { period: 'm' }), '전체 보유 차량 ' + totalCount + '대 요약정보 보기');
+  link(totalNode, href(SUMMARY, { period: 'm' }), (assignedGroupScope ? policy.group + ' 보유 차량 ' : '전체 보유 차량 ') + totalCount + '대 요약정보 보기');
 
   var status = document.querySelectorAll('.live-summary .status-metric');
   if (status[0]) {

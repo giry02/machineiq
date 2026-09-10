@@ -781,15 +781,8 @@
         companyName: item.companyName || (item.companyId && item.companyId !== '1933' ? item.companyName : '(주)세종물류중부지점')
       };
     }).filter(function (item) { return !!item.vin; });
-    if (Array.isArray(roleTargetPolicy.companyIds)) {
-      fleet = fleet.filter(function (item) {
-        return roleTargetPolicy.companyIds.indexOf(item.companyId) > -1;
-      });
-    }
+    fleet = roleRules.filterVehicles(MANAGEMENT_ROLE, fleet);
     if (lithiumList) fleet = fleet.filter(function (item) { return item.type === '리튬'; });
-    if (MANAGEMENT_ROLE === 'customer_staff' && (lithiumList || ACTSUB === 'shock')) {
-      fleet = fleet.filter(function (item) { return item.group === '물류1팀'; });
-    }
     var typeCatalog = window.MIQ && Array.isArray(window.MIQ.TYPES) && window.MIQ.TYPES.length
       ? window.MIQ.TYPES.slice() : ['엔진', '납산', '리튬'];
     if (lithiumList) typeCatalog = ['리튬'];
@@ -832,7 +825,11 @@
     var requestedVehicle = query.get('veh') || query.get('equipmentId') || '';
     /* 서비스 이력의 호기는 현재 차량 카탈로그에 없을 수도 있다. 차량 레코드를
        만들지 않고 조회 조건만 보존해, 이력이 0건이어도 다른 차량으로 바뀌지 않게 한다. */
-    var serviceHistoryVin = ACT === 'srvc' && profile === 'full' && requestedVehicle && !vehicleByVin(requestedVehicle, fleet)
+    var historyRecords = window.MIQServiceRecords && MIQServiceRecords.records || [];
+    var allowedHistory = ['dealer_staff', 'customer_staff'].indexOf(MANAGEMENT_ROLE) < 0 || roleRules.filterVehicles(MANAGEMENT_ROLE, historyRecords).some(function (record) {
+      return String(record.vin).replace(/[^0-9A-Z]/gi, '').toUpperCase() === String(requestedVehicle).replace(/[^0-9A-Z]/gi, '').toUpperCase();
+    });
+    var serviceHistoryVin = ACT === 'srvc' && profile === 'full' && requestedVehicle && allowedHistory && !vehicleByVin(requestedVehicle, fleet)
       ? requestedVehicle : '';
     function hasServiceHistoryVin() { return !!serviceHistoryVin && state.vin === serviceHistoryVin; }
     var initialVehicle = vehicleByVin(requestedVehicle, vehiclePool) || vehicleByVin(defaultVehicle, vehiclePool) || vehiclePool[0] || null;
@@ -848,7 +845,7 @@
         : profile === 'aggregate' ? '' : (vehicleByVin(requestedVehicle, fleet) || {}).vin || serviceHistoryVin
     };
     if (profile === 'vehicle' && initialVehicle) {
-      state.group = roleTargetPolicy.hideGroup ? '' : initialVehicle.group;
+      state.group = roleTargetPolicy.group || (roleTargetPolicy.hideGroup ? '' : initialVehicle.group);
       state.type = initialVehicle.type;
     }
 
@@ -948,13 +945,13 @@
       if (changed === 'type') state.vin = '';
       if (profile === 'aggregate') state.vin = '';
       if (roleTargetPolicy.companyId) state.companyId = roleTargetPolicy.companyId;
-      if (roleTargetPolicy.hideGroup) state.group = '';
+      if (roleTargetPolicy.hideGroup) state.group = roleTargetPolicy.group || '';
       if (lithiumList) state.type = '리튬';
 
       var selected = profile === 'aggregate' ? null : vehicleByVin(state.vin, fleet);
       if (selected) {
         state.companyId = selected.companyId;
-        state.group = roleTargetPolicy.hideGroup ? '' : selected.group;
+        state.group = roleTargetPolicy.group || (roleTargetPolicy.hideGroup ? '' : selected.group);
         state.type = selected.type;
         state.vin = selected.vin;
         return;
@@ -972,7 +969,7 @@
         state.group = '';
       } else {
         var companyRows = rowsFor(state.companyId, '', '', fleet);
-        if (state.group && !companyRows.some(function (item) { return item.group === state.group; })) {
+        if (!roleTargetPolicy.group && state.group && !companyRows.some(function (item) { return item.group === state.group; })) {
           state.group = '';
         }
       }
@@ -986,7 +983,7 @@
         if (changed === 'company') { state.group = ''; state.type = ''; state.vin = ''; }
         if (changed === 'group') { state.type = ''; state.vin = ''; }
         if (changed === 'type') state.vin = '';
-        if (roleTargetPolicy.hideGroup) state.group = '';
+        if (roleTargetPolicy.hideGroup) state.group = roleTargetPolicy.group || '';
 
         var requiredCompanies = companyCatalog.filter(function (item) {
           return rowsFor(item.id, '', '', vehiclePool).length > 0;
@@ -1001,8 +998,9 @@
         var requiredCompanyRows = rowsFor(state.companyId, '', '', vehiclePool);
         var requiredGroups = unique(requiredCompanyRows.map(function (item) { return item.group; }));
         if (roleTargetPolicy.hideGroup) {
-          state.group = '';
-          setOptions(group, [{ value: '', label: countLabel('전체 그룹', requiredCompanyRows.length), rawLabel: '전체 그룹' }], '');
+          state.group = roleTargetPolicy.group || '';
+          var fixedGroupName = roleTargetPolicy.group || '전체 그룹';
+          setOptions(group, [{ value: state.group, label: countLabel(fixedGroupName, requiredCompanyRows.length), rawLabel: fixedGroupName }], state.group);
         } else {
           if (requiredGroups.indexOf(state.group) < 0) state.group = requiredGroups[0] || '';
           setOptions(group, requiredGroups.map(function (name) {
@@ -1026,7 +1024,7 @@
         var requiredVehicle = vehicleByVin(state.vin, requiredVehicles);
         if (requiredVehicle) {
           state.companyId = requiredVehicle.companyId;
-          state.group = roleTargetPolicy.hideGroup ? '' : requiredVehicle.group;
+          state.group = roleTargetPolicy.group || (roleTargetPolicy.hideGroup ? '' : requiredVehicle.group);
           state.type = requiredVehicle.type;
         }
         setGroupAvailability(false);
@@ -1036,7 +1034,7 @@
       normalizeTargetState(changed);
 
       var availableCompanies = companyCatalog.filter(function (item) {
-        return rowsFor(item.id, '', '', fleet).length > 0
+        return rowsFor(item.id, '', '', fleet).length > 0 || item.id === roleTargetPolicy.companyId
           || (item.id === state.companyId && previewCompanyIds.indexOf(item.id) >= 0);
       });
       setOptions(company, [{ value: 'all', label: countLabel('전체 업체', fleet.length), rawLabel: '전체 업체' }].concat(availableCompanies.map(function (item) {
@@ -1046,7 +1044,9 @@
       var companyRows = rowsFor(state.companyId, '', '', fleet);
       var groupNames = unique(companyRows.map(function (item) { return item.group; }));
       var groupOptions = [{ value: '', label: countLabel('전체 그룹', companyRows.length), rawLabel: '전체 그룹' }];
-      if (state.companyId !== 'all') {
+      if (roleTargetPolicy.group) {
+        groupOptions = [{ value: roleTargetPolicy.group, label: countLabel(roleTargetPolicy.group, companyRows.length), rawLabel: roleTargetPolicy.group }];
+      } else if (state.companyId !== 'all') {
         groupOptions = groupOptions.concat(groupNames.map(function (name) {
           return { value: name, label: countLabel(name, rowsFor(state.companyId, name, '', fleet).length), rawLabel: name };
         }));
@@ -1074,7 +1074,7 @@
       var companyName = state.companyId === 'all'
         ? '전체 업체'
         : (selectedCompany && selectedCompany.name) || (selectedVehicle && selectedVehicle.companyName) || '선택 업체';
-      var groupName = roleTargetPolicy.hideGroup ? '' : (state.group || '전체 그룹');
+      var groupName = roleTargetPolicy.group || (roleTargetPolicy.hideGroup ? '' : (state.group || '전체 그룹'));
       var typeName = state.type || '전체 분류';
       var vehicleName = selectedVehicle ? selectedVehicle.vin + ' · ' + selectedVehicle.model : hasServiceHistoryVin() ? state.vin : '전체 차량';
       var scopeSegments = [];
@@ -1086,7 +1086,7 @@
       return {
         companyId: state.companyId,
         companyName: companyName,
-        group: roleTargetPolicy.hideGroup ? null : (state.group || null),
+        group: roleTargetPolicy.group || (roleTargetPolicy.hideGroup ? null : (state.group || null)),
         groupName: groupName,
         type: state.type || null,
         typeName: typeName,
@@ -1105,7 +1105,7 @@
     function addressForState() {
       var url = new URL(location.href);
       url.searchParams.set('companyId', state.companyId);
-      if (!roleTargetPolicy.hideGroup && state.group) url.searchParams.set('group', state.group); else url.searchParams.delete('group');
+      if (roleTargetPolicy.group || (!roleTargetPolicy.hideGroup && state.group)) url.searchParams.set('group', roleTargetPolicy.group || state.group); else url.searchParams.delete('group');
       if (state.type) url.searchParams.set('type', state.type); else url.searchParams.delete('type');
       if (state.vin) url.searchParams.set('veh', state.vin); else url.searchParams.delete('veh');
       ['groupName', 'groupId', 'fuelType', 'powerType', 'equipmentId', 'vehicleId', 'vehicle', 'vin'].forEach(function (key) {
@@ -1146,7 +1146,7 @@
       var selected = vehicleByVin(state.vin, fleet);
       if (selected) {
         state.companyId = selected.companyId;
-        state.group = roleTargetPolicy.hideGroup ? '' : selected.group;
+        state.group = roleTargetPolicy.group || (roleTargetPolicy.hideGroup ? '' : selected.group);
         state.type = selected.type;
       }
       commit('vehicle', true);
@@ -1173,13 +1173,13 @@
         commit('lnb', true);
         return;
       }
-      state.group = roleTargetPolicy.hideGroup ? '' : (target.group || '');
+      state.group = roleTargetPolicy.group || (roleTargetPolicy.hideGroup ? '' : (target.group || ''));
       state.type = target.type || '';
       state.vin = target.equipmentId || '';
       var selected = vehicleByVin(state.vin, fleet);
       if (selected) {
         state.companyId = selected.companyId;
-        state.group = roleTargetPolicy.hideGroup ? '' : selected.group;
+        state.group = roleTargetPolicy.group || (roleTargetPolicy.hideGroup ? '' : selected.group);
         state.type = selected.type;
       }
       commit('lnb', true);
@@ -1189,7 +1189,7 @@
       var selected = vehicleByVin(event.detail && event.detail.equipmentId, vehiclePool);
       if (!selected) return;
       state.companyId = selected.companyId;
-      state.group = roleTargetPolicy.hideGroup ? '' : selected.group;
+      state.group = roleTargetPolicy.group || (roleTargetPolicy.hideGroup ? '' : selected.group);
       state.type = selected.type;
       state.vin = selected.vin;
       refreshControls('vehicle');

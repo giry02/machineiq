@@ -1,7 +1,7 @@
 (function () {
   'use strict';
   var view = window.MIQDashboardCompanyView, model = window.MIQDashboardCompanies;
-  if (!view || !model || ['internal', 'dealer_owner'].indexOf(view.role) < 0) return;
+  if (!view || !model || ['internal', 'dealer_owner', 'dealer_staff'].indexOf(view.role) < 0) return;
   var host = document.getElementById('dashboardContent');
   var state = { companyId: '', pages: { live: 1, period: 1 } };
   var pendingCompanyId = '', candidates = [], activeCandidate = -1;

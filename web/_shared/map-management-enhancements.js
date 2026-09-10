@@ -225,7 +225,9 @@
     var scopeContext = initialTarget;
 
     var vinMap = {};
-    (MIQ.FLEET_CATALOG || MIQ.FLEET).forEach(function (vehicle) { vinMap[vehicle.vin] = vehicle; });
+    var mapFleet = MIQ.FLEET_CATALOG || MIQ.FLEET;
+    if (['dealer_staff', 'customer_staff'].indexOf(managementRole()) > -1) mapFleet = common.roles.filterVehicles(managementRole(), mapFleet);
+    mapFleet.forEach(function (vehicle) { vinMap[vehicle.vin] = vehicle; });
     var filters = {
       companyId: hasInitialTarget ? (initialTarget.companyId || 'all') : (query.get('companyId') || 'all'),
       group: hasInitialTarget ? (initialTarget.group || '') : (query.get('group') || ''),
@@ -282,6 +284,7 @@
     function allowed(row) {
       var vin = row.getAttribute('data-vin');
       var vehicle = vinMap[vin];
+      if (!vehicle && ['dealer_staff', 'customer_staff'].indexOf(managementRole()) > -1) return false;
       if (filters.companyId !== 'all' && (!vehicle || String(vehicle.companyId || '1933') !== String(filters.companyId))) return false;
       if (filters.group && (!vehicle || vehicle.group !== filters.group)) return false;
       if (filters.type && (!vehicle || vehicle.type !== filters.type)) return false;

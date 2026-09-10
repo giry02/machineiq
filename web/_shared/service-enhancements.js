@@ -360,6 +360,7 @@
 
   function matchesCompany(info) {
     if (accountPolicy.companyIds && accountPolicy.companyIds.indexOf(info.companyId) < 0) return false;
+    if (accountPolicy.group && info.group !== accountPolicy.group) return false;
     var id = filterState.companyId;
     if (!id || id === 'all') return true;
     if (info.companyId) return String(info.companyId) === String(id);
@@ -456,7 +457,8 @@
   }
 
   function serviceScopeFilter() {
-    return Object.assign({}, filterState, { companyIds: accountPolicy.companyIds, supplyState: '', errorState: '' });
+    return Object.assign({}, filterState, { companyIds: accountPolicy.companyIds, group: accountPolicy.group || filterState.group,
+      exactGroup: !!accountPolicy.group, supplyState: '', errorState: '' });
   }
 
   function updateSummaryCounts() {
@@ -890,9 +892,9 @@
 
   function applyUrlState() {
     var params = new URLSearchParams(location.search);
-    filterState.companyId = params.get('companyId') || '';
+    filterState.companyId = (accountPolicy.group && accountPolicy.companyId) || params.get('companyId') || '';
     filterState.vehicle = params.get('veh') || params.get('vehicle') || '';
-    filterState.group = params.get('group') || '';
+    filterState.group = accountPolicy.group || params.get('group') || '';
     filterState.type = params.get('type') || '';
     filterState.supplyState = page === 'supply' ? (params.get('state') || '') : '';
     var requestedErrorState = page === 'error' ? String(params.get('state') || '').toLowerCase() : '';
@@ -944,9 +946,9 @@
 
   document.addEventListener('miq:target-change', function (event) {
     scopeContext = event.detail || scopeContext;
-    filterState.companyId = event.detail && event.detail.companyId || '';
+    filterState.companyId = (accountPolicy.group && accountPolicy.companyId) || event.detail && event.detail.companyId || '';
     filterState.vehicle = event.detail && event.detail.equipmentId || '';
-    filterState.group = event.detail && event.detail.group || '';
+    filterState.group = accountPolicy.group || event.detail && event.detail.group || '';
     filterState.type = event.detail && event.detail.type || '';
     enhanceVinLinks();
     applyFilters();

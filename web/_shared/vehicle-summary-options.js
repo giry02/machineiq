@@ -21,6 +21,10 @@
     PERIOD[mode].range=[range.from,range.to]
   });
   var VEHICLES=Array.isArray(MIQ.FLEET_CATALOG)&&MIQ.FLEET_CATALOG.length?MIQ.FLEET_CATALOG:MIQ.FLEET;
+  var summaryPolicy=MIQCommon.roles.targetPolicy(document.body.dataset.managementRole);
+  if(['dealer_staff','customer_staff'].indexOf(document.body.dataset.managementRole)>-1){
+    VEHICLES=MIQCommon.roles.filterVehicles(document.body.dataset.managementRole,VEHICLES);
+  }
   if(window.MIQServiceRecords&&window.MIQServiceDemo){
     var serviceDay=dateRules.format(dateRules.yesterday());
     var serviceDemo=MIQServiceDemo.create(VEHICLES,serviceDay);
@@ -35,7 +39,7 @@
   var TYPES=MIQ.TYPES;
   var DETAIL='../Vehicle%20Detail/vehicle-detail-tobe.html';
   var QUERY=new URLSearchParams(location.search);
-  var currentCompanyId=QUERY.get('companyId')||'all';
+  var currentCompanyId=(summaryPolicy.group&&summaryPolicy.companyId)||QUERY.get('companyId')||'all';
   var scopeContext=window.MIQ_TARGET_CONTEXT||null;
   var currentMetric=QUERY.get('metric')||'';
   var currentSource=QUERY.get('source')||'';
@@ -126,7 +130,7 @@
     var params=new URLSearchParams(location.search);
     var scopeVehicle=selectedVehicle();
     /* 차량이 선택된 경우 상위 범위는 차량 메타데이터가 단일 진실 원천이다. */
-    var scopeGroup=scopeVehicle&&scopeVehicle.group||state.sel&&state.sel.group||null;
+    var scopeGroup=summaryPolicy.group||scopeVehicle&&scopeVehicle.group||state.sel&&state.sel.group||null;
     var scopeType=scopeVehicle&&scopeVehicle.type||state.sel&&state.sel.type||null;
     params.set('companyId',currentCompanyId);
     params.set('period',state.period);

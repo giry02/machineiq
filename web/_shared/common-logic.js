@@ -37,7 +37,15 @@
   function targetPolicy(role) {
     var policy = targetPolicies[resolveRole(role)];
     return { hideCompany: policy.hideCompany, hideGroup: policy.hideGroup, companyId: policy.companyId,
-      companyIds: policy.companyIds ? policy.companyIds.slice() : null };
+      companyIds: policy.companyIds ? policy.companyIds.slice() : null,
+      group: resolveRole(role) === 'customer_staff' ? '물류1팀' : '' };
+  }
+  function filterVehicles(role, vehicles) {
+    var policy = targetPolicy(role);
+    return (Array.isArray(vehicles) ? vehicles : []).filter(function (vehicle) {
+      return vehicle && (!policy.companyIds || policy.companyIds.indexOf(String(vehicle.companyId || '')) > -1)
+        && (!policy.group || vehicle.group === policy.group);
+    });
   }
 
   function formatDate(date) {
@@ -172,9 +180,10 @@
       resolve: resolveRole, label: roleLabel, isDealer: isDealer, isCustomer: isCustomer,
       hasCapability: function (role, capability) { return codes.indexOf(role) > -1 && (!capability || capabilities[role].indexOf(capability) > -1); },
       targetPolicy: targetPolicy,
+      filterVehicles: filterVehicles,
       scopeLabel: function (role) { return isCustomer(role) ? '전체 차량' : '전체 업체'; },
       dashboardDimension: function (role) { return role === 'internal' || isDealer(role) ? 'company' : 'group'; },
-      hideDashboardComparison: function (role) { return role === 'dealer_staff'; },
+      hideDashboardComparison: function (role) { return role === 'customer_staff'; },
       hideMaintenanceDetails: isCustomer
     },
     dates: { format: formatDate, parse: parseDate, addDays: addDays, today: today, yesterday: yesterday,

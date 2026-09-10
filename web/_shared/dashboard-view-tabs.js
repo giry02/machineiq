@@ -1,7 +1,7 @@
 (function(){
   'use strict';
   var role=MIQCommon.roles.resolve(document.body.dataset.managementRole||new URLSearchParams(location.search).get('role'));
-  if(['internal','dealer_owner','dealer_staff'].indexOf(role)<0)return;
+  if(['internal','dealer_owner','dealer_staff','customer_staff'].indexOf(role)<0)return;
   var tabs=document.querySelector('.dashboard-view-tabs');
   var panels=[document.querySelector('.dashboard-live'),document.querySelector('.dashboard-period')];
   if(!tabs||panels.some(function(panel){return !panel;}))return;

@@ -149,8 +149,8 @@
 </div>
 
 <script src="../_shared/meeting-model.js?rev=d195eb0eec48"></script>
-<script src="../_shared/common-logic.js?v=20260907-common-logic-r42&amp;rev=eee81a6f747c"></script>
-<script src="../_shared/nav.js?v=20260907-common-logic-r42&amp;rev=2f3aa7124d78"></script>
+<script src="../_shared/common-logic.js?v=20260907-common-logic-r42&amp;rev=fe89537280cd"></script>
+<script src="../_shared/nav.js?v=20260907-common-logic-r42&amp;rev=187c22679f16"></script>
 <script src="../_mock-data/generated/fleet.generated.js?v=20260906-json-r1&amp;rev=7e813828c801"></script>
 <script src="../_shared/fleet.js?v=20260906-json-r1&amp;rev=c6c8a0208b21"></script>
 <script src="../_shared/map-positions.js?rev=d86638aec5ee"></script>
@@ -169,7 +169,11 @@
   /* Captured last positions use their original VIN, address and timestamp.
      Hourly operating metrics remain separate from the location capture time. */
   var positionByVin = new Map((window.MIQMapPositions || []).map(function (position) { return [position.vin, position]; }));
-  var DATA = (MIQ.FLEET_CATALOG || MIQ.FLEET).map(function (v) {
+  var scopedFleet = MIQ.FLEET_CATALOG || MIQ.FLEET;
+  if (['dealer_staff', 'customer_staff'].indexOf(document.body.dataset.managementRole) > -1) {
+    scopedFleet = MIQCommon.roles.filterVehicles(document.body.dataset.managementRole, scopedFleet);
+  }
+  var DATA = scopedFleet.map(function (v) {
     var position = positionByVin.get(v.vin);
     var hourly = MIQMeeting.hourlyVehicle(v, MIQMeeting.hourlyWindow());
     return {
@@ -325,7 +329,7 @@
 
   window.MIQMapData={rows:DATA,select:select,setSearch:function(value){state.q=value;render();}};
   var hourlyClock=MIQMeeting.watchHourly(function(w){
-    var fleet=MIQ.FLEET_CATALOG||MIQ.FLEET;
+    var fleet=scopedFleet;
     DATA.forEach(function(row,i){
       var v=fleet[i],sample=MIQMeeting.hourlyVehicle(v,w);
       row.st=sample.status;row.dataTime=sample.dataTime;
@@ -346,6 +350,6 @@
 <script src="../_shared/map-route-source.js?rev=07244b2649ed"></script>
 <script src="../_shared/google-map-sdk.js?rev=27adc2197f51"></script>
 <script src="../_shared/google-map.js?rev=d61a90175765"></script>
-<script src="../_shared/map-management-enhancements.js?v=20260907-common-logic-r42&amp;rev=0f4fc1ac13b5"></script>
+<script src="../_shared/map-management-enhancements.js?v=20260907-common-logic-r42&amp;rev=2646c46c8078"></script>
 </body>
 </html>
