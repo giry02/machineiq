@@ -33,7 +33,6 @@
     { key: 'anlz', label: '운행이력',
       subs: [
         { key: 'summary', label: '요약정보', dir: 'Vehicle Summary', asis: 'vehicle-summary-asis.html', tobe: 'vehicle-summary-tobe-3.html' },
-        { key: 'summary2', label: '요약정보 2', dir: 'Vehicle Summary', tobe: 'vehicle-summary-tobe-option-a-expand.html', hidden: true },
         /* 차량 상세 = 숨은 화면. 요약정보에서만 진입 */
         { key: 'detail', label: '차량 상세', dir: 'Vehicle Detail', asis: 'vehicle-detail-asis.html', tobe: 'vehicle-detail-tobe.html', hidden: true, from: '요약정보' },
         { key: 'usage', label: '운행시간', dir: 'Usage Time', asis: 'usage-time-asis.html', tobe: 'usage-time-tobe.html' },
@@ -1904,7 +1903,7 @@
         title: '운행이력',
         items: [
           ['summary', '요약정보']
-        ].concat(VARIANT === 'tobe' ? [['summary2', '요약정보 2']] : []).concat([
+        ].concat([
           ['usage', VARIANT === 'tobe' ? '운행시간' : '사용시간'], ['oper', '운영효율']
         ]).concat(VARIANT === 'tobe' ? [['operb', '운영효율 B안'], ['shock', '충격'], ['lithium', '리튬배터리']] : [])
       },
