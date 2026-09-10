@@ -321,7 +321,7 @@
     if (!document.querySelector('link[data-current-shell]')) {
       var shellCss = document.createElement('link');
       shellCss.rel = 'stylesheet';
-      shellCss.href = BASE + '_shared/current-shell.css?v=20260910-content-search-r2';
+      shellCss.href = BASE + '_shared/current-shell.css?v=20260910-content-search-r3';
       shellCss.setAttribute('data-current-shell', '');
       document.head.appendChild(shellCss);
     }
@@ -897,6 +897,19 @@
     var detailButton = wrap.querySelector('[data-target-detail]');
     var companyControl = wrap.querySelector('[data-target-slot="company"]');
 
+    function setSearchPanelOpen(open) {
+      var label = open ? '상세검색 닫기' : '차량 상세검색';
+      panel.hidden = !open;
+      detailButton.setAttribute('aria-expanded', open ? 'true' : 'false');
+      detailButton.setAttribute('aria-label', label);
+      detailButton.setAttribute('title', label);
+      detailButton.querySelector('span').textContent = label;
+      detailButton.querySelector('svg').innerHTML = open
+        ? '<path d="m6 6 12 12M18 6 6 18"></path>'
+        : '<circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m15.5 15.5 5 5"></path>';
+    }
+    setSearchPanelOpen(false);
+
     if (profile === 'aggregate') {
       wrap.querySelector('[data-target-slot="vehicle"]').hidden = true;
     }
@@ -1144,8 +1157,7 @@
       state.group = '';
       state.type = '';
       state.vin = '';
-      if (panel) panel.hidden = true;
-      if (detailButton) detailButton.setAttribute('aria-expanded', 'false');
+      setSearchPanelOpen(false);
       commit('company', true);
       if (company && typeof company.focus === 'function') company.focus();
     });
@@ -1219,8 +1231,7 @@
     }
 
     detailButton.addEventListener('click', function () {
-      panel.hidden = !panel.hidden;
-      detailButton.setAttribute('aria-expanded', panel.hidden ? 'false' : 'true');
+      setSearchPanelOpen(panel.hidden);
       if (!panel.hidden) input.focus();
     });
     wrap.querySelector('[data-target-search-button]').addEventListener('click', runSearch);
@@ -1234,8 +1245,7 @@
       state.group = roleTargetPolicy.hideGroup ? '' : selected.group;
       state.type = selected.type;
       state.vin = selected.vin;
-      panel.hidden = true;
-      detailButton.setAttribute('aria-expanded', 'false');
+      setSearchPanelOpen(false);
       if (profile === 'aggregate') {
         var analysisMenu = MENU.filter(function (item) { return item.key === 'anlz'; })[0];
         var detailPage = analysisMenu && analysisMenu.subs.filter(function (item) { return item.key === 'detail'; })[0];

@@ -1168,6 +1168,13 @@ body.miq-current-shell .miq-target-selector.is-hierarchy .miq-target-selector__p
     padding: 0;
   }
   body.miq-current-shell .miq-target-selector.is-hierarchy .miq-target-selector__detail > span { display: none; }
+  body.miq-current-shell .miq-target-selector.is-hierarchy .miq-target-selector__detail[aria-expanded="true"] {
+    width: auto;
+    padding: 0 18px;
+  }
+  body.miq-current-shell .miq-target-selector.is-hierarchy .miq-target-selector__detail[aria-expanded="true"] > span {
+    display: inline;
+  }
 }
 
 @media (max-width: 1100px) {
