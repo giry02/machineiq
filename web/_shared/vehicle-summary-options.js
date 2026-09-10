@@ -321,7 +321,7 @@
   }
   function connectionDot(vehicle){
     var status=MIQSummaryRow.connection(vehicle.conn);
-    var label=status==='on'?'연결됨':status==='off'?'연결안됨':'연결 정보 미수집';
+    var label=status==='on'?'TMS 연결중':status==='off'?'TMS 연결안됨':'TMS 정보 미수집';
     return '<i class="connection-dot '+status+'" role="img" aria-label="'+label+'" title="'+label+'"></i>'
   }
   function energyText(vehicle){
@@ -381,7 +381,7 @@
       var performance=performanceText(vehicle,value);
       var times=MIQSummaryRow.times(vehicle,value.min);
       return '<tr class="vehicle-row" data-vin="'+escapeAttr(vehicle.vin)+'" style="--row-delay:'+(index*16)+'ms">'
-        +'<td><div class="vehicle-identity"><button type="button" class="row-expand" data-expand-vin="'+escapeAttr(vehicle.vin)+'" aria-expanded="'+(expanded?'true':'false')+'" aria-controls="'+detailId+'" aria-label="'+escapeAttr(vehicle.vin)+' 상세 '+(expanded?'접기':'펼치기')+'">'+(expanded?'−':'+')+'</button><span class="vehicle-identity__text"><a href="'+detailHref(vehicle)+'">'+connectionDot(vehicle)+'<span class="vehicle-vin">'+vehicle.vin+'</span></a><span>'+vehicle.model+'</span></span></div></td>'
+        +'<td><div class="vehicle-identity"><button type="button" class="row-expand" data-expand-vin="'+escapeAttr(vehicle.vin)+'" aria-expanded="'+(expanded?'true':'false')+'" aria-controls="'+detailId+'" aria-label="'+escapeAttr(vehicle.vin)+' 상세 '+(expanded?'접기':'펼치기')+'">'+(expanded?'−':'+')+'</button><span class="vehicle-identity__text"><a href="'+detailHref(vehicle)+'">'+connectionDot(vehicle)+'<span class="vehicle-vin">'+vehicle.vin+'</span></a><span class="vehicle-model">'+vehicle.model+'</span></span></div></td>'
         +'<td><span class="affiliation"><strong>'+vehicle.group+'</strong><span class="vehicle-type">'+vehicle.type+(vehicle.type==='리튬'?socHtml(vehicle):'')+'</span></span></td>'
         +'<td><span class="metric-pair"><span>거리 <strong>'+valueOrDash(vehicle.cumKm,' Km')+'</strong></span><span>시간 <strong>'+valueOrDash(vehicle.cumH,' H')+'</strong></span></span></td>'
         +'<td><span class="metric-pair"><span>거리 <strong>'+num(value.km,value.km<10?1:0)+' Km</strong></span><span>시간 <strong>'+hm(value.min)+'</strong></span></span></td>'
@@ -473,7 +473,7 @@
     if(option==='expand'){
       var allExpanded=rows.length>0&&rows.every(function(vehicle){return Boolean(state.expanded[vehicle.vin])});
       optionToolbar.innerHTML='<span class="option-toolbar__count"></span>'
-        +'<span class="connection-legend" aria-label="차량 연결 상태 범례"><span><i class="connection-dot on" aria-hidden="true"></i>연결됨</span><span><i class="connection-dot off" aria-hidden="true"></i>연결안됨</span>'+(rows.some(function(vehicle){return MIQSummaryRow.connection(vehicle.conn)==='unknown'})?'<span><i class="connection-dot unknown" aria-hidden="true"></i>미수집</span>':'')+'</span>'
+        +'<span class="connection-legend" aria-label="TMS 연결 상태 범례"><span><i class="connection-dot on" aria-hidden="true"></i>TMS 연결중</span><span><i class="connection-dot off" aria-hidden="true"></i>TMS 연결안됨</span>'+(rows.some(function(vehicle){return MIQSummaryRow.connection(vehicle.conn)==='unknown'})?'<span><i class="connection-dot unknown" aria-hidden="true"></i>TMS 정보 미수집</span>':'')+'</span>'
         +'<div class="option-toolbar__tools"><span class="option-toolbar__hint">+ 버튼으로 차량별 추가 정보를 확인합니다.</span><button type="button" class="option-toolbar__button" id="toggleAllDetails">'+(allExpanded?'모두 접기':'모두 펼치기')+'</button></div>';
       renderToolbarScope(rows);
       document.getElementById('toggleAllDetails').addEventListener('click',function(){

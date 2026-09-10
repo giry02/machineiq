@@ -93,6 +93,7 @@ body.miq-summary-option[data-summary-option="expand"][data-sub="summary"] .optio
 .table-sort{display:inline-flex;align-items:center;gap:4px;padding:3px 0;border:0;background:transparent;color:inherit;font-size:13px;font-weight:700}
 .table-sort .sort-ind{width:9px;color:var(--bobcat-gray);font-size:11px;opacity:1}
 .table-sort.is-sorted .sort-ind{color:var(--bobcat-red-active)}
+.expand-table th:nth-child(3) .table-sort,.expand-table th:nth-child(4) .table-sort{display:flex;width:100%;max-width:160px;margin-inline:auto}
 .table-sort:focus-visible{outline:2px solid var(--bobcat-red);outline-offset:2px}
 .expand-table td{height:60px;padding:7px 10px;border-bottom:1px solid var(--bobcat-steel);color:var(--bobcat-dark);font-size:14px;vertical-align:middle}
 .expand-table thead th:nth-child(5),.expand-table .vehicle-row td:nth-child(5){padding-left:26px}
@@ -111,14 +112,15 @@ body.miq-summary-option[data-summary-option="expand"][data-sub="summary"] .optio
 .vehicle-identity__text a{display:flex;align-items:center;gap:6px}
 .vehicle-identity__text a .vehicle-vin{overflow:hidden;font:inherit;color:inherit;text-overflow:ellipsis}
 .vehicle-identity__text span{color:var(--bobcat-muted);font-size:12px;line-height:18px}
+.vehicle-identity__text .vehicle-model{margin-left:13px}
 .affiliation{display:flex;flex-direction:column;min-width:0}
 .affiliation strong{overflow:hidden;font-size:14px;line-height:20px;text-overflow:ellipsis}
 .affiliation span{color:var(--bobcat-muted);font-size:12px;line-height:18px}
 .affiliation .vehicle-type{display:flex;align-items:center;gap:10px}
 .affiliation .soc{flex-shrink:0}
 .row-time{font-size:14px;font-weight:600}
-.metric-pair{display:grid;gap:3px}
-.metric-pair span{display:grid;grid-template-columns:30px minmax(0,1fr);align-items:baseline;gap:4px;color:var(--bobcat-muted);font-size:12px;line-height:18px}
+.metric-pair{display:grid;width:100%;max-width:160px;margin-inline:auto;gap:3px}
+.metric-pair>span{display:grid;grid-template-columns:30px minmax(0,1fr);align-items:baseline;gap:4px;color:var(--bobcat-muted);font-size:12px;line-height:18px}
 .metric-pair strong{overflow:hidden;color:var(--bobcat-dark);font-size:14px;font-weight:600;text-align:right;text-overflow:ellipsis}
 .performance-cell span{display:block;color:var(--bobcat-muted);font-size:12px;line-height:18px}
 .performance-cell strong{display:block;color:var(--bobcat-dark);font-size:14px;line-height:20px}
