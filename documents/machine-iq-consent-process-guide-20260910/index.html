@@ -1,0 +1,789 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MACHINE IQ 차량·권한·동의 프로세스 설명자료</title>
+  <style>
+    :root {
+      --ink: #182231;
+      --muted: #5f6e82;
+      --line: #d9e0e8;
+      --paper: #ffffff;
+      --canvas: #eef1f5;
+      --external: #eef0f2;
+      --miq: #e7f1ff;
+      --store: #e9f8ef;
+      --actor: #fff1e6;
+      --decision: #fff6d9;
+      --exception: #fff0ef;
+      --blue: #2f7ee6;
+      --green: #1f9d62;
+      --orange: #eb7b2c;
+      --red: #d64b40;
+      --nav-width: 264px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--canvas);
+      font-family: "Noto Sans KR", "Malgun Gothic", Arial, sans-serif;
+      line-height: 1.58;
+      word-break: keep-all;
+    }
+    a { color: inherit; }
+    button { font: inherit; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 26px;
+      color: #fff;
+      background: #161f2c;
+      box-shadow: 0 2px 14px rgba(15, 23, 42, .14);
+    }
+    .brand { font-size: 16px; font-weight: 800; letter-spacing: -.2px; }
+    .top-actions { display: flex; gap: 8px; }
+    .top-actions a,
+    .top-actions button {
+      border: 1px solid rgba(255,255,255,.32);
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: #fff;
+      background: transparent;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .layout { display: grid; grid-template-columns: var(--nav-width) minmax(0, 1fr); }
+    .side {
+      position: sticky;
+      top: 62px;
+      align-self: start;
+      height: calc(100vh - 62px);
+      overflow: auto;
+      padding: 24px 18px;
+      border-right: 1px solid var(--line);
+      background: #fff;
+    }
+    .side-title { margin: 0 0 14px; font-size: 13px; color: var(--muted); }
+    .side a {
+      display: block;
+      margin-bottom: 4px;
+      padding: 9px 10px;
+      border-radius: 6px;
+      color: #334155;
+      font-size: 13px;
+      text-decoration: none;
+    }
+    .side a:hover { background: #f1f5f9; }
+    .side .minor { padding-left: 24px; color: #64748b; font-size: 12px; }
+
+    main { min-width: 0; padding: 28px; }
+    .sheet {
+      max-width: 1440px;
+      margin: 0 auto 24px;
+      padding: 42px 48px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--paper);
+      box-shadow: 0 8px 28px rgba(15, 23, 42, .06);
+    }
+    .cover { padding-top: 56px; padding-bottom: 54px; }
+    .eyebrow { margin: 0 0 12px; color: var(--orange); font-size: 13px; font-weight: 800; letter-spacing: .04em; }
+    h1 { margin: 0; font-size: 36px; line-height: 1.28; letter-spacing: -1.4px; }
+    h2 { margin: 0 0 12px; font-size: 25px; line-height: 1.35; letter-spacing: -.8px; }
+    h3 { margin: 30px 0 12px; font-size: 18px; letter-spacing: -.35px; }
+    h4 { margin: 0 0 8px; font-size: 15px; }
+    .lead { max-width: 960px; margin: 18px 0 0; color: var(--muted); font-size: 16px; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: #475569;
+      background: #f8fafc;
+      font-size: 12px;
+    }
+    .summary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    .summary-card { padding: 18px; border: 1px solid var(--line); border-radius: 8px; background: #fafbfc; }
+    .summary-card strong { display: block; margin-bottom: 6px; font-size: 15px; }
+    .summary-card p { margin: 0; color: var(--muted); font-size: 13px; }
+
+    .section-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 22px; }
+    .section-no { flex: 0 0 auto; min-width: 72px; padding: 7px 10px; border-radius: 5px; color: #fff; background: #182231; font-size: 12px; font-weight: 800; text-align: center; }
+    .section-copy { flex: 1 1 auto; }
+    .section-copy p { margin: 0; color: var(--muted); }
+    .message {
+      margin: 20px 0;
+      padding: 16px 18px;
+      border-left: 4px solid var(--blue);
+      background: #f6f9fd;
+    }
+    .message strong { display: block; margin-bottom: 5px; }
+    .message p { margin: 0; color: #465569; }
+
+    .legend { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; margin: 18px 0 24px; }
+    .legend-item { padding: 11px 10px; border: 1px solid; border-radius: 6px; font-size: 12px; text-align: center; }
+    .external { border-color: #96a0aa !important; background: var(--external) !important; }
+    .miq { border-color: #65a5f2 !important; background: var(--miq) !important; }
+    .store { border-color: #59b984 !important; background: var(--store) !important; }
+    .actor { border-color: #ee9b61 !important; background: var(--actor) !important; }
+    .decision { border-color: #e1aa29 !important; background: var(--decision) !important; }
+    .exception { border-color: #e17a72 !important; background: var(--exception) !important; }
+
+    .flow-strip {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 26px;
+      margin: 22px 0 30px;
+    }
+    .flow-card {
+      position: relative;
+      min-height: 142px;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+    }
+    .flow-card:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      top: 50%;
+      right: -21px;
+      transform: translateY(-50%);
+      color: #64748b;
+      font-size: 24px;
+      font-weight: 800;
+    }
+    .flow-card b { display: block; margin-bottom: 7px; }
+    .flow-card span { display: block; color: var(--muted); font-size: 12px; }
+
+    .process-line {
+      display: grid;
+      grid-template-columns: repeat(var(--cols, 6), minmax(0, 1fr));
+      gap: 24px;
+      align-items: stretch;
+      margin: 18px 0 22px;
+    }
+    .process-node {
+      position: relative;
+      min-height: 128px;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+    }
+    .process-node:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      top: 50%;
+      right: -20px;
+      transform: translateY(-50%);
+      color: #68778a;
+      font-size: 21px;
+      font-weight: 800;
+    }
+    .node-id { margin-bottom: 6px; color: #64748b; font-size: 11px; font-weight: 800; }
+    .node-title { margin-bottom: 8px; font-size: 14px; font-weight: 800; }
+    .node-desc { color: #4c5b6d; font-size: 12px; }
+    .branch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0 24px; }
+    .branch { padding: 16px; border: 1px solid var(--line); border-radius: 7px; }
+    .branch.yes { border-color: #8bcaaa; background: #f2fbf6; }
+    .branch.no { border-color: #e69a94; background: #fff6f5; }
+    .branch p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+
+    .talk-track { margin: 12px 0 0; padding: 0; list-style: none; counter-reset: talk; }
+    .talk-track li { position: relative; margin: 0 0 10px; padding: 13px 16px 13px 48px; border: 1px solid var(--line); border-radius: 7px; background: #fff; }
+    .talk-track li::before {
+      counter-increment: talk;
+      content: counter(talk);
+      position: absolute;
+      left: 15px;
+      top: 13px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      color: #fff;
+      background: #334155;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 22px;
+      text-align: center;
+    }
+
+    .table-wrap { overflow-x: auto; margin: 14px 0 26px; border: 1px solid var(--line); border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; background: #fff; font-size: 12.5px; }
+    th, td { padding: 11px 12px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th:last-child, td:last-child { border-right: 0; }
+    tr:last-child td { border-bottom: 0; }
+    th { color: #fff; background: #202938; font-weight: 700; }
+    td code { color: #214f91; font-family: Consolas, monospace; font-size: 11.5px; white-space: normal; }
+    .tag { display: inline-block; margin: 1px 3px 1px 0; padding: 2px 6px; border-radius: 4px; background: #eef2f7; color: #475569; font-size: 10.5px; font-weight: 700; }
+    .tag.ok { color: #17603c; background: #dcf5e7; }
+    .tag.warn { color: #8a3a32; background: #ffdfdc; }
+    .tag.ask { color: #795700; background: #fff0b8; }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .note-card { padding: 18px; border: 1px solid var(--line); border-radius: 8px; background: #fbfcfe; }
+    .note-card p, .note-card ul { margin-top: 8px; margin-bottom: 0; color: var(--muted); font-size: 13px; }
+    .note-card ul { padding-left: 18px; }
+
+    .qa-list details { margin-bottom: 9px; border: 1px solid var(--line); border-radius: 7px; background: #fff; }
+    .qa-list summary { padding: 14px 16px; cursor: pointer; font-weight: 800; }
+    .qa-answer { padding: 0 16px 16px; color: var(--muted); font-size: 13px; }
+    .footnote { margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--line); color: #6b7788; font-size: 11px; }
+
+    @media (max-width: 1080px) {
+      :root { --nav-width: 0px; }
+      .layout { display: block; }
+      .side { display: none; }
+      main { padding: 18px; }
+      .sheet { padding: 30px 24px; }
+      .summary-grid, .legend, .flow-strip, .process-line, .two-col { grid-template-columns: 1fr 1fr; }
+      .flow-card::after, .process-node::after { display: none; }
+    }
+    @media (max-width: 680px) {
+      .topbar { height: auto; min-height: 62px; padding: 12px 16px; }
+      .top-actions a { display: none; }
+      h1 { font-size: 28px; }
+      .summary-grid, .legend, .flow-strip, .process-line, .two-col, .branch-grid { grid-template-columns: 1fr; }
+      .section-head { display: block; }
+      .section-no { display: inline-block; margin-bottom: 12px; }
+    }
+
+    @media print {
+      @page { size: A4 landscape; margin: 6mm; }
+      body { background: #fff; font-size: 8pt; line-height: 1.38; }
+      .topbar, .side { display: none !important; }
+      .layout { display: block; }
+      main { padding: 0; }
+      .sheet { max-width: none; margin: 0; padding: 4mm; border: 0; border-radius: 0; box-shadow: none; break-after: page; }
+      .sheet:last-child { break-after: auto; }
+      .process-node, .flow-card, .note-card, .branch, tr, details { break-inside: avoid; }
+      .table-wrap { overflow: visible; }
+      h1 { font-size: 22pt; }
+      h2 { margin-bottom: 4px; font-size: 15pt; }
+      h3 { margin: 12px 0 6px; font-size: 11pt; }
+      h4 { margin-bottom: 4px; font-size: 9pt; }
+      .cover { padding-top: 12mm; }
+      .lead { margin-top: 10px; font-size: 10pt; }
+      .meta { margin-top: 12px; }
+      .pill { padding: 4px 7px; font-size: 7.5pt; }
+      .section-head { gap: 10px; margin-bottom: 10px; }
+      .section-head p { font-size: 8pt; }
+      .section-no { min-width: 56px; padding: 5px 7px; font-size: 7.5pt; }
+      .message { margin: 8px 0; padding: 8px 10px; }
+      .message p { font-size: 8pt; }
+      .legend { grid-template-columns: repeat(6, 1fr); }
+      .legend { gap: 5px; margin: 8px 0 12px; }
+      .legend-item { padding: 6px 5px; font-size: 7.2pt; }
+      .summary-grid { grid-template-columns: repeat(3, 1fr); }
+      .summary-grid { gap: 8px; margin-top: 16px; }
+      .summary-card { padding: 10px; }
+      .summary-card strong { margin-bottom: 3px; font-size: 9pt; }
+      .summary-card p { font-size: 8pt; }
+      .flow-strip { grid-template-columns: repeat(5, 1fr); }
+      .flow-strip { gap: 16px; margin: 10px 0 12px; }
+      .flow-card { min-height: 84px; padding: 9px; }
+      .flow-card span { font-size: 7.3pt; }
+      .flow-card:not(:last-child)::after { right: -14px; font-size: 16px; }
+      .process-line { grid-template-columns: repeat(var(--cols, 6), 1fr); }
+      .process-line { gap: 14px; margin: 8px 0 10px; }
+      .process-node { min-height: 88px; padding: 8px; }
+      .process-node:not(:last-child)::after { right: -12px; font-size: 15px; }
+      .node-id { margin-bottom: 3px; font-size: 6.8pt; }
+      .node-title { margin-bottom: 4px; font-size: 8.2pt; }
+      .node-desc { font-size: 7pt; }
+      .branch-grid { gap: 8px; margin: 7px 0 10px; }
+      .branch { padding: 8px; }
+      .branch p { margin-top: 2px; font-size: 7.5pt; }
+      .talk-track { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 8px; }
+      .talk-track li { margin: 0; padding: 6px 8px 6px 28px; font-size: 7.5pt; }
+      .talk-track li::before { left: 7px; top: 6px; width: 16px; height: 16px; font-size: 7pt; line-height: 16px; }
+      .table-wrap { margin: 7px 0 11px; }
+      table { font-size: 7.2pt; line-height: 1.28; }
+      th, td { padding: 5px 6px; }
+      td code { font-size: 6.8pt; }
+      .two-col { gap: 8px; }
+      .note-card { padding: 9px; }
+      .note-card p, .note-card ul { margin-top: 4px; font-size: 7.5pt; }
+      .qa-list details { margin-bottom: 4px; }
+      .qa-list summary { padding: 7px 9px; font-size: 8pt; }
+      .qa-answer { padding: 0 9px 8px; font-size: 7.4pt; }
+      #qa .qa-list summary { padding: 5px 8px; }
+      #qa .qa-answer { padding: 0 8px 5px; font-size: 7.2pt; }
+      #qa h3 { margin: 8px 0 4px; }
+      #qa .table-wrap { margin-top: 4px; }
+      .footnote { display: none; }
+      .flow-card::after, .process-node::after { display: block; }
+      details[open] summary { padding-bottom: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">MACHINE IQ · 차량·권한·동의 프로세스 설명자료</div>
+    <div class="top-actions">
+      <a href="https://www.figma.com/board/vegYtDDzWOZoDOVDSz67Z4?node-id=0-1" target="_blank" rel="noreferrer">FigJam 원본</a>
+      <a href="./MACHINE_IQ_차량_권한_동의_프로세스_설명자료_20260910.pdf" download>PDF 파일</a>
+      <button type="button" onclick="window.print()">인쇄 / PDF 저장</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="side" aria-label="문서 목차">
+      <p class="side-title">설명 순서</p>
+      <a href="#cover">문서 개요</a>
+      <a href="#read">보드 읽는 법</a>
+      <a href="#overall">01. 전체 공정</a>
+      <a class="minor" href="#overall-steps">전체 14단계</a>
+      <a href="#new">02. NEW 자동 매핑</a>
+      <a href="#no-consent">03. 미동의·조회 제한</a>
+      <a href="#consent">04. 동의·승인</a>
+      <a href="#signup">05. 가입·승인·수동 보완</a>
+      <a href="#runtime">06. Agent/API/Web 조회</a>
+      <a href="#data">데이터 관계 요약</a>
+      <a href="#qa">예상 질문과 답변</a>
+    </nav>
+
+    <main>
+      <section class="sheet cover" id="cover">
+        <p class="eyebrow">설명용 별도 문서 · 기준일 2026-09-10</p>
+        <h1>MACHINE IQ 차량·권한·동의 프로세스</h1>
+        <p class="lead">생산 시점에 생성된 차량과 단말 정보가 MACHINE IQ에 들어와 차량으로 매핑되고, 고객 동의와 승인 여부에 따라 조회 가능한 차량 범위로 확정되는 과정을 설명합니다. 전체 흐름과 FigJam의 각 세부 공정을 같은 번호 체계로 연결했습니다.</p>
+        <div class="meta">
+          <span class="pill">대상: 고객·업무 담당자·개발 담당자</span>
+          <span class="pill">범위: 전체 공정 + 세부 공정 02~06</span>
+          <span class="pill">형식: 화면 설명 / 인쇄·PDF 가능</span>
+        </div>
+
+        <div class="summary-grid">
+          <article class="summary-card">
+            <strong>이 자료에서 답하는 질문 1</strong>
+            <p>차량과 단말은 어느 시점에 어떤 값을 기준으로 연결되는가?</p>
+          </article>
+          <article class="summary-card">
+            <strong>이 자료에서 답하는 질문 2</strong>
+            <p>동의가 없을 때와 있을 때 처리 결과가 왜 달라지는가?</p>
+          </article>
+          <article class="summary-card">
+            <strong>이 자료에서 답하는 질문 3</strong>
+            <p>최종적으로 사용자가 볼 수 있는 차량 범위는 어떻게 계산되는가?</p>
+          </article>
+        </div>
+
+        <div class="message">
+          <strong>전체 내용을 한 문장으로 설명하면</strong>
+          <p>“차량·단말의 물리적 연결을 먼저 확인하고, 업체·사용자 관계와 유효한 동의를 다시 확인한 뒤, 조건을 충족한 차량만 사용자의 조회 범위에 포함시키는 과정입니다.”</p>
+        </div>
+      </section>
+
+      <section class="sheet" id="read">
+        <div class="section-head">
+          <span class="section-no">읽는 법</span>
+          <div class="section-copy">
+            <h2>보드의 선과 데이터 표를 구분해서 설명</h2>
+            <p>공정 화살표는 처리 순서이며, 각 단계 아래의 IN/OUT 표는 그 단계가 읽거나 저장하거나 반환하는 데이터 정의입니다.</p>
+          </div>
+        </div>
+
+        <div class="legend">
+          <div class="legend-item external">외부 원천<br>MES·ERP·SAP</div>
+          <div class="legend-item miq">MIQ 처리<br>Agent·API·Web</div>
+          <div class="legend-item store">DB 적재·조회<br>관계·상태·이력</div>
+          <div class="legend-item actor">사용자 행위<br>선택·신청·조치</div>
+          <div class="legend-item decision">조건 판단<br>Y / N 분기</div>
+          <div class="legend-item exception">제한·예외<br>재시도·보완</div>
+        </div>
+
+        <div class="two-col">
+          <article class="note-card">
+            <h4>실선 화살표</h4>
+            <p>업무가 진행되는 주 경로입니다. 왼쪽 단계의 처리 결과가 오른쪽 단계의 입력으로 넘어갑니다.</p>
+          </article>
+          <article class="note-card">
+            <h4>회색 점선</h4>
+            <p>공정 이동이 아니라 해당 단계의 데이터 정의를 연결합니다. 점선 끝의 표는 화면이나 API의 다음 단계가 아닙니다.</p>
+          </article>
+          <article class="note-card">
+            <h4>논리명</h4>
+            <p>업무 담당자가 이해하는 데이터 이름입니다. 예: 차량, 단말, 동의 상태, 승인 요청.</p>
+          </article>
+          <article class="note-card">
+            <h4>물리명</h4>
+            <p>API·DB에서 구현 시 사용하는 후보 필드명입니다. 실제 확정 명세와 다르면 연계 설계 단계에서 조정합니다.</p>
+          </article>
+        </div>
+
+        <div class="message">
+          <strong>세 가지 관계를 구분해야 합니다</strong>
+          <p>① 차량–단말 관계는 “어떤 단말이 어떤 차량에 장착됐는가”, ② 업체–차량 관계는 “누가 이 차량을 소유·판매·서비스하는가”, ③ 동의–권한 관계는 “누가 어느 기간 동안 이 차량 데이터를 볼 수 있는가”를 의미합니다.</p>
+        </div>
+      </section>
+
+      <section class="sheet" id="overall">
+        <div class="section-head">
+          <span class="section-no">전체 01</span>
+          <div class="section-copy">
+            <h2>전체 공정: 생산에서 화면 조회와 서비스 처리까지</h2>
+            <p>세부 공정이 어느 위치에 속하는지 먼저 설명하는 상위 지도입니다. 전체 단계를 5개 구간으로 묶되, 실제 공정은 01~14단계로 유지합니다.</p>
+          </div>
+        </div>
+
+        <div class="flow-strip">
+          <article class="flow-card external"><b>① 생산·원천 기준정보</b><span>MES/MQS에서 생산 결과, ERP/SAP에서 차량·판매 기준정보 생성</span></article>
+          <article class="flow-card miq"><b>② 단말 수집·검증·차량 매핑</b><span>단말 최초 신호 수신, 필수값 검증, 차량·단말 기준정보 조회</span></article>
+          <article class="flow-card store"><b>③ 관계·운행 데이터 적재</b><span>차량–단말 유효 관계와 통신·위치·운행·에러 이력 저장</span></article>
+          <article class="flow-card actor"><b>④ 동의·권한 판단</b><span>사용자 조직·역할과 동의·승인 상태를 확인하여 허용 범위 산정</span></article>
+          <article class="flow-card miq"><b>⑤ 조회·서비스 처리</b><span>허용된 차량만 화면에 표시하고 조치 결과와 변경 이력을 저장</span></article>
+        </div>
+
+        <div class="message">
+          <strong>이 장에서 강조할 핵심</strong>
+          <p>단말 데이터가 들어왔다고 바로 사용자 화면에 노출되는 것이 아닙니다. 차량 식별 → 관계 확정 → 동의·권한 확인 → 조회 범위 계산을 모두 통과해야 합니다.</p>
+        </div>
+
+        <h3 id="overall-steps">전체 14단계 설명</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>단계</th><th>주체</th><th>처리 내용</th><th>주요 입력</th><th>결과·저장</th><th>연결되는 세부 공정</th></tr></thead>
+            <tbody>
+              <tr><td>01</td><td>MES / MQS</td><td>생산 완료 결과와 차량 식별 기준 생성</td><td>생산번호, 차대번호</td><td><code>AUFNR, EQUNR</code></td><td>02 NEW 매핑</td></tr>
+              <tr><td>02</td><td>ERP / SAP</td><td>기종·일련번호·조직 등 장비·판매 기준정보 생성</td><td>생산 결과</td><td><code>TYPB2, SERIAL_NO, ORG_ID</code></td><td>02 NEW 매핑</td></tr>
+              <tr><td>03</td><td>Terminal</td><td>차량에 장착된 단말 활성화</td><td>단말 ID</td><td><code>TERMINAL_ID, STATE_CODE</code></td><td>02 NEW 매핑</td></tr>
+              <tr><td>04</td><td>AHN Terminal Agent</td><td>단말의 최초 신호와 발생 시각 전송</td><td>단말 ID, 센서 상태</td><td><code>TERMINAL_ID, EVENT_DATETIME</code></td><td>06 수집 흐름</td></tr>
+              <tr><td>05</td><td>MIQ Cloud API</td><td>수신값의 형식과 필수값 검증</td><td><code>terminalId, eventDatetime</code></td><td>정상 요청 또는 오류 응답</td><td>06 수집 흐름</td></tr>
+              <tr><td>06</td><td>EAI / SAP</td><td>단말·일련번호 기준으로 차량과 조직 후보 조회</td><td>단말 ID, 차량 식별자</td><td><code>equipmentId, VIN, model, organizationId</code></td><td>02·03·04</td></tr>
+              <tr><td>07</td><td>권한·동의 판단</td><td>차량–단말 관계와 동의·승인 조건 충족 여부 판단</td><td>기존 관계, 동의 상태, 유효기간</td><td>Y: 승인 경로 / N: 제한 경로</td><td>03 미동의, 04 동의</td></tr>
+              <tr><td>08</td><td>MIQ Cloud DB</td><td>차량–단말 관계의 시작·종료 이력 저장</td><td>차량 ID, 단말 ID</td><td><code>EQUIPMENT_TERMINAL_REL, VALID_FROM/TO</code></td><td>02·04</td></tr>
+              <tr><td>09</td><td>MIQ Cloud DB</td><td>통신·위치·운행·에러 등 텔레메트리 적재</td><td>항목 코드, 값, 발생 시각</td><td><code>TELEMETRY_EVENT</code></td><td>06 수집 흐름</td></tr>
+              <tr><td>10</td><td>사용자 / Web·App</td><td>로그인 후 사용자 역할과 조직 확인</td><td>사용자 ID, 언어</td><td><code>roleId, organizationId</code></td><td>05·06</td></tr>
+              <tr><td>11</td><td>Authorization</td><td>조회 가능한 조직·업체·그룹·차량 범위 계산</td><td>역할, 조직, 활성 관계</td><td>허용 ID 집합</td><td>04·06</td></tr>
+              <tr><td>12</td><td>MIQ Cloud API</td><td>화면별 조회 조건을 받아 허용 범위 내 데이터 요청</td><td>업체·그룹·차량·기간·언어</td><td>화면별 조회 응답</td><td>06 화면 조회</td></tr>
+              <tr><td>13</td><td>Fleet / Dealer Web·App</td><td>차량·상태·운행·에러를 표시하고 상세 조회·조치 수행</td><td>조회 결과</td><td>사용자 화면·조치 요청</td><td>06 화면 조회</td></tr>
+              <tr><td>14</td><td>Cloud API / DB</td><td>승인·반려·설정·조치 결과와 변경 이력 저장</td><td>행위 유형, 대상, 처리자</td><td>처리 결과·변경 이력</td><td>05·06</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <ol class="talk-track">
+          <li>왼쪽의 생산·판매 원천에서 차량을 식별할 수 있는 기준정보가 먼저 만들어집니다.</li>
+          <li>단말이 차량에 장착되고 최초 통신이 발생하면 MIQ가 단말 ID를 중심으로 차량 후보를 찾습니다.</li>
+          <li>차량–단말 관계가 확정된 뒤 운행 데이터가 저장되지만, 사용자 조회 권한은 별도로 계산합니다.</li>
+          <li>동의와 승인 조건을 충족하면 허용 차량 집합에 포함하고, 그렇지 않으면 제한 사유와 다음 행동을 안내합니다.</li>
+          <li>화면은 계산된 허용 범위 안의 차량만 조회하며 승인·반려·설정·조치 결과는 다시 이력으로 남깁니다.</li>
+        </ol>
+      </section>
+
+      <section class="sheet" id="new">
+        <div class="section-head">
+          <span class="section-no">세부 02</span>
+          <div class="section-copy">
+            <h2>NEW 단말–차량 자동 매핑</h2>
+            <p>생산 바코드와 단말 바코드가 연결되고, 단말의 최초 통신을 기준으로 MIQ에 차량–단말 관계가 생성되는 경로입니다.</p>
+          </div>
+        </div>
+
+        <div class="process-line" style="--cols: 7">
+          <article class="process-node external"><div class="node-id">02-01</div><div class="node-title">생산 바코드 스캔</div><div class="node-desc">차량 바코드와 단말 바코드를 함께 식별합니다.</div></article>
+          <article class="process-node external"><div class="node-id">02-02</div><div class="node-title">추적성 부품 등록</div><div class="node-desc">생산오더와 단말 번호를 SAP 추적성 정보로 연결합니다.</div></article>
+          <article class="process-node miq"><div class="node-id">02-03</div><div class="node-title">단말 활성화</div><div class="node-desc">Agent가 최초 통신을 시작하고 단말 상태를 남깁니다.</div></article>
+          <article class="process-node miq"><div class="node-id">02-04</div><div class="node-title">상태 판정</div><div class="node-desc">통신·G-Sensor·GPS·배터리 상태값을 점검합니다.</div></article>
+          <article class="process-node decision"><div class="node-id">02-D1</div><div class="node-title">필수 상태 정상?</div><div class="node-desc">정상 여부에 따라 자동 매핑 또는 재조회 경로로 분기합니다.</div></article>
+          <article class="process-node miq"><div class="node-id">02-05</div><div class="node-title">미동의 API 요청</div><div class="node-desc">Terminal No와 미동의 상태를 MIQ 요청 이력에 남깁니다.</div></article>
+          <article class="process-node store"><div class="node-id">02-07</div><div class="node-title">차량–단말 매핑 저장</div><div class="node-desc">확정된 차량 ID와 단말 ID 관계를 저장합니다.</div></article>
+        </div>
+
+        <div class="branch-grid">
+          <article class="branch yes"><strong>정상 경로</strong><p>차량 후보 조회가 성공하고 식별값이 일치하면 관계를 생성한 뒤 전체 공정 07의 동의·승인 판단으로 이동합니다.</p></article>
+          <article class="branch no"><strong>예외 경로</strong><p>상태 미정·차량 후보 미확인·저장 실패 시 재조회, 재호출 또는 수동 보완으로 전환합니다.</p></article>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>구분</th><th>업무 데이터</th><th>물리 필드·저장 후보</th><th>설명 시 주의점</th></tr></thead>
+            <tbody>
+              <tr><td>IN</td><td>생산번호, 차량 식별자, 단말 ID</td><td><code>AUFNR, TERMINAL_ID</code></td><td>생산 원천과 단말 원천의 키가 함께 있어야 자동 매핑 가능</td></tr>
+              <tr><td>STATE</td><td>단말 상태, 최종 신호 시각</td><td><code>STATE_CODE, LAST_SIGNAL_DATETIME</code></td><td>상태 코드 값과 정상 판정 기준은 별도 확정 필요</td></tr>
+              <tr><td>LOOKUP</td><td>Terminal No로 생산·차량 후보 조회</td><td><code>TERMINAL_ID → AUFNR</code></td><td>ERP/SAP/EAI 중 최종 기준 시스템을 구분하여 설명</td></tr>
+              <tr><td>STORE</td><td>차량–단말 활성 관계</td><td><code>EQUIPMENT_ID, TERMINAL_ID</code></td><td>관계 시작·종료 이력을 보존하는 구조가 필요</td></tr>
+              <tr><td>RETRY</td><td>재시도 횟수, 최근 요청일, 처리 결과</td><td><code>TRY_CNT, LATEST_REQ_DATE, AFTER_PROC_MSG</code></td><td>재시도 주기와 최대 횟수는 정책 확인 항목</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="sheet" id="no-consent">
+        <div class="section-head">
+          <span class="section-no">세부 03</span>
+          <div class="section-copy">
+            <h2>미동의·만료·권한 불일치: 조회 제한과 다음 행동 안내</h2>
+            <p>차량 후보는 확인됐지만 유효한 동의나 승인 조건이 부족한 경우입니다. 단순 오류가 아니라 “왜 제한됐는지”와 “다음에 무엇을 해야 하는지”를 결과로 반환합니다.</p>
+          </div>
+        </div>
+
+        <div class="process-line" style="--cols: 6">
+          <article class="process-node actor"><div class="node-id">P31 · D31</div><div class="node-title">매핑 요청</div><div class="node-desc">업체·차량·요청자를 지정합니다.<br><code>organization_id, equipment_id, actor_id</code></div></article>
+          <article class="process-node miq"><div class="node-id">P32</div><div class="node-title">요청 전달</div><div class="node-desc">Web/App이 차량 관계 확인 요청을 Cloud API에 전달합니다.</div></article>
+          <article class="process-node miq"><div class="node-id">P33 · D32</div><div class="node-title">기존 관계 조회</div><div class="node-desc">소유·판매·사용 관계를 조회합니다.<br><code>owner_org_id, dealer_org_id, user_org_id</code></div></article>
+          <article class="process-node decision"><div class="node-id">P34 · D33</div><div class="node-title">유효한 동의 존재?</div><div class="node-desc"><code>consent_status, consent_scope, expired_at</code> 기준으로 판단합니다.</div></article>
+          <article class="process-node store"><div class="node-id">P35 · D34</div><div class="node-title">제한 상태 저장</div><div class="node-desc">미동의·만료·요청자·처리 상태를 이력으로 남깁니다.</div></article>
+          <article class="process-node exception"><div class="node-id">P36 · D35</div><div class="node-title">제한 안내 반환</div><div class="node-desc"><code>allowed=false, reason_code, next_action</code>을 화면에 반환합니다.</div></article>
+        </div>
+
+        <div class="branch-grid">
+          <article class="branch yes"><strong>Y · 동의 유효</strong><p>이 세부 공정에서 종료하지 않고 세부 04 동의 차량 처리로 연결합니다.</p></article>
+          <article class="branch no"><strong>N · 동의 없음 또는 무효</strong><p>제한 상태를 저장하고 동의 요청, 승인 대기, 갱신 등 다음 행동을 안내합니다.</p></article>
+        </div>
+
+        <ol class="talk-track">
+          <li>사용자가 업체와 차량을 선택하면 요청자 정보까지 포함한 매핑 요청이 생성됩니다.</li>
+          <li>MIQ는 먼저 해당 차량의 기존 소유·판매·사용 관계를 확인합니다.</li>
+          <li>관계가 있다고 곧바로 허용하지 않고, 동의 상태·범위·만료 여부를 따로 검사합니다.</li>
+          <li>조건이 부족하면 제한 사유를 코드화해 저장하고, 화면에는 필요한 다음 행동을 함께 반환합니다.</li>
+          <li>따라서 “차량을 찾지 못함”과 “차량은 있으나 볼 권한이 없음”을 서로 다른 상태로 안내할 수 있습니다.</li>
+        </ol>
+
+        <h3>단계별 데이터 IN / OUT</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>데이터 ID</th><th>연결 단계</th><th>구분</th><th>논리 데이터</th><th>물리 필드</th><th>업무 의미</th></tr></thead>
+            <tbody>
+              <tr><td>D31</td><td>P31</td><td>IN</td><td>매핑 요청</td><td><code>organization_id, equipment_id, actor_id</code></td><td>누가 어느 업체의 어떤 차량을 요청했는지 식별</td></tr>
+              <tr><td>D32</td><td>P33</td><td>LOOKUP</td><td>기존 관계</td><td><code>owner_org_id, dealer_org_id, user_org_id</code></td><td>소유·판매·사용 관계 후보 확인</td></tr>
+              <tr><td>D33</td><td>P34</td><td>LOOKUP</td><td>동의 상태</td><td><code>consent_status, consent_scope, expired_at</code></td><td>동의 완료 여부, 허용 범위, 만료 여부 확인</td></tr>
+              <tr><td>D34</td><td>P35</td><td>STORE</td><td>제한 상태</td><td><code>request_id, status, requester_id, requested_at</code></td><td>제한 처리와 후속 진행 상태 추적</td></tr>
+              <tr><td>D35</td><td>P36</td><td>OUT</td><td>제한 안내</td><td><code>allowed=false, reason_code, next_action</code></td><td>사용자에게 제한 이유와 후속 행동 전달</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="sheet" id="consent">
+        <div class="section-head">
+          <span class="section-no">세부 04</span>
+          <div class="section-copy">
+            <h2>동의·승인: 활성 관계 저장과 조회 범위 반영</h2>
+            <p>승인 대상이 명확하고 승인 행위자의 권한, 고객 동의, 관계 유효기간이 모두 충족된 경우입니다. 승인 사실을 활성 관계로 저장하고 사용자의 조회 가능 차량 목록에 반영합니다.</p>
+          </div>
+        </div>
+
+        <div class="process-line" style="--cols: 6">
+          <article class="process-node actor"><div class="node-id">① · D41</div><div class="node-title">승인 대상 지정</div><div class="node-desc">조직·그룹·차량을 선택합니다.<br><code>organization_id, group_id, equipment_id</code></div></article>
+          <article class="process-node miq"><div class="node-id">② · D42</div><div class="node-title">승인 요청</div><div class="node-desc">행위자·대상·동의 정보를 전달합니다.<br><code>actor_user_id, request_id, consent_id</code></div></article>
+          <article class="process-node miq"><div class="node-id">③ · D43</div><div class="node-title">동의·권한 조회</div><div class="node-desc"><code>consent_status, role_code, valid_from/to</code>를 확인합니다.</div></article>
+          <article class="process-node decision"><div class="node-id">④</div><div class="node-title">권한과 동의 모두 유효?</div><div class="node-desc">승인 행위자 범위, 고객 동의, 유효기간을 함께 검사합니다.</div></article>
+          <article class="process-node store"><div class="node-id">⑤ · D44</div><div class="node-title">활성 관계 저장</div><div class="node-desc">차량·조직·그룹·사용자 관계를 활성 상태로 저장합니다.</div></article>
+          <article class="process-node miq"><div class="node-id">⑥ · D45</div><div class="node-title">조회 범위 반영</div><div class="node-desc">허용 업체·그룹·차량 목록을 다시 계산해 화면 조회에 적용합니다.</div></article>
+        </div>
+
+        <div class="branch-grid">
+          <article class="branch yes"><strong>Y · 모두 유효</strong><p>활성 관계를 저장하고 허용 업체·그룹·차량 집합에 포함합니다.</p></article>
+          <article class="branch no"><strong>N · 조건 불충족</strong><p>세부 03 제한 처리로 이동하여 미동의·만료·권한 불일치 사유를 반환합니다.</p></article>
+        </div>
+
+        <div class="message">
+          <strong>판단 기준</strong>
+          <p>승인 행위자가 해당 조직 범위를 처리할 권한이 있는지, 고객 동의가 유효한지, 업체–차량–사용자 관계의 유효기간이 현재 시점에 포함되는지를 모두 충족해야 합니다.</p>
+        </div>
+
+        <h3>단계별 데이터 IN / OUT</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>데이터 ID</th><th>연결 단계</th><th>구분</th><th>논리 데이터</th><th>물리 필드</th><th>업무 의미</th></tr></thead>
+            <tbody>
+              <tr><td>D41</td><td>①</td><td>IN</td><td>승인 대상</td><td><code>organization_id, group_id, equipment_id</code></td><td>어느 조직·그룹의 어떤 차량을 승인할지 지정</td></tr>
+              <tr><td>D42</td><td>②</td><td>IN</td><td>승인 요청</td><td><code>actor_user_id, request_id, consent_id</code></td><td>승인 행위자와 요청·동의 근거 연결</td></tr>
+              <tr><td>D43</td><td>③</td><td>LOOKUP</td><td>동의·권한</td><td><code>consent_status, role_code, valid_from/to</code></td><td>동의 완료, 역할 권한, 유효기간 확인</td></tr>
+              <tr><td>D44</td><td>⑤</td><td>STORE</td><td>활성 관계</td><td><code>organization_id, group_id, equipment_id, user_id, relation_status</code></td><td>승인된 차량 접근 관계 저장</td></tr>
+              <tr><td>D45</td><td>⑥</td><td>OUT</td><td>조회 범위</td><td><code>allowed_org_ids, allowed_group_ids, allowed_equipment_ids</code></td><td>화면과 API가 사용할 최종 허용 ID 집합</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="sheet" id="signup">
+        <div class="section-head">
+          <span class="section-no">세부 05</span>
+          <div class="section-copy">
+            <h2>가입·승인·수동 보완</h2>
+            <p>자동 매핑만으로 해결되지 않는 계정 생성, 고객 동의, 딜러 승인, 장비 식별 보완을 처리하는 보조 공정입니다.</p>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <article class="note-card">
+            <h4>A. 회원가입 및 자동 승인</h4>
+            <ul>
+              <li>고객이 사업자번호·업체명·연락처를 입력합니다.</li>
+              <li>Web이 사업자번호와 차량 보유 관계를 검증합니다.</li>
+              <li>관계가 일치하면 자동 승인하고 사용자·업체·역할·그룹 범위를 생성합니다.</li>
+              <li>불일치하면 반려 사유와 보완 자료를 관리하는 승인 대기로 전환합니다.</li>
+            </ul>
+          </article>
+          <article class="note-card">
+            <h4>B. 고객 동의 및 차량 승인</h4>
+            <ul>
+              <li>소유자 계정과 처리 딜러를 선택하고 약관에 동의합니다.</li>
+              <li>차량 권한 신청 후 딜러 승인 완료 여부를 확인합니다.</li>
+              <li>승인 시 관계 유효기간을 저장하고 동의 고객의 차량 목록을 재조회합니다.</li>
+            </ul>
+          </article>
+          <article class="note-card">
+            <h4>C. 수동 매핑 보완</h4>
+            <ul>
+              <li>Equipment ID가 불명확하면 단말 시리얼 사진 등 증빙을 접수합니다.</li>
+              <li>운영자가 SAP/MES/MIQ 기준정보를 대조해 실제 장비와 단말 일치 여부를 확인합니다.</li>
+              <li>일치하면 수동 관계를 저장하고, 불일치·중복은 보완 사유와 처리 상태를 남깁니다.</li>
+            </ul>
+          </article>
+          <article class="note-card exception">
+            <h4>설명 시 분리할 항목</h4>
+            <ul>
+              <li>가입 승인과 차량 조회 승인은 같은 승인이 아닙니다.</li>
+              <li>약관 동의와 차량 데이터 제공 동의의 버전·범위를 별도 관리해야 합니다.</li>
+              <li>수동 보완은 자동 공정의 예외이며 정상 경로로 설명하면 안 됩니다.</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>영역</th><th>주요 데이터</th><th>저장·조회 후보</th><th>결과</th></tr></thead>
+            <tbody>
+              <tr><td>계정 신청</td><td>사업자번호, 업체명, 연락처</td><td><code>COMPANY_REG_NUMBER, NAME1_SP, SMTP_ADDRESS, MOBNM_SP</code></td><td>자동 승인 또는 승인 대기</td></tr>
+              <tr><td>약관·동의</td><td>약관 버전, 동의 여부, 동의 일시</td><td><code>TERMS_VERSION, AGREE_YN, AGREE_DATETIME</code></td><td>동의 근거 생성</td></tr>
+              <tr><td>차량 권한</td><td>업체, 차량, 사용자, 유효기간</td><td><code>COMPANY_ID, EQUIPMENT_ID, USER_ID, PERMIT_YN, VALID_FROM/TO</code></td><td>허용 관계 활성화</td></tr>
+              <tr><td>수동 보완</td><td>첨부자료, Terminal ID, Equipment ID, 보완 사유</td><td><code>ATTACHMENT_ID, TERMINAL_ID, EQUIPMENT_ID, CONFLICT_REASON</code></td><td>관계 확정 또는 보완 요청</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="sheet" id="runtime">
+        <div class="section-head">
+          <span class="section-no">세부 06</span>
+          <div class="section-copy">
+            <h2>Agent → Cloud API → SAP/EAI → DB → Web/App</h2>
+            <p>권한 관계가 만들어진 이후 실제 차량 데이터가 수집·저장되고, 사용자가 화면을 조회하고 조치하는 실행 시점의 흐름입니다.</p>
+          </div>
+        </div>
+
+        <h3>A. 차량 단말 데이터 수집·적재</h3>
+        <div class="process-line" style="--cols: 7">
+          <article class="process-node external"><div class="node-id">06-A1</div><div class="node-title">차량 상태 발생</div><div class="node-desc">상태·통신·위치·센서 변화가 발생합니다.</div></article>
+          <article class="process-node external"><div class="node-id">06-A2</div><div class="node-title">Agent 수집</div><div class="node-desc">GPS, G-Sensor, 충격, 배터리 등 원천값을 묶습니다.</div></article>
+          <article class="process-node miq"><div class="node-id">06-A3</div><div class="node-title">Cloud API 수신</div><div class="node-desc">Terminal ID, 인증값, payload를 검증합니다.</div></article>
+          <article class="process-node miq"><div class="node-id">06-A4</div><div class="node-title">EAI 기준 조회</div><div class="node-desc">단말과 차량의 기준 관계를 확인합니다.</div></article>
+          <article class="process-node external"><div class="node-id">06-A5</div><div class="node-title">SAP/ERP/MES 조회</div><div class="node-desc">장비·기종·소유 조직 기준정보를 조회합니다.</div></article>
+          <article class="process-node store"><div class="node-id">06-A6</div><div class="node-title">관계 생성·검증</div><div class="node-desc">장비–단말–조직 관계의 유효성을 확정합니다.</div></article>
+          <article class="process-node store"><div class="node-id">06-A7</div><div class="node-title">Cloud DB 적재</div><div class="node-desc">상태, 최종신호, 텔레메트리, 처리 이력을 저장합니다.</div></article>
+        </div>
+
+        <h3>B. Fleet·Dealer 화면 조회·상호작용</h3>
+        <div class="process-line" style="--cols: 6">
+          <article class="process-node actor"><div class="node-id">06-B1</div><div class="node-title">사용자 화면 진입</div><div class="node-desc">서비스, 언어, 업체 맥락을 전달합니다.</div></article>
+          <article class="process-node miq"><div class="node-id">06-B2</div><div class="node-title">권한 검증</div><div class="node-desc">역할·메뉴·조직·차량 범위를 확인합니다.</div></article>
+          <article class="process-node miq"><div class="node-id">06-B3</div><div class="node-title">화면 조회 API</div><div class="node-desc">업체·그룹·차량·기간 조건으로 조회합니다.</div></article>
+          <article class="process-node store"><div class="node-id">06-B4</div><div class="node-title">DB 조회</div><div class="node-desc">차량 상태·가동·에러·위치 데이터를 집계합니다.</div></article>
+          <article class="process-node miq"><div class="node-id">06-B5</div><div class="node-title">응답·화면 표시</div><div class="node-desc">요약·목록·페이지 정보를 Web/App에 표시합니다.</div></article>
+          <article class="process-node actor"><div class="node-id">06-B6</div><div class="node-title">조치 및 결과</div><div class="node-desc">승인·반려·설정·조치를 요청하고 처리 결과를 이력으로 남깁니다.</div></article>
+        </div>
+
+        <div class="message">
+          <strong>이 장과 동의 공정의 연결</strong>
+          <p>화면 조회 시 매번 전체 동의 절차를 다시 수행하는 것이 아니라, 세부 04에서 만든 활성 관계와 허용 ID 집합을 권한 검증의 기준으로 사용합니다. 관계가 만료되거나 철회되면 허용 범위를 다시 계산해야 합니다.</p>
+        </div>
+      </section>
+
+      <section class="sheet" id="data">
+        <div class="section-head">
+          <span class="section-no">데이터</span>
+          <div class="section-copy">
+            <h2>핵심 데이터가 연결되는 방식</h2>
+            <p>설명할 때 테이블명을 먼저 나열하기보다, 업무 데이터가 어떤 식별자로 다음 단계에 연결되는지부터 설명합니다.</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>업무 대상</th><th>논리 키</th><th>물리 키 예시</th><th>생성·조회 시점</th><th>다음 단계에서 쓰이는 목적</th></tr></thead>
+            <tbody>
+              <tr><td>생산 차량</td><td>생산번호·차대번호</td><td><code>AUFNR, EQUNR, VIN</code></td><td>MES/MQS 생산 완료</td><td>차량 기준정보와 단말 후보 연결</td></tr>
+              <tr><td>단말</td><td>Terminal ID·Serial</td><td><code>TERMINAL_ID, SERIAL_NO</code></td><td>단말 장착·최초 통신</td><td>차량 후보 조회와 텔레메트리 귀속</td></tr>
+              <tr><td>차량</td><td>Equipment ID</td><td><code>EQUIPMENT_ID</code></td><td>ERP/SAP/EAI 기준 조회</td><td>화면 목록·상세·서비스 처리 대상</td></tr>
+              <tr><td>조직·업체</td><td>Organization / Company ID</td><td><code>ORGANIZATION_ID, COMPANY_ID</code></td><td>판매·고객·사용 관계 조회</td><td>사용자와 차량의 업무 범위 결정</td></tr>
+              <tr><td>그룹</td><td>Group ID</td><td><code>GROUP_ID</code></td><td>승인 대상 지정 또는 관리 배정</td><td>조회 범위 세분화</td></tr>
+              <tr><td>사용자·역할</td><td>User ID·Role Code</td><td><code>USER_ID, ROLE_ID, ROLE_CODE</code></td><td>로그인·승인 처리</td><td>승인 가능 범위와 화면 메뉴 권한 결정</td></tr>
+              <tr><td>동의</td><td>Consent ID·상태·기간</td><td><code>CONSENT_ID, CONSENT_STATUS, VALID_FROM/TO</code></td><td>약관 동의·차량 데이터 승인</td><td>조회 허용 또는 제한 사유 판단</td></tr>
+              <tr><td>활성 관계</td><td>조직–그룹–차량–사용자 관계</td><td><code>RELATION_STATUS, PERMIT_YN</code></td><td>동의·승인 완료</td><td>허용 업체·그룹·차량 ID 집합 계산</td></tr>
+              <tr><td>텔레메트리</td><td>항목 코드·발생 시각</td><td><code>METRIC_CODE, METRIC_VALUE, EVENT_DATETIME</code></td><td>Agent 수집·Cloud 적재</td><td>상태·운행·위치·에러 화면 표시</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="two-col">
+          <article class="note-card">
+            <h4>동의가 바꾸는 것</h4>
+            <p>차량 원천 데이터 자체를 만들거나 삭제하는 것이 아니라, 특정 사용자에게 노출할 수 있는 차량 집합을 바꿉니다.</p>
+          </article>
+          <article class="note-card">
+            <h4>관계 이력이 필요한 이유</h4>
+            <p>단말 교체, 차량 양도, 조직 이동, 동의 철회가 발생하면 과거와 현재의 유효 관계를 구분해야 하기 때문입니다.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="sheet" id="qa">
+        <div class="section-head">
+          <span class="section-no">Q&amp;A</span>
+          <div class="section-copy">
+            <h2>설명 자리에서 예상되는 질문</h2>
+            <p>현재 FigJam의 의미를 설명하기 위한 답변이며, 실제 운영 정책과 물리 테이블은 확정 과정에서 달라질 수 있습니다.</p>
+          </div>
+        </div>
+
+        <div class="qa-list">
+          <details open><summary>Q1. 차량과 단말이 매핑됐으면 바로 화면에서 보이나요?</summary><div class="qa-answer">아닙니다. 차량–단말 관계는 데이터 귀속을 위한 물리 관계입니다. 사용자가 보려면 업체·사용자 관계와 유효한 동의·승인 조건까지 충족해 허용 차량 집합에 포함돼야 합니다.</div></details>
+          <details open><summary>Q2. “미동의”는 차량을 못 찾았다는 뜻인가요?</summary><div class="qa-answer">다릅니다. 차량을 못 찾는 경우는 식별·매핑 실패이고, 미동의는 차량 또는 관계 후보는 있으나 데이터 조회 근거가 부족한 상태입니다. 화면 안내와 후속 조치도 별도로 처리해야 합니다.</div></details>
+          <details open><summary>Q3. 동의만 있으면 누구나 승인할 수 있나요?</summary><div class="qa-answer">아닙니다. 승인 행위자가 해당 조직·고객·차량을 처리할 권한이 있어야 하고, 동의 범위와 유효기간도 현재 요청에 맞아야 합니다.</div></details>
+          <details open><summary>Q4. 동의가 만료되거나 철회되면 어떻게 되나요?</summary><div class="qa-answer">활성 관계의 유효 상태를 변경하고 허용 업체·그룹·차량 집합을 다시 계산해야 합니다. 이후 조회는 제한 경로로 전환되고 만료 또는 철회 사유와 필요한 행동을 반환합니다.</div></details>
+          <details open><summary>Q5. D31~D45는 새로운 공정 번호인가요?</summary><div class="qa-answer">아닙니다. P31~P36 또는 ①~⑥은 처리 단계이고, D31~D45는 그 단계 옆에 붙는 데이터 정의 ID입니다. 데이터 표는 공정 경로에 포함되지 않습니다.</div></details>
+          <details open><summary>Q6. 왜 논리명과 물리명을 같이 표시하나요?</summary><div class="qa-answer">업무 담당자는 “승인 대상·동의 상태·조회 범위”로 이해하고, 개발 담당자는 실제 API·DB 필드로 연결해야 하기 때문입니다. 같은 데이터를 두 관점에서 확인하기 위한 표기입니다.</div></details>
+          <details open><summary>Q7. 자동 매핑이 실패하면 데이터가 유실되나요?</summary><div class="qa-answer">즉시 유실로 처리하지 않습니다. 요청 이력과 실패 사유를 남기고 재조회·재호출·수동 보완 경로를 거치도록 설계합니다. 단, 재시도 주기와 최대 횟수는 운영 정책으로 확정해야 합니다.</div></details>
+          <details open><summary>Q8. 현재 표의 물리 필드와 테이블명이 최종 확정인가요?</summary><div class="qa-answer">FigJam에서 데이터 흐름을 이해하기 위한 연결 기준입니다. 실제 API 스키마와 DB 명세 대조 후 필드명, 기준 시스템, 저장 테이블, 이력 보존 방식은 최종 확정해야 합니다.</div></details>
+        </div>
+
+        <h3>최종 확정이 필요한 운영 기준</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>항목</th><th>확정할 내용</th><th>미확정 시 영향</th></tr></thead>
+            <tbody>
+              <tr><td>동의 범위</td><td>업체·그룹·차량 단위 중 실제 동의 단위와 상속 규칙</td><td>허용 차량 계산 결과가 시스템별로 달라질 수 있음</td></tr>
+              <tr><td>동의 유효기간</td><td>시작·종료·철회 시각, 만료 배치와 즉시 반영 여부</td><td>만료 차량이 계속 보이거나 정상 차량이 차단될 수 있음</td></tr>
+              <tr><td>승인 권한</td><td>딜러 대표·직원·고객 대표별 승인 가능 범위</td><td>과도한 승인 또는 불필요한 승인 대기 발생</td></tr>
+              <tr><td>기준 시스템</td><td>차량·소유·판매·고객 관계의 최종 원천을 SAP/EAI/MIQ 중 확정</td><td>같은 차량에 서로 다른 관계가 생성될 수 있음</td></tr>
+              <tr><td>예외 재처리</td><td>재시도 간격, 최대 횟수, 수동 전환 조건, 담당자 알림</td><td>실패 요청이 장기간 방치되거나 중복 처리될 수 있음</td></tr>
+              <tr><td>감사 이력</td><td>승인·반려·철회·수동 수정의 처리자·시각·사유 보존 기간</td><td>권한 변경 근거와 장애 원인 추적이 어려움</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="footnote">본 문서는 현재 FigJam 공정을 설명하기 위한 별도 자료입니다. FigJam 보드 자체와 기존 공정 배치는 변경하지 않았습니다.</p>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
