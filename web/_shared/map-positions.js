@@ -1,4 +1,7 @@
-/* Original captured daily-equipment last positions; no generated vehicle locations. */
+/* Original captured daily-equipment last positions are preserved below.
+   The final three entries marked demo:true are separated demonstration locations
+   for the customer staff fleet near company 1933's existing Hwaseong position.
+   They are not collected GPS measurements. */
 window.MIQMapPositions = [
   {
     "vin": "FBA36_225380008",
@@ -230,5 +233,29 @@ window.MIQMapPositions = [
     "lng": 128.600818,
     "address": "대한민국 창원시 세아창원특수강후문",
     "lastDatetime": "2026-08-13 19:20:19"
+  },
+  {
+    "vin": "FBA32_DEMO_CS01",
+    "lat": 37.035646,
+    "lng": 126.787038,
+    "address": "경기도 화성시 우정읍 이화리 (시연 위치 1)",
+    "lastDatetime": "2026-09-10 14:00:00",
+    "demo": true
+  },
+  {
+    "vin": "FBA18_DEMO_CS02",
+    "lat": 37.035246,
+    "lng": 126.787238,
+    "address": "경기도 화성시 우정읍 이화리 (시연 위치 2)",
+    "lastDatetime": "2026-09-10 14:00:00",
+    "demo": true
+  },
+  {
+    "vin": "FBD30_DEMO_CS03",
+    "lat": 37.035446,
+    "lng": 126.787538,
+    "address": "경기도 화성시 우정읍 이화리 (시연 위치 3)",
+    "lastDatetime": "2026-09-10 14:00:00",
+    "demo": true
   }
 ];

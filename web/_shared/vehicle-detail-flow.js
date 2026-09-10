@@ -7,6 +7,13 @@
   var requested = query.get('veh') || query.get('equipmentId');
   var metricFleet = Array.isArray(MIQ.FLEET) ? MIQ.FLEET : [];
   var fleet = Array.isArray(MIQ.FLEET_CATALOG) && MIQ.FLEET_CATALOG.length ? MIQ.FLEET_CATALOG : metricFleet;
+  var role = MIQCommon.roles.resolve(document.body.dataset.managementRole || query.get('role'));
+  if (role === 'dealer_staff' || role === 'customer_staff') {
+    fleet = MIQCommon.roles.filterVehicles(role, fleet);
+    metricFleet = metricFleet.filter(function (item) {
+      return fleet.some(function (allowed) { return allowed.vin === item.vin; });
+    });
+  }
   function normalize(value) { return String(value || '').replace(/[-_]/g, '').toLowerCase(); }
   var defaultVehicle = fleet.filter(function (item) { return normalize(item.vin) === normalize('FBA32_224250271'); })[0] || metricFleet[0] || fleet[0] || null;
   var matchedVehicle = fleet.filter(function (item) { return normalize(item.vin) === normalize(requested); })[0] || (!requested ? defaultVehicle : null);
@@ -31,6 +38,16 @@
     if (matchedVehicle.group) query.set('group', matchedVehicle.group); else query.delete('group');
     if (matchedVehicle.type) query.set('type', matchedVehicle.type); else query.delete('type');
     history.replaceState(null, '', location.pathname + '?' + query.toString() + location.hash);
+  }
+  if (matchedVehicle && window.MIQServiceRecords && window.MIQServiceDemo) {
+    var serviceDay = MIQCommon.dates.format(MIQCommon.dates.yesterday());
+    var serviceDemo = MIQServiceDemo.create([vehicle], serviceDay);
+    serviceDemo.maintenance.concat(serviceDemo.error).forEach(function (record) {
+      var present = MIQServiceRecords.records.some(function (existing) {
+        return existing.demo && existing.kind === record.kind && existing.vin === record.vin && existing.date === record.date;
+      });
+      if (!present) MIQServiceRecords.records.push(record);
+    });
   }
   var aliases = { day: 'd', daily: 'd', week: 'w', weekly: 'w', month: 'm', monthly: 'm', custom: 'c' };
   var period = aliases[query.get('period')] || query.get('period') || 'm';
@@ -180,6 +197,9 @@
     if (metrics[0]) metrics[0].querySelector('.metric__v').textContent = !hasNumber(vehicle.km) ? '수집 전' : number(vehicle.km * info.factor, vehicle.km * info.factor < 10 ? 1 : 0) + ' Km';
     if (metrics[1]) metrics[1].querySelector('.metric__v').textContent = !hasNumber(vehicle.min) ? '수집 전' : hours(vehicle.min * info.factor);
     if (metrics[2]) metrics[2].querySelector('.metric__v').textContent = !hasNumber(vehicle.shock) ? '수집 전' : number(Math.round(vehicle.shock * info.factor)) + '회';
+    var historyCounts = window.MIQSummaryRow ? MIQSummaryRow.historyCounts(window.MIQServiceRecords, vehicle, [info.from, info.to]) : { repair: null, fault: null };
+    if (metrics[3]) metrics[3].querySelector('.metric__v').textContent = historyCounts.repair === null ? '미제공' : number(historyCounts.repair);
+    if (metrics[4]) metrics[4].querySelector('.metric__v').textContent = historyCounts.fault === null ? '미제공' : number(historyCounts.fault);
   }
 
   function syncLinks() {

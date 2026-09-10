@@ -148,25 +148,26 @@
   </main>
 </div>
 
-<script src="../_shared/meeting-model.js?rev=d195eb0eec48"></script>
+<script src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script>
 <script src="../_shared/common-logic.js?v=20260907-common-logic-r42&amp;rev=fe89537280cd"></script>
 <script src="../_shared/nav.js?v=20260907-common-logic-r42&amp;rev=187c22679f16"></script>
-<script src="../_mock-data/generated/fleet.generated.js?v=20260906-json-r1&amp;rev=7e813828c801"></script>
-<script src="../_shared/fleet.js?v=20260906-json-r1&amp;rev=c6c8a0208b21"></script>
-<script src="../_shared/map-positions.js?rev=d86638aec5ee"></script>
+<script src="../_mock-data/generated/fleet.generated.js?v=20260906-json-r1&amp;rev=f69042cf6b57"></script>
+<script src="../_shared/fleet.js?v=20260906-json-r1&amp;rev=9bc7caf2ff93"></script>
+<script src="../_shared/map-positions.js?rev=9ee532d97810"></script>
 <script src="../_shared/map-popup.js?rev=a48bddd5d062"></script>
 <script>
 /* ══════════════════════════════════════════════════════════════
    지도 인터랙션
      1) 업체 · 그룹 · 분류 · 차량 선택 범위를 지도 영역 · 집계 · 장비목록에 반영
      2) Google 지도 API 연결 시 아이콘/목록 선택과 동일 팝업, GPS 이동경로 표시. 미설정 시 기본 임베드 제공
-     3) 위치 · 주소 · 위치 기준 시각은 원본 캡처 사용. 시간별 가동 지표는 별도 시연 데이터.
-   수집되지 않은 좌표와 이동 경로는 생성하지 않는다.
+     3) 기존 차량 위치 · 주소 · 시각은 원본 캡처 사용. 고객 직원용 3대는 demo:true로 구분한 시연 위치.
+   시간별 가동 지표는 별도 시연 데이터이며 수집되지 않은 이동 경로는 생성하지 않는다.
    ══════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
 
-  /* Captured last positions use their original VIN, address and timestamp.
+  /* Captured positions retain their original VIN, address and timestamp.
+     The three demo:true positions are explicit demonstration data, not GPS captures.
      Hourly operating metrics remain separate from the location capture time. */
   var positionByVin = new Map((window.MIQMapPositions || []).map(function (position) { return [position.vin, position]; }));
   var scopedFleet = MIQ.FLEET_CATALOG || MIQ.FLEET;

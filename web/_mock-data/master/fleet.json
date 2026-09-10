@@ -15,12 +15,12 @@
     {
       "companyId": "1933",
       "companyName": "(주)세종물류중부지점",
-      "vehicleCount": 10,
-      "connected": 9,
-      "disconnected": 1,
-      "running": 6,
+      "vehicleCount": 13,
+      "connected": 11,
+      "disconnected": 2,
+      "running": 8,
       "idle": 3,
-      "fault": 1,
+      "fault": 2,
       "replacementNeeded": 1,
       "replacementSoon": 1,
       "dashboardRoles": [
@@ -2559,6 +2559,82 @@
       "cumKm": null,
       "cumH": null,
       "catalogOnly": true
+    },
+    {
+      "companyId": "1933",
+      "companyName": "(주)세종물류중부지점",
+      "catalogOnly": false,
+      "demo": true,
+      "group": "물류1팀",
+      "model": "B30S-7",
+      "vin": "FBA32_DEMO_CS01",
+      "type": "리튬",
+      "cumKm": 12540,
+      "cumH": 3180,
+      "conn": true,
+      "soc": 78,
+      "km": 84,
+      "min": 2160,
+      "eff": 88,
+      "shock": 2,
+      "bc": 2.8,
+      "summaryDetail": {
+        "workMinutes": 1900,
+        "idleMinutes": 260,
+        "supplyDueCount": 0,
+        "activeErrorCount": 1
+      }
+    },
+    {
+      "companyId": "1933",
+      "companyName": "(주)세종물류중부지점",
+      "catalogOnly": false,
+      "demo": true,
+      "group": "물류1팀",
+      "model": "B18S-7",
+      "vin": "FBA18_DEMO_CS02",
+      "type": "납산",
+      "cumKm": 7340,
+      "cumH": 1840,
+      "conn": false,
+      "soc": 46,
+      "km": 36,
+      "min": 960,
+      "eff": 75,
+      "shock": 0,
+      "bc": 3.2,
+      "summaryDetail": {
+        "workMinutes": 720,
+        "idleMinutes": 240,
+        "supplyDueCount": 0,
+        "activeErrorCount": 0
+      }
+    },
+    {
+      "companyId": "1933",
+      "companyName": "(주)세종물류중부지점",
+      "catalogOnly": false,
+      "demo": true,
+      "group": "물류1팀",
+      "model": "D30S-9",
+      "vin": "FBD30_DEMO_CS03",
+      "type": "엔진",
+      "cumKm": 18520,
+      "cumH": 4260,
+      "conn": true,
+      "soc": null,
+      "km": 126,
+      "min": 2820,
+      "eff": 3.7,
+      "efficiencyRate": 81.9,
+      "shock": 1,
+      "fc": 3.7,
+      "summaryDetail": {
+        "workMinutes": 2310,
+        "idleMinutes": 510,
+        "supplyDueCount": 0,
+        "activeErrorCount": 0
+      }
     }
   ]
 }

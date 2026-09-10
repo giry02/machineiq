@@ -84,6 +84,9 @@
     });
     var running=connected&&window.hours>0&&random(v.vin+window.date+':'+(window.hours-1))>.25;
     var fault=connected&&random(v.vin+'fault')>.86?1:0;
+    // Explicit demonstration vehicles share their current fault count with summary/dashboard.
+    var activeError=v.summaryDetail&&v.summaryDetail.activeErrorCount;
+    if(v.demo===true&&typeof activeError==='number'&&Number.isFinite(activeError)&&activeError>=0)fault=activeError;
     return {known:known,connected:connected,running:running,idle:connected&&!running,fault:fault,runH:known?total.minutes/60:null,
       km:known?total.km:null,fuel:known?total.fuel:null,battery:known?total.battery:null,
       dataTime:connected?window.date+' '+window.to:null,
