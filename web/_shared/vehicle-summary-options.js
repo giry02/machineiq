@@ -21,6 +21,11 @@
     PERIOD[mode].range=[range.from,range.to]
   });
   var VEHICLES=Array.isArray(MIQ.FLEET_CATALOG)&&MIQ.FLEET_CATALOG.length?MIQ.FLEET_CATALOG:MIQ.FLEET;
+  if(window.MIQServiceRecords&&window.MIQServiceDemo){
+    var serviceDay=dateRules.format(dateRules.yesterday());
+    var serviceDemo=MIQServiceDemo.create(VEHICLES,serviceDay);
+    MIQServiceRecords.records.push.apply(MIQServiceRecords.records,serviceDemo.maintenance.concat(serviceDemo.error));
+  }
   if(favoriteSummary){
     try{
       var favoriteIds=window.MIQFavorites.read(favoriteRole,VEHICLES);
@@ -36,7 +41,7 @@
   var currentSource=QUERY.get('source')||'';
   var PERIOD_ALIASES={day:'d',daily:'d',week:'w',weekly:'w',month:'m',monthly:'m',custom:'c'};
   var METRIC_SORT={distance:'km',time:'min',fuel:'fuel',battery:'battery',efficiency:'electricEff',shock:'shock'};
-  var SORT_KEYS=['vin','group','type','cumKm','cumH','km','min','performance','electricEff','shock','conn','soc','fuel','battery'];
+  var SORT_KEYS=['vin','group','type','cumKm','cumH','km','min','workMin','performance','electricEff','shock','conn','soc','fuel','battery'];
   var requestedPeriod=PERIOD_ALIASES[QUERY.get('period')]||QUERY.get('period');
   var requestedSort=QUERY.get('sort')||METRIC_SORT[currentMetric];
   var requestedVehicle=VEHICLES.filter(function(vehicle){
@@ -262,6 +267,7 @@
       case'cumH':return vehicle.cumH;
       case'km':return value.km;
       case'min':return value.min;
+      case'workMin':return MIQSummaryRow.times(vehicle,value.min).working;
       case'performance':return value.operatingEff;
       case'electricEff':return value.operatingEff;
       case'shock':return value.shock;
@@ -299,7 +305,7 @@
   function sortLabel(key){
     var labels={
       vin:'차량번호',group:'그룹',type:'분류',cumKm:'누적 이동거리',cumH:'누적 가동시간',
-      km:'기간 이동거리',min:'기간 가동시간',performance:'운영효율',electricEff:'운영효율',
+      km:'기간 이동거리',min:'기간 가동시간',workMin:'기간 작업시간',performance:'운영효율',electricEff:'운영효율',
       shock:'충격 횟수',conn:'TMS 연결',soc:'배터리 SOC',fuel:'엔진 연료소비',battery:'전동 배터리소비'
     };
     return labels[key]||'기본 순서'
@@ -310,8 +316,13 @@
     return '<span class="connection-badge '+(vehicle.conn?'on':'off')+'">'+(vehicle.conn?'연결됨':'연결 끊김')+'</span>'
   }
   function socHtml(vehicle){
-    if(vehicle.soc===null)return'<span class="na">-</span>';
-    return '<span class="soc"><span class="soc__track"><i class="soc__fill" style="width:'+vehicle.soc+'%;--soc-color:'+socColor(vehicle.soc)+'"></i></span><strong>'+vehicle.soc+'%</strong></span>'
+    if(!hasNumber(vehicle.soc)||Number(vehicle.soc)<0||Number(vehicle.soc)>100)return'<span class="na" title="배터리 잔량 미수집">-</span>';
+    return '<span class="soc" role="img" aria-label="배터리 잔량 '+vehicle.soc+'%"><span class="soc__track"><i class="soc__fill" style="width:'+vehicle.soc+'%;--soc-color:'+socColor(vehicle.soc)+'"></i></span><strong>'+vehicle.soc+'%</strong></span>'
+  }
+  function connectionDot(vehicle){
+    var status=MIQSummaryRow.connection(vehicle.conn);
+    var label=status==='on'?'연결됨':status==='off'?'연결안됨':'연결 정보 미수집';
+    return '<i class="connection-dot '+status+'" role="img" aria-label="'+label+'" title="'+label+'"></i>'
   }
   function energyText(vehicle){
     return vehicle.soc===null?'정보 미제공':vehicle.soc+'%'
@@ -334,23 +345,15 @@
     var sample=vehicle.summaryDetail||{};
     function valid(number){return typeof number==='number'&&isFinite(number)&&number>=0}
     function count(number){return valid(number)&&Math.floor(number)===number?num(number)+'건':'—'}
-    var total=valid(value.min)?Math.round(value.min):null;
-    var work=null;
-    var idle=null;
-    /* Explicit prototype minutes, not a reverse calculation from eff (engine eff is L/H).
-       Round the period total once so displayed work + idle always equals running time. */
-    if(total!==null&&valid(sample.workMinutes)&&valid(sample.idleMinutes)
-      &&valid(vehicle.min)&&sample.workMinutes+sample.idleMinutes===vehicle.min){
-      work=vehicle.min>0?Math.round(total*sample.workMinutes/vehicle.min):0;
-      idle=total-work
-    }
+    var times=MIQSummaryRow.times(vehicle,value.min);
+    var history=MIQSummaryRow.historyCounts(window.MIQServiceRecords,vehicle,PERIOD[state.period].range);
     return [
-      ['작업시간',work===null?'—':hm(work)],
-      ['대기시간',idle===null?'—':hm(idle)],
-      ['가동시간',total===null?'—':hm(total)],
+      ['대기시간',times.idle===null?'—':hm(times.idle)],
       ['충격횟수',valid(value.shock)?num(value.shock)+'회':'—'],
       ['소모품교체',count(sample.supplyDueCount)],
-      ['차량 에러',count(sample.activeErrorCount)]
+      ['차량 에러',count(sample.activeErrorCount)],
+      ['수리이력',count(history.repair)],
+      ['고장이력',count(history.fault)]
     ]
   }
   function detailPanel(vehicle,value){
@@ -359,7 +362,6 @@
       +items.map(function(item){
         return '<div class="vehicle-detail-panel__item"><span>'+item[0]+'</span><strong>'+item[1]+'</strong></div>'
       }).join('')
-      +'<p class="vehicle-detail-panel__note">목업 데이터 · 시간·충격: 선택 기간('+PERIOD[state.period].label+') · 소모품교체: 현재 교체 필요 · 차량 에러: 현재 미해결 · —: 정보 미제공</p>'
       +'</div>'
   }
 
@@ -377,14 +379,15 @@
       var expanded=Boolean(state.expanded[vehicle.vin]);
       var detailId='vehicle-detail-'+safeId(vehicle.vin);
       var performance=performanceText(vehicle,value);
+      var times=MIQSummaryRow.times(vehicle,value.min);
       return '<tr class="vehicle-row" data-vin="'+escapeAttr(vehicle.vin)+'" style="--row-delay:'+(index*16)+'ms">'
-        +'<td><div class="vehicle-identity"><button type="button" class="row-expand" data-expand-vin="'+escapeAttr(vehicle.vin)+'" aria-expanded="'+(expanded?'true':'false')+'" aria-controls="'+detailId+'" aria-label="'+escapeAttr(vehicle.vin)+' 상세 '+(expanded?'접기':'펼치기')+'">'+(expanded?'−':'+')+'</button><span class="vehicle-identity__text"><a href="'+detailHref(vehicle)+'">'+vehicle.vin+'</a><span>'+vehicle.model+'</span></span></div></td>'
-        +'<td><span class="affiliation"><strong>'+vehicle.group+'</strong><span>'+vehicle.type+'</span></span></td>'
+        +'<td><div class="vehicle-identity"><button type="button" class="row-expand" data-expand-vin="'+escapeAttr(vehicle.vin)+'" aria-expanded="'+(expanded?'true':'false')+'" aria-controls="'+detailId+'" aria-label="'+escapeAttr(vehicle.vin)+' 상세 '+(expanded?'접기':'펼치기')+'">'+(expanded?'−':'+')+'</button><span class="vehicle-identity__text"><a href="'+detailHref(vehicle)+'">'+connectionDot(vehicle)+'<span class="vehicle-vin">'+vehicle.vin+'</span></a><span>'+vehicle.model+'</span></span></div></td>'
+        +'<td><span class="affiliation"><strong>'+vehicle.group+'</strong><span class="vehicle-type">'+vehicle.type+(vehicle.type==='리튬'?socHtml(vehicle):'')+'</span></span></td>'
         +'<td><span class="metric-pair"><span>거리 <strong>'+valueOrDash(vehicle.cumKm,' Km')+'</strong></span><span>시간 <strong>'+valueOrDash(vehicle.cumH,' H')+'</strong></span></span></td>'
         +'<td><span class="metric-pair"><span>거리 <strong>'+num(value.km,value.km<10?1:0)+' Km</strong></span><span>시간 <strong>'+hm(value.min)+'</strong></span></span></td>'
         +'<td><span class="performance-cell"><span>'+performance.label+'</span><strong>'+performance.value+'</strong></span></td>'
-        +'<td class="c">'+connectionHtml(vehicle)+'</td>'
-        +'<td class="c">'+socHtml(vehicle)+'</td>'
+        +'<td class="c"><strong class="row-time">'+(times.running===null?'—':hm(times.running))+'</strong></td>'
+        +'<td class="c"><strong class="row-time">'+(times.working===null?'—':hm(times.working))+'</strong></td>'
         +'</tr>'
         +'<tr class="detail-row" data-detail-vin="'+escapeAttr(vehicle.vin)+'" id="'+detailId+'"'+(expanded?'':' hidden')+'><td colspan="7">'+detailPanel(vehicle,value)+'</td></tr>'
     }).join('');
@@ -396,8 +399,8 @@
       +'<th scope="col">'+sortButton('누적','cumKm')+'</th>'
       +'<th scope="col">'+sortButton('선택 기간 '+PERIOD[state.period].label,'km')+'</th>'
       +'<th scope="col">'+sortButton('운영효율(%)','performance')+'</th>'
-      +'<th scope="col" class="c">'+sortButton('TMS','conn')+'</th>'
-      +'<th scope="col" class="c">'+sortButton('SOC','soc')+'</th>'
+      +'<th scope="col" class="c">'+sortButton('가동시간','min')+'</th>'
+      +'<th scope="col" class="c">'+sortButton('작업시간','workMin')+'</th>'
       +'</tr></thead><tbody>'+body+'</tbody></table></div>'
   }
 
@@ -470,6 +473,7 @@
     if(option==='expand'){
       var allExpanded=rows.length>0&&rows.every(function(vehicle){return Boolean(state.expanded[vehicle.vin])});
       optionToolbar.innerHTML='<span class="option-toolbar__count"></span>'
+        +'<span class="connection-legend" aria-label="차량 연결 상태 범례"><span><i class="connection-dot on" aria-hidden="true"></i>연결됨</span><span><i class="connection-dot off" aria-hidden="true"></i>연결안됨</span>'+(rows.some(function(vehicle){return MIQSummaryRow.connection(vehicle.conn)==='unknown'})?'<span><i class="connection-dot unknown" aria-hidden="true"></i>미수집</span>':'')+'</span>'
         +'<div class="option-toolbar__tools"><span class="option-toolbar__hint">+ 버튼으로 차량별 추가 정보를 확인합니다.</span><button type="button" class="option-toolbar__button" id="toggleAllDetails">'+(allExpanded?'모두 접기':'모두 펼치기')+'</button></div>';
       renderToolbarScope(rows);
       document.getElementById('toggleAllDetails').addEventListener('click',function(){

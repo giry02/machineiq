@@ -61,6 +61,12 @@ body.miq-summary-option[data-summary-option="expand"][data-sub="summary"] .optio
 .option-toolbar__count{color:var(--bobcat-muted);font-size:14px}
 .option-toolbar__count b{color:var(--bobcat-dark)}
 .option-toolbar__tools{display:flex;align-items:center;gap:8px;margin-left:auto}
+.connection-legend{display:inline-flex;align-items:center;gap:14px;color:var(--bobcat-muted);font-size:12px;line-height:18px;white-space:nowrap}
+.connection-legend>span{display:inline-flex;align-items:center;gap:6px}
+.connection-dot{display:inline-block;flex:0 0 7px;width:7px;height:7px;border-radius:50%;background:var(--bobcat-muted)}
+.connection-dot.on{background:var(--bobcat-success)}
+.connection-dot.off{background:var(--bobcat-danger)}
+.connection-dot.unknown{background:transparent;box-shadow:inset 0 0 0 1px var(--bobcat-muted)}
 .option-toolbar__hint,.sort-current{color:var(--bobcat-muted);font-size:12px;line-height:18px;white-space:nowrap}
 .option-toolbar__button{height:34px;padding:0 11px;border:1px solid var(--bobcat-steel);border-radius:4px;background:#fff;color:var(--bobcat-dark);font-size:13px;font-weight:600}
 .option-toolbar__button:hover,.option-toolbar__button:focus-visible{border-color:var(--bobcat-red);color:var(--bobcat-red-active)}
@@ -102,10 +108,15 @@ body.miq-summary-option[data-summary-option="expand"][data-sub="summary"] .optio
 .vehicle-identity__text{display:flex;flex-direction:column;min-width:0}
 .vehicle-identity__text a{overflow:hidden;color:var(--bobcat-dark);font-size:14px;font-weight:700;line-height:20px;text-decoration:none;text-overflow:ellipsis}
 .vehicle-identity__text a:hover{color:var(--bobcat-red-active);text-decoration:underline}
+.vehicle-identity__text a{display:flex;align-items:center;gap:6px}
+.vehicle-identity__text a .vehicle-vin{overflow:hidden;font:inherit;color:inherit;text-overflow:ellipsis}
 .vehicle-identity__text span{color:var(--bobcat-muted);font-size:12px;line-height:18px}
 .affiliation{display:flex;flex-direction:column;min-width:0}
 .affiliation strong{overflow:hidden;font-size:14px;line-height:20px;text-overflow:ellipsis}
 .affiliation span{color:var(--bobcat-muted);font-size:12px;line-height:18px}
+.affiliation .vehicle-type{display:flex;align-items:center;gap:10px}
+.affiliation .soc{flex-shrink:0}
+.row-time{font-size:14px;font-weight:600}
 .metric-pair{display:grid;gap:3px}
 .metric-pair span{display:grid;grid-template-columns:30px minmax(0,1fr);align-items:baseline;gap:4px;color:var(--bobcat-muted);font-size:12px;line-height:18px}
 .metric-pair strong{overflow:hidden;color:var(--bobcat-dark);font-size:14px;font-weight:600;text-align:right;text-overflow:ellipsis}
