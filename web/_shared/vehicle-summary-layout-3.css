@@ -1,0 +1,21 @@
+/* 요약정보 3: 제목·기간 조회 아래에 기존 공통 차량 검색을 배치한다. */
+body.miq-current-shell[data-summary-layout="title-search"] .summary-content > .miq-target-selector {
+  margin-bottom:12px;
+}
+body.miq-current-shell[data-summary-layout="title-search"] .miq-target-selector.is-hierarchy .miq-target-selector__row {
+  padding-left:0;
+  padding-right:0;
+}
+body.miq-current-shell[data-summary-layout="title-search"] .miq-target-selector.is-hierarchy .miq-target-selector__panel {
+  padding-left:0;
+  padding-right:0;
+}
+body.miq-current-shell[data-summary-layout="title-search"] .layout > .miq-side-toggle {
+  position:fixed;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:111;
+}
+body.miq-current-shell[data-summary-layout="title-search"] .kpi-strip-a {
+  grid-template-columns:repeat(5,minmax(0,1fr));
+}

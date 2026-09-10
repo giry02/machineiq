@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>운행이력 - 요약정보 3</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
+<link rel="stylesheet" href="../_shared/gnb.css"/>
+<link rel="stylesheet" href="../_shared/content-system.css?v=20260902-readability"/>
+<link rel="stylesheet" href="../_shared/vehicle-summary-options.css?v=20260907-summary-spacing-r2"/>
+<link rel="stylesheet" href="../_shared/vehicle-summary-layout-3.css"/>
+</head>
+<body class="miq-content-system miq-content-summary miq-summary-option" data-summary-option="expand" data-gnb="anlz" data-sub="summary3" data-summary-layout="title-search" data-variant="tobe" data-base="../">
+
+<div id="gnb"></div>
+
+<div class="layout">
+  <aside class="lnb" id="lnb"></aside>
+
+  <main class="main">
+    <div class="summary-content miq-content-frame">
+      <header class="summary-titlebar">
+        <div class="summary-heading">
+          <h1 class="miq-page-title">요약정보 3</h1>
+          <span class="miq-page-scope" id="scopeTitle">- 전체</span>
+        </div>
+        <div class="filter-bar">
+          <div class="period-tabs" id="periodTabs" role="group" aria-label="조회 기간 단위">
+            <button type="button" data-period="d">일</button>
+            <button type="button" data-period="w">주</button>
+            <button type="button" class="active" data-period="m">월</button>
+            <button type="button" data-period="c">사용자설정</button>
+            </div>
+          <div class="date-range" id="dateRange">
+            <input type="date" value="2026-07-01" disabled aria-label="조회 시작일"/>
+            <span>~</span>
+            <input type="date" value="2026-07-31" disabled aria-label="조회 종료일"/>
+          </div>
+          <button type="button" class="btn-search miq-button miq-button--primary" id="runSearch">조회</button>
+        </div>
+      </header>
+
+      <section class="option-kpi" id="summaryKpi" aria-label="선택 기간 핵심 지표"></section>
+      <div class="option-toolbar" id="optionToolbar"></div>
+      <section class="option-list" id="vehicleList" aria-label="차량 운행 목록"></section>
+      <div class="option-live" id="optionLive" aria-live="polite"></div>
+    </div>
+  </main>
+</div>
+
+<script src="../_shared/meeting-model.js"></script>
+<script src="../_shared/common-logic.js?v=20260907-common-logic-r42"></script>
+<script src="../_shared/nav.js?v=20260907-common-logic-r42"></script>
+<script src="../_mock-data/generated/fleet.generated.js?v=20260907-summary-detail-r1"></script>
+<script src="../_shared/fleet.js?v=20260906-json-r1"></script>
+<script src="../_shared/lnb-tree.js?v=20260905-company-group-r3"></script>
+<script src="../_shared/vehicle-summary-options.js?v=20260909-period-sync-r1"></script>
+</body>
+</html>

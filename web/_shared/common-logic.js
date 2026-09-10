@@ -114,6 +114,7 @@
     var destination = new URL(fallback, base);
     var paths = ['../Vehicle%20Summary/vehicle-summary-tobe-option-a-expand.html',
       '../Vehicle%20Summary/vehicle-summary-tobe-2.html',
+      '../Vehicle%20Summary/vehicle-summary-tobe-3.html',
       '../Vehicle%20Summary/vehicle-summary-tobe-v2.html',
       '../Vehicle%20Summary/vehicle-summary-tobe-option-b-sort.html',
       '../Vehicle%20Summary/vehicle-summary-tobe-option-c-reference-sort.html'];

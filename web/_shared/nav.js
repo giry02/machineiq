@@ -34,6 +34,7 @@
       subs: [
         { key: 'summary', label: '요약정보', dir: 'Vehicle Summary', asis: 'vehicle-summary-asis.html', tobe: 'vehicle-summary-tobe-option-a-expand.html' },
         { key: 'summary2', label: '요약정보 2', dir: 'Vehicle Summary', tobe: 'vehicle-summary-tobe-2.html', hidden: true },
+        { key: 'summary3', label: '요약정보 3', dir: 'Vehicle Summary', tobe: 'vehicle-summary-tobe-3.html', hidden: true },
         /* 차량 상세 = 숨은 화면. 요약정보에서만 진입 */
         { key: 'detail', label: '차량 상세', dir: 'Vehicle Detail', asis: 'vehicle-detail-asis.html', tobe: 'vehicle-detail-tobe.html', hidden: true, from: '요약정보' },
         { key: 'usage', label: '운행시간', dir: 'Usage Time', asis: 'usage-time-asis.html', tobe: 'usage-time-tobe.html' },
@@ -210,7 +211,7 @@
     var container = null;
     var title = null;
     var heading = null;
-    if ((ACTSUB === 'summary' || ACTSUB === 'summary2') && body.classList.contains('miq-content-summary')) {
+    if ((ACTSUB === 'summary' || ACTSUB === 'summary2' || ACTSUB === 'summary3') && body.classList.contains('miq-content-summary')) {
       container = document.querySelector('.summary-titlebar');
       title = container && container.querySelector('.miq-page-title');
       if (!container || !title) return;
@@ -884,6 +885,8 @@
     if (body.getAttribute('data-summary-layout') === 'content-search') {
       var summaryLayout = document.querySelector('.layout');
       summaryLayout.insertBefore(wrap, summaryLayout.firstChild);
+    } else if (body.getAttribute('data-summary-layout') === 'title-search') {
+      document.querySelector('.summary-titlebar').insertAdjacentElement('afterend', wrap);
     }
 
     var company = wrap.querySelector('[data-target-company]');
@@ -1886,7 +1889,7 @@
         title: '운행이력',
         items: [
           ['summary', '요약정보']
-        ].concat(VARIANT === 'tobe' ? [['summary2', '요약정보 2']] : []).concat([
+        ].concat(VARIANT === 'tobe' ? [['summary2', '요약정보 2'], ['summary3', '요약정보 3']] : []).concat([
           ['usage', VARIANT === 'tobe' ? '운행시간' : '사용시간'], ['oper', '운영효율']
         ]).concat(VARIANT === 'tobe' ? [['operb', '운영효율 B안'], ['shock', '충격'], ['lithium', '리튬배터리']] : [])
       },
