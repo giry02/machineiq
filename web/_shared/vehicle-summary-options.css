@@ -97,6 +97,7 @@ body.miq-summary-option[data-summary-option="expand"][data-sub="summary"] .optio
 .expand-table .table-sort .sort-ind{position:absolute;left:calc(100% + 3px);width:8px}
 .table-sort:focus-visible{outline:2px solid var(--bobcat-red);outline-offset:2px}
 .expand-table td{height:60px;padding:9px 12px;border-bottom:1px solid var(--bobcat-steel);color:var(--bobcat-dark);font-size:14px;vertical-align:middle}
+.expand-table th:last-child,.expand-table .vehicle-row td:last-child{padding-right:24px}
 .expand-table tbody:last-child tr:last-child td{border-bottom:0}
 .expand-table .vehicle-row{animation:rowEnter .18s ease both;animation-delay:var(--row-delay,0ms)}
 .expand-table .vehicle-row:hover{background:var(--bobcat-light)}
