@@ -1,0 +1,755 @@
+{
+  "revision": "2026-09-10-r25",
+  "chartHelpAndSmallButton": {
+    "revision": "2026-09-10-r18",
+    "scope": "LQ-DASH-001 통신/가동 모수 설명을 제목 옆 공통 ? 도움말로 이동. 기본 숨김, 열기/닫기·초점 복귀 재사용. 역할별 모수·차트·이동 유지. 패널 제목 옆 버튼만 12px/500으로 변경, 제목16px·주요 버튼13px 및 기존 32px 표시/44px 터치 유지.",
+    "preserved": "숫자·집계·권한·화면 ID·데이터 이동 변경 없음. 알림 대상은 기존 교체 필요/에러로 유지. Figma 작업 없음.",
+    "verification": "도움말 숨김/모수/열기/닫기 및 버튼 전용 글자 크기·터치 영역 자동 검사. 브라우저 시각 검증 미수행."
+  },
+  "shortcutAppearance": {
+    "revision": "2026-09-10-r17",
+    "scope": "LQ-OPS-002 실적 바로가기 3개에 기존 토큰의 테두리·옅은 배경·화살표 추가. 44px/3칸 유지. LQ-OPS-001/002 공통 상태 칸은 세로 구분선을 24px 및 text-muted 60%로 강화.",
+    "preserved": "데이터·수치·위험색·활성/비활성·권한·이동·화면 ID 유지. 로컬 표현만 변경, Figma 작업 없음.",
+    "verification": "공통 3버튼/화살표/구분선 스타일 및 전체 회귀 검사 통과. 브라우저 시각 검증 미수행."
+  },
+  "consistencyAndHierarchy": {
+    "revision": "2026-09-10-r15",
+    "terminology": "가동 중 작업 비중/운행효율 -> 운영효율. 기존 metrics.efficiency 및 workShare 값, dailyEfficiency의 작업 활용률 기준, 기존 route/ID 유지.",
+    "detailActions": "LQ-OPS-002의 업무 현황/운영효율/충격 상세와 정비 기록/소모품/에러를 공통 아이콘+균등 칸 shortcutRow로 표시. 상하단 점검 모두 동일 vehicleActions 렌더러 사용. 0/-/필요!/임박 색상 유지.",
+    "detailNavigation": "하단 정비·소모품 영역의 기존 supplies/error 직접 상세 링크도 LQ-SVC-001의 해당 차량 서비스 탭으로 통일. supplies는 상태 필터 없음, error는 금일 미해제. 정비 기록 및 기타 이동 유지. 소모품/에러 개별 ID는 알림/서비스/직접 URL 호환 용도로 보존.",
+    "reportHierarchy": "LQ-RPT-001: 전체 작업 현황 -> 보조 합계/대당 평균(접힘) -> 그룹별 작업 현황 -> 차량별 작업 현황. 작업 배분 명칭 제거. 대표 다중 그룹에만 그룹 비교, 단일 그룹/그룹장/직원 및 개별 차량의 기존 범위 유지.",
+    "review": "docs/reports/CUSTOMER_MOBILE_UI_REVIEW_20260910.md",
+    "scope": "지정 항목만 반영. 추가 15개 표현/기준/구조 권고는 미반영. 실제 API/서버 인가/저장 미연결, 기존 웹/딜러 기본/B 수정 없음."
+  },
+  "vehicleEfficiencyAndUrgency": {
+    "revision": "2026-09-10-r14",
+    "efficiency": "LQ-OPS-001 카드에 기존 metrics.efficiency를 운영효율로 추가. 조회 기간 작업 / (작업 + 대기) × 100, 소수점 한 자리. 분모0·자료 없음·금일 미연결은 -. 작업0/운행 양수는 0%. 업무 현황의 가정 기준시간 대비 활용률과 구분.",
+    "servicePresentation": "LQ-OPS-001/002의 고정 소모품/에러 칸에 기존 refresh-cw/triangle-alert 아이콘. 교체 필요 품목을 포함한 소모품과 양수 현재 에러에 기존 danger/danger-soft 토큰 강조. 소모품 필요에는 ! 추가, 임박만 있으면 warning-text. 필요/임박 별도 칸 없음.",
+    "urgencyRule": "M.supplyItems의 현재 품목별 표시 사용률 기준: 100% 이상 due, 80% 이상~100% 미만 soon. 품목 수와 필요/임박 수를 혼동하지 않도록 접근성 이름과 접힌 집계 기준에 설명. 사용률 미수신은 정상으로 분류하지 않음.",
+    "preserved": "소모품 숫자는 전체 품목 수, 클릭은 해당 차량 서비스 소모품 전체(상태 필터 없음). 에러/잔량/충격 이동·0과 -·4칸 순서·터치44px·역할 범위·기존 ID 유지. 실제 API/저장 미연결."
+  },
+  "fixedVehicleActionsPresentation": {
+    "revision": "2026-09-10-r13",
+    "slots": [
+      "supplies",
+      "error",
+      "battery",
+      "shock"
+    ],
+    "values": "모든 요약 차량에서 동일 4칸. 확인된 빈 소모품 목록/에러0은 0, 미수신은 -. 엔진의 배터리 잔량은 해당 없음 -. 실제 SOC0은 0%, 충격0은 0건. 미연결 잔량은 마지막 수신 시점의 값.",
+    "interaction": "0/미수신 서비스와 해당 없는 잔량은 비활성. 기존 양수 서비스/전동 배터리/충격 이동 유지. 상세의 서비스 전용 줄은 2칸 유지.",
+    "scope": "표시만 보완. 새 입출력 계약·권한·업무 이동·화면 ID 없음. FigJam 업무 흐름/마지막 이동 변경 기록 r12 유지. 실제 API 미연결."
+  },
+  "compactVehicleActionsRevision": {
+    "revision": "2026-09-10-r12",
+    "scope": "LQ-OPS-001/002 공통 차량 점검 줄만 변경. 소모품·에러·잔량·충격의 단일 줄, 별도 필요/임박 버튼과 엔진 진입 제거.",
+    "supplyCount": "차량의 현재 조회 품목 수. 서비스 소모품 탭으로 serviceEquipmentId/service만 전달하고 serviceFocus는 비움. 필요/임박 구분은 서비스 목록에서 확인.",
+    "preserved": "에러의 금일 미해제 필터, 잔량/충격 이동, 서비스 소모품의 상세 이동 없음, 역할 범위·원본 데이터·기존 ID 유지. 엔진 상세 자체는 차량 상세/직접 URL 호환을 위해 유지."
+  },
+  "navigationRevision": {
+    "revision": "2026-09-10-r11",
+    "vehicleIssueBadges": "LQ-OPS-001 및 LQ-OPS-002의 공통 에러/필요/임박 버튼 -> LQ-SVC-001. serviceEquipmentId + service + serviceFocus 전달. 현재 에러는 수집일 금일 미해제 조건.",
+    "suppliesList": "LQ-SVC-001 소모품 품목 행 상세 이동/화살표 제거. 기존 표시 필드·카드·CSS 유지. LQ-SVC-003은 알림/차량 상세/직접 URL 용도로 유지하고 폐지하지 않음.",
+    "serviceVehicleScope": "서비스 내 차량과 상태 조건을 표시하고 해제 가능. 탭 변경은 차량 유지/상태 해제. 하단 서비스·홈 KPI는 이전 차량 조건 초기화. 역할/그룹 범위 적용, 직접 범위 밖 요청은 전체 집계로 대체하지 않음.",
+    "runtime": "로컬 시안 이동만 변경. 실제 API/인가/저장 미연결. 기존 웹 FigJam 화면/표/연결선/좌표 보존."
+  },
+  "status": "confirmation-prototype",
+  "presentationNote": "r8: 사용자 화면의 제작용 문구 제거. 시간·산식·미수신 상태는 유지. 가입 테스트 자동 입력 버튼/인증번호 힌트 제거, 기존 입력 필드·검증·권한·업무 이동 유지. 실제 API·메일·저장 미연결 상태는 동일하며 이 문서에 보존.",
+  "prototypeRoot": "html/customer/mobile-prototype",
+  "parentRegistry": "docs/ux/screen-registry.json",
+  "figjam": {
+    "fileKey": "c4kCb5sPboVFEqnKFkAMfW",
+    "changeNoteId": "733:7302",
+    "existingNodesMutated": [],
+    "mobileChangeNoteUpdated": "2026-09-10-r15",
+    "noteBounds": {
+      "x": 18080,
+      "y": -16079,
+      "width": 1600,
+      "height": 5076
+    },
+    "overlapCount": 0,
+    "syncDeferred": {
+      "revision": "2026-09-10-r22",
+      "reason": "사용자 의사에 따라 로컬만 작업. Figma/FigJam 읽기/쓰기 없음. 마지막 원격 동기화 r15 유지."
+    }
+  },
+  "roles": [
+    "customer_owner",
+    "customer_staff",
+    "customer_group_leader"
+  ],
+  "runtime": "독립 HTML 컨펌 시안. 실제 API/인증/인가/메일/SMS/PUSH/승인/서버 저장 없음. r22 고객 전용 로컬 인증 흐름/가입 대기 식별자 및 아이디 저장, 메모리 PUSH 설정만 허용.",
+  "sourceArchive": "imq.zip",
+  "sourceProject": "linq-dev-ap2-codecommit-linq-app-frontend",
+  "implementations": [
+    {
+      "id": "LQ-DASH-001",
+      "path": "index.html#home",
+      "menuId": "dash/group",
+      "in": [
+        "role"
+      ],
+      "out": [
+        "total",
+        "connected",
+        "offline",
+        "running",
+        "idle",
+        "operatingRate",
+        "error",
+        "due",
+        "soon",
+        "group performance",
+        "vehicle work/idle preview sorted by work minutes, up to 3 known vehicles",
+        "role-specific group comparison or assigned vehicle work/idle roster"
+      ],
+      "next": [
+        "LQ-OPS-001",
+        "LQ-OPS-002",
+        "LQ-RPT-001",
+        "LQ-SVC-001"
+      ],
+      "note": "그룹/분류 선택 및 오늘 작업은 어떤가요 패널 제거. 항상 역할 내 전체 현황. 이전 URL의 그룹/분류/검색/실시간 조건 무시. 통신/가동 차트, 그룹별 작업, 차량별 작업과 리포트 연결 유지. r2: 점검 KPI는 조건별 서비스로 직접 이동. 대표는 그룹 비교/차량별 작업 전체보기, 직원·그룹장은 중복 그룹 집계 없이 배정 차량별 금일 작업·대기·미확인. 2026-09-10 r3: 임시20% 판정과 차량별 활용률 제거. 실적 확인 차량의 작업시간 오름차순 최대3대, 전체보기는 역할 내 전체 차량의 금일 리포트(all)로 연결. 행은 같은 차량의 금일 리포트로 연결. 집계 시각·예시·저활용 판정 없음을 카드에 표시. r5: 중복 확인/전체/미확인 대수 문구 제거, 버튼은 전체보기로 간소화. 그룹 비교 계산 기준은 제목 옆 도움말 아이콘으로 펼치고 아이콘 재선택 또는 닫기로 접는다. 기본 숨김. 기존 화면 내부 설명으로 화면 ID·데이터·권한·이동·FigJam 흐름 유지. r6: 차량별/내 그룹 목록의 정렬·가동시간 정의·예시 설명도 제목 옆 공통 도움말로 이동. 각각 열기/닫기, 초점 복귀. 데이터·권한·화면 이동·ID·FigJam 흐름 변경 없음. r7/r8: 우측 보유 대수를 07.06 00:00~14:00 기준으로 교체. 1시간 수집 완료 구간(한국시간)을 표시하며 현재시각으로 자동 변경하지 않음. 고정 시점 14:00, 활용률의 별도 08시 시작 가정은 6시간으로 정합화. 화면의 예시/목업 문구 제거. 실제 데이터는 여전히 월간 배분 자료이며 수집 API 미연결. 기존 ID·입출력 계약·권한·FigJam 업무 이동 유지. r16: 그룹/차량 행에 동일 운영효율 산식, 그룹 대당 작업/대기와 이동 화살표. 교체 필요/에러 위험색, 임박 주의색."
+    },
+    {
+      "id": "LQ-OPS-001",
+      "path": "index.html#summary",
+      "menuId": "anlz/summary",
+      "in": [
+        "role",
+        "group",
+        "q",
+        "live",
+        "period",
+        "from",
+        "to",
+        "rangeOpen (inline UI only)"
+      ],
+      "out": [
+        "equipmentId",
+        "equipmentNumber",
+        "model",
+        "group",
+        "type",
+        "km",
+        "shock",
+        "work",
+        "idle",
+        "efficiency (work / (work + idle), period; - if unavailable or no operation)",
+        "connected/operating/last received",
+        "soc (last receipt if offline)",
+        "service issue counts and direct links",
+        "collection window (requested period clipped to snapshot and vehicle last receipt)"
+      ],
+      "next": [
+        "LQ-OPS-002",
+        "LQ-OPS-005",
+        "LQ-OPS-007",
+        "LQ-SVC-001"
+      ],
+      "note": " r3: 차량 분류 필터 제거. 그룹·금일/주/월 + 검색/기간 요약을 최대 2줄로 배치. 날짜 직접 입력/조회는 기간 버튼으로 펼침. 2026-09-10: 전체/확인 필요/정상 탭 줄 제거, 구 status 입력 무시. 그룹/검색/기간 및 홈에서 연결한 live 조건과 개별 차량 상태 표시는 유지. r2: 합계는 리포트로 통합. 차량 행의 작업/대기/거리와 구체적 에러/교체/동력/충격 바로가기. 개별 상태 배지는 통신/가동을 표시. 금일 미연결 실적은 미확인. r16: 실적은 수집 구간까지만 표시. 수집 구간 독립 표시, 숫자 0/- 구분 및 공통 출력 함수. 고정 4칸 유지. r19: 검색 컨트롤은 기존 방식 유지. 운영효율에서 월 경계의 주간 범위를 전달해도 수신 자료의 교집합으로 같은 실적을 표시."
+    },
+    {
+      "id": "LQ-OPS-002",
+      "path": "index.html#detail",
+      "menuId": "anlz/summary",
+      "in": [
+        "equipmentId",
+        "role",
+        "group",
+        "q",
+        "live",
+        "period",
+        "from",
+        "to"
+      ],
+      "out": [
+        "codeName",
+        "fuelTypeCode",
+        "modelYear",
+        "cumH",
+        "cumKm",
+        "min",
+        "km",
+        "work",
+        "idle",
+        "efficiency",
+        "shock",
+        "receivedAt",
+        "current issues",
+        "soc/fc/bc snapshot or fixed monthly fixture",
+        "maintenance fixture",
+        "collapsed basic vehicle information",
+        "collection window (requested period clipped to snapshot and vehicle last receipt)",
+        "batteryVoltage/batteryCapacity inline"
+      ],
+      "next": [
+        "LQ-OPS-005",
+        "LQ-OPS-002-P01",
+        "LQ-SVC-001",
+        "LQ-SVC-002",
+        "LQ-RPT-001",
+        "LQ-REF-003"
+      ],
+      "note": "r2: 점검·실적을 먼저, 기본 제원/누적은 하단 펼침. 동력·정비·위치 핵심 정보 직접 표시. 중복 운행정보 버튼은 제거하되 기존 hash/ID는 호환 유지. 리포트/효율 바로가기는 동일 차량·기간 전달. r16: 상단 현재 점검에만 소모품/에러. 아래 최근 정비와 기록 이동. 에너지 가용 필드를 인라인 표시, 중복 상세 버튼 제거. 에너지 직접 URL/ID는 호환 보존. r19: 검색 컨트롤은 기존 방식 유지. 운영효율에서 월 경계의 주간 범위를 전달해도 수신 자료의 교집합으로 같은 실적을 표시."
+    },
+    {
+      "id": "LQ-OPS-005",
+      "path": "index.html#shock",
+      "menuId": "anlz/summary",
+      "in": [
+        "equipmentId",
+        "from",
+        "to",
+        "returnView: summary|services|detail"
+      ],
+      "out": [
+        "shock",
+        "세부 시각/강도 미수신 표시"
+      ],
+      "next": [
+        "LQ-OPS-001",
+        "LQ-OPS-002",
+        "LQ-SVC-001"
+      ],
+      "note": " r2: 진입한 목록/상세로 복귀하고 조회 맥락을 유지. 실제 API 미연결."
+    },
+    {
+      "id": "LQ-OPS-006",
+      "path": "index.html#engine",
+      "menuId": "anlz/summary",
+      "in": [
+        "equipmentId",
+        "period",
+        "from",
+        "to",
+        "returnView: summary|services|detail"
+      ],
+      "out": [
+        "fc",
+        "온도/회전수 미수신 표시"
+      ],
+      "next": [
+        "LQ-OPS-001",
+        "LQ-OPS-002",
+        "LQ-SVC-001"
+      ],
+      "note": " r2: 진입한 목록/상세로 복귀하고 조회 맥락을 유지. 실제 API 미연결. 소비량은 7월 월간 목업 고정값이며 기간별 연비인 것처럼 표시하지 않음. 공통 기간 값은 복귀용으로 보존하나 이 화면에 기간 변경 입력 없음."
+    },
+    {
+      "id": "LQ-OPS-007",
+      "path": "index.html#battery",
+      "menuId": "anlz/summary",
+      "in": [
+        "equipmentId",
+        "fuelTypeCode",
+        "returnView: summary|services|detail"
+      ],
+      "out": [
+        "soc",
+        "bc",
+        "batteryVoltage",
+        "batteryCapacity",
+        "충전 예약 미연결 안내",
+        "receivedAt",
+        "offline last-received qualifier"
+      ],
+      "next": [
+        "LQ-OPS-001",
+        "LQ-OPS-002",
+        "LQ-SVC-001"
+      ],
+      "note": " r2: 진입한 목록/상세로 복귀하고 조회 맥락을 유지. 실제 API 미연결. 전력소비량은 7월 월간 목업 고정값. 미연결 잔량은 마지막 수신으로 표시."
+    },
+    {
+      "id": "LQ-SVC-001",
+      "path": "index.html#services",
+      "menuId": "srvc/all",
+      "in": [
+        "role",
+        "group",
+        "service: maintenance|supplies|error",
+        "servicePeriod",
+        "serviceFrom",
+        "serviceTo",
+        "serviceFocus: error|due|soon",
+        "serviceEquipmentId (optional vehicle constraint)"
+      ],
+      "out": [
+        "vehicle cards",
+        "maintenance/error history within selected dates",
+        "supplies current snapshot (ignores date range)",
+        "category tab event/item counts, role/group/vehicle and active focus scoped",
+        "supply itemId/name, usedHours, cycleHours, percent, status, remaining/excess hours",
+        "vehicle/event totals",
+        "error occurred count vs unresolved count"
+      ],
+      "next": [
+        "LQ-OPS-002",
+        "LQ-SVC-002",
+        "LQ-SVC-004"
+      ],
+      "note": "r9: 전체 탭 제거. 기본 정비/이번 달. 정비와 에러는 기간 이력이며 소모품은 마지막 수집 현재 상태. servicePeriod/From/To로 정비·에러 기간을 공유/유지하며 보고서·알림 기간과 분리. 홈 에러 KPI는 금일 미해제 조건. 현재 상태 카운터를 기간 발생 건수로 재활용하지 않고 명시적 컨펌 이력 레코드로 분리. 실제 서버 미연결. r10: 탭에 건수 복원(정비/에러 선택 기간, 소모품 현재 품목). 소모품을 차량 카드 내부 품목별로 표시하며 사용시간/교체주기·정수 사용률·필요/임박·잔여/초과시간 제공. 동일 품목 ID로 상세 연결. 현재 3대/4품목(필요2/임박2), 등록 품목 API 미연결. 기존 카드·토큰·네비게이션 유지. r16: 제목 ?에 기간/현재 집계 기준. 소모품 총수는 품목 단위. 필요/에러/완료 공통 의미색, 정비·에러 공유 기간 및 소모품 인라인 유지."
+    },
+    {
+      "id": "LQ-SVC-002",
+      "path": "index.html#maintenance",
+      "menuId": "srvc/maintenance",
+      "in": [
+        "equipmentId",
+        "returnView: summary|services|detail|notifications",
+        "serviceEntry (optional selected record ID)",
+        "servicePeriod/From/To",
+        "notificationPeriod/From/To",
+        "notificationState"
+      ],
+      "out": [
+        "정비완료 예시 기록",
+        "selected record timestamp/status"
+      ],
+      "next": [
+        "LQ-OPS-001",
+        "LQ-OPS-002",
+        "LQ-SVC-001"
+      ],
+      "note": " r2: 진입한 목록/상세로 복귀하고 조회 맥락을 유지. 실제 API 미연결. r9: serviceEntry로 선택 이력을 조회하며 차량/종류가 다르면 조회 불가. 알림에서 진입한 소모품/에러는 알림 목록으로 복귀하며 필터·기간 유지. 이력 발생/해제 시각은 명시적으로 추가한 컨펌 자료이며 실제 API 응답 아님."
+    },
+    {
+      "id": "LQ-SVC-003",
+      "path": "index.html#supplies",
+      "menuId": "srvc/supply",
+      "in": [
+        "equipmentId",
+        "returnView: summary|services|detail|notifications",
+        "serviceEntry (optional selected record ID)",
+        "servicePeriod/From/To",
+        "notificationPeriod/From/To",
+        "notificationState"
+      ],
+      "out": [
+        "supplyDueCount",
+        "supplySoonCount",
+        "itemId/name",
+        "cycleHours/usedHours",
+        "percent (rounded usedHours / cycleHours * 100, not capped)",
+        "status: due >= 100, soon >= 80, normal < 80, unknown if invalid",
+        "remaining/excess hours",
+        "lastChangedAt or 미수신",
+        "selected record timestamp/status"
+      ],
+      "next": [
+        "LQ-OPS-001",
+        "LQ-OPS-002",
+        "LQ-SVC-001",
+        "LQ-COM-004"
+      ],
+      "note": "r2/r9: 진입한 목록/상세로 복귀하고 조회 맥락을 유지. serviceEntry로 선택 품목을 조회하며 차량/종류가 다르면 조회 불가. 알림에서 진입한 소모품은 알림 목록으로 복귀하며 필터·기간 유지. r10: 품목별 사용률과 최근 교체일·수집 시각 제공. 웹 service-supply-tobe.html 및 service-enhancements.js의 사용률·상태·초과시간 기준 사용. 진행 막대만 100%로 제한. 미수신/잘못된 주기를 정상0%로 표시하지 않음. FBA32_224250271의 두 품목은 동일 VIN 웹 행을 사용. 나머지 두 차량 품목은 모바일 시나리오 보완 fixture이며 다른 웹 VIN과 실제 조인한 자료가 아님. 실제 API/저장 미연결."
+    },
+    {
+      "id": "LQ-SVC-004",
+      "path": "index.html#error",
+      "menuId": "srvc/error",
+      "in": [
+        "equipmentId",
+        "returnView: summary|services|detail|notifications",
+        "serviceEntry (optional selected record ID)",
+        "servicePeriod/From/To",
+        "notificationPeriod/From/To",
+        "notificationState"
+      ],
+      "out": [
+        "activeErrorCount",
+        "코드/설명 미수신 표시",
+        "selected record timestamp/status",
+        "occurredAt",
+        "resolvedAt"
+      ],
+      "next": [
+        "LQ-OPS-001",
+        "LQ-OPS-002",
+        "LQ-SVC-001",
+        "LQ-COM-004"
+      ],
+      "note": " r2: 진입한 목록/상세로 복귀하고 조회 맥락을 유지. 실제 API 미연결. r9: serviceEntry로 선택 이력을 조회하며 차량/종류가 다르면 조회 불가. 알림에서 진입한 소모품/에러는 알림 목록으로 복귀하며 필터·기간 유지. 이력 발생/해제 시각은 명시적으로 추가한 컨펌 자료이며 실제 API 응답 아님."
+    },
+    {
+      "id": "LQ-AUTH-002",
+      "path": "signup.html",
+      "roles": [
+        "anonymous"
+      ],
+      "in": [
+        "약관",
+        "진입 URL role: customer_staff는 직원, 그 외 대표; 화면 역할 선택 없음",
+        "아이디",
+        "이메일/인증번호",
+        "비밀번호/확인",
+        "이름",
+        "전화번호",
+        "국가/지역/주소",
+        "업체/딜러",
+        "장비/단말기 Serial"
+      ],
+      "out": [
+        "중복/인증 예시 결과",
+        "신청정보 요약",
+        "승인 주체/대기"
+      ],
+      "actualWrite": false,
+      "note": "r22 웹 가입 폼의 고객2역할/12자 비밀번호/승인대기 기준. 취소·완료 로그인 연결. 로컬 탭 내 가입대기 식별자만 저장하며 실제 가입/승인/발송 미연결. r25: 역할/구분 라디오 제거, 소속 정보 제목. 기존 고객 경로별 필수 입력과 승인 주체 유지."
+    },
+    {
+      "id": "LQ-RPT-001",
+      "path": "index.html#reports",
+      "menuId": "rpt/rptstatus",
+      "in": [
+        "role",
+        "group",
+        "period",
+        "from",
+        "to",
+        "reportFocus:all|waiting|unknown (default all; legacy low becomes all)",
+        "rangeOpen (inline UI only)",
+        "reportVehicle: empty (all) | scoped demo equipmentId"
+      ],
+      "out": [
+        "work/idle/unused/capacity",
+        "rate/workShare",
+        "group performance",
+        "waiting vehicles (explicit temporary filter; no low-utilization classification)",
+        "known/unknown",
+        "selected vehicle identity/link and vehicle-only metrics",
+        "invalid/out-of-scope vehicle error",
+        "all vehicle roster sorted by work minutes, unknown last, with visible criteria",
+        "secondary period totals and per-vehicle average",
+        "collection window (requested period clipped to snapshot and vehicle last receipt)"
+      ],
+      "next": [
+        "LQ-REF-003",
+        "LQ-OPS-002"
+      ],
+      "note": "업체별 현황의 고객 모바일 표현. 업무 리포트로 표시하며 소속 업체 안의 그룹/차량 작업 활용을 확인. 개인 평가/다른 업체 비교/저장 없음. r3: 차량 분류 필터 제거. 그룹·금일/주/월 + 검색/기간 요약을 최대 2줄로 배치. 날짜 직접 입력/조회는 기간 버튼으로 펼침. 2026-09-10: 차량 선택은 기존 2줄 조회 영역에 추가. 대표는 선택 그룹 내, 직원/그룹장은 배정 그룹 내 차량. 선택 시 해당 1대만 집계. 탭 이동 및 날짜 리포트 이동은 reportVehicle/기간 유지, 별도 31일 버튼만 월 전체 전환. 잘못된 직접 차량 링크는 오류, 그룹/역할 변경 시 범위 밖 선택 해제. 상세 equipmentId와 별도 상태이며 요약/홈 목록에는 적용하지 않음. 개별 조회에서는 그룹 비교/우선 차량 목록 대신 운행시간/거리/충격/활용·대기 상태를 표시. r2: 기본 전체 차량 비교. 2026-09-10 r3: low 판정/필터/이유 제거, 구 low 입력은 all 처리. 작업시간 오름차순(동률 차량번호순), 미확인은 목록 뒤 별도 표시. 차량 행은 활용률 대신 작업·대기시간, 개별 보고서는 저활용 판정 대신 대기 비중과 산식 표시. 조회 기준은 접지 않고 표시. 긴 대기는 기존30%/30분의 임시 조회 조건임을 명시. 단일 그룹에서는 그룹 재집계 패널 제거. 주요 수치는 한 번만, 보조 합계는 펼침. r6: 합계 활용률 산식·가정, 차량 목록 정렬·예시·긴 대기 임시 조건, 개별 차량 대기 비중 산식은 제목 옆 공통 도움말에 기본 숨김. 통신 미연결 경고와 실제 실적·집계 대수는 상시 표시. 각각 열기/닫기, 초점 복귀. 데이터·권한·화면 이동·ID·FigJam 흐름 변경 없음. r16: 대표값 운영효율=작업/(작업+대기). 그룹행도 같은 효율/대당 작업·대기. 조회 범위와 수집 구간 표시. 가정 잔여 명칭 및 상세 기준 도움말. r19: 검색 컨트롤은 기존 방식 유지. 운영효율에서 월 경계의 주간 범위를 전달해도 수신 자료의 교집합으로 같은 실적을 표시."
+    },
+    {
+      "id": "LQ-REF-003",
+      "path": "index.html#efficiency",
+      "menuId": "anlz/operb",
+      "in": [
+        "role",
+        "group",
+        "period: d|w|m (legacy c/custom normalized to m)",
+        "from",
+        "to",
+        "expanded date",
+        "rangeOpen (inline UI only)",
+        "reportVehicle: empty (all) | scoped demo equipmentId"
+      ],
+      "out": [
+        "daily work/idle/unused/rate",
+        "average work per vehicle",
+        "elapsed dates only; omit future dates, preserve past missing rows",
+        "selected vehicle identity/link and vehicle-only metrics",
+        "invalid/out-of-scope vehicle error",
+        "visible daily work and idle hours",
+        "requested calendar period and available collection window separately",
+        "collection window (requested period clipped to snapshot and vehicle last receipt)",
+        "workShare as primary operating efficiency",
+        "future/uncollected days without report action"
+      ],
+      "next": [
+        "LQ-RPT-001",
+        "LQ-OPS-002"
+      ],
+      "note": "사용자가 선택한 웹 두 번째 운영효율 B안의 모바일 구현. 기본 LQ-OPS-004를 대체하지 않음. 날짜 행 펼치기와 날짜 리포트 연결. 미사용은 일 10h 가정. 하단 리포트 안에 제공. r3: 차량 분류 필터 제거. 그룹·금일/주/월 + 검색/기간 요약을 최대 2줄로 배치. 날짜 직접 입력/조회는 기간 버튼으로 펼침. 2026-09-10: 차량 선택은 기존 2줄 조회 영역에 추가. 대표는 선택 그룹 내, 직원/그룹장은 배정 그룹 내 차량. 선택 시 해당 1대만 집계. 탭 이동 및 날짜 리포트 이동은 reportVehicle/기간 유지, 별도 31일 버튼만 월 전체 전환. 잘못된 직접 차량 링크는 오류, 그룹/역할 변경 시 범위 밖 선택 해제. 상세 equipmentId와 별도 상태이며 요약/홈 목록에는 적용하지 않음. r2: 금일(d)은390분·미연결 제외로 업무 현황과 일치. 날짜 리포트(c)는600분 완결 예시.31일 차트 행에 작업/대기 시간을 모두 표시하고 의미를 접근성 라벨에도 포함. r16: 대표 운영효율=workShare. 막대는 가정 기준시간의 작업·대기·잔여 구성. 일별 펼침에 운영효율 및 활용률 구분. 미래/미수신은 31행에 미집계로 유지하고 날짜 리포트 링크 없음. r19: 웹 일/주/월 검색 규칙 적용. 일 날짜1개, 주 양끝6일 간격 자동연동, 월 선택한달1일~말일/진행월수집일까지. 자유기간 제거 및 구 URL 보정. 월간 행수는 해당 월 달력 기준. 기간/차량을 유지하여 업무 리포트·상세로 이동. 마지막 수집 시각/가용 자료의 교집합으로 집계. r21: 오늘 이후 행 제거. 작업/대기 각 시간에 라벨, 반복 대당 표현은 ?에만 표시. 평균 시간과 합산 비율을 구분하며 산식은 동일."
+    },
+    {
+      "id": "LQ-ACC-001",
+      "path": "index.html#settings",
+      "alias": "index.html#account",
+      "menuId": "myacct/account",
+      "in": [
+        "role",
+        "pushAlarmYn/shockWarningYn/vehicleWarningYn/batteryWarningYn/marketingYn (in-memory boolean only)"
+      ],
+      "out": [
+        "예시 계정 정보",
+        "조회 범위",
+        "customer role switch",
+        "current role's PUSH preferences",
+        "logout clears local authenticated-role and returns to customer login"
+      ],
+      "note": "동일 계정 조회 목적/ID 유지. 내 정보를 설정에 포함하고 하단 네 번째 메뉴는 리포트로 교체. r16: 설정에 내 정보만 노출. 검수 역할 선택·가입·제작 설명은 review.html 분리. 실제 프로필 저장 기능 추가하지 않음. r22: 권한 화면 확인 및 원본 PUSH 전체/4항목 복원, 로그인/회원가입 링크. 로컬 메모리만 변경. SMS 원본 분석 별도 보고서. r25: 계정 메뉴의 로그인/회원가입을 로그아웃으로 교체. 현재 탭의 고객 로그인 표시만 제거하며 ID 저장/가입대기/다른 앱 데이터는 보존. 실제 서버 세션 미연결, 직접 URL 검수 접근 유지.",
+      "next": [
+        "LQ-AUTH-003"
+      ]
+    },
+    {
+      "id": "LQ-AUTH-003",
+      "path": "login.html",
+      "roles": [
+        "anonymous"
+      ],
+      "in": [
+        "identifier",
+        "password",
+        "rememberIdentifier",
+        "customer_owner|customer_staff"
+      ],
+      "out": [
+        "validation",
+        "five-attempt lock",
+        "pending approval notice",
+        "customer home or forced password change"
+      ],
+      "next": [
+        "LQ-DASH-001",
+        "LQ-AUTH-003-T01",
+        "LQ-AUTH-002",
+        "LQ-AUTH-004"
+      ],
+      "actualWrite": false,
+      "note": "r24 사용자 최종 선택: 딜러앱 login.html/login.css/모바일 공통 CSS 직접 재사용. 고객 계정 상태·기능 유지. r23 웹 폼/자체 스타일 조합 미사용."
+    },
+    {
+      "id": "LQ-AUTH-003-T01",
+      "path": "login.html#forced-password-panel",
+      "roles": [
+        "anonymous"
+      ],
+      "in": [
+        "temporary-password authentication",
+        "new password/confirmation"
+      ],
+      "out": [
+        "validation",
+        "local temporary state cleared",
+        "customer home"
+      ],
+      "actualWrite": false,
+      "note": "기존 ID/임시 비밀번호 변경 기능 유지. 딜러앱 로그인 필드/버튼 재사용."
+    },
+    {
+      "id": "LQ-AUTH-004",
+      "path": "find-password.html",
+      "roles": [
+        "anonymous"
+      ],
+      "in": [
+        "identifier",
+        "name",
+        "email",
+        "six-digit code"
+      ],
+      "out": [
+        "3-minute verification",
+        "24-hour local temporary password",
+        "login link"
+      ],
+      "next": [
+        "LQ-AUTH-003",
+        "LQ-AUTH-002"
+      ],
+      "actualWrite": false,
+      "note": "r24 딜러앱 find-password.html/공통 CSS 재사용. 고객 이메일 인증/3분/임시 비밀번호24h/고객 로그인 복귀. 실제 서버 미연결."
+    }
+  ],
+  "newScreens": [
+    {
+      "id": "LQ-COM-004",
+      "parent": "LQ-DASH-001",
+      "name": "사용자 알림 내역(App)",
+      "kind": "page",
+      "status": "prototype",
+      "path": "index.html#notifications",
+      "roles": [
+        "customer_owner",
+        "customer_staff",
+        "customer_group_leader"
+      ],
+      "in": [
+        "role",
+        "pushType",
+        "message",
+        "pushDatetime",
+        "equipmentId",
+        "dashboard unreadPushCnt",
+        "notificationCategory: all|shock|error|battery|other (default all)"
+      ],
+      "out": [
+        "role-scoped received PUSH history in response order",
+        "message with preserved line breaks",
+        "pushDatetime",
+        "separate unreadPushCnt badge",
+        "empty state and settings link",
+        "joined category filter tabs with role-scoped received counts; battery-li/la combined; unknown types under other when present"
+      ],
+      "next": [
+        "LQ-OPS-005",
+        "LQ-OPS-007",
+        "LQ-SVC-004",
+        "LQ-ACC-001",
+        "LQ-SVC-003",
+        "LQ-SVC-002",
+        "LQ-OPS-006",
+        "LQ-OPS-002-T01"
+      ],
+      "note": "r23 원본 push.vue/api.notice.js 기준. 조치/기간 필터 및 서비스 건수→PUSH 변환 제거. pushType/message/pushDatetime/equipmentId 표시 및 해당 차량 정보로 이동, 알림 복귀. 응답 순서 유지, 빈 내역→설정. unreadPushCnt는 대시보드 별도 응답값이며 임의 읽음/완료 변경 없음. 충격/에러/배터리 로컬자료만, 실제 서버/발송/읽음 갱신 미연결. 공지/마케팅 수신 타입/이동 계약 미확인; 미지원 타입은 본문만 표시. 기타 원본 차량 상세 경로 보존은 발송 발생 조건 확정을 뜻하지 않음. r25: 기존 mobile-status-tabs 재사용. 전체/충격/차량 에러/배터리 필터, 기타는 수신 내역 있을 때 노출(직접 선택 경로는 빈상태). 새 독립 화면이 아닌 동일 내역의 필터라 ID 유지. 선택 유형은 상세 왕복/새로고침에서 보존, 읽지 않음 배지는 불변. 공지/마케팅 수신 계약 미확인으로 임의 매핑 없음."
+    },
+    {
+      "id": "LQ-OPS-002-T01",
+      "parent": "LQ-OPS-002",
+      "name": "차량별 운행정보(App)",
+      "kind": "tab",
+      "status": "prototype",
+      "path": "index.html#operation",
+      "roles": [
+        "customer_owner",
+        "customer_staff",
+        "customer_group_leader"
+      ],
+      "in": [
+        "equipmentId",
+        "period",
+        "from",
+        "to"
+      ],
+      "out": [
+        "min",
+        "km",
+        "work",
+        "idle"
+      ],
+      "note": "기존 App 운행정보의 목적을 등록. 웹의 독립 사용시간/운영효율 메뉴를 이동시키지 않음. r2: 상세 내 운행 요약과 중복되는 메뉴 버튼만 제거. 기존 직접 경로는 호환용으로 계속 동작하며 ID 폐기/재사용하지 않음."
+    },
+    {
+      "id": "LQ-OPS-002-P01",
+      "parent": "LQ-OPS-002",
+      "name": "차량 최종 위치(App)",
+      "kind": "popup",
+      "status": "prototype",
+      "path": "index.html#detail",
+      "selector": "#location-dialog",
+      "roles": [
+        "customer_owner",
+        "customer_staff",
+        "customer_group_leader"
+      ],
+      "in": [
+        "equipmentId"
+      ],
+      "out": [
+        "최종 주소/좌표/지도",
+        "기종/상태/그룹/통신",
+        "총 가동시간/조회 기간 가동시간",
+        "고객사/위치 기준 시간",
+        "전체보기·축소·닫기"
+      ],
+      "note": "r24 딜러앱 dialog DOM/공유 CSS/전체보기·축소/Escape/닫기·바깥클릭 재사용. 고객 데이터·권한·좌표범위 검사 후 조회. 닫기 시 iframe src 정리."
+    }
+  ],
+  "scenarioOnlyRoutes": [
+    "index.html#settings",
+    "review.html"
+  ],
+  "constraints": [
+    "기존 웹 화면 ID, 메뉴 계층, 입출력 표와 FigJam 배치는 변경하지 않음.",
+    "신규 ID는 본 확장 등록부에 발급하며 상위 등록부가 이를 참조함. 삭제 시 재사용하지 않음.",
+    "고객 대표: 회사 1933 전체 목업 차량. 고객 직원/그룹장: 같은 회사 기본그룹으로 한정. customer_group_leader는 컨펌 시나리오 키이며 원본 roleId/isLeader 서버 계약으로 확정된 값이 아님. URL의 역할은 서버 인가가 아님.",
+    "업무 활용 예시: 금일 08:00~14:30 경과 390분, 완결 기간은 일 600분 가정. 낮은 활용은 작업/기준시간 20% 미만, 긴 대기는 대기/가동 30% 이상 및 30분 이상. 휴무/배차/운전자 정보 미연결로 개인 성과 판단 불가.",
+    "r3: 홈은 역할 내 전체 범위 고정. 차량 분류 입력은 모바일 전 화면에서 제거하고 구 URL type은 무시. 그룹/기간/검색은 공통 2줄 이내, 날짜 입력은 인라인 펼침. 입력·날짜 검증·기간 전달 유지.",
+    "equipmentId는 demo-equipment-XX이며 실 VIN과 동일하다고 가정하지 않음.",
+    "원본 차량 편집/삭제/등록, 안전점검, 충전 예약, 정비/소모품 저장, FCM/QR/네이티브 기능은 변경하거나 연결하지 않음.",
+    "2026-09-10: 요약정보 상태 탭/구 status 조건 제거. 리포트/효율 차량 선택은 예시 reportVehicle 식별값이며 실제 서버 인가나 새 API 계약이 아님. 금일 미연결 차량은 집계 미확인으로 표시, 과거 완결 기간 예시 실적과 구분.",
+    "r2: 보조 필드 펼침은 기존 화면의 정보 배치이며 새 독립 탭/화면 아님. 메뉴·가입·설정은 보존. 비수신 원인·배차·휴게·운전자 성과를 추정하지 않음. 배터리 SOC는 수신시각, 연료/전력소비량은7월 고정 목업값을 표시."
+  ],
+  "backup": {
+    "path": "backups/customer-mobile-before-ux-20260910.zip",
+    "sha256": "6C634C014DD69BA71AD19F3DE5EBBAC8BA6B17834D7B7124054DD1E0DBE3AE42",
+    "verifiedFileCount": 828,
+    "stage": "before r2 UX changes"
+  },
+  "reviewImplementation": {
+    "revision": "2026-09-10-r16",
+    "report": "docs/reports/CUSTOMER_MOBILE_UI_REVIEW_20260910.md",
+    "scope": "r15 추가 권고 R01~R15의 로컬 화면 표현·계산·중복·검수 분리를 적용. 아래 revision별 속성은 이전 기록이며 최신 화면은 이 객체와 각 implementation의 r16 note 기준.",
+    "metric": "운영효율은 작업/(작업+대기)×100. 전체·그룹은 합산 시간의 가중 비율, 차량은 동일 산식. 기준시간 대비 작업 활용률은 보조 가정 지표. 실제 성과 판정 없음.",
+    "period": "조회 기간과 수집 구간 분리. 기존 월간 원본·일별 배분 자료는 보존하되 화면 집계는 2026-07-06 14:00 및 차량별 마지막 수신 날짜까지만 포함. 31일 행 유지, 미래/미수신 날짜는 미집계·효율 -, 상세 링크 없음.",
+    "status": "STATUS/DISPLAY/periodWindow 공유. 필요·에러 danger, 임박 warning, 정상/조치완료 neutral. 숫자 미수신/산출 불가 -, 실제 0 유지. 소모품 h, 짧은 비교 시간 h/m, 상세 시간/분.",
+    "hierarchy": "전체 -> 그룹 -> 차량 유지. 그룹 행: 이동 화살표 + 운영효율 + 대당 작업/대기 + 집계 모수. 상세 상단만 소모품/에러, 하단은 최근 정비. 에너지 가용 필드는 상세에서 모두 표시하고 중복 상세 버튼 제거.",
+    "serviceAndNotifications": "서비스 ?에 기간 이력 건수/현재 품목 수 기준, 탭 옆 수집 시각 및 선택 탭 단위. 소모품 기간 미적용/인라인 유지. 알림 품목명 또는 에러코드 미수신 설명, 조치 필요/조치 완료; 열람으로 완료 변경하지 않음.",
+    "settingsAndSignup": "설정은 내 정보만. 역할 전환/검토/가입은 review.html 별도 검수 진입점. 가입 명칭 고객 대표/고객 직원, 표시 언어 한국어만. 직원 Serial 필수는 답변/서버 규칙 확인 전 현행 유지.",
+    "pending": [
+      "실제 시계열/충격 발생시각·강도/에러코드 데이터",
+      "알림 읽음 및 조치 완료 서버 상태 연결",
+      "직원 최초 장비·단말기 Serial 필수 여부",
+      "소모품 반올림/원값 판정 정책",
+      "서버 권한·가입/인증·메일·실시간 연동"
+    ],
+    "preserved": "새 ID/권한 없음. 엔진/배터리 호환 URL 및 ID 보존. 딜러 기본/B·웹 원본·미사용 보조 파일 삭제/수정 없음.",
+    "verification": "자동 회귀 검사, 모든 역할·화면 표시 및 기존 80 상세 사례, 새 수집 시점/0·-/31행/공통 산식/도움말·검수 분리 검사. 브라우저·실기기 시각 검증 미수행."
+  },
+  "efficiencyPeriodSearch": {
+    "revision": "2026-09-10-r19",
+    "reference": "웹 Operational Efficiency/operational-efficiency-tobe-option-b.html 및 _shared/nav.js의 기간 입력 연동; _shared/common-logic.js의 operatingRange/linkedWeek/monthRange",
+    "scope": "운영효율 LQ-REF-003 검색 UI만 일·주·월로 제한. 자유기간 전환 제거. 기타 메뉴 검색 방식은 유지.",
+    "day": "일: 조회일 1개, from=to. 금일 아닌 과거 일자도 선택 가능.",
+    "week": "주: 연속 7일. 시작일 수정 시 종료일=+6일, 종료일 수정 시 시작일=-6일. 기본은 마지막 수집일을 끝으로 7일.",
+    "month": "월: 입력한 날짜가 속한 월의 1일~말일. 수집 진행 중인 월은 마지막 수집일까지. 월간 차트는 해당 월의 28/29/30/31일, 미수집은 미집계.",
+    "legacy": "period=c/custom은 m으로 정규화. 두 달짜리 기존 URL도 시작일이 속한 한 달로 보정하고 주소를 갱신. from이 없으면 to 또는 마지막 수집일 기준.",
+    "submission": "입력 변경은 연결된 양쪽 날짜만 보정, 조회 클릭으로 확정. 조회 후에도 일/주/월 단위 유지. 그룹·차량·역할 유지.",
+    "data": "모바일 고정 수집 시각 2026-07-06 14:00 사용. 웹의 기기 기준 전일을 현재 수신으로 가장하지 않음. 7월 외 수신 자료 생성 없음. 월경계 주간 조회는 가용 자료와 교집합, 리포트/차량 상세/그룹/요약에서도 같은 기간 수치 유지.",
+    "preserved": "동일 화면 ID, 기존 필터 영역 CSS/카드/내비게이션·서비스/알림·권한 유지. 월간 운영효율 보기 버튼은 선택 월 진입.",
+    "verification": "웹 날짜 함수와 일/주/월 결과 비교, 윤년·월말·연말·기존 두달 URL·조회 전 초안/조회 후 확정·각 1/7/28~31행·조회 기간 왕복·전체 회귀 통과. 브라우저 시각 검증 미수행."
+  },
+  "currentDateDemoData": {
+    "revision": "2026-09-10-r20",
+    "scope": "고객 모바일 model.js/customer.js만 데이터·날짜 보완. 기존 화면 ID·권한·메뉴·필터 구조·CSS 보존.",
+    "clock": "화면 로드 시 기기 시각을 한국 시간(UTC+09:00)으로 환산한 오늘 날짜와 정시. 09:59는09:00. 실제 API 수집 시각이 아니라 사용자 요청에 따른 로컬 더미 기준.",
+    "performance": "2026-07 원본 월간 합계 유지. 2026-08부터 현재 월까지 차량·월별 계수를 적용한 독립 더미를 일별 배분. 과거 월은 전체, 현재 월은 오늘 정시까지. 오늘 분량은 완료 시간/24 비율, 미래는 미집계. 일/주/월·전체/그룹/차량 모두 같은 산식. 웹 공유 데이터 수정 없음.",
+    "defaults": "금일은오늘, 주는기존월~일, 월은현재달. 운영효율은 r19 웹 방식 유지(일1일/주연속7일/월한달); 진행월조회종료는오늘. 명시적과거조회URL은유지.",
+    "relatedDates": "현재 수신은오늘정시, 미연결은전일17:42. 월별정비·에러이력추가, 과거에러는해제. 현재미해제3건+교체필요2건은유지. 최근정비/선택정비이력은실제표시용레코드참조, 에너지평균도현재월더미로보완.",
+    "preserved": "소모품 현재품목·교체주기/사용률·최근교체일, 차량식별/그룹/권한, 0/- 의미, 디자인, 알림종류유지. 실제API/서버/저장/푸시 미연결.",
+    "verification": "8/9월 역할별 집계, 차량별 일/월합계·거리·충격, 월경계주간, 오늘·자정·월말·연말·윤년과 시간전환, 과거이력해제/중복ID/미래이력 방지, 전체기존회귀 통과. CSS 바이트동일. 브라우저시각검증 미수행.",
+    "backup": "backups/customer-mobile-before-r20-20260910/"
+  },
+  "efficiencyPresentation": {
+    "revision": "2026-09-10-r21",
+    "scope": "LQ-REF-003만. 반복 대당 표시는 도움말로 모으고 각 시간에 작업/대기 라벨 추가. 시간은 선택범위 실적 확인 차량 평균, 운영효율은 합산 작업/운행 비율. 계산식 유지.",
+    "futureDates": "오늘 이후 날짜는 DOM 목록에 생성하지 않음. 지난 날짜의 실제 미집계는 유지. 현재9월10일이면10행, 지난8월은31행. 미래만 선택하면 빈 상태.",
+    "preserved": "기간 검색/차량·그룹·권한/데이터/이동 유지. 시간 칸만110px 확보. 신규 화면 ID 없음."
+  },
+  "authAndPushRestoration": {
+    "revision": "2026-09-10-r22",
+    "reference": "웹 Login/login-tobe.html 및 registration/web-registration-tobe-v3.html, 추출 앱 views/pages/etc/setting.vue와 apis/api.setting.js",
+    "settings": "권한 화면 확인 select 복원. PUSH 전체와 shockWarningYn/vehicleWarningYn/batteryWarningYn/marketingYn. 기본 미선택, 전체OFF 하위4개OFF, 역할별 메모리만 유지. 로그인/가입 진입.",
+    "auth": "기존 LQ-AUTH-003/003-T01/004/002 재사용. 고객 대표/직원만, 가입승인대기 유지. 웹12자 비밀번호·이메일코드3분·실패5회·임시비밀번호24h·변경 후 홈 경로 연결. 실제 계정 인증·생성·메일 미연결.",
+    "storage": "고객 전용 linq-customer-prototype-* 키. 선택한 아이디, 로그인 시도/임시 비밀번호 상태, 가입 대기 userId/email/role/status만 로컬 보관. 가입 비밀번호/전화/주소/Serial 및 실제 인증 토큰 저장 없음.",
+    "sms": "분석만. 실제 발송 불실시. 실시간 배터리 라벨→messageExpendableYn, 주간 SMS→email*Yn 불일치. 서버 발송 조건/수신번호/채널 확정 전 수신 스위치 연결하지 않음.",
+    "report": "docs/reports/CUSTOMER_MOBILE_PUSH_SMS_AUTH_20260910.md",
+    "verification": "기존 회귀 및 추가 미래일 숨김/라벨/PUSH 항목·전체OFF·역할 격리/로그인·양역할 가입·승인대기/메일코드만료/임시 비밀번호 검증 통과. 실제 서버 요청/브라우저 시각 테스트 미실시.",
+    "backup": "backups/customer-mobile-before-r21-20260910 및 before-r22-20260910"
+  },
+  "originalPushInbox": {
+    "revision": "2026-09-10-r23",
+    "reference": "extracted app push.vue/api.notice.js/store.dashboard.js/HeaderDefault.vue",
+    "report": "docs/reports/CUSTOMER_MOBILE_PUSH_INBOX_20260910.md",
+    "backup": "backups/customer-mobile-before-r23-20260910",
+    "verification": "원본 필드·응답 순서·unread 별도 값·빈상태·권한범위·차량 정보 이동/복귀·알수없는타입·이스케이프·로그인 눈아이콘·고객 인증 회귀 검사. 브라우저 시각 검사 미실시.",
+    "figma": "사용자 지시에 따라 수정하지 않음. 로컬 등록부만 최신화."
+  },
+  "dealerReuse": {
+    "revision": "2026-09-10-r24",
+    "source": "html/dealer/mobile-home/login.html, find-password.html, signup.html, index.html location-dialog / shared CSS",
+    "scope": "사용자 최종 지시로 인증3화면 및 지도는 딜러앱 재사용. 고객 역할/경로/전용 상태 연결. 기존 PUSH/서비스/리포트 불변.",
+    "backup": "backups/customer-mobile-before-r24-20260910/",
+    "inactiveAuthFiles": "auth.js/auth.css는 기존 이력 보존 파일이며 로그인/비밀번호 찾기에서 로드하지 않음.",
+    "verification": "인증3화면 CSS 스택 일치/가입·로그인·복구/지도 상호작용 및 기존 회귀 자동 검사. 브라우저 시각 비교 미실시. 실제 서버 미연결. Figma 수정 없음."
+  },
+  "signupLogoutAndNotificationTabs": {
+    "revision": "2026-09-10-r25",
+    "backup": "backups/customer-mobile-before-r25-20260910/",
+    "verification": "양 역할 가입/로그인/복구, 로그인 표시 정리·타 앱 데이터 보존, 유형 건수/필터/복귀/권한/빈상태/알수없는타입 및 전체 회귀 검사 통과. 공유 원본/헤더/하단/인증 CSS 불변. 브라우저 시각 비교 미실시.",
+    "figma": "사용자 지시에 따라 로컬 등록부만 갱신; Figma 수정 없음."
+  }
+}
