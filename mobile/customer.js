@@ -18,6 +18,8 @@
   let state, navigated = false, rangeOpen = false;
   const supplySelection=new Set();
   let supplyContext='',supplyPending=[],supplyUndo=[],supplyMessage='';
+  const chargeMemory=new Map();
+  let chargeContext='',chargeDraft=null,chargeMessage='';
   // Per-role, in-memory UI preferences only. No OS permission, FCM or server write.
   const pushFields=[['shockWarningYn','실시간 충격'],['vehicleWarningYn','실시간 차량 에러'],['batteryWarningYn','실시간 배터리 경고'],['marketingYn','공지사항/마케팅 알림']];
   const pushPreferences=Object.fromEntries(Object.keys(M.ROLE_LABELS).map(role=>[role,{pushAlarmYn:false,...Object.fromEntries(pushFields.map(([key])=>[key,false]))}]));
@@ -127,7 +129,7 @@
     return shortcutRow(links,'차량 점검 및 정보');
   }
   function criteriaHeading(title,id,heading='h2') {
-    return `<div class="panel-heading-with-tip"><${heading}>${title}</${heading}><button id="${id}-trigger" type="button" class="criteria-tip" data-criteria-tip="${id}" aria-label="${title} 기준 안내" aria-expanded="false" aria-controls="${id}">${icon('circle-help')}</button></div>`;
+    return `<div class="panel-heading-with-tip"><${heading}>${title}</${heading}><button id="${id}-trigger" type="button" class="criteria-tip" data-criteria-tip="${id}" aria-label="${title}${title.endsWith('기준')?' 안내':' 기준 안내'}" aria-expanded="false" aria-controls="${id}">${icon('circle-help')}</button></div>`;
   }
   function criteriaPanel(id,content) {
     return `<div id="${id}" class="criteria-tip-panel" hidden>${content}<button type="button" class="criteria-tip-close" data-close-criteria="${id}">닫기${icon('x')}</button></div>`;
@@ -197,14 +199,50 @@
   }
   function selected() { return M.scope(rows,{...state,group:'',type:''}).find(v=>v.equipmentId===state.equipmentId); }
   function vehicleHeader(v) { return `<section class="detail-hero"><div class="detail-icon">${icon('truck')}</div><div><small>${esc(v.group)} · ${esc(v.type)}</small><h1>${esc(v.equipmentNumber)}</h1><p>${esc(v.model)} · ${esc(v.companyName)}</p></div>${status(v)}</section>`; }
+  function shockBreakdown(m) {
+    return `<div class="shock-breakdown" aria-label="충격 강도별 건수">${M.SHOCK_LEVELS.map(level=>`<div class="shock-band is-${level.key}"><span>${level.label}</span><strong>${fmt(m?.shockBands?.[level.key],'건')}</strong><small>${level.level} · ${level.min}g 이상</small></div>`).join('')}</div>${criteriaHeading('충격 분류 기준','shock-level-help','h3')}${criteriaPanel('shock-level-help',M.SHOCK_LEVELS.map(level=>`<p class="source-note"><strong>${level.label}</strong> ${level.min}g 이상${level.max?' ~ '+level.max+'g 미만':''} · ${level.description}</p>`).join('')+'<p class="source-note">웹의 기본 기준입니다. 충격은 가장 높은 해당 단계에 한 번만 집계합니다. 강도별 건수는 모바일 시연 이력이며 실제 센서 수신값이나 사고 판정이 아닙니다.</p>')}`;
+  }
+  function lithiumStates(v) {
+    if(v.type!=='리튬')return '';
+    const known=!v.catalogOnly&&Number.isFinite(v.soc)&&v.soc>=0&&v.soc<=100;
+    const info=known?window.MIQLithiumListModel?.snapshot(v):null;
+    const fields=[['temperature','온도','thermometer'],['charge','충전','zap'],['battery','배터리','battery']];
+    return `<div class="lithium-state-grid" aria-label="리튬 배터리 상태">${fields.map(([key,label,ico])=>{const value=info?.[key]||'수집 전',tone=['경고','이상'].includes(value)?'danger':value==='주의'?'warning':value==='정상'?'normal':'unknown';return `<div class="lithium-state-item is-${tone}">${icon(ico)}<span>${label}</span><strong>${esc(value)}</strong></div>`;}).join('')}</div>`;
+  }
+  function chargeAvailable(v) {return v?.type==='리튬'&&!v.catalogOnly&&Number.isFinite(v.soc)&&v.soc>=0&&v.soc<=100;}
+  function chargeVehicle() {const v=selected();return ['detail','battery'].includes(state.view)&&chargeAvailable(v)?v:null;}
+  function prepareCharge(v) {
+    const key='linq.customer.smartCharge.v1:'+state.role+':'+v.equipmentNumber;
+    if(chargeContext!==key){
+      let saved=chargeMemory.get(key);
+      if(!saved)try{const value=JSON.parse(localStorage.getItem(key));if(value&&typeof value.on==='boolean'&&M.chargeWindow(value.from,value.to))saved=value;}catch(e){}
+      chargeDraft={...(saved||{on:true,from:22,to:6})};chargeContext=key;chargeMessage='';
+    }
+    return chargeDraft;
+  }
+  function smartCharge(v) {
+    if(v.type!=='리튬')return '';
+    const draft=prepareCharge(v),available=chargeAvailable(v),on=available&&draft.on,w=M.chargeWindow(draft.from,draft.to);
+    const field=(name,label,value)=>`<label><span>${label}</span><select data-charge-hour="${name}" aria-label="${label}" ${on?'':'disabled'}>${Array.from({length:24},(_,h)=>`<option value="${h}" ${h===Number(value)?'selected':''}>${String(h).padStart(2,'0')}시</option>`).join('')}</select></label>`;
+    return `<section class="mobile-smart-charge" aria-label="스마트 충전"><label class="setting-row"><span><strong>스마트 충전</strong></span><input type="checkbox" data-charge-enabled aria-label="스마트 충전 사용" ${on?'checked':''} ${available?'':'disabled'}><i aria-hidden="true"></i></label><div class="charge-time-fields">${field('from','충전 시작 시간',draft.from)}${field('to','충전 종료 시간',draft.to)}</div><div class="charge-schedule"><span>${!available?'설정 수집 전':on?w.startLabel+' → '+w.endLabel+' · '+w.duration+'시간':'스마트 충전 꺼짐'}</span><small>차량 시간 · Asia/Seoul</small></div><div class="charge-save-row"><p class="source-note">시연용 설정 · 실제 충전 명령 없음</p><button type="button" class="detail-secondary-button" data-save-charge ${available?'':'disabled'}>저장</button></div><p class="charge-feedback" role="status" aria-live="polite" ${chargeMessage?'':'hidden'}>${esc(chargeMessage)}</p></section>`;
+  }
+  function saveCharge() {
+    const v=chargeVehicle();if(!v)return;
+    const draft=prepareCharge(v);if(!M.chargeWindow(draft.from,draft.to))return;
+    try{
+      if(typeof localStorage!=='undefined')localStorage.setItem(chargeContext,JSON.stringify(draft));
+      chargeMemory.set(chargeContext,{...draft});chargeMessage=typeof localStorage==='undefined'?'이 화면에서만 저장했습니다. (시연)':'저장했습니다. (시연)';
+    }catch(e){chargeMessage='저장하지 못했습니다. 다시 시도해 주세요.';}
+    render();$('[data-save-charge]')?.focus();
+  }
   function details() {
     const v=selected();
     if(!v) return '<p class="error-note">차량을 찾을 수 없거나 조회 범위 밖의 차량입니다.</p><button class="detail-secondary-button" data-route="summary">차량 목록으로</button>';
     const m=periodMetrics(v),energy=v.type==='엔진'?'엔진':'배터리';
     const latestMaintenance=M.serviceHistory([v]).find(r=>r.kind==='maintenance');
     return `<div data-screen-id="LQ-OPS-002">${vehicleHeader(v)}<section class="detail-card"><div class="dashboard-panel__head"><h2>현재 점검 상태</h2><span>${v.conn?'수신 '+v.receivedAt.slice(5):'마지막 수신 '+v.receivedAt.slice(5)}</span></div>${vehicleActions(v,{shock:false,energy:false})}</section>
-      ${periodControls()}<section class="detail-card"><div class="dashboard-panel__head"><h2>조회 기간 운행</h2>${periodCutoff()}</div>${definition([['작업시간',m?hours(m.work):'-'],['대기시간',m?hours(m.idle):'-'],['운행시간',m?hours(m.min):'-'],['운행거리',m?fmt(m.km,' km'):'-'],['운영효율',rate(m?.efficiency)],['충격',m?fmt(m.shock,'건'):'-']])}${reportActions(v)}</section>
-      <section class="detail-card"><div class="dashboard-panel__head"><h2>${energy} 정보</h2><span>${v.conn?'현재 수신':'마지막 수신'}</span></div>${v.type==='엔진'?definition([['평균 연료소비량',fmt(v.fc,' L/h')],['기준',M.ENERGY_MONTH+' 월간']]):definition([['종류',v.type],['잔량',rate(v.soc),v],['평균 전력소비량',fmt(v.bc,' kWh/h (월간)')],['배터리 전압',fmt(v.batteryVoltage,' V')],['배터리 용량',fmt(v.batteryCapacity,' Ah')],['수신시각',v.receivedAt]])}<p class="source-note">${energy==='엔진'?'회전수·냉각수 온도 이력 미수신':'시계열·충전 이력 미수신'}</p></section>
+      ${periodControls()}<section class="detail-card"><div class="dashboard-panel__head"><h2>조회 기간 운행</h2>${periodCutoff()}</div>${definition([['작업시간',m?hours(m.work):'-'],['대기시간',m?hours(m.idle):'-'],['운행시간',m?hours(m.min):'-'],['운행거리',m?fmt(m.km,' km'):'-'],['운영효율',rate(m?.efficiency)],['충격',m?fmt(m.shock,'건'):'-']])}${shockBreakdown(m)}${reportActions(v)}</section>
+      <section class="detail-card"><div class="dashboard-panel__head"><h2>${energy} 정보</h2><span>${v.conn?'현재 수신':'마지막 수신'}</span></div>${lithiumStates(v)}${v.type==='엔진'?definition([['평균 연료소비량',fmt(v.fc,' L/h')],['기준',M.ENERGY_MONTH+' 월간']]):definition([['종류',v.type],['잔량',rate(v.soc),v],['평균 전력소비량',fmt(v.bc,' kWh/h (월간)')],['배터리 전압',fmt(v.batteryVoltage,' V')],['배터리 용량',fmt(v.batteryCapacity,' Ah')],['수신시각',v.receivedAt]])}<p class="source-note">${energy==='엔진'?'회전수·냉각수 온도 이력 미수신':v.type==='리튬'?'상태는 웹 시연 데이터 · 마지막 수신 기준입니다. 실시간 상태·충전 이력은 미연결입니다.':'시계열·충전 이력 미수신'}</p>${smartCharge(v)}</section>
       <section class="detail-card"><div class="dashboard-panel__head"><h2>최근 정비</h2><button type="button" data-route="maintenance">정비 기록${icon('chevron-right')}</button></div><p class="source-note">${latestMaintenance?esc(latestMaintenance.occurredAt.slice(5,10).replace('-','.'))+' '+esc(latestMaintenance.label)+' · 처리완료':'정비 기록 없음'}</p></section>
       <section class="detail-card"><div class="dashboard-panel__head"><h2>최종 위치</h2>${v.position?'<button type="button" data-map>지도 보기 ›</button>':''}</div><p class="source-note">${v.position?esc(v.position.address)+'<br>('+v.position.lat+', '+v.position.lng+')':'위치 정보 없음'}</p></section>
       <details class="detail-card vehicle-basics"><summary>차량 기본정보 · 누적 실적${icon('chevron-down')}</summary>${definition([['기종',v.codeName],['동력',v.type],['연식',v.modelYear],['누적 운행시간',fmt(v.cumH)+' h'],['누적 운행거리',fmt(v.cumKm)+' km'],['업체',v.companyName]])}</details>
@@ -213,16 +251,15 @@
   function child() {
     const v=selected(); if(!v) return details();
     const m=periodMetrics(v), kind=state.view;
-    const ids={shock:'LQ-OPS-005',engine:'LQ-OPS-006',battery:'LQ-OPS-007',operation:'LQ-OPS-002-T01',supplies:'LQ-SVC-003',maintenance:'LQ-SVC-002',error:'LQ-SVC-004'};
+    const ids={shock:'LQ-OPS-005',engine:'LQ-OPS-006',battery:'LQ-OPS-007',operation:'LQ-OPS-002-T01',supplies:'LQ-SVC-003',maintenance:'LQ-SVC-002'};
     let content='';
     if(kind==='operation') content=definition([['운행시간',m?hours(m.min):'-'],['운행거리',m?fmt(m.km,' km'):'-'],['작업시간',m?hours(m.work):'-'],['대기시간',m?hours(m.idle):'-']]);
-    if(kind==='shock') content=definition([['기간 내 충격',m?fmt(m.shock,'건'):'-']])+'<p class="source-note">충격 발생시각·강도 이력 미수신</p>';
+    if(kind==='shock') content=definition([['기간 내 충격',m?fmt(m.shock,'건'):'-']])+shockBreakdown(m);
     if(kind==='engine') content=v.type==='엔진'?definition([['평균 연료소비량 ('+M.ENERGY_MONTH+')',fmt(v.fc,' L/h')]])+'<p class="source-note">냉각수 온도·엔진 회전수 이력 미수신</p>':'<p class="empty-state">엔진 차량이 아닙니다.</p>';
-    if(kind==='battery') content=v.type!=='엔진'?definition([['배터리 종류',v.type],['잔량'+(!v.conn?' (마지막 수신)':''),v.soc!=null?v.soc+'%':'-',v],['수신시각',v.receivedAt],['평균 전력소비량 ('+M.ENERGY_MONTH+')',v.bc!=null?v.bc+' kWh/h':'-'],['배터리 전압',fmt(v.batteryVoltage,' V')],['배터리 용량',fmt(v.batteryCapacity,' Ah')],['충전 예약','이용 불가']]):'<p class="empty-state">배터리 차량이 아닙니다.</p>';
+    if(kind==='battery') content=v.type!=='엔진'?lithiumStates(v)+definition([['배터리 종류',v.type],['잔량'+(!v.conn?' (마지막 수신)':''),v.soc!=null?v.soc+'%':'-',v],['수신시각',v.receivedAt],['평균 전력소비량 ('+M.ENERGY_MONTH+')',v.bc!=null?v.bc+' kWh/h':'-'],['배터리 전압',fmt(v.batteryVoltage,' V')],['배터리 용량',fmt(v.batteryCapacity,' Ah')],...(v.type==='리튬'?[]:[['충전 예약','이용 불가']])])+smartCharge(v):'<p class="empty-state">배터리 차량이 아닙니다.</p>';
     if(kind==='supplies') content=supplyToolbar()+(M.supplyItems(v).filter(r=>!state.serviceEntry||r.id===state.serviceEntry).map(supplyDetail).join('')||'<p class="empty-state">등록된 소모품이 없습니다.</p>');
-    if(kind==='error') content=definition([['현재 에러',v.activeErrorCount+'건'],['에러코드 / 설명','세부 수신 데이터 없음']]);
     if(kind==='maintenance') content=M.serviceRecords([v],{kind,from:state.from,to:state.to}).map(r=>`<article class="service-record"><header><strong>${esc(r.label)}</strong><span class="status-pill">처리완료</span></header><p>유압 계통 및 소모품 점검</p><small>${esc(r.occurredAt)} · 정비 기록</small></article>`).join('')||'<p class="empty-state">해당 내역이 없습니다.</p>';
-    if(state.serviceEntry&&['error','maintenance'].includes(kind)) {
+    if(state.serviceEntry&&kind==='maintenance') {
       const records=kind==='supplies'?M.serviceRecords([v],{kind}):M.serviceHistory([v]);
       const entry=records.find(r=>r.id===state.serviceEntry&&r.kind===kind);
       if(!entry) content='<p class="empty-state">조회할 수 없는 내역입니다.</p>';
@@ -284,6 +321,16 @@
     supplyUndo=snapshot;supplyMessage=snapshot.length+'개 항목을 교체 완료로 처리했습니다. (시연)';
     supplySelection.clear();dialog.close();render();$('[data-open-supply-reset]')?.focus();
   }
+  function errorDocument(record) {
+    const catalog=window.CustomerErrorDocuments;
+    if(!record.pdfKey||!catalog||!Object.hasOwn(catalog,record.pdfKey))return null;
+    const pdf=catalog[record.pdfKey];
+    return pdf.code===record.code&&pdf.mime==='application/pdf'&&/^JVBERi0[A-Za-z0-9+/=]+$/.test(pdf.base64||'')&&/^[\w.-]+\.pdf$/.test(pdf.filename||'')?pdf:null;
+  }
+  function errorRow(r) {
+    const pdf=errorDocument(r),action=pdf?`<a class="error-pdf-download" href="data:application/pdf;base64,${pdf.base64}" download="${esc(pdf.filename)}" aria-label="에러코드 ${esc(r.code)} PDF 다운로드 (시연 자료)" title="PDF 다운로드 (시연 자료)">${icon('file-down')}</a>`:'<span class="error-pdf-missing" aria-label="등록된 PDF 없음" title="등록된 PDF 없음">-</span>';
+    return `<div class="service-item-line error-service-item is-state-${r.resolved?'neutral':'danger'}" data-error-record="${esc(r.id)}"><div class="error-service-copy"><span class="error-service-heading">${icon('triangle-alert')}<strong>${esc(r.code||r.label)}</strong><b>${r.resolved?'해제':'미해제'}</b></span>${r.description?`<span class="error-service-description">${esc(r.description)}</span>`:''}<small>발생 ${esc(r.occurredAt.slice(5).replace('-','.'))}${r.resolvedAt?' · 해제 '+esc(r.resolvedAt.slice(5).replace('-','.')):''}</small></div>${action}</div>`;
+  }
   function services() {
     const available=M.scope(rows,state),selectedVehicle=available.find(v=>v.equipmentId===state.serviceEquipmentId);
     const scoped=state.serviceEquipmentId?available.filter(v=>v.equipmentId===state.serviceEquipmentId):available,s=periodState(),current=state.service==='supplies';
@@ -292,7 +339,7 @@
     const vehicles=scoped.filter(v=>filtered.some(r=>r.equipmentId===v.equipmentId));
     const tabCount=key=>M.serviceRecords(scoped,{kind:key,from:s.from,to:s.to,focus:key===state.service?state.serviceFocus:''}).reduce((n,r)=>n+r.count,0);
     const open=filtered.filter(r=>!r.resolved).reduce((n,r)=>n+r.count,0);
-    const itemRow=r=>current?`<div class="service-item-line supply-service-item"><span class="supply-service-name">${state.role==='customer_owner'?supplyCheckbox(r):`<strong>${esc(r.name)}</strong>`}</span>${supplyUsage(r)}</div>`:`<button type="button" class="service-item-line is-state-${r.resolved?'neutral':'danger'}" data-service-vehicle="${esc(r.equipmentId)}" data-kind="${r.kind}" data-entry="${esc(r.id)}"><span>${icon(r.kind==='error'?'triangle-alert':r.kind==='supplies'?'refresh-cw':'clipboard-check')}${esc(r.label)}<small>${current?'':esc(r.occurredAt.slice(5).replace('-','.'))}</small></span><b>${current?r.count+'건':r.resolved?(r.kind==='error'?'해제':'처리완료'):'미해제'}</b>${icon('chevron-right')}</button>`;
+    const itemRow=r=>r.kind==='error'?errorRow(r):current?`<div class="service-item-line supply-service-item"><span class="supply-service-name">${state.role==='customer_owner'?supplyCheckbox(r):`<strong>${esc(r.name)}</strong>`}</span>${supplyUsage(r)}</div>`:`<button type="button" class="service-item-line is-state-${r.resolved?'neutral':'danger'}" data-service-vehicle="${esc(r.equipmentId)}" data-kind="${r.kind}" data-entry="${esc(r.id)}"><span>${icon('clipboard-check')}${esc(r.label)}<small>${esc(r.occurredAt.slice(5).replace('-','.'))}</small></span><b>${r.resolved?'처리완료':'미해제'}</b>${icon('chevron-right')}</button>`;
     return `<div data-screen-id="LQ-SVC-001"><div class="snapshot">${criteriaHeading('서비스','service-help','h1')}${periodCutoff()}</div>${criteriaPanel('service-help','<p class="source-note">정비·에러 탭은 선택 기간의 발생 이력 건수, 소모품 탭은 마지막 수집 기준의 현재 품목 수입니다. 정비와 에러는 조회 기간을 공유하며 소모품에는 기간을 적용하지 않습니다. 소모품 사용률 = 사용시간 ÷ 교체주기 × 100 (정수 반올림). 100% 이상 교체 필요, 80% 이상 100% 미만 교체 임박입니다.</p>')}${scopeControls()}<div class="mobile-status-tabs service-category-tabs" role="group" aria-label="서비스 종류">${tabs.map(([key,title,ico])=>`<button type="button" data-service="${key}" aria-pressed="${state.service===key}" class="${state.service===key?'is-active':''}">${icon(ico)}<span>${title}</span><strong>${tabCount(key)}</strong></button>`).join('')}</div>
       ${current?supplyToolbar():periodControls()}
       ${state.serviceFocus||state.serviceEquipmentId?`<button type="button" class="clear-filter" data-clear-service-focus aria-label="서비스 조회 조건 해제">${state.serviceEquipmentId?esc(selectedVehicle?.equipmentNumber||'조회할 수 없는 차량'):''}${state.serviceEquipmentId&&state.serviceFocus?' · ':''}${state.serviceFocus?esc(liveLabels[state.serviceFocus])+(state.serviceEquipmentId?'':' 차량'):''}${icon('x')}</button>`:''}
@@ -349,6 +396,9 @@
   }
   function render() {
     state=readState();
+    if(!['detail','battery'].includes(state.view)){chargeContext='';chargeDraft=null;chargeMessage='';}
+    // Keep old error links usable without retaining a separate detail screen.
+    if(state.view==='error')return go('services',{service:'error',serviceEquipmentId:state.equipmentId||state.serviceEquipmentId,serviceEntry:'',serviceFocus:'',q:'',live:''},true);
     const nextSupplyContext=JSON.stringify([state.view,state.service,state.role,state.group,state.serviceEquipmentId,state.equipmentId,state.serviceEntry,state.serviceFocus]);
     if(supplyContext!==nextSupplyContext){supplySelection.clear();supplyPending=[];supplyUndo=[];supplyMessage='';supplyContext=nextSupplyContext;if($('#supply-reset-dialog')?.open)$('#supply-reset-dialog').close();}
     if(state.view==='efficiency'){
@@ -404,6 +454,7 @@
     const b=e.target.closest('button'); if(!b)return;
     if(b.hasAttribute('data-close-supply-reset'))return $('#supply-reset-dialog').close();
     if(b.hasAttribute('data-open-supply-reset'))return openSupplyReset();
+    if(b.hasAttribute('data-save-charge'))return saveCharge();
     if(b.hasAttribute('data-confirm-supply-reset'))return confirmSupplyReset();
     if(b.hasAttribute('data-undo-supply-reset')){
       if(M.undoSupplyReset(rows,state,supplyUndo)){supplyUndo=[];supplyMessage='교체 완료 처리를 취소했습니다.';render();$('[data-open-supply-reset]')?.focus();}return;
@@ -456,8 +507,8 @@
     if(b.dataset.notificationEntry) {
       const entry=M.pushHistory(M.scope(rows,{...state,group:''})).find(r=>r.id===b.dataset.notificationEntry);
       const view=entry&&M.pushPresentation(entry).view;
+      if(view==='error')return go('services',{service:'error',serviceEquipmentId:entry.equipmentId,serviceEntry:'',serviceFocus:'',servicePeriod:'d',serviceFrom:entry.pushDatetime.slice(0,10),serviceTo:entry.pushDatetime.slice(0,10),returnView:'notifications',group:'',q:'',live:''});
       if(view)return go(view,{equipmentId:entry.equipmentId,serviceEntry:'',returnView:'notifications',group:''});
-      return;
       return;
     }
     if(b.dataset.service) return go('services',{service:b.dataset.service,serviceFocus:''},true);
@@ -467,6 +518,12 @@
     if(b.hasAttribute('data-expand-map')) return setLocationMapExpanded(!$('#location-dialog').classList.contains('is-map-expanded'));
   });
   document.addEventListener('change',e=>{
+    if(e.target.hasAttribute?.('data-charge-enabled')||e.target.dataset.chargeHour){
+      const v=chargeVehicle();if(!v)return;const draft=prepareCharge(v);
+      if(e.target.hasAttribute?.('data-charge-enabled'))draft.on=Boolean(e.target.checked);
+      else {const field=e.target.dataset.chargeHour,value=Number(e.target.value);if(!draft.on||!['from','to'].includes(field)||!Number.isInteger(value)||value<0||value>23)return;draft[field]=value;}
+      chargeMessage='변경 후 저장해 주세요.';render();const selector=e.target.dataset.chargeHour?'[data-charge-hour="'+e.target.dataset.chargeHour+'"]':'[data-charge-enabled]';$(selector)?.focus();return;
+    }
     if(e.target.dataset.supplySelect||e.target.hasAttribute?.('data-supply-select-all')){
       const items=visibleSupplies().filter(resettable);
       if(state.role!=='customer_owner')return;

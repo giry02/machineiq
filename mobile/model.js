@@ -25,6 +25,29 @@
     duration:(minutes,compact=false)=>Number.isFinite(minutes)&&minutes>=0?(compact?`${Math.floor(minutes/60)}h ${minutes%60}m`:`${Math.floor(minutes/60)}시간 ${minutes%60}분`):'-',
     efficiency:value=>Number.isFinite(value)?value.toLocaleString('ko-KR')+'%':'-'
   };
+  // Same default bands as web Shock/shock-tobe.html. These are not live sensor thresholds.
+  const SHOCK_LEVELS=[
+    {key:'s3',label:'민감',level:'Lv3',min:1.2,max:1.8,color:'#2b8a3e',description:'노면이 고르지 않거나 과속 방지턱을 넘을 때 발생할 수 있는 정도'},
+    {key:'s4',label:'주의',level:'Lv4',min:1.8,max:2.5,color:'#f59f00',description:'충분히 감속하지 않은 상태에서 화물을 들 때 발생할 수 있는 정도'},
+    {key:'s5',label:'경고',level:'Lv5',min:2.5,max:null,color:'#e03131',description:'운전자가 느낄 수 있을 정도의 강한 충격'}
+  ];
+  function shockLevel(g) {return Number.isFinite(g)?[...SHOCK_LEVELS].reverse().find(level=>g>=level.min)?.key||null:null;}
+  // Deterministic demo event magnitudes, not an estimate of real severity from a total.
+  // A period selects the same ordinal events used by the existing monthly count allocation.
+  function demoShockBands(v,first,count) {
+    const bands={s3:0,s4:0,s5:0},magnitudes=[1.3,1.5,2.0,1.4,1.6,2.1,1.3,2.7,1.2,1.9];
+    const seed=Number(v.equipmentId?.match(/\d+$/)?.[0]||0);
+    for(let i=first;i<first+count;i++)bands[shockLevel(magnitudes[(i+seed)%magnitudes.length])]++;
+    return bands;
+  }
+  // Match the web meeting-model charge window, including equal hours = 24 hours.
+  function chargeWindow(start,end) {
+    if(start==null||end==null||typeof start==='boolean'||typeof end==='boolean'||String(start).trim()===''||String(end).trim()==='')return null;
+    start=Number(start);end=Number(end);
+    if(!Number.isInteger(start)||!Number.isInteger(end)||start<0||start>23||end<0||end>23)return null;
+    const overnight=start>=end,duration=(end-start+24)%24||24,pad=n=>String(n).padStart(2,'0');
+    return {start,end,duration,overnight,startLabel:(overnight?'전일 ':'금일 ')+pad(start)+':00',endLabel:'금일 '+pad(end)+':00',fill:duration/24*100,midnight:overnight?(24-start)/24*100:null};
+  }
   function periodWindow(from,to) {
     const valid=Boolean(calendarDate(from)&&calendarDate(to)&&from<=to);
     const cutoff=SNAPSHOT.slice(0,10),through=valid?(to<cutoff?to:cutoff):null;
@@ -114,6 +137,12 @@
     return scope(rows,state).filter(v => !q || `${v.equipmentNumber} ${v.model} ${v.group}`.toLowerCase().includes(q))
       .filter(v => !state.live || (state.live === 'connected' ? v.conn : state.live === 'offline' ? !v.conn : state.live === 'running' ? v.operating === true : state.live === 'idle' ? v.operating === false : state.live === 'error' ? v.activeErrorCount > 0 : state.live === 'due' ? v.supplyDueCount > 0 : state.live === 'soon' ? v.supplySoonCount > 0 : true));
   }
+  // Same-VIN reference codes from the web error list. Dates remain explicit mobile demo fixtures.
+  function errorReference(v,index) {
+    if(v.equipmentNumber==='FBA32_224250271'&&index===0)return {code:'P0003',description:'연료량 조절 밸브 회로 이상',pdfKey:'p0003'};
+    if(v.equipmentNumber==='FBA32_224250271'&&index===1)return {code:'A7',description:'주행 제어 시스템 경고',pdfKey:null};
+    return {code:null,description:null,pdfKey:null};
+  }
   // Explicit confirmation records. These dates are not inferred from active counters in a production API.
   function serviceHistory(rows) {
     const months=[];
@@ -123,7 +152,7 @@
       const day=offset=>isoDay(shiftDay(anchor,offset)),suffix=current?'':'-'+month;
       return rows.flatMap(v=>[
         {id:v.equipmentId+'-maintenance-1'+suffix,equipmentId:v.equipmentId,kind:'maintenance',label:'정기 점검',occurredAt:day(-3)+' 10:00',resolvedAt:day(-3)+' 11:00',resolved:true,count:1},
-        ...Array.from({length:v.activeErrorCount},(_,i)=>({id:v.equipmentId+'-error-'+i+suffix,equipmentId:v.equipmentId,kind:'error',label:'차량 에러',code:null,occurredAt:day(0)+' '+(current?String(Math.max(0,Number(SNAPSHOT.slice(11,13))-(i?2:6))).padStart(2,'0'):(i?'13':'09'))+':00',resolvedAt:current?null:day(1)+' 09:00',resolved:!current,count:1})),
+        ...Array.from({length:v.activeErrorCount},(_,i)=>({id:v.equipmentId+'-error-'+i+suffix,equipmentId:v.equipmentId,kind:'error',label:'차량 에러',...errorReference(v,i),occurredAt:day(0)+' '+(current?String(Math.max(0,Number(SNAPSHOT.slice(11,13))-(i?2:6))).padStart(2,'0'):(i?'13':'09'))+':00',resolvedAt:current?null:day(1)+' 09:00',resolved:!current,count:1})),
         ...(v.equipmentId==='demo-equipment-01'?[{id:v.equipmentId+'-error-resolved'+suffix,equipmentId:v.equipmentId,kind:'error',label:'차량 에러',code:null,occurredAt:day(-4)+' 11:00',resolvedAt:day(-3)+' 09:00',resolved:true,count:1}]:[])
       ]);
     }).sort((a,b)=>b.occurredAt.localeCompare(a.occurredAt)||a.id.localeCompare(b.id));
@@ -249,17 +278,21 @@
     if(from>to||(from===TODAY&&SNAPSHOT.slice(11,13)==='00'))return null;
     if (!Number.isFinite(v.min)||v.min<0||!Number.isFinite(v.summaryDetail?.workMinutes)||v.summaryDetail.workMinutes<0) return null;
     let work=0,idle=0,distance=0,shock=0;
+    const shockBands={s3:0,s4:0,s5:0};
     for(let start=calendarDate(from);isoDay(start)<=to;){
       const month=isoDay(start).slice(0,7),end=new Date(Date.UTC(start.getUTCFullYear(),start.getUTCMonth()+1,0));
       const first=start.getUTCDate(),last=month===to.slice(0,7)?Number(to.slice(-2)):end.getUTCDate();
       const allocate=(total,offset=0)=>dailyAllocation(Math.round(total*demoFactor(month,v,offset)),v,first,last,offset,end.getUTCDate(),month);
       const monthlyWork=Math.min(v.min,v.summaryDetail.workMinutes);
       work+=allocate(monthlyWork);idle+=allocate(v.min-monthlyWork,2);
-      distance+=allocate(Math.round((v.km||0)*10));shock+=allocate(v.shock||0);
+      distance+=allocate(Math.round((v.km||0)*10));
+      const monthShock=allocate(v.shock||0),before=first>1?dailyAllocation(Math.round((v.shock||0)*demoFactor(month,v,0)),v,1,first-1,0,end.getUTCDate(),month):0;
+      shock+=monthShock;
+      const bands=demoShockBands(v,before,monthShock);for(const key of Object.keys(shockBands))shockBands[key]+=bands[key];
       start=shiftDay(end,1);
     }
     const min=work+idle;
-    return {min,work,idle,km:Number.isFinite(v.km)&&v.km>=0?distance/10:null,shock:Number.isFinite(v.shock)&&v.shock>=0?shock:null,
+    return {min,work,idle,km:Number.isFinite(v.km)&&v.km>=0?distance/10:null,shock:Number.isFinite(v.shock)&&v.shock>=0?shock:null,shockBands:Number.isFinite(v.shock)&&v.shock>=0?shockBands:null,
       efficiency:min ? Math.round(work/min*1000)/10 : null,fc:v.fc ?? null,bc:v.bc ?? null};
   }
   const percent=(part,total)=>total ? Math.round(part/total*1000)/10 : null;
@@ -297,5 +330,5 @@
     return {equipmentId:v.equipmentId,companyId:COMPANY,group:v.group,startDate:state.from,endDate:state.to,
       periodType:state.period,date:state.from.replaceAll('-','')};
   }
-  return {SNAPSHOT,TODAY,DATA_START,ENERGY_MONTH,STATUS,DISPLAY,periodWindow,hourlyWindow,COMPANY,ROLE_LABELS,buildVehicles,scope,listed,attention,counts,dates,calendarDate,efficiencyRange,efficiencyPerformance,efficiencyWindow,efficiencyCalendar,metrics,performance,dailyEfficiency,serviceItems,supplyItems,resetSupplies,undoSupplyReset,serviceHistory,serviceRecords,pushHistory,pushPresentation,unreadPushCount,requestContext};
+  return {SNAPSHOT,TODAY,DATA_START,ENERGY_MONTH,STATUS,DISPLAY,SHOCK_LEVELS,shockLevel,chargeWindow,periodWindow,hourlyWindow,COMPANY,ROLE_LABELS,buildVehicles,scope,listed,attention,counts,dates,calendarDate,efficiencyRange,efficiencyPerformance,efficiencyWindow,efficiencyCalendar,metrics,performance,dailyEfficiency,serviceItems,supplyItems,resetSupplies,undoSupplyReset,serviceHistory,serviceRecords,pushHistory,pushPresentation,unreadPushCount,requestContext};
 });

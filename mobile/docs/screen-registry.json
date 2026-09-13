@@ -1,8 +1,12 @@
 {
-  "revision": "2026-09-13-r45",
+  "revision": "2026-09-13-r46",
   "lithiumSocColor": {
     "revision": "2026-09-13-r45",
-    "screenIds": ["LQ-OPS-001", "LQ-OPS-002", "LQ-OPS-007"],
+    "screenIds": [
+      "LQ-OPS-001",
+      "LQ-OPS-002",
+      "LQ-OPS-007"
+    ],
     "scope": "리튬·납산 배터리 아이콘 내부를 고정 크기로 채우고 SOC 구간별 색상만 표시. 퍼센트 숫자는 원래 글자색. 잔량에 비례하는 채움 길이/면적 변화 없음. 기존 버튼 크기·배치·폰트·수치·권한·이동 유지.",
     "source": "Lithium/lithium-tobe.html의 socVal 색상",
     "thresholds": "60~100% #37b24d, 30~60% 미만 #f59f00, 0~30% 미만 #e03131. 미수신/범위 밖/엔진·수소은 기존 표시.",
@@ -11,8 +15,13 @@
   "supplyReset": {
     "revision": "2026-09-13-r42",
     "screenId": "LQ-SVC-003-P02",
-    "entry": ["LQ-SVC-001-T01", "LQ-SVC-003"],
-    "allowedRoles": ["customer_owner"],
+    "entry": [
+      "LQ-SVC-001-T01",
+      "LQ-SVC-003"
+    ],
+    "allowedRoles": [
+      "customer_owner"
+    ],
     "input": "조회 범위의 개별/전체 소모품 선택, 확인/취소, 실행 취소. 미수신/0H 제외.",
     "output": "선택 품목 0H·정상·교체시각. 홈/요약/상세 필요·임박 집계 동기화.",
     "scope": "UI와 처리 함수에서 대표 권한 확인. 범위/역할/화면 전환 시 선택과 미확정 팝업 정리. 메모리 시연이며 서버 인가/장비 리셋/영구 저장 아님.",
@@ -22,11 +31,12 @@
     "date": "2026-09-13",
     "registry": "docs/ux/customer-mobile-ia-registry.json",
     "menuCount": 20,
-    "pageCount": 31,
-    "existingScreenCount": 21,
+    "pageCount": 30,
+    "existingScreenCount": 20,
     "newScreenCount": 10,
     "popupCount": 2,
-    "scope": "모바일은 현재 고객용 모바일을 의미한다. 현재 구현의 메뉴·페이지·단계·독립 탭·팝업을 엑셀로 문서화하고 신규 세부 ID를 발급한다. 기존 UI·동작 및 FigJam 보드는 수정하지 않는다. 신규 ID는 별도 확장 등록부에 기록한다."
+    "scope": "현재 활성 30페이지와 모바일 폐지 호환 경로 1개를 보존한다. 웹 화면 ID는 변경/재사용하지 않는다. 이전 엑셀/PDF는 별도 스냅샷이다.",
+    "registeredPageCount": 31
   },
   "staffSignupEquipment": {
     "revision": "2026-09-10-r41",
@@ -108,13 +118,14 @@
     "fileKey": "c4kCb5sPboVFEqnKFkAMfW",
     "currentProcessMap": {
       "updatedAt": "2026-09-13",
-      "sourceRevision": "2026-09-10-r41",
+      "sourceRevision": "2026-09-13-r46",
       "rootId": "887:8864",
       "url": "https://www.figma.com/board/c4kCb5sPboVFEqnKFkAMfW?node-id=887-8864",
       "record": "docs/ux/figjam-customer-mobile-process-20260913.json",
       "scope": "사용자 요청으로 현재 모바일 흐름을 기존 보드 오른쪽에 추가. 권한/메뉴·홈·차량·서비스·리포트·알림·인증·설정의 8영역. 기존 웹/운영관리/모바일 변경 메모의 내용과 배치 보존. 기존 화면 ID 재사용, 신규 발급 없음.",
       "verified": "브라우저의 현재 메뉴·목록·상세·서비스·리포트·설정·알림과 소스/등록부 대조. FigJam 시각 검토, 표 겹침/영역 넘침/분기 진입선 누락 없음. 기존 5개 최상위 노드 하위의 내용·좌표·연결 보존값 일치.",
-      "runtime": "실제 API/서버 인증·인가/메일/SMS/PUSH/승인/서버 저장은 미연결. 이전 syncDeferred는 당시 로컬 작업 이력이며 이번 요청 범위의 현재 흐름 동기화는 완료."
+      "runtime": "실제 API/서버 인증·인가/메일/SMS/PUSH/승인/서버 저장은 미연결. 이전 syncDeferred는 당시 로컬 작업 이력이며 이번 요청 범위의 현재 흐름 동기화는 완료.",
+      "incrementalRecord": "docs/ux/figjam-customer-mobile-detail-r46.json"
     },
     "changeNoteId": "733:7302",
     "existingNodesMutated": [],
@@ -144,9 +155,20 @@
       "id": "LQ-SVC-003-P02",
       "path": "index.html#supply-reset-dialog",
       "menuId": "srvc/supply",
-      "in": ["customer_owner only", "visible item IDs", "confirm / cancel"],
-      "out": ["0H / normal / lastChangedAt", "supplyDueCount / supplySoonCount", "undo previous batch"],
-      "next": ["LQ-SVC-001-T01", "LQ-SVC-003"],
+      "in": [
+        "customer_owner only",
+        "visible item IDs",
+        "confirm / cancel"
+      ],
+      "out": [
+        "0H / normal / lastChangedAt",
+        "supplyDueCount / supplySoonCount",
+        "undo previous batch"
+      ],
+      "next": [
+        "LQ-SVC-001-T01",
+        "LQ-SVC-003"
+      ],
       "note": "현재 범위 확인 후 원자적 메모리 처리. 직원/그룹장 차단. 웹 활성 P02 목적 재사용, 폐지 P01 보존."
     },
     {
@@ -228,7 +250,8 @@
         "live",
         "period",
         "from",
-        "to"
+        "to",
+        "리튬만: 스마트 충전 on/off, 시작/종료 시간, 저장"
       ],
       "out": [
         "codeName",
@@ -248,7 +271,10 @@
         "maintenance fixture",
         "collapsed basic vehicle information",
         "collection window (requested period clipped to snapshot and vehicle last receipt)",
-        "batteryVoltage/batteryCapacity inline"
+        "batteryVoltage/batteryCapacity inline",
+        "웹 온도/충전/배터리 상태; 알 수 없는 값은 수집 전",
+        "역할/VIN별 로컬 스마트 충전 설정, 성공/실패 피드백",
+        "민감/주의/경고 충격 건수와 웹 기본 임계값 안내"
       ],
       "next": [
         "LQ-OPS-005",
@@ -258,7 +284,7 @@
         "LQ-RPT-001",
         "LQ-REF-003"
       ],
-      "note": "r2: 점검·실적을 먼저, 기본 제원/누적은 하단 펼침. 동력·정비·위치 핵심 정보 직접 표시. 중복 운행정보 버튼은 제거하되 기존 hash/ID는 호환 유지. 리포트/효율 바로가기는 동일 차량·기간 전달. r16: 상단 현재 점검에만 소모품/에러. 아래 최근 정비와 기록 이동. 에너지 가용 필드를 인라인 표시, 중복 상세 버튼 제거. 에너지 직접 URL/ID는 호환 보존. r19: 검색 컨트롤은 기존 방식 유지. 운영효율에서 월 경계의 주간 범위를 전달해도 수신 자료의 교집합으로 같은 실적을 표시."
+      "note": "r2: 점검·실적을 먼저, 기본 제원/누적은 하단 펼침. 동력·정비·위치 핵심 정보 직접 표시. 중복 운행정보 버튼은 제거하되 기존 hash/ID는 호환 유지. 리포트/효율 바로가기는 동일 차량·기간 전달. r16: 상단 현재 점검에만 소모품/에러. 아래 최근 정비와 기록 이동. 에너지 가용 필드를 인라인 표시, 중복 상세 버튼 제거. 에너지 직접 URL/ID는 호환 보존. r19: 검색 컨트롤은 기존 방식 유지. 운영효율에서 월 경계의 주간 범위를 전달해도 수신 자료의 교집합으로 같은 실적을 표시. r46: 기존 화면 안의 리튬 기능 확장. 서버/API/장비 명령 없음. 납산·엔진 유지. r46: 결정적 강도 시연 이력을 기존 기간 총수와 일관되게 분류. 실제 가속도 수신값 아님."
     },
     {
       "id": "LQ-OPS-005",
@@ -272,14 +298,15 @@
       ],
       "out": [
         "shock",
-        "세부 시각/강도 미수신 표시"
+        "세부 시각/강도 미수신 표시",
+        "민감/주의/경고 충격 건수와 웹 기본 임계값 안내"
       ],
       "next": [
         "LQ-OPS-001",
         "LQ-OPS-002",
         "LQ-SVC-001"
       ],
-      "note": " r2: 진입한 목록/상세로 복귀하고 조회 맥락을 유지. 실제 API 미연결."
+      "note": " r2: 진입한 목록/상세로 복귀하고 조회 맥락을 유지. 실제 API 미연결. r46: 결정적 강도 시연 이력을 기존 기간 총수와 일관되게 분류. 실제 가속도 수신값 아님."
     },
     {
       "id": "LQ-OPS-006",
@@ -310,7 +337,8 @@
       "in": [
         "equipmentId",
         "fuelTypeCode",
-        "returnView: summary|services|detail"
+        "returnView: summary|services|detail",
+        "리튬만: 스마트 충전 on/off, 시작/종료 시간, 저장"
       ],
       "out": [
         "soc",
@@ -319,14 +347,16 @@
         "batteryCapacity",
         "충전 예약 미연결 안내",
         "receivedAt",
-        "offline last-received qualifier"
+        "offline last-received qualifier",
+        "웹 온도/충전/배터리 상태; 알 수 없는 값은 수집 전",
+        "역할/VIN별 로컬 스마트 충전 설정, 성공/실패 피드백"
       ],
       "next": [
         "LQ-OPS-001",
         "LQ-OPS-002",
         "LQ-SVC-001"
       ],
-      "note": " r2: 진입한 목록/상세로 복귀하고 조회 맥락을 유지. 실제 API 미연결. 전력소비량은 7월 월간 목업 고정값. 미연결 잔량은 마지막 수신으로 표시."
+      "note": " r2: 진입한 목록/상세로 복귀하고 조회 맥락을 유지. 실제 API 미연결. 전력소비량은 7월 월간 목업 고정값. 미연결 잔량은 마지막 수신으로 표시. r46: 기존 화면 안의 리튬 기능 확장. 서버/API/장비 명령 없음. 납산·엔진 유지."
     },
     {
       "id": "LQ-SVC-001",
@@ -349,14 +379,15 @@
         "category tab event/item counts, role/group/vehicle and active focus scoped",
         "supply itemId/name, usedHours, cycleHours, percent, status, remaining/excess hours",
         "vehicle/event totals",
-        "error occurred count vs unresolved count"
+        "error occurred count vs unresolved count",
+        "에러 코드/설명/발생·해제 일시 및 PDF 존재별 다운로드 아이콘"
       ],
       "next": [
         "LQ-OPS-002",
         "LQ-SVC-002",
-        "LQ-SVC-004"
+        "LQ-SVC-001-T02"
       ],
-      "note": "r9: 전체 탭 제거. 기본 정비/이번 달. 정비와 에러는 기간 이력이며 소모품은 마지막 수집 현재 상태. servicePeriod/From/To로 정비·에러 기간을 공유/유지하며 보고서·알림 기간과 분리. 홈 에러 KPI는 금일 미해제 조건. 현재 상태 카운터를 기간 발생 건수로 재활용하지 않고 명시적 컨펌 이력 레코드로 분리. 실제 서버 미연결. r10: 탭에 건수 복원(정비/에러 선택 기간, 소모품 현재 품목). 소모품을 차량 카드 내부 품목별로 표시하며 사용시간/교체주기·정수 사용률·필요/임박·잔여/초과시간 제공. 동일 품목 ID로 상세 연결. 현재 3대/4품목(필요2/임박2), 등록 품목 API 미연결. 기존 카드·토큰·네비게이션 유지. r16: 제목 ?에 기간/현재 집계 기준. 소모품 총수는 품목 단위. 필요/에러/완료 공통 의미색, 정비·에러 공유 기간 및 소모품 인라인 유지."
+      "note": "r9: 전체 탭 제거. 기본 정비/이번 달. 정비와 에러는 기간 이력이며 소모품은 마지막 수집 현재 상태. servicePeriod/From/To로 정비·에러 기간을 공유/유지하며 보고서·알림 기간과 분리. 홈 에러 KPI는 금일 미해제 조건. 현재 상태 카운터를 기간 발생 건수로 재활용하지 않고 명시적 컨펌 이력 레코드로 분리. 실제 서버 미연결. r10: 탭에 건수 복원(정비/에러 선택 기간, 소모품 현재 품목). 소모품을 차량 카드 내부 품목별로 표시하며 사용시간/교체주기·정수 사용률·필요/임박·잔여/초과시간 제공. 동일 품목 ID로 상세 연결. 현재 3대/4품목(필요2/임박2), 등록 품목 API 미연결. 기존 카드·토큰·네비게이션 유지. r16: 제목 ?에 기간/현재 집계 기준. 소모품 총수는 품목 단위. 필요/에러/완료 공통 의미색, 정비·에러 공유 기간 및 소모품 인라인 유지. r46: 에러 행은 비클릭 목록, PDF 있는 항목만 다운로드. 별도 상세 없음."
     },
     {
       "id": "LQ-SVC-002",
@@ -425,19 +456,13 @@
         "notificationState"
       ],
       "out": [
-        "activeErrorCount",
-        "코드/설명 미수신 표시",
-        "selected record timestamp/status",
-        "occurredAt",
-        "resolvedAt"
+        "해당 차량 서비스 에러 목록으로 호환 이동"
       ],
       "next": [
-        "LQ-OPS-001",
-        "LQ-OPS-002",
-        "LQ-SVC-001",
-        "LQ-COM-004"
+        "LQ-SVC-001-T02"
       ],
-      "note": " r2: 진입한 목록/상세로 복귀하고 조회 맥락을 유지. 실제 API 미연결. r9: serviceEntry로 선택 이력을 조회하며 차량/종류가 다르면 조회 불가. 알림에서 진입한 소모품/에러는 알림 목록으로 복귀하며 필터·기간 유지. 이력 발생/해제 시각은 명시적으로 추가한 컨펌 자료이며 실제 API 응답 아님."
+      "note": "r46: 모바일 에러 상세 폐지. #error 직접 주소는 차량·기간 범위를 유지하여 서비스 에러 탭으로 replace. 웹 LQ-SVC-004는 유지, ID 재사용 없음.",
+      "status": "retired-mobile"
     },
     {
       "id": "LQ-AUTH-002",
@@ -653,14 +678,14 @@
       "next": [
         "LQ-OPS-005",
         "LQ-OPS-007",
-        "LQ-SVC-004",
+        "LQ-SVC-001-T02",
         "LQ-ACC-001",
         "LQ-SVC-003",
         "LQ-SVC-002",
         "LQ-OPS-006",
         "LQ-OPS-002-T01"
       ],
-      "note": "r23 원본 push.vue/api.notice.js 기준. 조치/기간 필터 및 서비스 건수→PUSH 변환 제거. pushType/message/pushDatetime/equipmentId 표시 및 해당 차량 정보로 이동, 알림 복귀. 응답 순서 유지, 빈 내역→설정. unreadPushCnt는 대시보드 별도 응답값이며 임의 읽음/완료 변경 없음. 충격/에러/배터리 로컬자료만, 실제 서버/발송/읽음 갱신 미연결. 공지/마케팅 수신 타입/이동 계약 미확인; 미지원 타입은 본문만 표시. 기타 원본 차량 상세 경로 보존은 발송 발생 조건 확정을 뜻하지 않음. r25: 기존 mobile-status-tabs 재사용. 전체/충격/차량 에러/배터리 필터, 기타는 수신 내역 있을 때 노출(직접 선택 경로는 빈상태). 새 독립 화면이 아닌 동일 내역의 필터라 ID 유지. 선택 유형은 상세 왕복/새로고침에서 보존, 읽지 않음 배지는 불변. 공지/마케팅 수신 계약 미확인으로 임의 매핑 없음."
+      "note": "r23 원본 push.vue/api.notice.js 기준. 조치/기간 필터 및 서비스 건수→PUSH 변환 제거. pushType/message/pushDatetime/equipmentId 표시 및 해당 차량 정보로 이동, 알림 복귀. 응답 순서 유지, 빈 내역→설정. unreadPushCnt는 대시보드 별도 응답값이며 임의 읽음/완료 변경 없음. 충격/에러/배터리 로컬자료만, 실제 서버/발송/읽음 갱신 미연결. 공지/마케팅 수신 타입/이동 계약 미확인; 미지원 타입은 본문만 표시. 기타 원본 차량 상세 경로 보존은 발송 발생 조건 확정을 뜻하지 않음. r25: 기존 mobile-status-tabs 재사용. 전체/충격/차량 에러/배터리 필터, 기타는 수신 내역 있을 때 노출(직접 선택 경로는 빈상태). 새 독립 화면이 아닌 동일 내역의 필터라 ID 유지. 선택 유형은 상세 왕복/새로고침에서 보존, 읽지 않음 배지는 불변. 공지/마케팅 수신 계약 미확인으로 임의 매핑 없음. r46: 에러 PUSH는 역할 범위 내 해당 차량·수신일의 서비스 에러 목록으로 이동하며 이전 버튼으로 복귀. 읽음 수는 변경하지 않는다."
     },
     {
       "id": "LQ-OPS-002-T01",
@@ -817,5 +842,25 @@
     "backup": "backups/customer-mobile-before-r25-20260910/",
     "verification": "양 역할 가입/로그인/복구, 로그인 표시 정리·타 앱 데이터 보존, 유형 건수/필터/복귀/권한/빈상태/알수없는타입 및 전체 회귀 검사 통과. 공유 원본/헤더/하단/인증 CSS 불변. 브라우저 시각 비교 미실시.",
     "figma": "사용자 지시에 따라 로컬 등록부만 갱신; Figma 수정 없음."
+  },
+  "errorPdf": {
+    "revision": "2026-09-13-r46",
+    "screenId": "LQ-SVC-001-T02",
+    "behavior": "에러 행 상세/화살표 없음. 코드·설명·발생/해제 목록. PDF 키·파일·코드 유효성 확인 후 파일 아이콘만 제공, 없으면 -. 다운로드 후 목록 유지.",
+    "compatibility": "모바일 #error는 해당 차량 서비스 에러 목록으로 replace. 웹 LQ-SVC-004 ID는 유지하며 모바일 구현만 폐지.",
+    "source": "웹 Service/service-error-tobe.html P0003/A7 동일 VIN. P0003 PDF는 웹의 코드·설명만 옮긴 시연 참고자료이며 실제 정비 매뉴얼 아님.",
+    "network": "PDF 내장. 서버/API 요청 없음."
+  },
+  "lithiumAndShock": {
+    "revision": "2026-09-13-r46",
+    "screenIds": [
+      "LQ-OPS-002",
+      "LQ-OPS-005",
+      "LQ-OPS-007"
+    ],
+    "source": "Lithium/lithium-tobe.html, _shared/lithium-list-model.js, _shared/meeting-model.js, Shock/shock-tobe.html",
+    "input": "역할 조회 범위의 리튬 차량에서 스마트 충전 on/off·시작/종료(0~23시)·저장. 충격은 기존 조회 기간.",
+    "output": "리튬 온도·충전·배터리 상태(웹 모델 재사용), 수집 전/마지막 수신 구분. 충전 22→06=8시간, 같은 시각=24시간. 역할+VIN별 고객 전용 브라우저 저장. 실제 충전/서버 인가 아님. 충격 민감1.2~1.8g 미만·주의1.8~2.5g 미만·경고2.5g 이상 및 건수.",
+    "data": "강도별 건수는 결정적 시연 이벤트이며 실제 센서 판정 아님. 기존 기간 총합 유지, 일 합계=월 합계. 미집계는 -; 실제 0은 0건. 비리튬에는 상태/스마트 충전 추가 없음."
   }
 }

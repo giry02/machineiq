@@ -19,9 +19,10 @@
   },
   "figjam": {
     "changed": true,
-    "note": "r42에서 기존 모바일 서비스 영역에 대표 전용 Reset 팝업과 권한·입출력을 반영했다. 기존 위치는 유지했다. 앞서 문서화한 신규 세부 ID 10개 전체가 원격 반영되었다는 의미는 아니다.",
+    "note": "r42에서 기존 모바일 서비스 영역에 대표 전용 Reset 팝업과 권한·입출력을 반영했다. 기존 위치는 유지했다. 앞서 문서화한 신규 세부 ID 10개 전체가 원격 반영되었다는 의미는 아니다. r46: 에러 상세를 파일 출력으로 바꾸고 알림 도착 화면·리튬 상태/충전·충격 출력 정의를 현재 위치에서 갱신.",
     "supplyResetRecord": "docs/ux/figjam-customer-mobile-supply-reset-20260913.json",
-    "record": "docs/ux/figjam-customer-mobile-process-20260913.json"
+    "record": "docs/ux/figjam-customer-mobile-process-20260913.json",
+    "detailRecord": "docs/ux/figjam-customer-mobile-detail-r46.json"
   },
   "menus": [
     {
@@ -351,9 +352,9 @@
       "parent": "LQ-OPS-001",
       "area": "차량",
       "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
-      "description": "차량 식별·가동 상태, 현재 점검, 기간 운행, 에너지 정보, 최근 정비, 최종 위치와 기본정보를 보여준다.",
-      "input": "선택 차량, 조회 기간. 업무 현황·운영효율·충격 상세, 정비 기록, 지도 보기.",
-      "output": "선택 차량/기간으로 리포트·충격·정비·서비스 이동. 지도 팝업 열기.",
+      "description": "차량 식별·가동 상태, 현재 점검, 기간 운행, 에너지 정보, 최근 정비, 최종 위치와 기본정보를 보여준다. 리튬만 웹 온도·충전·배터리 상태와 스마트 충전 표시.",
+      "input": "선택 차량, 조회 기간. 업무 현황·운영효율·충격 상세, 정비 기록, 지도 보기. 스마트 충전 on/off·시작/종료 시간·저장.",
+      "output": "선택 차량/기간으로 리포트·충격·정비·서비스 이동. 지도 팝업 열기. 차량/역할별 브라우저 시연 저장. 자정 넘김과 동일 시간 24시간 지원. 충격 민감·주의·경고별 건수와 기준 안내(시연 강도; 총합 일치).",
       "exception": "범위 밖/잘못된 차량은 조회 불가. 위치 없는 차량에는 지도 보기 미제공. 기본정보는 인라인 펼침.",
       "route": "index.html#detail?equipmentId=demo-equipment-01",
       "isNew": false
@@ -381,7 +382,7 @@
       "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
       "description": "선택 차량의 조회 기간 충격 건수를 확인한다.",
       "input": "차량, 날짜, 금일·주·월. 알림에서 선택한 차량도 진입 가능.",
-      "output": "선택 차량의 기간 충격 표시. 진입한 목록/상세/알림으로 복귀.",
+      "output": "선택 차량의 기간 충격 표시. 진입한 목록/상세/알림으로 복귀. 충격 민감·주의·경고별 건수와 기준 안내(시연 강도; 총합 일치).",
       "exception": "발생 시각·강도 세부 이력은 미수신. 알림 진입이어도 특정 충격 이벤트 분석 화면은 아니다.",
       "route": "index.html#shock?equipmentId=demo-equipment-01",
       "isNew": false
@@ -407,9 +408,9 @@
       "parent": "LQ-OPS-002",
       "area": "차량",
       "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
-      "description": "전동 차량의 배터리 종류·잔량·수신시각·월간 전력소비·전압·용량을 확인한다.",
-      "input": "차량 잔량 선택 또는 배터리 경고 알림.",
-      "output": "배터리 수신 정보 표시 및 원래 목록/상세/알림 복귀.",
+      "description": "전동 차량의 배터리 종류·잔량·수신시각·월간 전력소비·전압·용량을 확인한다. 리튬만 웹 온도·충전·배터리 상태와 스마트 충전 표시.",
+      "input": "차량 잔량 선택 또는 배터리 경고 알림. 스마트 충전 on/off·시작/종료 시간·저장.",
+      "output": "배터리 수신 정보 표시 및 원래 목록/상세/알림 복귀. 차량/역할별 브라우저 시연 저장. 자정 넘김과 동일 시간 24시간 지원.",
       "exception": "미연결은 마지막 수신값. 엔진 차량은 대상 아님. 충전 예약과 충전 이력은 이용 불가.",
       "route": "index.html#battery?equipmentId=demo-equipment-01",
       "isNew": false
@@ -458,17 +459,18 @@
     },
     {
       "id": "LQ-SVC-004",
-      "name": "에러 상세",
+      "name": "에러 상세 (모바일 폐지)",
       "type": "상세",
       "parent": "LQ-SVC-001-T02",
       "area": "서비스",
       "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
-      "description": "선택 에러 기록의 발생·해제 시각과 상태 또는 차량의 현재 에러 요약을 표시한다.",
-      "input": "차량 식별자, 선택 에러 이력 식별자. 에러 알림에서도 진입.",
-      "output": "서비스 이력 진입은 선택 기록, 알림/직접 진입은 현재 요약. 원래 화면으로 복귀.",
-      "exception": "선택 기록이 없거나 범위 밖이면 조회 불가. 알림 메시지와 서비스 기록의 식별자는 동일하지 않다.",
+      "description": "별도 에러 상세는 제공하지 않는다. ID는 폐지 이력으로 보존하며 웹의 동일 ID는 유지한다.",
+      "input": "호환 주소의 차량·조회 기간.",
+      "output": "서비스 에러 탭으로 대체 이동.",
+      "exception": "범위 밖 차량은 빈 목록. 직접 진입 시 PDF 자동 다운로드 없음.",
       "route": "index.html#error?equipmentId=demo-equipment-01",
-      "isNew": false
+      "isNew": false,
+      "status": "retired-mobile"
     },
     {
       "id": "LQ-SVC-002",
@@ -619,9 +621,9 @@
       "parent": "LQ-SVC-001",
       "area": "서비스",
       "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
-      "description": "기간 내 차량 에러 발생 이력과 해제/미해제 상태를 확인한다.",
+      "description": "기간 내 차량 에러 발생 이력과 해제/미해제 상태를 확인한다. 코드·설명·발생/해제 일시를 목록에서 확인한다.",
       "input": "그룹(대표), 날짜, 금일·주·월, 진입 차량·미해제 조건 해제.",
-      "output": "에러 이력 선택 시 해당 기록 상세. 차량번호는 차량 상세로 이동.",
+      "output": "PDF가 있는 항목만 다운로드 아이콘. 파일 없으면 -. 별도 상세 이동 없음. 차량번호는 기존 차량 상세로 이동.",
       "exception": "차량의 현재 에러 버튼으로 진입하면 해당 차량의 금일 미해제 조건을 적용한다.",
       "route": "index.html#services?service=error",
       "isNew": true
@@ -684,9 +686,30 @@
     }
   ],
   "transitions": [
-    {"from":"LQ-SVC-001-T01","action":"대표가 품목 선택 후 교체 완료 · Reset","to":"LQ-SVC-003-P02","state":"현재 범위의 품목 ID·차량·사용시간·건수","back":"취소/닫기/Esc는 무변경 복귀","note":"직원·그룹장 불가. 선택 0개/미수신/0H는 실행 불가"},
-    {"from":"LQ-SVC-003","action":"대표가 품목 선택 후 Reset","to":"LQ-SVC-003-P02","state":"해당 차량/선택 품목 범위","back":"소모품 상세","note":"호환 상세에서도 같은 처리 규칙"},
-    {"from":"LQ-SVC-003-P02","action":"교체 완료 확인 또는 취소","to":"LQ-SVC-001-T01","state":"확인: 0H/정상·교체시각·집계 갱신; 취소: 무변경","back":"상세 진입 시 LQ-SVC-003 복귀","note":"실행 취소 제공. 새로고침 시 초기값, 서버 저장 없음"},
+    {
+      "from": "LQ-SVC-001-T01",
+      "action": "대표가 품목 선택 후 교체 완료 · Reset",
+      "to": "LQ-SVC-003-P02",
+      "state": "현재 범위의 품목 ID·차량·사용시간·건수",
+      "back": "취소/닫기/Esc는 무변경 복귀",
+      "note": "직원·그룹장 불가. 선택 0개/미수신/0H는 실행 불가"
+    },
+    {
+      "from": "LQ-SVC-003",
+      "action": "대표가 품목 선택 후 Reset",
+      "to": "LQ-SVC-003-P02",
+      "state": "해당 차량/선택 품목 범위",
+      "back": "소모품 상세",
+      "note": "호환 상세에서도 같은 처리 규칙"
+    },
+    {
+      "from": "LQ-SVC-003-P02",
+      "action": "교체 완료 확인 또는 취소",
+      "to": "LQ-SVC-001-T01",
+      "state": "확인: 0H/정상·교체시각·집계 갱신; 취소: 무변경",
+      "back": "상세 진입 시 LQ-SVC-003 복귀",
+      "note": "실행 취소 제공. 새로고침 시 초기값, 서버 저장 없음"
+    },
     {
       "from": "LQ-AUTH-003",
       "action": "일반 로그인",
@@ -945,11 +968,11 @@
     },
     {
       "from": "LQ-SVC-001-T02",
-      "action": "에러 기록 행",
-      "to": "LQ-SVC-004",
-      "state": "equipmentId·serviceEntry·returnView=services",
-      "back": "서비스",
-      "note": ""
+      "action": "등록 PDF 다운로드 아이콘",
+      "to": "LQ-SVC-001-T02",
+      "state": "PDF 키/등록 파일/코드 유효성",
+      "back": "목록 유지",
+      "note": "파일 출력이며 별도 페이지 이동 아님. PDF 없음은 -."
     },
     {
       "from": "LQ-SVC-001",
@@ -1042,10 +1065,10 @@
     {
       "from": "LQ-COM-004-T02",
       "action": "유형별 알림 행",
-      "to": "LQ-SVC-004",
-      "state": "equipmentId·returnView=notifications·선택 탭",
+      "to": "LQ-SVC-001-T02",
+      "state": "serviceEquipmentId·수신일(serviceFrom/To)·returnView=notifications",
       "back": "선택한 알림 탭",
-      "note": "전체 탭에서도 같은 유형 분기"
+      "note": "전체/차량 에러 알림에서 해당 차량·수신일의 서비스 에러 목록으로 이동."
     },
     {
       "from": "LQ-COM-004-T03",
@@ -1139,5 +1162,12 @@
       "#account는 설정과 같은 화면. 일부 상세는 현재 버튼 진입 없이 기존 경로만 유지한다.",
       "중복 화면 ID를 만들거나 현재 메뉴에 없는 항목을 메뉴로 추가하지 않는다."
     ]
-  ]
+  ],
+  "detailRevision": {
+    "revision": "2026-09-13-r46",
+    "activePageCount": 30,
+    "registeredPageCount": 31,
+    "retiredMobileScreen": "LQ-SVC-004",
+    "notes": "에러는 목록+PDF만. 리튬 상태3종/스마트 충전 및 충격 강도는 기존 상세 화면 내 확장. 새 페이지/팝업 발급 없음. 기존 엑셀은 당시 스냅샷."
+  }
 }

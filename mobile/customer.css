@@ -306,6 +306,50 @@ body.customer-prototype:has(.supply-reset-dialog[open]) { overflow:hidden; }
 .customer-prototype .health-kpis .dashboard-kpi__label svg { color:inherit; }
 .customer-prototype .service-item-line.is-state-danger > span > svg { color:var(--linq-color-danger); }
 .customer-prototype .service-item-line.is-state-neutral > span > svg { color:var(--linq-color-text-muted); }
+.customer-prototype .error-service-item .error-service-copy { flex:1; min-width:0; display:flex; flex-direction:column; gap:5px; }
+.customer-prototype .error-service-heading { display:flex; align-items:center; gap:6px; }
+.customer-prototype .error-service-heading strong { font-size:14px; font-weight:600; }
+.customer-prototype .error-service-heading b { margin-left:auto; font-size:12px; font-weight:600; white-space:nowrap; }
+.customer-prototype .error-service-item.is-state-danger .error-service-heading svg { color:var(--linq-color-danger); }
+.customer-prototype .error-service-item.is-state-neutral .error-service-heading svg { color:var(--linq-color-text-muted); }
+.customer-prototype .error-service-description { font-size:13px; }
+.customer-prototype .error-service-item .error-pdf-download,
+.customer-prototype .error-service-item .error-pdf-missing { display:flex; align-items:center; justify-content:center; flex:0 0 44px; min-height:44px; color:var(--linq-color-text-muted); }
+.customer-prototype .error-pdf-download { border-radius:4px; text-decoration:none; }
+.customer-prototype .error-pdf-download svg { width:20px; height:20px; color:var(--linq-color-primary-fill); }
+.customer-prototype .error-pdf-download:focus-visible { outline:2px solid var(--linq-color-primary-fill); outline-offset:2px; }
+.customer-prototype .shock-breakdown,
+.customer-prototype .lithium-state-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); margin:10px 0; }
+.customer-prototype .shock-band,
+.customer-prototype .lithium-state-item { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; min-width:0; padding:8px 3px; text-align:center; border-right:1px solid var(--linq-color-border-subtle); }
+.customer-prototype .shock-band:last-child,
+.customer-prototype .lithium-state-item:last-child { border-right:0; }
+.customer-prototype .shock-band > span,
+.customer-prototype .lithium-state-item > span { font-size:12px; }
+.customer-prototype .shock-band > strong { font-size:18px; line-height:1.3; }
+.customer-prototype .shock-band > small { font-size:10px; color:var(--linq-color-text-muted); white-space:nowrap; }
+.customer-prototype .shock-band.is-s3 > strong { color:#2b8a3e; }
+.customer-prototype .shock-band.is-s4 > strong { color:#f59f00; }
+.customer-prototype .shock-band.is-s5 > strong { color:#e03131; }
+.customer-prototype .shock-breakdown + .panel-heading-with-tip { justify-content:flex-end; margin:0 0 10px; }
+.customer-prototype .shock-breakdown + .panel-heading-with-tip h3 { font-size:11px; font-weight:400; color:var(--linq-color-text-muted); }
+.customer-prototype .lithium-state-item svg { width:18px; height:18px; color:var(--linq-color-text-muted); }
+.customer-prototype .lithium-state-item strong { font-size:14px; }
+.customer-prototype .lithium-state-item.is-danger strong { color:var(--linq-color-danger); }
+.customer-prototype .lithium-state-item.is-warning strong { color:#f59f00; }
+.customer-prototype .lithium-state-item.is-unknown strong { color:var(--linq-color-text-muted); }
+.customer-prototype .mobile-smart-charge { margin-top:12px; border-top:1px solid var(--linq-color-border-subtle); }
+.customer-prototype .mobile-smart-charge .setting-row { padding:10px 0; border:0; min-height:44px; }
+.customer-prototype .charge-time-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.customer-prototype .charge-time-fields label { display:flex; flex-direction:column; gap:6px; min-width:0; font-size:12px; }
+.customer-prototype .charge-time-fields select { box-sizing:border-box; width:100%; height:44px; padding:0 10px; font:inherit; font-size:14px; border:1px solid var(--linq-color-border); border-radius:4px; background:#fff; color:var(--linq-color-text); }
+.customer-prototype .charge-time-fields select:disabled { opacity:.5; background:#f5f5f5; }
+.customer-prototype .charge-schedule { display:flex; flex-direction:column; gap:4px; margin-top:10px; font-size:13px; }
+.customer-prototype .charge-schedule small { color:var(--linq-color-text-muted); font-size:11px; }
+.customer-prototype .charge-save-row { display:flex; align-items:center; gap:10px; margin-top:10px; }
+.customer-prototype .charge-save-row .source-note { flex:1; margin:0; }
+.customer-prototype .charge-save-row .detail-secondary-button { width:auto; min-width:72px; min-height:44px; margin:0; }
+.customer-prototype .charge-feedback { margin:8px 0 0; font-size:12px; color:var(--linq-color-text-muted); }
 .customer-prototype .performance-group > strong { display:flex; align-items:center; gap:4px; min-width:0; }
 .customer-prototype .performance-group > strong svg { width:14px; height:14px; flex:none; color:var(--linq-color-text-muted); }
 .customer-prototype .performance-group > b { font-size:12px; align-self:center; }

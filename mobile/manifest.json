@@ -1,18 +1,26 @@
 {
-  "revision": "2026-09-13-r45",
+  "revision": "2026-09-13-r46",
   "entry": "login.html",
   "files": [
     {
       "path": "index.html",
-      "sha256": "fabb982fc3ba57e213cf3e2a70f00df7f532939694548118b025b3414d3914c1"
+      "sha256": "9fc80991d2c60a2d024443cc61def0f4019d5e4c8a602c70c393f1d253263bb6"
     },
     {
       "path": "customer.js",
-      "sha256": "4a5c827a2e531de5f210caec44981afb81d13ebc8180720ada4917a1aff6b76c"
+      "sha256": "65045a61d50391818a4c13c9a5fa37d735727facd0b8d7f345fad4f8e51a7e94"
     },
     {
       "path": "customer.css",
-      "sha256": "894d11151b476db6fac395538d7274db48c67c944a8679110b512d54eb796877"
+      "sha256": "f59c92e7d628c785793878eabe1c52fc5a1f8ad9826cbca080dc6d4d13c01765"
+    },
+    {
+      "path": "error-documents.js",
+      "sha256": "a5fd9bd4e41235125856e818b3883cc59c1a8822c761372ac73139fb59c22e97"
+    },
+    {
+      "path": "lithium-status-model.js",
+      "sha256": "23c25ab2c12280c504659792befeaec6fc258becdb247cd78234934792466740"
     },
     {
       "path": "location-map.js",
@@ -20,7 +28,7 @@
     },
     {
       "path": "model.js",
-      "sha256": "d8d6676500a184ac494f73d1264fb0de8f7bfe0ac9acd86582115cc168075be9"
+      "sha256": "ea5c97abe49db5c070856aadc1b329ae41e1ba0277e764539a791c1a99f32e96"
     },
     {
       "path": "login.html",
@@ -652,7 +660,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "554150285d9d6ca2b884904182bb53bef742ef74b9614fc7c81f11d2a7d428c0"
+      "sha256": "f0fc6d4d47f3a0ca08da6bebb6dd4555124b132872a385f3a95a2eec01bdefc7"
     },
     {
       "path": ".gitattributes",
@@ -660,11 +668,15 @@
     },
     {
       "path": "docs/screen-registry.json",
-      "sha256": "7400cd22ce1ba79fc7c7069af059d6705ab2d427b902dcf6fca29d0517999552"
+      "sha256": "c987391528e70e6731a7e5241b082b2e99a7fcdcc77d705df8081333b4c0646d"
     },
     {
       "path": "docs/menu-page-registry.json",
-      "sha256": "b414a0b0a071e79f421799e0772a76d0de7c35a0492d999dd464c59bbcb455cd"
+      "sha256": "d4bed3b9bb9c06824854796c77d4aa0a1b8911ee7704554254f59c7dacb74f43"
+    },
+    {
+      "path": "docs/figjam-detail-r46.json",
+      "sha256": "0f8737e72e289075b5daa2f824745ad86de45544fe3d23ff7ffc68bb3ed24f58"
     },
     {
       "path": "docs/supply-reset.md",
@@ -691,12 +703,20 @@
       "sha256": "fce13030f152ec11a1b2db1df710d14a2cc9a6f800dcdfa04d958e0b017c8a76"
     },
     {
-      "path": "docs/html-delivery.md",
-      "sha256": "31e471eb2b4144ab1f8e8eeff26446123188819ddc11109ad5c946aa3fbcb3fd"
+      "path": "tests/error.cjs",
+      "sha256": "5d61ac515706ba2a434682f4a1f40710fadf8f249496485ff95ade3be6781847"
     },
     {
-      "path": "downloads/MACHINE_IQ_MOBILE_HTML_20260913_r45.zip",
-      "sha256": "a3f0db4e7c3f274620e8307a526263f1f55cb44e547eded55a0310996518b8e6"
+      "path": "tests/lithium-shock.cjs",
+      "sha256": "03877e5f325ae012f632d99fc511f9f3eda9da2e2a40ad3a77a1a3b6edc36d84"
+    },
+    {
+      "path": "docs/html-delivery.md",
+      "sha256": "4302bef563947521a390f1f6fd6f1a907699ffa4dd6a1942cb238b227480aece"
+    },
+    {
+      "path": "downloads/MACHINE_IQ_MOBILE_HTML_20260913_r46.zip",
+      "sha256": "2f567cd0eab0e1e11e766aa33ff70c100550683781d2d297875c5342041a7566"
     }
   ]
 }
