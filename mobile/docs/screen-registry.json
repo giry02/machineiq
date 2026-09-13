@@ -1,5 +1,44 @@
 {
-  "revision": "2026-09-10-r25",
+  "revision": "2026-09-13-r42",
+  "supplyReset": {
+    "revision": "2026-09-13-r42",
+    "screenId": "LQ-SVC-003-P02",
+    "entry": ["LQ-SVC-001-T01", "LQ-SVC-003"],
+    "allowedRoles": ["customer_owner"],
+    "input": "조회 범위의 개별/전체 소모품 선택, 확인/취소, 실행 취소. 미수신/0H 제외.",
+    "output": "선택 품목 0H·정상·교체시각. 홈/요약/상세 필요·임박 집계 동기화.",
+    "scope": "UI와 처리 함수에서 대표 권한 확인. 범위/역할/화면 전환 시 선택과 미확정 팝업 정리. 메모리 시연이며 서버 인가/장비 리셋/영구 저장 아님.",
+    "report": "docs/reports/CUSTOMER_MOBILE_SUPPLY_RESET_20260913.md"
+  },
+  "informationArchitecture": {
+    "date": "2026-09-13",
+    "registry": "docs/ux/customer-mobile-ia-registry.json",
+    "menuCount": 20,
+    "pageCount": 31,
+    "existingScreenCount": 21,
+    "newScreenCount": 10,
+    "popupCount": 2,
+    "scope": "모바일은 현재 고객용 모바일을 의미한다. 현재 구현의 메뉴·페이지·단계·독립 탭·팝업을 엑셀로 문서화하고 신규 세부 ID를 발급한다. 기존 UI·동작 및 FigJam 보드는 수정하지 않는다. 신규 ID는 별도 확장 등록부에 기록한다."
+  },
+  "staffSignupEquipment": {
+    "revision": "2026-09-10-r41",
+    "screenId": "LQ-AUTH-002",
+    "scope": "고객 직원의 장비 연결 정보 섹션과 완료 요약의 장비 Serial을 제외. 장비/단말기 입력은 숨김·비활성으로 검증 대상에서 제외하며 고객 대표로 전환하면 기존 필수 입력을 복원한다.",
+    "preserved": "나머지 가입 디자인·항목·역할/구분·승인 주체·인증/로그인 유지. 실제 서버 미연결. 기존 로컬 작업 범위에 따라 FigJam 동기화 보류."
+  },
+  "signupRolePicker": {
+    "revision": "2026-09-10-r40",
+    "screenId": "LQ-AUTH-002",
+    "input": "소속 정보에 기존 signup-role-field/list 라디오로 고객 대표·고객 직원 역할/구분 복원. 진입 URL role은 초기 선택만 지정하고 이후 선택값으로 소속 필수 항목·승인 주체를 전환한다.",
+    "preserved": "기존 딜러 모바일 CSS 재사용. 고객 대표는 딜러대표 승인, 직원은 기존 업체 선택 후 고객 대표 승인. 약관·인증·비밀번호·장비 연결·로그인/로그아웃 유지. 실제 서버/메일/SMS/승인 미연결. 사용자 로컬 작업 범위에 따라 FigJam 동기화 보류, 마지막 원격 r15 유지."
+  },
+  "summaryVehiclePicker": {
+    "revision": "2026-09-10-r38",
+    "screenId": "LQ-OPS-001",
+    "input": "자유 검색 q를 전체 차량/개별 차량 선택 listVehicle로 교체. 첫 행 그룹+차량, 둘째 행 날짜+금일/주/월. 기존 리포트 선택창 디자인 재사용.",
+    "scope": "역할·선택 그룹 허용 차량만 후보로 제공. 선택 차량만 목록에 표시하고 전체 차량 선택으로 해제. 기간·상세 왕복은 유지, 역할/그룹 변경 시 범위 밖 선택은 해제. 잘못된 ID는 빈 목록. 종전 q는 요약정보에서 무시.",
+    "preserved": "기존 화면 ID·상세 이동·권한·집계·리포트 선택 상태 유지. 로컬 목업만 변경, 실제 API/인가 미연결. 사용자 로컬 작업 범위에 따라 FigJam 동기화는 보류하며 마지막 원격 r15 유지."
+  },
   "chartHelpAndSmallButton": {
     "revision": "2026-09-10-r18",
     "scope": "LQ-DASH-001 통신/가동 모수 설명을 제목 옆 공통 ? 도움말로 이동. 기본 숨김, 열기/닫기·초점 복귀 재사용. 역할별 모수·차트·이동 유지. 패널 제목 옆 버튼만 12px/500으로 변경, 제목16px·주요 버튼13px 및 기존 32px 표시/44px 터치 유지.",
@@ -59,6 +98,16 @@
   "parentRegistry": "docs/ux/screen-registry.json",
   "figjam": {
     "fileKey": "c4kCb5sPboVFEqnKFkAMfW",
+    "currentProcessMap": {
+      "updatedAt": "2026-09-13",
+      "sourceRevision": "2026-09-10-r41",
+      "rootId": "887:8864",
+      "url": "https://www.figma.com/board/c4kCb5sPboVFEqnKFkAMfW?node-id=887-8864",
+      "record": "docs/ux/figjam-customer-mobile-process-20260913.json",
+      "scope": "사용자 요청으로 현재 모바일 흐름을 기존 보드 오른쪽에 추가. 권한/메뉴·홈·차량·서비스·리포트·알림·인증·설정의 8영역. 기존 웹/운영관리/모바일 변경 메모의 내용과 배치 보존. 기존 화면 ID 재사용, 신규 발급 없음.",
+      "verified": "브라우저의 현재 메뉴·목록·상세·서비스·리포트·설정·알림과 소스/등록부 대조. FigJam 시각 검토, 표 겹침/영역 넘침/분기 진입선 누락 없음. 기존 5개 최상위 노드 하위의 내용·좌표·연결 보존값 일치.",
+      "runtime": "실제 API/서버 인증·인가/메일/SMS/PUSH/승인/서버 저장은 미연결. 이전 syncDeferred는 당시 로컬 작업 이력이며 이번 요청 범위의 현재 흐름 동기화는 완료."
+    },
     "changeNoteId": "733:7302",
     "existingNodesMutated": [],
     "mobileChangeNoteUpdated": "2026-09-10-r15",
@@ -83,6 +132,15 @@
   "sourceArchive": "imq.zip",
   "sourceProject": "linq-dev-ap2-codecommit-linq-app-frontend",
   "implementations": [
+    {
+      "id": "LQ-SVC-003-P02",
+      "path": "index.html#supply-reset-dialog",
+      "menuId": "srvc/supply",
+      "in": ["customer_owner only", "visible item IDs", "confirm / cancel"],
+      "out": ["0H / normal / lastChangedAt", "supplyDueCount / supplySoonCount", "undo previous batch"],
+      "next": ["LQ-SVC-001-T01", "LQ-SVC-003"],
+      "note": "현재 범위 확인 후 원자적 메모리 처리. 직원/그룹장 차단. 웹 활성 P02 목적 재사용, 폐지 P01 보존."
+    },
     {
       "id": "LQ-DASH-001",
       "path": "index.html#home",
@@ -119,7 +177,7 @@
       "in": [
         "role",
         "group",
-        "q",
+        "listVehicle",
         "live",
         "period",
         "from",
@@ -381,7 +439,7 @@
       ],
       "in": [
         "약관",
-        "진입 URL role: customer_staff는 직원, 그 외 대표; 화면 역할 선택 없음",
+        "역할/구분: 고객 대표·고객 직원 라디오; 진입 URL role은 초기 선택(customer_staff는 직원, 그 외 대표)",
         "아이디",
         "이메일/인증번호",
         "비밀번호/확인",
@@ -389,7 +447,7 @@
         "전화번호",
         "국가/지역/주소",
         "업체/딜러",
-        "장비/단말기 Serial"
+        "장비/단말기 Serial (고객 대표만; 고객 직원은 숨김·입력 제외)"
       ],
       "out": [
         "중복/인증 예시 결과",
@@ -397,7 +455,7 @@
         "승인 주체/대기"
       ],
       "actualWrite": false,
-      "note": "r22 웹 가입 폼의 고객2역할/12자 비밀번호/승인대기 기준. 취소·완료 로그인 연결. 로컬 탭 내 가입대기 식별자만 저장하며 실제 가입/승인/발송 미연결. r25: 역할/구분 라디오 제거, 소속 정보 제목. 기존 고객 경로별 필수 입력과 승인 주체 유지."
+      "note": "r22 웹 가입 폼의 고객2역할/12자 비밀번호/승인대기 기준. 취소·완료 로그인 연결. 로컬 탭 내 가입대기 식별자만 저장하며 실제 가입/승인/발송 미연결. r25: 역할/구분 라디오 제거, 소속 정보 제목. r40 사용자 요청으로 소속 정보에 고객 대표/고객 직원 라디오 복원. 역할 변경 시 업체 선택을 초기화하고 소속 필수 항목/승인 주체를 변경하며 개인 입력/인증은 보존한다. 기존 ID와 고객 경로별 필수 입력/승인 주체 유지."
     },
     {
       "id": "LQ-RPT-001",
@@ -642,10 +700,10 @@
         "최종 주소/좌표/지도",
         "기종/상태/그룹/통신",
         "총 가동시간/조회 기간 가동시간",
-        "고객사/위치 기준 시간",
-        "전체보기·축소·닫기"
+        "위치 기준 시간 (r32 고객사 행 제거)",
+        "전체보기·접기·닫기 / 두 손가락 확대·축소 / 드래그 이동 / 데스크톱 휠 확대·축소"
       ],
-      "note": "r24 딜러앱 dialog DOM/공유 CSS/전체보기·축소/Escape/닫기·바깥클릭 재사용. 고객 데이터·권한·좌표범위 검사 후 조회. 닫기 시 iframe src 정리."
+      "note": "r24 딜러앱 dialog DOM/공유 CSS/전체보기·축소/Escape/닫기·바깥클릭 재사용. 고객 데이터·권한·좌표범위 검사 후 조회. r29 하단 밀착 모달: 앱 폭 최대480px/높이 최대88dvh, 하단 안전영역/내부 스크롤, 배경 잠금, 열 때 상단 초기화. r31 상단 양쪽16px 라운드는 바깥 클리핑/본문 스크롤 분리로 유지. r32 고객사 행만 제거. r33 iframe 대신 imq.zip 원본 App의 Maps JavaScript API와 지도 ID를 사용. 지도 안 버튼은 전체보기/접기 하나만 표시. 터치 확대·축소/드래그 및 휠 조작, 원본 차량 좌표와 차량번호 마커. 전체보기/접기는 이동한 중심 유지, 닫기/빠른 재열기 시 오래된 비동기 표시 차단. 원본 브라우저 키는 Git 제외 로컬 설정에만 복사, 설정/로딩/인증 실패 시 안내와 외부 Google 지도 링크 표시. SDK는 최초 지도 열기에만 로드. 서버 차량 데이터 연동·API 키의 도메인 허용/실기기 동작 확인은 미실시. 기존 ID와 조회 권한/메뉴 이동 유지, Figma 변경 없음."
     }
   ],
   "scenarioOnlyRoutes": [

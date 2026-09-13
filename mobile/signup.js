@@ -53,8 +53,7 @@
   let emailTimer = 0;
 
   function roleValue() {
-    // Keep the incoming customer flow without exposing a role selector.
-    return new URLSearchParams(window.location.search).get('role') === 'customer_staff' ? 'customer-employee' : 'customer-owner';
+    return $('input[name="signupRole"]:checked')?.value === 'customer-employee' ? 'customer-employee' : 'customer-owner';
   }
 
   function visible(element) {
@@ -170,6 +169,9 @@
     $$('[data-role-scope]').forEach(element => {
       element.hidden = !element.dataset.roleScope.split(' ').includes(role);
     });
+    ['#signup-equipment-serial','#signup-terminal-serial'].forEach(selector => {
+      $(selector).disabled = role !== 'customer-owner';
+    });
     selectedCompany = '';
     company.value = '';
     closeCompanyList();
@@ -259,7 +261,7 @@
     addSummaryRow(summary, '인증 이메일', maskEmail(email.value.trim()));
     addSummaryRow(summary, role === 'customer-employee' ? '소속 업체' : '업체명', company.value.trim());
     addSummaryRow(summary, '소속 딜러', dealer.value);
-    addSummaryRow(summary, '장비 Serial', $('#signup-equipment-serial').value.trim());
+    if (role === 'customer-owner') addSummaryRow(summary, '장비 Serial', $('#signup-equipment-serial').value.trim());
     stepButtons.find(button => button.dataset.signupStep === 'complete').disabled = false;
     showStep('complete');
     window.lucide?.createIcons({attrs:{'stroke-width':2}});
@@ -299,6 +301,11 @@
     else showStep(button.dataset.signupStep);
   }));
 
+  $$('input[name="signupRole"]').forEach(input => input.addEventListener('change', () => {
+    if (!input.checked) return;
+    clearErrors();
+    applyRole();
+  }));
   country.addEventListener('change', applyCountry);
   region.addEventListener('change', () => populateDealers(region.value));
   company.addEventListener('input', renderCompanies);
@@ -406,6 +413,8 @@
   });
   window.addEventListener('beforeunload', stopTimer);
 
+  const initialRole = new URLSearchParams(window.location.search).get('role') === 'customer_staff' ? 'customer-employee' : 'customer-owner';
+  $$('input[name="signupRole"]').forEach(input => { input.checked = input.value === initialRole; });
   applyCountry();
   applyRole();
   updateAgreementState();

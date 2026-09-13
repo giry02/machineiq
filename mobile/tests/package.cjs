@@ -16,13 +16,15 @@ for(const item of manifest.files){
 const ctx=vm.createContext({window:{},Date});
 vm.runInContext(read('data/fleet.generated.js'),ctx);vm.runInContext(read('model.js'),ctx);
 const M=ctx.window.CustomerPrototype,rows=M.buildVehicles(ctx.window.MIQ_MOCK_DATA.fleet);
-assert.equal(rows.length,10);
+assert.equal(rows.length,13,'Current customer demo fleet');
 for(const role of Object.keys(M.ROLE_LABELS)){
   const scoped=M.scope(rows,{role}),messages=M.pushHistory(scoped);
   assert(messages.every(m=>scoped.some(v=>v.equipmentId===m.equipmentId)));
   assert(M.counts(scoped).total===scoped.length);
 }
-assert(!read('signup.html').includes('name="signupRole"'));
+assert(read('signup.html').includes('name="signupRole"'));
+assert(read('index.html').includes('data-screen-id="LQ-SVC-003-P02"'));
+assert(!manifest.files.some(item=>/map-config\.local|\.env(?:\.|$)/.test(item.path)));
 assert(read('customer.js').includes('data-logout')&&read('customer.js').includes('data-notification-category'));
 assert(!read('customer.js').includes('localhost:'));
 const server=require('../serve.cjs');
@@ -35,5 +37,5 @@ const server=require('../serve.cjs');
     assert.equal((await fetch(base+'/manifest.json')).status,403);
     assert.equal((await fetch(base+'/login.html',{method:'POST'})).status,405);
     console.log('PASS: packaged checksums, syntax, all local assets, vehicle scopes and local HTTP routes.');
-  }finally{server.close();}
+  }finally{server.closeAllConnections();server.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

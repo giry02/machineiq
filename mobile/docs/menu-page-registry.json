@@ -1,0 +1,1143 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-09-13",
+  "scope": "모바일 = 현재 고객용 모바일 프로토타입",
+  "sourceRoot": "html/customer/mobile-prototype",
+  "workbook": "outputs/01a065cf-a62e-7001-9333-b6e1fc0b5fa6/MACHINE_IQ_모바일_메뉴_페이지_구조도_20260913.xlsx",
+  "idPolicy": {
+    "menuIds": "LQM-MNU-001~020은 모바일 관리 ID. 기존 _shared/nav.js MENU.key/subs.key는 별도 매핑으로 보존한다.",
+    "screenIds": "기존 20개 유지. 현재 구현된 가입·비밀번호 단계와 독립 서비스·알림 탭 10개에 미사용 ID 발급.",
+    "popup": "지도 모달과 대표 전용 소모품 교체 완료 확인 모달을 독립 페이지로 관리. 인라인 펼침·필터·토스트는 별도 페이지에서 제외."
+  },
+  "runtimeChange": true,
+  "supplyResetRevision": {
+    "date": "2026-09-13",
+    "revision": "2026-09-13-r42",
+    "popupId": "LQ-SVC-003-P02",
+    "idPolicy": "웹의 활성 교체 완료 확인 ID를 재사용. 폐지된 교환 정보 수정 P01은 재사용하지 않음.",
+    "workbookNote": "이전 엑셀은 리셋 추가 전 30페이지 스냅샷. 현재 등록부는 기존 ID 참조 21개+신규 단계/탭 10개=31페이지, 팝업 2개."
+  },
+  "figjam": {
+    "changed": true,
+    "note": "r42에서 기존 모바일 서비스 영역에 대표 전용 Reset 팝업과 권한·입출력을 반영했다. 기존 위치는 유지했다. 앞서 문서화한 신규 세부 ID 10개 전체가 원격 반영되었다는 의미는 아니다.",
+    "supplyResetRecord": "docs/ux/figjam-customer-mobile-supply-reset-20260913.json",
+    "record": "docs/ux/figjam-customer-mobile-process-20260913.json"
+  },
+  "menus": [
+    {
+      "id": "LQM-MNU-001",
+      "name": "홈",
+      "parent": "",
+      "area": "하단 메뉴",
+      "key": "dash/group",
+      "page": "LQ-DASH-001",
+      "position": "하단 1",
+      "description": "금일 통신·가동·작업·점검 현황을 확인하는 시작 메뉴.",
+      "trigger": "홈 선택 시 이전 그룹·차량 조건 초기화."
+    },
+    {
+      "id": "LQM-MNU-002",
+      "name": "차량",
+      "parent": "",
+      "area": "하단 메뉴",
+      "key": "anlz/summary",
+      "page": "LQ-OPS-001",
+      "position": "하단 2",
+      "description": "차량 목록을 조회하고 차량 상세 및 점검 정보로 진입한다.",
+      "trigger": "하단 차량 버튼. 목록/상세에서 하단 차량이 활성화된다."
+    },
+    {
+      "id": "LQM-MNU-003",
+      "name": "서비스",
+      "parent": "",
+      "area": "하단 메뉴",
+      "key": "srvc/all",
+      "page": "LQ-SVC-001",
+      "position": "하단 3",
+      "description": "정비·소모품·에러를 유형별로 확인한다.",
+      "trigger": "하단 진입은 정비 탭, 특정 차량/상태 조건 초기화."
+    },
+    {
+      "id": "LQM-MNU-004",
+      "name": "정비",
+      "parent": "LQM-MNU-003",
+      "area": "하단 메뉴",
+      "key": "srvc/maintenance",
+      "page": "LQ-SVC-001",
+      "position": "서비스 탭 1",
+      "description": "조회 기간의 정비 이력과 처리 상태를 확인한다.",
+      "trigger": "기본 탭. 정비·에러 간 서비스 기간 공유."
+    },
+    {
+      "id": "LQM-MNU-005",
+      "name": "소모품",
+      "parent": "LQM-MNU-003",
+      "area": "하단 메뉴",
+      "key": "srvc/supply",
+      "page": "LQ-SVC-001-T01",
+      "position": "서비스 탭 2",
+      "description": "현재 소모품 사용률과 교체 필요/임박을 확인한다.",
+      "trigger": "기간 조건 없이 현재 품목 조회."
+    },
+    {
+      "id": "LQM-MNU-006",
+      "name": "에러",
+      "parent": "LQM-MNU-003",
+      "area": "하단 메뉴",
+      "key": "srvc/error",
+      "page": "LQ-SVC-001-T02",
+      "position": "서비스 탭 3",
+      "description": "조회 기간의 에러 발생 및 해제 상태를 확인한다.",
+      "trigger": "탭 전환 시 차량은 유지하고 상태 조건은 해제."
+    },
+    {
+      "id": "LQM-MNU-007",
+      "name": "리포트",
+      "parent": "",
+      "area": "하단 메뉴",
+      "key": "rpt/rptstatus",
+      "page": "LQ-RPT-001",
+      "position": "하단 4",
+      "description": "업무 현황과 운영효율을 확인하는 리포트 진입 메뉴.",
+      "trigger": "기본은 업무 리포트."
+    },
+    {
+      "id": "LQM-MNU-008",
+      "name": "업무 현황",
+      "parent": "LQM-MNU-007",
+      "area": "하단 메뉴",
+      "key": "rpt/rptstatus",
+      "page": "LQ-RPT-001",
+      "position": "리포트 탭 1",
+      "description": "기간 작업 현황과 그룹/차량별 실적을 확인한다.",
+      "trigger": "운영효율과 그룹·차량·조회 조건 공유."
+    },
+    {
+      "id": "LQM-MNU-009",
+      "name": "운영효율",
+      "parent": "LQM-MNU-007",
+      "area": "하단 메뉴",
+      "key": "anlz/operb",
+      "page": "LQ-REF-003",
+      "position": "리포트 탭 2",
+      "description": "일별 운영 현황과 작업/대기 구성을 확인한다.",
+      "trigger": "일·주·월 단위로 날짜를 정규화한다."
+    },
+    {
+      "id": "LQM-MNU-010",
+      "name": "설정",
+      "parent": "",
+      "area": "하단 메뉴",
+      "key": "myacct/account",
+      "page": "LQ-ACC-001",
+      "position": "하단 5",
+      "description": "내 정보, 테스트 조회 역할, PUSH 수신 항목을 확인한다.",
+      "trigger": "계정 메뉴에 로그아웃 제공."
+    },
+    {
+      "id": "LQM-MNU-011",
+      "name": "로그아웃",
+      "parent": "LQM-MNU-010",
+      "area": "하단 메뉴",
+      "key": "모바일 전용",
+      "page": "LQ-AUTH-003",
+      "position": "설정 계정 메뉴",
+      "description": "현재 시연 로그인 상태를 종료하고 로그인으로 이동한다.",
+      "trigger": "별도 확인 팝업 없이 즉시 처리."
+    },
+    {
+      "id": "LQM-MNU-012",
+      "name": "알림 내역",
+      "parent": "",
+      "area": "공통 메뉴",
+      "key": "모바일 전용",
+      "page": "LQ-COM-004",
+      "position": "상단 종 아이콘",
+      "description": "PUSH 수신 이력을 유형별로 확인한다.",
+      "trigger": "하단 고정 메뉴가 아닌 공통 상단 진입."
+    },
+    {
+      "id": "LQM-MNU-013",
+      "name": "전체",
+      "parent": "LQM-MNU-012",
+      "area": "공통 메뉴",
+      "key": "모바일 전용",
+      "page": "LQ-COM-004",
+      "position": "알림 탭 1",
+      "description": "허용된 차량의 수신 이력을 모두 확인한다.",
+      "trigger": "기본 탭."
+    },
+    {
+      "id": "LQM-MNU-014",
+      "name": "충격",
+      "parent": "LQM-MNU-012",
+      "area": "공통 메뉴",
+      "key": "모바일 전용",
+      "page": "LQ-COM-004-T01",
+      "position": "알림 탭 2",
+      "description": "충격 유형의 수신 이력만 확인한다.",
+      "trigger": "유형별 건수와 빈 상태 표시."
+    },
+    {
+      "id": "LQM-MNU-015",
+      "name": "차량 에러",
+      "parent": "LQM-MNU-012",
+      "area": "공통 메뉴",
+      "key": "모바일 전용",
+      "page": "LQ-COM-004-T02",
+      "position": "알림 탭 3",
+      "description": "차량 에러 유형의 수신 이력만 확인한다.",
+      "trigger": "유형별 건수와 빈 상태 표시."
+    },
+    {
+      "id": "LQM-MNU-016",
+      "name": "배터리",
+      "parent": "LQM-MNU-012",
+      "area": "공통 메뉴",
+      "key": "모바일 전용",
+      "page": "LQ-COM-004-T03",
+      "position": "알림 탭 4",
+      "description": "배터리 유형의 수신 이력만 확인한다.",
+      "trigger": "유형별 건수와 빈 상태 표시."
+    },
+    {
+      "id": "LQM-MNU-017",
+      "name": "기타",
+      "parent": "LQM-MNU-012",
+      "area": "공통 메뉴",
+      "key": "모바일 전용",
+      "page": "LQ-COM-004-T04",
+      "position": "알림 탭 5",
+      "description": "기타 유형의 수신 이력만 확인한다.",
+      "trigger": "유형별 건수와 빈 상태 표시."
+    },
+    {
+      "id": "LQM-MNU-018",
+      "name": "로그인",
+      "parent": "",
+      "area": "로그인 이전",
+      "key": "모바일 전용",
+      "page": "LQ-AUTH-003",
+      "position": "인증 진입",
+      "description": "아이디·비밀번호로 고객 모바일 시연에 진입한다.",
+      "trigger": "일반 로그인/임시 비밀번호 분기."
+    },
+    {
+      "id": "LQM-MNU-019",
+      "name": "회원가입",
+      "parent": "",
+      "area": "로그인 이전",
+      "key": "모바일 전용",
+      "page": "LQ-AUTH-002",
+      "position": "로그인 하단 링크",
+      "description": "약관 동의, 정보 입력, 신청 완료를 진행한다.",
+      "trigger": "고객 대표와 고객 직원만 가입 선택."
+    },
+    {
+      "id": "LQM-MNU-020",
+      "name": "비밀번호 찾기",
+      "parent": "",
+      "area": "로그인 이전",
+      "key": "모바일 전용",
+      "page": "LQ-AUTH-004",
+      "position": "로그인 하단 링크",
+      "description": "아이디 확인, Email 인증, 임시 비밀번호 발급을 진행한다.",
+      "trigger": "발급 후 로그인과 새 비밀번호 설정 연결."
+    }
+  ],
+  "existingScreens": [
+    {
+      "id": "LQ-SVC-003-P02",
+      "name": "소모품 교체 완료 확인",
+      "type": "팝업",
+      "parent": "LQ-SVC-003",
+      "area": "서비스",
+      "roles": "고객 대표만",
+      "description": "선택 품목·차량·건수를 확인한 후 교체 완료를 일괄 처리한다.",
+      "input": "현재 조회 범위의 유효한 사용시간>0 품목 ID, 고객 대표, 확인/취소.",
+      "output": "사용시간 0H·정상·최근 교체 시각, 홈/차량의 필요·임박 집계 갱신. 목록 복귀와 실행 취소.",
+      "exception": "직원·그룹장 선택/처리 차단. 그룹·차량·역할·화면 변경 시 선택 해제. 메모리 시연이며 새로고침 시 복원, 실제 서버/장비 변경 없음.",
+      "route": "index.html#services?service=supplies → #supply-reset-dialog",
+      "isNew": false
+    },
+    {
+      "id": "LQ-AUTH-003",
+      "name": "로그인",
+      "type": "페이지",
+      "parent": "",
+      "area": "인증",
+      "roles": "비로그인 고객",
+      "description": "아이디와 비밀번호로 고객 모바일 시연을 시작한다. 아이디 저장 및 비밀번호 표시 전환을 제공한다.",
+      "input": "아이디, 비밀번호, 아이디 저장. 고객 직원 진입 경로를 지원한다.",
+      "output": "일반 로그인은 홈으로 이동. 임시 비밀번호 사용 시 새 비밀번호 설정으로 전환. 가입/비밀번호 찾기 링크.",
+      "exception": "실제 인증 아님. 가입 승인 대기 및 로그인 실패 누적 잠금은 로컬 시연 상태.",
+      "route": "login.html",
+      "isNew": false
+    },
+    {
+      "id": "LQ-AUTH-003-T01",
+      "name": "새 비밀번호 설정",
+      "type": "단계",
+      "parent": "LQ-AUTH-003",
+      "area": "인증",
+      "roles": "임시 비밀번호 로그인 고객",
+      "description": "임시 비밀번호 로그인 후 새 비밀번호를 입력하는 로그인 화면 내부 단계.",
+      "input": "새 비밀번호, 확인. 영문·숫자·특수문자 포함 12자 이상.",
+      "output": "유효성 검사 후 홈 이동. 임시 비밀번호 상태와 입력 비밀번호를 지운다.",
+      "exception": "별도 모달이 아니다. 실제 서버 비밀번호 변경은 수행하지 않는다.",
+      "route": "login.html",
+      "isNew": false
+    },
+    {
+      "id": "LQ-AUTH-002",
+      "name": "회원가입 약관 동의",
+      "type": "페이지",
+      "parent": "",
+      "area": "인증",
+      "roles": "비로그인 고객",
+      "description": "회원가입의 첫 단계. 개인정보 수집·제3자 제공·서비스 이용 필수 약관과 선택 동의를 확인한다.",
+      "input": "전체 동의, 개별 약관 동의, 약관 보기.",
+      "output": "필수 동의 완료 후 정보 입력. 약관 보기는 같은 화면 안에서 펼친다.",
+      "exception": "기존 회원가입 화면 ID를 기본 단계에 유지. 실제 약관 접수/저장 없음.",
+      "route": "signup.html",
+      "isNew": false
+    },
+    {
+      "id": "LQ-AUTH-004",
+      "name": "비밀번호 찾기 아이디 확인",
+      "type": "페이지",
+      "parent": "",
+      "area": "인증",
+      "roles": "비로그인 고객",
+      "description": "비밀번호 찾기의 첫 단계. 가입 아이디 또는 이메일을 확인한다.",
+      "input": "사용자 ID 또는 이메일.",
+      "output": "다음 선택 시 Email 본인 인증 단계로 이동. 로그인/가입 링크.",
+      "exception": "실제 계정 조회가 아닌 시연 입력 검사.",
+      "route": "find-password.html",
+      "isNew": false
+    },
+    {
+      "id": "LQ-DASH-001",
+      "name": "금일 현황",
+      "type": "페이지",
+      "parent": "",
+      "area": "홈",
+      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "description": "통신·가동 현황, 에러 발생·교체 필요/임박, 금일 작업과 그룹/차량별 현황을 보여준다.",
+      "input": "통신/가동 범례, 점검 카드, 그룹·차량 행, 요약정보/리포트 버튼.",
+      "output": "조건별 차량 목록, 서비스 내역, 금일 리포트와 차량 상세로 이동.",
+      "exception": "대표: 업체 전체/선택 그룹. 직원·그룹장: 배정 그룹. 실제 서버 인가 미연결. 그룹 비교는 대표에게 제공. 수집 기준 시각과 미연결 상태를 구분한다.",
+      "route": "index.html#home",
+      "isNew": false
+    },
+    {
+      "id": "LQ-OPS-001",
+      "name": "요약정보",
+      "type": "페이지",
+      "parent": "",
+      "area": "차량",
+      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "description": "차량별 작업·대기·운행거리·운영효율 및 현재 점검 상태를 카드로 확인한다.",
+      "input": "그룹(대표), 전체/개별 차량, 날짜, 금일·주·월. 홈의 통신·가동 조건을 이어받을 수 있다.",
+      "output": "차량 카드에서 상세. 소모품/에러는 해당 차량 서비스, 배터리 잔량/충격은 해당 상세.",
+      "exception": "대표: 업체 전체/선택 그룹. 직원·그룹장: 배정 그룹. 실제 서버 인가 미연결. 그룹과 차량 선택을 위에, 날짜와 기간 단위를 아래에 배치. 미수신은 0과 구분.",
+      "route": "index.html#summary",
+      "isNew": false
+    },
+    {
+      "id": "LQ-OPS-002",
+      "name": "차량 상세",
+      "type": "페이지",
+      "parent": "LQ-OPS-001",
+      "area": "차량",
+      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "description": "차량 식별·가동 상태, 현재 점검, 기간 운행, 에너지 정보, 최근 정비, 최종 위치와 기본정보를 보여준다.",
+      "input": "선택 차량, 조회 기간. 업무 현황·운영효율·충격 상세, 정비 기록, 지도 보기.",
+      "output": "선택 차량/기간으로 리포트·충격·정비·서비스 이동. 지도 팝업 열기.",
+      "exception": "범위 밖/잘못된 차량은 조회 불가. 위치 없는 차량에는 지도 보기 미제공. 기본정보는 인라인 펼침.",
+      "route": "index.html#detail?equipmentId=demo-equipment-01",
+      "isNew": false
+    },
+    {
+      "id": "LQ-OPS-002-T01",
+      "name": "운행정보",
+      "type": "상세",
+      "parent": "LQ-OPS-002",
+      "area": "차량",
+      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "description": "선택 차량의 운행시간·거리·작업시간·대기시간을 조회한다.",
+      "input": "차량, 날짜, 금일·주·월.",
+      "output": "이전 상세 또는 지정된 원래 목록으로 복귀.",
+      "exception": "기존 호환 경로를 유지한 상세. 현재 차량 상세의 주요 버튼에는 별도 운행정보 버튼이 없다.",
+      "route": "index.html#operation?equipmentId=demo-equipment-01",
+      "isNew": false
+    },
+    {
+      "id": "LQ-OPS-005",
+      "name": "충격 상세",
+      "type": "상세",
+      "parent": "LQ-OPS-002",
+      "area": "차량",
+      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "description": "선택 차량의 조회 기간 충격 건수를 확인한다.",
+      "input": "차량, 날짜, 금일·주·월. 알림에서 선택한 차량도 진입 가능.",
+      "output": "선택 차량의 기간 충격 표시. 진입한 목록/상세/알림으로 복귀.",
+      "exception": "발생 시각·강도 세부 이력은 미수신. 알림 진입이어도 특정 충격 이벤트 분석 화면은 아니다.",
+      "route": "index.html#shock?equipmentId=demo-equipment-01",
+      "isNew": false
+    },
+    {
+      "id": "LQ-OPS-006",
+      "name": "엔진 상세",
+      "type": "상세",
+      "parent": "LQ-OPS-002",
+      "area": "차량",
+      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "description": "엔진 차량의 월간 평균 연료소비량을 확인하는 기존 호환 화면.",
+      "input": "엔진 차량 식별자.",
+      "output": "월간 연료소비량 표시 및 원래 화면 복귀.",
+      "exception": "현재 주요 메뉴 진입 없음. 엔진 이외 차량은 대상 아님. 엔진 회전수·냉각수 온도 이력 미수신.",
+      "route": "index.html#engine?equipmentId=demo-equipment-02",
+      "isNew": false
+    },
+    {
+      "id": "LQ-OPS-007",
+      "name": "배터리 상세",
+      "type": "상세",
+      "parent": "LQ-OPS-002",
+      "area": "차량",
+      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "description": "전동 차량의 배터리 종류·잔량·수신시각·월간 전력소비·전압·용량을 확인한다.",
+      "input": "차량 잔량 선택 또는 배터리 경고 알림.",
+      "output": "배터리 수신 정보 표시 및 원래 목록/상세/알림 복귀.",
+      "exception": "미연결은 마지막 수신값. 엔진 차량은 대상 아님. 충전 예약과 충전 이력은 이용 불가.",
+      "route": "index.html#battery?equipmentId=demo-equipment-01",
+      "isNew": false
+    },
+    {
+      "id": "LQ-OPS-002-P01",
+      "name": "차량 최종 위치",
+      "type": "팝업",
+      "parent": "LQ-OPS-002",
+      "area": "차량",
+      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "description": "최종 수신 위치의 지도, 주소·좌표와 차량 정보를 표시하는 모달. 하나의 독립 페이지로 관리한다.",
+      "input": "차량 상세의 지도 보기. 전체보기/축소, 지도 이동·확대, 닫기.",
+      "output": "전체보기는 같은 팝업의 확장 상태. 닫기/배경 클릭으로 원래 차량 상세 복귀.",
+      "exception": "실시간 위치 아님. 위치 없으면 열리지 않음. 지도는 인터넷/API 키 필요. 오류 시 외부 지도 링크 제공.",
+      "route": "index.html#detail?equipmentId=demo-equipment-01",
+      "isNew": false
+    },
+    {
+      "id": "LQ-SVC-001",
+      "name": "서비스 정비 이력",
+      "type": "페이지",
+      "parent": "",
+      "area": "서비스",
+      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "description": "서비스 진입의 기본 정비 탭. 선택 기간 내 차량별 정비 이력과 처리 상태를 확인한다.",
+      "input": "그룹(대표), 날짜, 금일·주·월. 차량/상태 조건은 진입 화면에서 전달 가능.",
+      "output": "정비 이력 선택 시 정비 상세. 차량번호 선택 시 차량 상세. 소모품/에러 탭 전환.",
+      "exception": "정비·에러는 서비스 전용 조회 기간을 공유. 기본 정비 탭은 기존 서비스 화면 ID를 사용한다.",
+      "route": "index.html#services?service=maintenance",
+      "isNew": false
+    },
+    {
+      "id": "LQ-SVC-003",
+      "name": "소모품 상세",
+      "type": "상세",
+      "parent": "LQ-SVC-001-T01",
+      "area": "서비스",
+      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "description": "선택 차량의 소모품별 교체주기·사용시간·사용률·최근 교체일·수집 기준을 확인하는 호환 화면.",
+      "input": "차량 식별자, 선택 이력 식별자(호환).",
+      "output": "소모품 정보 표시 및 지정된 이전 화면 복귀.",
+      "exception": "현재 서비스 소모품 품목 행에는 이 화면 진입 링크가 없다. 고객 대표만 선택→교체 완료 확인(P02)→0H/정상 처리 가능. 서버 저장 없음.",
+      "route": "index.html#supplies?equipmentId=demo-equipment-01",
+      "isNew": false
+    },
+    {
+      "id": "LQ-SVC-004",
+      "name": "에러 상세",
+      "type": "상세",
+      "parent": "LQ-SVC-001-T02",
+      "area": "서비스",
+      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "description": "선택 에러 기록의 발생·해제 시각과 상태 또는 차량의 현재 에러 요약을 표시한다.",
+      "input": "차량 식별자, 선택 에러 이력 식별자. 에러 알림에서도 진입.",
+      "output": "서비스 이력 진입은 선택 기록, 알림/직접 진입은 현재 요약. 원래 화면으로 복귀.",
+      "exception": "선택 기록이 없거나 범위 밖이면 조회 불가. 알림 메시지와 서비스 기록의 식별자는 동일하지 않다.",
+      "route": "index.html#error?equipmentId=demo-equipment-01",
+      "isNew": false
+    },
+    {
+      "id": "LQ-SVC-002",
+      "name": "정비 상세",
+      "type": "상세",
+      "parent": "LQ-SVC-001",
+      "area": "서비스",
+      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "description": "선택한 정비 이력의 차량·항목·일시·처리상태 또는 차량 정비 기록 목록을 확인한다.",
+      "input": "차량, 정비 이력 식별자 또는 기간.",
+      "output": "서비스/차량 상세에서 진입하고 지정된 원래 화면으로 돌아간다.",
+      "exception": "정비 등록·수정·완료 처리 기능 없음. 정비는 PUSH 알림 유형으로 별도 제공되지 않는다.",
+      "route": "index.html#maintenance?equipmentId=demo-equipment-01",
+      "isNew": false
+    },
+    {
+      "id": "LQ-RPT-001",
+      "name": "업무 리포트",
+      "type": "페이지",
+      "parent": "",
+      "area": "리포트",
+      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "description": "선택 범위의 운영효율·작업/대기, 기간 합계·대당 평균과 그룹/차량별 작업 현황을 확인한다.",
+      "input": "그룹(대표), 전체/개별 차량, 날짜, 금일·주·월. 전체/긴 대기/미확인 필터.",
+      "output": "차량 행에서 상세, 그룹 선택으로 해당 범위 리포트, 운영효율 탭으로 이동.",
+      "exception": "개별 차량 선택 시 차량 운행정보 표시. 미확인·미연결과 실제 0 구분. 조건과 역할 범위 유지.",
+      "route": "index.html#reports",
+      "isNew": false
+    },
+    {
+      "id": "LQ-REF-003",
+      "name": "운영효율",
+      "type": "페이지",
+      "parent": "LQ-RPT-001",
+      "area": "리포트",
+      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "description": "기간 운영효율과 일별 작업·대기·잔여(가정) 구성을 확인한다. 일자 상세를 인라인으로 펼친다.",
+      "input": "그룹(대표), 차량, 일·주·월, 해당 단위의 날짜. 일자 펼침.",
+      "output": "펼친 일자의 업무 리포트로 이동. 선택 차량의 상세 이동. 업무 현황 탭과 조건 공유.",
+      "exception": "오늘 이후 날짜는 미표시. 과거 미수집은 미집계. 비율은 합산 기준, 시간은 실적 확인 차량 평균.",
+      "route": "index.html#efficiency",
+      "isNew": false
+    },
+    {
+      "id": "LQ-ACC-001",
+      "name": "설정",
+      "type": "페이지",
+      "parent": "",
+      "area": "설정",
+      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "description": "내 정보와 화면 확인용 역할 선택, PUSH 수신 항목 및 로그아웃을 제공한다.",
+      "input": "고객 대표/직원/그룹장 테스트 역할. PUSH 전체·충격·차량 에러·배터리 경고·공지/마케팅 토글.",
+      "output": "역할별 화면 범위 전환. 로그아웃 즉시 로그인으로 이동.",
+      "exception": "PUSH 전체 OFF는 하위도 OFF. 설정은 현재 실행 메모리만 유지. 실제 기기 권한/서버 PUSH 및 SMS 스위치 없음.",
+      "route": "index.html#settings",
+      "isNew": false
+    },
+    {
+      "id": "LQ-COM-004",
+      "name": "알림 내역 전체",
+      "type": "페이지",
+      "parent": "",
+      "area": "알림",
+      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "description": "기존 앱 PUSH 유형에 맞춘 수신 이력을 표시한다. 전체 탭이 기본이다.",
+      "input": "전체/충격/차량 에러/배터리/기타 탭, 이동 가능한 알림 행.",
+      "output": "충격·차량 에러·배터리는 해당 차량 상세로 이동. 목록으로 돌아올 때 선택 탭 유지.",
+      "exception": "역할별 배정 차량 이력. 미읽음 배지는 별도 값이며 단순 조회로 읽음 처리하지 않는다. 실제 PUSH 수신 없음.",
+      "route": "index.html#notifications",
+      "isNew": false
+    }
+  ],
+  "newScreens": [
+    {
+      "id": "LQ-AUTH-002-T01",
+      "name": "회원가입 정보 입력",
+      "type": "단계",
+      "parent": "LQ-AUTH-002",
+      "area": "인증",
+      "roles": "비로그인 고객 대표 · 고객 직원",
+      "description": "개인 정보, 연락처·주소, 소속 정보와 고객 대표/직원 역할을 입력한다. 장비 연결 정보는 고객 대표에게만 제공한다.",
+      "input": "이름·ID 중복확인·이메일 인증·비밀번호·국가/주소·전화·소속 업체. 대표는 지역/딜러/대표자/장비·단말기 Serial 추가.",
+      "output": "역할 전환 시 해당 소속 항목 적용. 직원은 기존 업체 선택 필수. 유효한 입력 후 신청 완료 단계.",
+      "exception": "직원 장비 연결 영역은 숨김·입력 제외. 인증/중복확인은 로컬 예시이며 실제 가입·메일·SMS 발송 없음.",
+      "route": "signup.html",
+      "isNew": true
+    },
+    {
+      "id": "LQ-AUTH-002-T02",
+      "name": "회원가입 신청 완료",
+      "type": "단계",
+      "parent": "LQ-AUTH-002",
+      "area": "인증",
+      "roles": "가입 양식을 완료한 고객",
+      "description": "신청번호, 신청 구분, 계정·업체 정보와 승인 대기 주체를 표시한다.",
+      "input": "앞 단계의 최종 입력값과 역할.",
+      "output": "대표는 딜러대표 승인 대기, 직원은 고객 대표 승인 대기. 로그인 화면으로 이동.",
+      "exception": "직원 요약에 장비 Serial 미표시. 탭 내 승인 대기 식별자만 보관하며 실제 접수·승인은 없음.",
+      "route": "signup.html",
+      "isNew": true
+    },
+    {
+      "id": "LQ-AUTH-004-T01",
+      "name": "Email 본인 인증",
+      "type": "단계",
+      "parent": "LQ-AUTH-004",
+      "area": "인증",
+      "roles": "비밀번호 찾기 이용 고객",
+      "description": "이름과 등록 이메일을 입력하고 6자리 인증 코드를 확인한다.",
+      "input": "이름, 등록 이메일, 코드 발송 및 인증 코드 입력.",
+      "output": "3분 유효시간 내 코드 확인 후 임시 비밀번호 발급 단계.",
+      "exception": "불일치·만료 안내. 실제 이메일 발송/본인 인증 미연결.",
+      "route": "find-password.html",
+      "isNew": true
+    },
+    {
+      "id": "LQ-AUTH-004-T02",
+      "name": "임시 비밀번호 발급",
+      "type": "단계",
+      "parent": "LQ-AUTH-004",
+      "area": "인증",
+      "roles": "인증 예시를 완료한 고객",
+      "description": "24시간 유효한 임시 비밀번호 예시를 표시하고 복사 기능을 제공한다.",
+      "input": "임시 비밀번호 복사, 로그인으로 이동.",
+      "output": "로그인 후 새 비밀번호 설정 단계로 연결.",
+      "exception": "로컬 시연 상태. 복사 기능은 브라우저 환경에 영향을 받으며 실제 계정 비밀번호 발급 아님.",
+      "route": "find-password.html",
+      "isNew": true
+    },
+    {
+      "id": "LQ-SVC-001-T01",
+      "name": "서비스 소모품 현황",
+      "type": "탭",
+      "parent": "LQ-SVC-001",
+      "area": "서비스",
+      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "description": "차량별 현재 소모품과 사용률·교체 필요/임박을 확인한다.",
+      "input": "그룹(대표), 진입 차량 조건, 조건 해제. 대표만 개별/전체 품목 선택 및 Reset.",
+      "output": "차량별 현재 품목/사용률 표시. 차량번호는 차량 상세로 이동. 대표는 P02 확인 팝업과 실행 취소 제공. 정상 처리 후 필요·임박 집계 동기화.",
+      "exception": "기간 적용 없음. 품목 행 자체는 상세 이동하지 않음. 날짜 버튼 대신 마지막 수집 시각 표시.",
+      "route": "index.html#services?service=supplies",
+      "isNew": true
+    },
+    {
+      "id": "LQ-SVC-001-T02",
+      "name": "서비스 에러 이력",
+      "type": "탭",
+      "parent": "LQ-SVC-001",
+      "area": "서비스",
+      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "description": "기간 내 차량 에러 발생 이력과 해제/미해제 상태를 확인한다.",
+      "input": "그룹(대표), 날짜, 금일·주·월, 진입 차량·미해제 조건 해제.",
+      "output": "에러 이력 선택 시 해당 기록 상세. 차량번호는 차량 상세로 이동.",
+      "exception": "차량의 현재 에러 버튼으로 진입하면 해당 차량의 금일 미해제 조건을 적용한다.",
+      "route": "index.html#services?service=error",
+      "isNew": true
+    },
+    {
+      "id": "LQ-COM-004-T01",
+      "name": "충격 알림",
+      "type": "탭",
+      "parent": "LQ-COM-004",
+      "area": "알림",
+      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "description": "실시간 충격 유형의 수신 이력만 표시한다.",
+      "input": "유형 탭 선택. 알림 행 선택.",
+      "output": "충격 상세 및 원래 선택 탭 유지.",
+      "exception": "유형별 건수는 해당 역할의 수신 이력 기준. 기록이 없으면 빈 목록. 기타는 별도 상세 페이지 없음.",
+      "route": "index.html#notifications?notificationCategory=shock",
+      "isNew": true
+    },
+    {
+      "id": "LQ-COM-004-T02",
+      "name": "차량 에러 알림",
+      "type": "탭",
+      "parent": "LQ-COM-004",
+      "area": "알림",
+      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "description": "실시간 차량 에러 유형의 수신 이력만 표시한다.",
+      "input": "유형 탭 선택. 알림 행 선택.",
+      "output": "에러 상세 및 원래 선택 탭 유지.",
+      "exception": "유형별 건수는 해당 역할의 수신 이력 기준. 기록이 없으면 빈 목록. 기타는 별도 상세 페이지 없음.",
+      "route": "index.html#notifications?notificationCategory=error",
+      "isNew": true
+    },
+    {
+      "id": "LQ-COM-004-T03",
+      "name": "배터리 알림",
+      "type": "탭",
+      "parent": "LQ-COM-004",
+      "area": "알림",
+      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "description": "실시간 배터리 경고 유형의 수신 이력만 표시한다.",
+      "input": "유형 탭 선택. 알림 행 선택.",
+      "output": "배터리 상세 및 원래 선택 탭 유지.",
+      "exception": "유형별 건수는 해당 역할의 수신 이력 기준. 기록이 없으면 빈 목록. 기타는 별도 상세 페이지 없음.",
+      "route": "index.html#notifications?notificationCategory=battery",
+      "isNew": true
+    },
+    {
+      "id": "LQ-COM-004-T04",
+      "name": "기타 알림",
+      "type": "탭",
+      "parent": "LQ-COM-004",
+      "area": "알림",
+      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "description": "공지사항/마케팅 등 상세 이동이 정의되지 않은 기타 유형을 표시한다.",
+      "input": "유형 탭 선택. ",
+      "output": "목록 안에서 내용 확인 및 원래 선택 탭 유지.",
+      "exception": "유형별 건수는 해당 역할의 수신 이력 기준. 기록이 없으면 빈 목록. 기타는 별도 상세 페이지 없음.",
+      "route": "index.html#notifications?notificationCategory=other",
+      "isNew": true
+    }
+  ],
+  "transitions": [
+    {"from":"LQ-SVC-001-T01","action":"대표가 품목 선택 후 교체 완료 · Reset","to":"LQ-SVC-003-P02","state":"현재 범위의 품목 ID·차량·사용시간·건수","back":"취소/닫기/Esc는 무변경 복귀","note":"직원·그룹장 불가. 선택 0개/미수신/0H는 실행 불가"},
+    {"from":"LQ-SVC-003","action":"대표가 품목 선택 후 Reset","to":"LQ-SVC-003-P02","state":"해당 차량/선택 품목 범위","back":"소모품 상세","note":"호환 상세에서도 같은 처리 규칙"},
+    {"from":"LQ-SVC-003-P02","action":"교체 완료 확인 또는 취소","to":"LQ-SVC-001-T01","state":"확인: 0H/정상·교체시각·집계 갱신; 취소: 무변경","back":"상세 진입 시 LQ-SVC-003 복귀","note":"실행 취소 제공. 새로고침 시 초기값, 서버 저장 없음"},
+    {
+      "from": "LQ-AUTH-003",
+      "action": "일반 로그인",
+      "to": "LQ-DASH-001",
+      "state": "고객 역할",
+      "back": "로그아웃은 로그인",
+      "note": "실제 인증 미연결"
+    },
+    {
+      "from": "LQ-AUTH-003",
+      "action": "임시 비밀번호로 로그인",
+      "to": "LQ-AUTH-003-T01",
+      "state": "임시 비밀번호/만료 상태",
+      "back": "",
+      "note": "미리 발급한 로컬 예시와 일치할 때"
+    },
+    {
+      "from": "LQ-AUTH-003-T01",
+      "action": "새 비밀번호 확인",
+      "to": "LQ-DASH-001",
+      "state": "역할",
+      "back": "",
+      "note": "서버 변경 없음"
+    },
+    {
+      "from": "LQ-AUTH-003",
+      "action": "회원가입 링크",
+      "to": "LQ-AUTH-002",
+      "state": "",
+      "back": "",
+      "note": ""
+    },
+    {
+      "from": "LQ-AUTH-002",
+      "action": "필수 약관 동의 후 다음",
+      "to": "LQ-AUTH-002-T01",
+      "state": "동의 상태",
+      "back": "약관 단계",
+      "note": ""
+    },
+    {
+      "from": "LQ-AUTH-002-T01",
+      "action": "유효한 가입 신청",
+      "to": "LQ-AUTH-002-T02",
+      "state": "최종 선택 역할·신청정보",
+      "back": "",
+      "note": "대표: 딜러대표 승인 / 직원: 고객 대표 승인"
+    },
+    {
+      "from": "LQ-AUTH-002-T02",
+      "action": "로그인으로",
+      "to": "LQ-AUTH-003",
+      "state": "승인대기 식별자",
+      "back": "",
+      "note": "실제 접수 없음, 해당 계정 로그인은 승인대기 안내"
+    },
+    {
+      "from": "LQ-AUTH-003",
+      "action": "비밀번호 찾기 링크",
+      "to": "LQ-AUTH-004",
+      "state": "",
+      "back": "",
+      "note": ""
+    },
+    {
+      "from": "LQ-AUTH-004",
+      "action": "아이디 확인 다음",
+      "to": "LQ-AUTH-004-T01",
+      "state": "입력 식별자",
+      "back": "",
+      "note": ""
+    },
+    {
+      "from": "LQ-AUTH-004-T01",
+      "action": "코드 인증 확인",
+      "to": "LQ-AUTH-004-T02",
+      "state": "이름·이메일·코드 유효시간",
+      "back": "",
+      "note": "실제 발송 없음"
+    },
+    {
+      "from": "LQ-AUTH-004-T02",
+      "action": "로그인으로",
+      "to": "LQ-AUTH-003",
+      "state": "임시 비밀번호 시연 상태",
+      "back": "",
+      "note": ""
+    },
+    {
+      "from": "공통",
+      "action": "상단 알림 버튼",
+      "to": "LQ-COM-004",
+      "state": "역할/알림 유형",
+      "back": "원래 화면",
+      "note": "하단 메뉴 활성 없음"
+    },
+    {
+      "from": "LQ-DASH-001",
+      "action": "통신/가동 범례 또는 요약정보",
+      "to": "LQ-OPS-001",
+      "state": "live 연결/미연결/가동/미가동",
+      "back": "홈",
+      "note": ""
+    },
+    {
+      "from": "LQ-DASH-001",
+      "action": "에러 발생 카드",
+      "to": "LQ-SVC-001-T02",
+      "state": "금일·미해제 조건",
+      "back": "홈",
+      "note": ""
+    },
+    {
+      "from": "LQ-DASH-001",
+      "action": "교체 필요/임박 카드",
+      "to": "LQ-SVC-001-T01",
+      "state": "due/soon 조건",
+      "back": "홈",
+      "note": ""
+    },
+    {
+      "from": "LQ-DASH-001",
+      "action": "그룹/리포트/전체보기",
+      "to": "LQ-RPT-001",
+      "state": "금일·선택 그룹",
+      "back": "홈",
+      "note": ""
+    },
+    {
+      "from": "LQ-DASH-001",
+      "action": "차량 행",
+      "to": "LQ-OPS-002",
+      "state": "equipmentId·금일",
+      "back": "홈",
+      "note": ""
+    },
+    {
+      "from": "LQ-OPS-001",
+      "action": "차량 카드",
+      "to": "LQ-OPS-002",
+      "state": "equipmentId·기간·목록 차량 조건",
+      "back": "차량 목록",
+      "note": ""
+    },
+    {
+      "from": "LQ-OPS-001",
+      "action": "소모품 버튼",
+      "to": "LQ-SVC-001-T01",
+      "state": "serviceEquipmentId·소모품 전체",
+      "back": "이전 화면",
+      "note": "품목 없는 경우 비활성"
+    },
+    {
+      "from": "LQ-OPS-001",
+      "action": "에러 버튼",
+      "to": "LQ-SVC-001-T02",
+      "state": "serviceEquipmentId·금일·미해제",
+      "back": "이전 화면",
+      "note": "현재 에러 0/미수신은 비활성"
+    },
+    {
+      "from": "LQ-OPS-002",
+      "action": "소모품 버튼",
+      "to": "LQ-SVC-001-T01",
+      "state": "serviceEquipmentId·소모품 전체",
+      "back": "이전 화면",
+      "note": "품목 없는 경우 비활성"
+    },
+    {
+      "from": "LQ-OPS-002",
+      "action": "에러 버튼",
+      "to": "LQ-SVC-001-T02",
+      "state": "serviceEquipmentId·금일·미해제",
+      "back": "이전 화면",
+      "note": "현재 에러 0/미수신은 비활성"
+    },
+    {
+      "from": "LQ-OPS-001",
+      "action": "배터리 잔량 버튼",
+      "to": "LQ-OPS-007",
+      "state": "equipmentId·returnView=summary",
+      "back": "차량 목록",
+      "note": "엔진/미수신은 비활성"
+    },
+    {
+      "from": "LQ-OPS-001",
+      "action": "충격 버튼",
+      "to": "LQ-OPS-005",
+      "state": "equipmentId·기간·returnView=summary",
+      "back": "차량 목록",
+      "note": ""
+    },
+    {
+      "from": "LQ-OPS-002",
+      "action": "업무 현황 버튼",
+      "to": "LQ-RPT-001",
+      "state": "reportVehicle·조회 기간",
+      "back": "차량 상세",
+      "note": ""
+    },
+    {
+      "from": "LQ-OPS-002",
+      "action": "운영효율 버튼",
+      "to": "LQ-REF-003",
+      "state": "reportVehicle·조회 기간",
+      "back": "차량 상세",
+      "note": ""
+    },
+    {
+      "from": "LQ-OPS-002",
+      "action": "충격 상세 버튼",
+      "to": "LQ-OPS-005",
+      "state": "equipmentId·조회 기간",
+      "back": "차량 상세",
+      "note": ""
+    },
+    {
+      "from": "LQ-OPS-002",
+      "action": "정비 기록",
+      "to": "LQ-SVC-002",
+      "state": "equipmentId·조회 기간",
+      "back": "차량 상세",
+      "note": ""
+    },
+    {
+      "from": "LQ-OPS-002",
+      "action": "지도 보기",
+      "to": "LQ-OPS-002-P01",
+      "state": "equipmentId·최종 수신 좌표",
+      "back": "차량 상세",
+      "note": "위치가 있을 때만"
+    },
+    {
+      "from": "LQ-OPS-002-P01",
+      "action": "전체보기 / 축소",
+      "to": "LQ-OPS-002-P01",
+      "state": "지도 중심·동일 차량",
+      "back": "원래 팝업 상태",
+      "note": "새 페이지/새 팝업을 생성하지 않음"
+    },
+    {
+      "from": "LQ-OPS-002-P01",
+      "action": "닫기 / 배경 클릭",
+      "to": "LQ-OPS-002",
+      "state": "지도 호출 해제·초점 복귀",
+      "back": "차량 상세",
+      "note": "확장 중 Escape는 먼저 축소"
+    },
+    {
+      "from": "LQ-SVC-001",
+      "action": "정비 기록 행",
+      "to": "LQ-SVC-002",
+      "state": "equipmentId·serviceEntry·returnView=services",
+      "back": "서비스",
+      "note": ""
+    },
+    {
+      "from": "LQ-SVC-001-T02",
+      "action": "에러 기록 행",
+      "to": "LQ-SVC-004",
+      "state": "equipmentId·serviceEntry·returnView=services",
+      "back": "서비스",
+      "note": ""
+    },
+    {
+      "from": "LQ-SVC-001",
+      "action": "차량번호",
+      "to": "LQ-OPS-002",
+      "state": "equipmentId",
+      "back": "서비스",
+      "note": ""
+    },
+    {
+      "from": "LQ-SVC-001-T01",
+      "action": "차량번호",
+      "to": "LQ-OPS-002",
+      "state": "equipmentId",
+      "back": "서비스",
+      "note": ""
+    },
+    {
+      "from": "LQ-SVC-001-T02",
+      "action": "차량번호",
+      "to": "LQ-OPS-002",
+      "state": "equipmentId",
+      "back": "서비스",
+      "note": ""
+    },
+    {
+      "from": "LQ-SVC-001",
+      "action": "소모품 탭",
+      "to": "LQ-SVC-001-T01",
+      "state": "차량 유지·상태 조건 해제",
+      "back": "정비/에러 탭",
+      "note": "소모품은 기간 미적용"
+    },
+    {
+      "from": "LQ-SVC-001-T01",
+      "action": "에러 탭",
+      "to": "LQ-SVC-001-T02",
+      "state": "차량 유지·서비스 기간 복원",
+      "back": "정비/소모품 탭",
+      "note": ""
+    },
+    {
+      "from": "LQ-RPT-001",
+      "action": "운영효율 탭",
+      "to": "LQ-REF-003",
+      "state": "그룹·reportVehicle·기간",
+      "back": "업무 현황",
+      "note": "기간은 일/주/월 규칙으로 정규화"
+    },
+    {
+      "from": "LQ-REF-003",
+      "action": "업무 현황 탭",
+      "to": "LQ-RPT-001",
+      "state": "그룹·reportVehicle·기간",
+      "back": "운영효율",
+      "note": ""
+    },
+    {
+      "from": "LQ-REF-003",
+      "action": "일자 펼침의 업무 리포트",
+      "to": "LQ-RPT-001",
+      "state": "선택 일자의 from=to·reportVehicle",
+      "back": "운영효율",
+      "note": "미집계 일자는 실행 버튼 없음"
+    },
+    {
+      "from": "LQ-RPT-001",
+      "action": "차량 상세/차량 행",
+      "to": "LQ-OPS-002",
+      "state": "equipmentId·기간",
+      "back": "리포트",
+      "note": ""
+    },
+    {
+      "from": "LQ-REF-003",
+      "action": "차량 상세/차량 행",
+      "to": "LQ-OPS-002",
+      "state": "equipmentId·기간",
+      "back": "리포트",
+      "note": ""
+    },
+    {
+      "from": "LQ-COM-004-T01",
+      "action": "유형별 알림 행",
+      "to": "LQ-OPS-005",
+      "state": "equipmentId·returnView=notifications·선택 탭",
+      "back": "선택한 알림 탭",
+      "note": "전체 탭에서도 같은 유형 분기"
+    },
+    {
+      "from": "LQ-COM-004-T02",
+      "action": "유형별 알림 행",
+      "to": "LQ-SVC-004",
+      "state": "equipmentId·returnView=notifications·선택 탭",
+      "back": "선택한 알림 탭",
+      "note": "전체 탭에서도 같은 유형 분기"
+    },
+    {
+      "from": "LQ-COM-004-T03",
+      "action": "유형별 알림 행",
+      "to": "LQ-OPS-007",
+      "state": "equipmentId·returnView=notifications·선택 탭",
+      "back": "선택한 알림 탭",
+      "note": "전체 탭에서도 같은 유형 분기"
+    },
+    {
+      "from": "LQ-COM-004",
+      "action": "유형 탭 선택",
+      "to": "LQ-COM-004-T04",
+      "state": "notificationCategory=other",
+      "back": "전체 탭",
+      "note": "기타 항목은 별도 상세 이동 없음"
+    },
+    {
+      "from": "LQ-ACC-001",
+      "action": "로그아웃",
+      "to": "LQ-AUTH-003",
+      "state": "현재 역할·시연 로그인 상태 해제",
+      "back": "",
+      "note": "확인 팝업 없음"
+    }
+  ],
+  "inlineComponents": [
+    [
+      "날짜 조회 펼침",
+      "목록·서비스 정비/에러·리포트·운행/충격",
+      "날짜 버튼에서 시작/종료일 입력 행을 펼치고 조회한다.",
+      "인라인 입력 영역. 팝업 페이지를 새로 만들지 않는다."
+    ],
+    [
+      "집계 기준 도움말",
+      "홈·서비스·리포트·운영효율·설정",
+      "제목 옆 물음표로 해당 지표/설정 설명을 열고 닫는다.",
+      "현재는 본문 안 펼침 패널. 모달 아님."
+    ],
+    [
+      "집계 기준 하단 펼침",
+      "홈·목록·상세·서비스·리포트",
+      "수치·미수신·집계 기준을 하단에서 펼쳐 확인한다.",
+      "화면의 설명 요소. 별도 이동/페이지 아님."
+    ],
+    [
+      "차량 기본정보 펼침",
+      "차량 상세",
+      "기종·동력·연식·누적 운행·업체 정보를 표시한다.",
+      "같은 상세의 접힘 영역."
+    ],
+    [
+      "일별 운영 상세 펼침",
+      "운영효율",
+      "날짜 행을 열어 운영효율·작업/대기·실적 확인 차량 수를 확인한다.",
+      "날짜별 별도 화면 ID를 만들지 않는다. 리포트 이동은 별도 연결."
+    ],
+    [
+      "업무 현황 확인 필터",
+      "업무 리포트",
+      "전체·긴 대기·미확인으로 동일 차량 목록을 필터링한다.",
+      "페이지 전환이 아닌 조회 조건."
+    ],
+    [
+      "PUSH 토글·테스트 역할",
+      "설정",
+      "수신 항목과 조회 역할을 변경하는 화면 내부 제어 요소.",
+      "실제 계정 권한 변경, FCM 설정 또는 SMS 발송 아님."
+    ],
+    [
+      "약관 본문 보기",
+      "회원가입 약관",
+      "각 약관 보기로 본문을 펼친다.",
+      "현재 구현은 인라인. 약관 팝업으로 기재하지 않는다."
+    ],
+    [
+      "메시지/오류 알림",
+      "로그인·가입·비밀번호 찾기",
+      "입력 오류·인증 상태·복사 결과 등 일시 메시지.",
+      "토스트/필드 오류. 독립 페이지 및 확인 모달 아님."
+    ],
+    [
+      "지도 전체보기",
+      "차량 최종 위치 팝업",
+      "같은 지도 모달을 전체 화면으로 확장하거나 원래 크기로 복귀한다.",
+      "LQ-OPS-002-P01의 표시 상태로 관리한다."
+    ],
+    [
+      "호환 경로",
+      "설정·운행정보·엔진·소모품 상세",
+      "#account는 설정과 같은 화면. 일부 상세는 현재 버튼 진입 없이 기존 경로만 유지한다.",
+      "중복 화면 ID를 만들거나 현재 메뉴에 없는 항목을 메뉴로 추가하지 않는다."
+    ]
+  ]
+}

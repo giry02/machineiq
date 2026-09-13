@@ -79,6 +79,26 @@
       .filter(v => state.role !== 'customer_owner' || !state.group || v.group === state.group)
       .filter(v => !state.type || v.type === state.type);
   }
+  // Prototype-only replacement transaction: no server/device writes.
+  function resetSupplies(rows,state,ids) {
+    if(state.role!=='customer_owner'||!Array.isArray(ids)||!ids.length)return [];
+    const requested=new Set(ids),targets=[];
+    for(const v of scope(rows,state))for(const item of supplyItems(v))if(requested.has(item.id)&&item.percent!=null&&item.usedHours>0)targets.push({v,item});
+    if(targets.length!==requested.size)return [];
+    const snapshots=targets.map(({v,item})=>({equipmentId:v.equipmentId,itemId:item.itemId,usedHours:item.usedHours,lastChangedAt:item.lastChangedAt}));
+    for(const {v,item} of targets){const source=v.supplies.find(s=>s.itemId===item.itemId);source.usedHours=0;source.lastChangedAt=SNAPSHOT;}
+    refreshSupplyCounts(rows);return snapshots;
+  }
+  function refreshSupplyCounts(rows) {
+    for(const v of rows){const items=supplyItems(v);v.supplyDueCount=items.filter(i=>i.key==='due').length;v.supplySoonCount=items.filter(i=>i.key==='soon').length;}
+  }
+  function undoSupplyReset(rows,state,snapshots) {
+    if(state.role!=='customer_owner'||!Array.isArray(snapshots)||!snapshots.length)return false;
+    const allowed=scope(rows,state),targets=snapshots.map(s=>({snapshot:s,item:allowed.find(v=>v.equipmentId===s.equipmentId)?.supplies?.find(i=>i.itemId===s.itemId)}));
+    if(targets.some(t=>!t.item||t.item.usedHours!==0))return false;
+    targets.forEach(({item,snapshot})=>{item.usedHours=snapshot.usedHours;item.lastChangedAt=snapshot.lastChangedAt;});
+    refreshSupplyCounts(rows);return true;
+  }
   function attention(v) { return !v.conn || v.activeErrorCount > 0 || v.supplyDueCount > 0 || v.supplySoonCount > 0; }
   // Reuse the existing confirmation fixtures, including the clearly labelled completed example.
   function serviceItems(v) {
@@ -277,5 +297,5 @@
     return {equipmentId:v.equipmentId,companyId:COMPANY,group:v.group,startDate:state.from,endDate:state.to,
       periodType:state.period,date:state.from.replaceAll('-','')};
   }
-  return {SNAPSHOT,TODAY,DATA_START,ENERGY_MONTH,STATUS,DISPLAY,periodWindow,hourlyWindow,COMPANY,ROLE_LABELS,buildVehicles,scope,listed,attention,counts,dates,calendarDate,efficiencyRange,efficiencyPerformance,efficiencyWindow,efficiencyCalendar,metrics,performance,dailyEfficiency,serviceItems,supplyItems,serviceHistory,serviceRecords,pushHistory,pushPresentation,unreadPushCount,requestContext};
+  return {SNAPSHOT,TODAY,DATA_START,ENERGY_MONTH,STATUS,DISPLAY,periodWindow,hourlyWindow,COMPANY,ROLE_LABELS,buildVehicles,scope,listed,attention,counts,dates,calendarDate,efficiencyRange,efficiencyPerformance,efficiencyWindow,efficiencyCalendar,metrics,performance,dailyEfficiency,serviceItems,supplyItems,resetSupplies,undoSupplyReset,serviceHistory,serviceRecords,pushHistory,pushPresentation,unreadPushCount,requestContext};
 });

@@ -1,22 +1,26 @@
 {
-  "revision": "2026-09-10-r25",
+  "revision": "2026-09-13-r42",
   "entry": "login.html",
   "files": [
     {
       "path": "index.html",
-      "sha256": "82467ab7f8161882f05d7a51e57a720f629d3e363132ff5c4a4a515d81e19c52"
+      "sha256": "83c2e1726f0fc15338b926d476cd73b60c40ca7e1a4fe72adfb843c3b9057576"
     },
     {
       "path": "customer.js",
-      "sha256": "2a15d8b3526920641573823ea75a1d8093f8dea172e2580cc3c8da97ce065f4f"
+      "sha256": "59835c1727ae8cfe02f11deea57136a56671b4dc55b6ebf79860077a6f697801"
     },
     {
       "path": "customer.css",
-      "sha256": "5f5151cea45ff225085900c50304b0b93c2c09df2fa4820d485f050a0774d42c"
+      "sha256": "8b70597f9f21e14e422814a6ec2f66484caae6a15025c224327b11131c5b841f"
+    },
+    {
+      "path": "location-map.js",
+      "sha256": "073dde74d6b275ee899bd3f048dd27435ece9dbd255f2f5f340c35d0a21bb979"
     },
     {
       "path": "model.js",
-      "sha256": "89372e0e782d0d9663404aeb52723a1b61cf14d6d95d3ce4889ae02a1532abdc"
+      "sha256": "d8d6676500a184ac494f73d1264fb0de8f7bfe0ac9acd86582115cc168075be9"
     },
     {
       "path": "login.html",
@@ -28,11 +32,11 @@
     },
     {
       "path": "signup.html",
-      "sha256": "98cdec6f4fee96e0b0903cc34dd814fbfd3756f03d63095209d2e98961f4f2a7"
+      "sha256": "4b4bc3fbf2d4b7acca43a285bb05d4d1a7e966dd0e7d2afbe2aba4c2f2781cfc"
     },
     {
       "path": "signup.js",
-      "sha256": "f16b5a95531e8d08ba7a8b522bdbd44b7a48e7c5686c089239b3e009fe7013d9"
+      "sha256": "ba2e40b79a02f51950ad77cffb5e6ed419b12728f1daa79e9a9742d479290044"
     },
     {
       "path": "signup-header.js",
@@ -632,7 +636,7 @@
     },
     {
       "path": "data/fleet.generated.js",
-      "sha256": "7e813828c80137c77e93e35f17fdc3c92ee3677724a73d5d099d888697fc361d"
+      "sha256": "f69042cf6b575c36299d4556484af87efd0607f9a66200e77b314a84bdf436d8"
     },
     {
       "path": "serve.cjs",
@@ -640,23 +644,47 @@
     },
     {
       "path": "tests/package.cjs",
-      "sha256": "b7d172b0d379de8ccdad568b6ebf3b8b3975e7418faaacc69f66013b1d024d13"
+      "sha256": "27d97bb0bd810e28e592cbb6762a3b61c0a9661bb597f776c3ebb20294796245"
     },
     {
       "path": "tests/auth.cjs",
-      "sha256": "596c623ac095644b747964dd526b96e832ef34f8d30b27eba07efc8a1d380238"
+      "sha256": "f0e9c1ff1c625ba548d8c5886bee8d02d5d4c4049cab2e07e72fc5e2760d048f"
     },
     {
       "path": "README.md",
-      "sha256": "4fea34cbbc8cc097ee083fefcedb6d339e49e351123073529449475587957425"
-    },
-    {
-      "path": "docs/screen-registry.json",
-      "sha256": "fc40979256882002cd45e7f533a16ddb48856f6287a32f84a11ac4320d99b2f0"
+      "sha256": "1521b09fd2b8f6375c0fa0bfd2fc92a28182503034639bb56f1c404f00288484"
     },
     {
       "path": ".gitattributes",
       "sha256": "a51e29dff0184e5213ef78ac09f9029d6179e799854920d092a0e630a3856fc4"
+    },
+    {
+      "path": "docs/screen-registry.json",
+      "sha256": "da9b8fab467cc48750a7d40e141a40ff1287d9d0b66a3bb256824b1398cf6a5e"
+    },
+    {
+      "path": "docs/menu-page-registry.json",
+      "sha256": "b414a0b0a071e79f421799e0772a76d0de7c35a0492d999dd464c59bbcb455cd"
+    },
+    {
+      "path": "docs/supply-reset.md",
+      "sha256": "9a713af7ec0bb22bf77b9b75a5b84e46297ae99e09e84514d90d0ab2a3472590"
+    },
+    {
+      "path": "docs/MACHINE_IQ_모바일_스타일가이드_20260913.pdf",
+      "sha256": "d18fd6a4931b08839701f45efb4a41c487e495efc722a27952ff3a29668eff66"
+    },
+    {
+      "path": "docs/MACHINE_IQ_모바일_메뉴_페이지_구조도_20260913.xlsx",
+      "sha256": "e7021feaeec46a028ca45af7bf4ce170de13823050360f0ca0df65585ab587af"
+    },
+    {
+      "path": "tests/supply-reset.cjs",
+      "sha256": "47c9cdf50f7d060a73f97f48821fd1c3c366c4136f6a10bde8ba410c6dc73931"
+    },
+    {
+      "path": "tests/harness.js",
+      "sha256": "7d295e06d6187029183ebb08511e52187b58ba0ae3fdae6e7525d80d63bfc109"
     }
   ]
 }

@@ -59,17 +59,48 @@ assert(page('login.html','',lock.storage).node('login-id').disabled);
 const remembered=page('login.html');remembered.node('save-id').checked=true;remembered.node('mobile-login-form').fire('submit');
 assert.equal(remembered.storage.localStorage.getItem('linq-customer-prototype-saved-identifier'),'fleet.admin@sejong-log.co.kr');
 assert([...remembered.storage.localStorage.values.keys()].every(k=>k.startsWith('linq-customer-prototype-')));
-for(const role of ['customer-owner','customer-employee']){
-  const p=page('signup.html',role==='customer-employee'?'?role=customer_staff':'?role=customer_owner'),n=p.node;
+for(const role of ['customer-owner','customer-employee'])for(const switchRole of [false,true]){
+  const initialRole=switchRole?(role==='customer-owner'?'customer-employee':'customer-owner'):role;
+  const p=page('signup.html',initialRole==='customer-employee'?'?role=customer_staff':'?role=customer_owner'),n=p.node;
   assert(n('signup-continue').disabled);n('signup-agree-all').checked=true;n('signup-agree-all').fire('change');assert(!n('signup-continue').disabled);n('signup-continue').fire('click');
-  assert.equal(p.document.querySelectorAll('input[name="signupRole"]').length,0);
+  const roleInputs=p.document.querySelectorAll('input[name="signupRole"]');
+  assert.equal(roleInputs.length,2);
+  assert.equal(p.document.querySelector('input[name="signupRole"]:checked').value,initialRole);
+  assert(p.document.querySelector('.signup-role-field').closest('[aria-labelledby="role-section-title"]'));
+  if(switchRole){
+    n('signup-name').value='유지할 이름';n('signup-company').value='전환 전 업체';
+    roleInputs.forEach(input=>{input.checked=input.value===role;});
+    roleInputs.find(input=>input.checked).fire('change');
+    assert.equal(n('signup-name').value,'유지할 이름');assert.equal(n('signup-company').value,'');
+  }
+  assert.equal(Boolean(n('signup-region').closest('[hidden]')),role==='customer-employee');
+  assert.equal(Boolean(n('signup-dealer').closest('[hidden]')),role==='customer-employee');
+  assert.equal(Boolean(n('signup-representative').closest('[hidden]')),role==='customer-employee');
+  for(const id of ['signup-equipment-serial','signup-terminal-serial']){
+    assert.equal(Boolean(n(id).closest('[hidden]')),role==='customer-employee');
+    assert.equal(n(id).disabled,role==='customer-employee');
+  }
   for(const field of p.document.querySelectorAll('[data-required]'))if(!field.closest('[hidden]'))field.value='filled';
   n('signup-user-id').value=role==='customer-owner'?'new.owner':'new.staff';n('signup-check-id').fire('click');
   n('signup-name').value='김가입';n('signup-email').value=role+'@example.com';n('signup-send-email').fire('click');n('signup-email-code').value='123456';n('signup-verify-email').fire('click');
   n('signup-phone').value='01012345678';n('signup-password').value='newPassword123!';n('signup-password-confirm').value='newPassword123!';
   n('signup-company').value=role==='customer-owner'?'신규업체':'세종';n('signup-company').fire('input');
-  if(role==='customer-employee'){assert(n('signup-region').closest('[hidden]'));n('signup-company-list').children.find(c=>c.tagName==='BUTTON').fire('click');}
+  if(role==='customer-employee'){
+    assert(n('signup-region').closest('[hidden]'));
+    n('signup-form').fire('submit');assert(n('signup-complete').hidden,'Staff must select an existing company, including after changing role');
+    assert(p.document.querySelector('[data-error-for="signup-company"]').textContent.includes('등록된 업체'));
+    n('signup-company-list').children.find(c=>c.tagName==='BUTTON').fire('click');
+  }
+  if(role==='customer-owner'){
+    n('signup-equipment-serial').value='';n('signup-terminal-serial').value='';
+    n('signup-form').fire('submit');assert(n('signup-complete').hidden,'Owner serial fields must remain required');
+    for(const id of ['signup-equipment-serial','signup-terminal-serial'])assert(p.document.querySelector('[data-error-for="'+id+'"]').textContent.includes('필수'));
+    n('signup-equipment-serial').value='OWNER-EQUIPMENT';n('signup-terminal-serial').value='OWNER-TERMINAL';
+  }else{
+    assert.equal(n('signup-equipment-serial').value,'');assert.equal(n('signup-terminal-serial').value,'');
+  }
   n('signup-form').fire('submit');assert(!n('signup-complete').hidden);assert(n('signup-approval-target').textContent.includes(role==='customer-owner'?'딜러대표':'고객 대표'));
+  assert.equal(n('signup-summary').children.some(child=>child.tagName==='DT'&&child.textContent==='장비 Serial'),role==='customer-owner');
   assert.equal(n('signup-password').value,'');assert.equal(n('signup-password-confirm').value,'');
   const pending=JSON.parse(p.storage.sessionStorage.getItem('linq-customer-prototype-pending-signup'));assert.equal(pending.status,'pending');assert.equal(pending.role,role);assert.deepEqual(Object.keys(pending).sort(),['email','role','status','userId']);
   n('signup-to-login').fire('click');assert.equal(p.location.href,'./login.html');

@@ -86,6 +86,10 @@
 
           <section class="signup-card" aria-labelledby="role-section-title">
             <h2 id="role-section-title">소속 정보</h2>
+            <fieldset class="signup-role-field"><legend>역할 / 구분 <em>*</em></legend><div class="signup-role-list">
+              <label><input type="radio" name="signupRole" value="customer-owner" checked><span><b>고객 대표</b><small>업체 등록 후 딜러대표 승인</small></span></label>
+              <label><input type="radio" name="signupRole" value="customer-employee"><span><b>고객 직원</b><small>등록 업체 선택 후 고객 대표 승인</small></span></label>
+            </div></fieldset>
             <div class="signup-fields signup-role-fields">
               <label class="signup-field" data-role-scope="customer-owner"><span>지역 <em>*</em></span><select id="signup-region" name="region" data-required><option value="">지역을 선택하세요</option><option value="ALAO">ALAO</option><option value="EMEA">EMEA</option></select><small data-error-for="signup-region"></small></label>
               <label class="signup-field" data-role-scope="customer-owner"><span>소속 딜러 <em>*</em></span><select id="signup-dealer" name="dealer" data-required><option value="">딜러를 선택하세요</option></select><p class="field-help" id="signup-dealer-help">지역을 먼저 선택해 주세요.</p><small data-error-for="signup-dealer"></small></label>
@@ -94,7 +98,7 @@
             </div>
           </section>
 
-          <section class="signup-card" data-role-scope="customer-owner customer-employee" aria-labelledby="equipment-section-title">
+          <section class="signup-card" data-role-scope="customer-owner" aria-labelledby="equipment-section-title">
             <h2 id="equipment-section-title">장비 연결 정보</h2>
             <p class="signup-card__lead">가입 승인 후 최초 차량 연결에 사용할 정보를 입력합니다.</p>
             <div class="signup-fields">
@@ -127,6 +131,6 @@
   </div>
   <script src="./shared/layouts/vendor/lucide.min.js"></script>
   <script src="./signup-header.js?v=20260910-r24"></script>
-  <script src="./signup.js?v=20260910-r25"></script>
+  <script src="./signup.js?v=20260910-r41"></script>
 </body>
 </html>

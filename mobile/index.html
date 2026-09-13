@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="./shared/mobile.css?v=20260907-20">
   <link rel="stylesheet" href="./shared/mobile-type-compact.css?v=20260907-1">
   <link rel="stylesheet" href="./shared/home-tone-c.css?v=20260907-2">
-  <link rel="stylesheet" href="./customer.css?v=20260910-r25">
+  <link rel="stylesheet" href="./customer.css?v=20260913-r42">
 </head>
 <body class="mobile-type-compact mobile-tone-c customer-prototype">
   <div class="mobile-app">
@@ -33,16 +33,25 @@
   </div>
   <dialog class="location-dialog" id="location-dialog" aria-labelledby="location-dialog-title" data-screen-id="LQ-OPS-002-P01">
     <header><div><small>최종 수신 위치</small><h2 id="location-dialog-title"></h2></div><button type="button" id="location-dialog-close" data-close-map aria-label="지도 닫기"><i data-lucide="x"></i></button></header>
+    <div class="location-dialog-body" id="location-dialog-body">
     <p id="location-dialog-address"></p>
     <div class="location-map-frame">
-      <iframe id="location-map" title="Google 지도 · 차량 최종 수신 위치" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
-      <button class="location-map-expand" id="location-map-expand" data-expand-map type="button" aria-label="지도 전체보기" aria-expanded="false" aria-controls="location-map" title="지도 전체보기"><i class="map-expand-icon" data-lucide="maximize" aria-hidden="true"></i><i class="map-collapse-icon" data-lucide="minimize" aria-hidden="true"></i></button>
+      <div id="location-map" class="customer-location-map" role="region" aria-label="Google 지도 · 차량 최종 수신 위치"></div>
+      <div class="location-map-status" id="location-map-status" role="status"><span id="location-map-status-text">지도를 불러오는 중입니다.</span><a id="location-map-external" target="_blank" rel="noopener noreferrer" hidden>Google 지도에서 보기</a></div>
+      <button class="location-map-expand" id="location-map-expand" data-expand-map type="button" aria-label="지도 전체보기" aria-expanded="false" aria-controls="location-map" title="지도 전체보기"><i class="map-expand-icon" data-lucide="maximize" aria-hidden="true"></i><i class="map-collapse-icon" data-lucide="minimize" aria-hidden="true"></i><span id="location-map-expand-label">전체보기</span></button>
     </div>
     <section class="location-dialog-info" aria-labelledby="location-info-title"><div class="location-info-heading"><h3 id="location-info-title">차량 정보</h3><span id="location-dialog-coordinate"></span></div><dl class="detail-definition" id="location-dialog-info"></dl><p>저장된 최종 수신 데이터입니다. 실시간 위치가 아니며, 원본에 없는 정보는 ‘정보 없음’으로 표시합니다.</p></section>
+    </div>
+  </dialog>
+  <dialog class="supply-reset-dialog" id="supply-reset-dialog" aria-labelledby="supply-reset-title" aria-describedby="supply-reset-description" data-screen-id="LQ-SVC-003-P02">
+    <header><h2 id="supply-reset-title">선택 항목 교체 완료</h2><button type="button" data-close-supply-reset aria-label="교체 완료 창 닫기"><i data-lucide="x"></i></button></header>
+    <div class="supply-reset-body"><strong id="supply-reset-count"></strong><ul id="supply-reset-items"></ul><p id="supply-reset-description">처리하면 사용시간이 0H로 초기화되고 상태가 정상으로 변경됩니다.</p><p class="source-note">시연용 처리입니다. 실제 장비나 서버에 반영되지 않으며 새로고침하면 원래 데이터로 돌아갑니다.</p></div>
+    <footer><button type="button" class="detail-secondary-button" data-close-supply-reset>취소</button><button type="button" class="report-primary-action" id="supply-reset-confirm" data-confirm-supply-reset>항목 처리</button></footer>
   </dialog>
   <script src="./shared/layouts/vendor/lucide.min.js"></script>
   <script src="./data/fleet.generated.js"></script>
-  <script src="./model.js?v=20260910-r24"></script>
-  <script src="./customer.js?v=20260910-r25"></script>
+  <script src="./model.js?v=20260913-r42"></script>
+  <script src="./location-map.js?v=20260910-r33"></script>
+  <script src="./customer.js?v=20260913-r42"></script>
 </body>
 </html>
