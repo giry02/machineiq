@@ -1,18 +1,18 @@
 {
-  "revision": "2026-09-13-r42",
+  "revision": "2026-09-13-r43",
   "entry": "login.html",
   "files": [
     {
       "path": "index.html",
-      "sha256": "83c2e1726f0fc15338b926d476cd73b60c40ca7e1a4fe72adfb843c3b9057576"
+      "sha256": "9cb3350575940557a3194e71419c7e6bd04785be1676e61643707f92ce0a5081"
     },
     {
       "path": "customer.js",
-      "sha256": "59835c1727ae8cfe02f11deea57136a56671b4dc55b6ebf79860077a6f697801"
+      "sha256": "619b17b964955cf7a592efb5bb086c870646b869f5389185dfbdf0a2fc7a2b2d"
     },
     {
       "path": "customer.css",
-      "sha256": "8b70597f9f21e14e422814a6ec2f66484caae6a15025c224327b11131c5b841f"
+      "sha256": "6d28ea594dcafb9074ff744014cbff6de3b139c652ba465afacb2702c71f4357"
     },
     {
       "path": "location-map.js",
@@ -652,7 +652,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "1521b09fd2b8f6375c0fa0bfd2fc92a28182503034639bb56f1c404f00288484"
+      "sha256": "d96beacb615588640bfe3c6071cdceffa450eb72b3751c7e9e5b265b85765276"
     },
     {
       "path": ".gitattributes",
@@ -660,7 +660,7 @@
     },
     {
       "path": "docs/screen-registry.json",
-      "sha256": "da9b8fab467cc48750a7d40e141a40ff1287d9d0b66a3bb256824b1398cf6a5e"
+      "sha256": "49adc69ca9625cf96148b54e865f20390072ec9b96e1a00c5944a75399dd3451"
     },
     {
       "path": "docs/menu-page-registry.json",
@@ -685,6 +685,18 @@
     {
       "path": "tests/harness.js",
       "sha256": "7d295e06d6187029183ebb08511e52187b58ba0ae3fdae6e7525d80d63bfc109"
+    },
+    {
+      "path": "tests/soc.cjs",
+      "sha256": "1ee42f1e7470d70ed869e3591c5eb02a00946b97b72e4d85ff11165b38055de7"
+    },
+    {
+      "path": "docs/html-delivery.md",
+      "sha256": "785e8183ccd5819870a29f847f49b46c02a395eb9913711bcac28af5bbfe50af"
+    },
+    {
+      "path": "downloads/MACHINE_IQ_MOBILE_HTML_20260913.zip",
+      "sha256": "802a8b41a8123b2bf4ca19da1c88585a93e7cdcfedfb71984e2426d234b787ec"
     }
   ]
 }

@@ -1,5 +1,13 @@
 {
-  "revision": "2026-09-13-r42",
+  "revision": "2026-09-13-r43",
+  "lithiumSocColor": {
+    "revision": "2026-09-13-r43",
+    "screenIds": ["LQ-OPS-001", "LQ-OPS-002", "LQ-OPS-007"],
+    "scope": "리튬배터리 SOC 숫자 색상만 변경. 게이지·배경·아이콘·배치·폰트·수치·권한·이동은 유지.",
+    "source": "Lithium/lithium-tobe.html의 socVal 색상",
+    "thresholds": "60~100% #37b24d, 30~60% 미만 #f59f00, 0~30% 미만 #e03131. 미수신/범위 밖/비리튬은 기존 표시.",
+    "figjam": "색상만 변경하며 입출력·권한·화면 이동 변경 없음. 기존 구조도 유지."
+  },
   "supplyReset": {
     "revision": "2026-09-13-r42",
     "screenId": "LQ-SVC-003-P02",
