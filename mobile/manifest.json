@@ -1,14 +1,14 @@
 {
-  "revision": "2026-09-13-r44",
+  "revision": "2026-09-13-r45",
   "entry": "login.html",
   "files": [
     {
       "path": "index.html",
-      "sha256": "6d347a4fae6f96f94666c02346b0e0138a8381fb28f21f10e498f61273b491eb"
+      "sha256": "fabb982fc3ba57e213cf3e2a70f00df7f532939694548118b025b3414d3914c1"
     },
     {
       "path": "customer.js",
-      "sha256": "5eb28c01a48a62a9b3a878b017314cb0e8487bbc116b5b9dbbc2474f2cddceb4"
+      "sha256": "4a5c827a2e531de5f210caec44981afb81d13ebc8180720ada4917a1aff6b76c"
     },
     {
       "path": "customer.css",
@@ -652,7 +652,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "213507e828fbd98ae492699e760fc0d3c57fcc0ec722aff574a2915f71334518"
+      "sha256": "554150285d9d6ca2b884904182bb53bef742ef74b9614fc7c81f11d2a7d428c0"
     },
     {
       "path": ".gitattributes",
@@ -660,7 +660,7 @@
     },
     {
       "path": "docs/screen-registry.json",
-      "sha256": "13c454f0d496b8f67b8efc67684a3d2a6414b321061469f0f26d9bbe053e621a"
+      "sha256": "7400cd22ce1ba79fc7c7069af059d6705ab2d427b902dcf6fca29d0517999552"
     },
     {
       "path": "docs/menu-page-registry.json",
@@ -688,15 +688,15 @@
     },
     {
       "path": "tests/soc.cjs",
-      "sha256": "caa4551005d1716a51a11c3934c625d3d47df539d7b6c6d5e1f1bffcf05b4141"
+      "sha256": "fce13030f152ec11a1b2db1df710d14a2cc9a6f800dcdfa04d958e0b017c8a76"
     },
     {
       "path": "docs/html-delivery.md",
-      "sha256": "67af15fcaca891c17a501b20496ea9c0ab97111d49a4413596330af63d238e81"
+      "sha256": "31e471eb2b4144ab1f8e8eeff26446123188819ddc11109ad5c946aa3fbcb3fd"
     },
     {
-      "path": "downloads/MACHINE_IQ_MOBILE_HTML_20260913_r44.zip",
-      "sha256": "f8ce4703deb2708ccbfdfdcb42ff75b0ee7e8113e85ac25a22a6f0a3f21b8de7"
+      "path": "downloads/MACHINE_IQ_MOBILE_HTML_20260913_r45.zip",
+      "sha256": "a3f0db4e7c3f274620e8307a526263f1f55cb44e547eded55a0310996518b8e6"
     }
   ]
 }
