@@ -1,18 +1,18 @@
 {
-  "revision": "2026-09-13-r43",
+  "revision": "2026-09-13-r44",
   "entry": "login.html",
   "files": [
     {
       "path": "index.html",
-      "sha256": "9cb3350575940557a3194e71419c7e6bd04785be1676e61643707f92ce0a5081"
+      "sha256": "6d347a4fae6f96f94666c02346b0e0138a8381fb28f21f10e498f61273b491eb"
     },
     {
       "path": "customer.js",
-      "sha256": "619b17b964955cf7a592efb5bb086c870646b869f5389185dfbdf0a2fc7a2b2d"
+      "sha256": "5eb28c01a48a62a9b3a878b017314cb0e8487bbc116b5b9dbbc2474f2cddceb4"
     },
     {
       "path": "customer.css",
-      "sha256": "6d28ea594dcafb9074ff744014cbff6de3b139c652ba465afacb2702c71f4357"
+      "sha256": "894d11151b476db6fac395538d7274db48c67c944a8679110b512d54eb796877"
     },
     {
       "path": "location-map.js",
@@ -652,7 +652,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "d96beacb615588640bfe3c6071cdceffa450eb72b3751c7e9e5b265b85765276"
+      "sha256": "213507e828fbd98ae492699e760fc0d3c57fcc0ec722aff574a2915f71334518"
     },
     {
       "path": ".gitattributes",
@@ -660,7 +660,7 @@
     },
     {
       "path": "docs/screen-registry.json",
-      "sha256": "49adc69ca9625cf96148b54e865f20390072ec9b96e1a00c5944a75399dd3451"
+      "sha256": "13c454f0d496b8f67b8efc67684a3d2a6414b321061469f0f26d9bbe053e621a"
     },
     {
       "path": "docs/menu-page-registry.json",
@@ -688,15 +688,15 @@
     },
     {
       "path": "tests/soc.cjs",
-      "sha256": "1ee42f1e7470d70ed869e3591c5eb02a00946b97b72e4d85ff11165b38055de7"
+      "sha256": "caa4551005d1716a51a11c3934c625d3d47df539d7b6c6d5e1f1bffcf05b4141"
     },
     {
       "path": "docs/html-delivery.md",
-      "sha256": "785e8183ccd5819870a29f847f49b46c02a395eb9913711bcac28af5bbfe50af"
+      "sha256": "67af15fcaca891c17a501b20496ea9c0ab97111d49a4413596330af63d238e81"
     },
     {
-      "path": "downloads/MACHINE_IQ_MOBILE_HTML_20260913.zip",
-      "sha256": "802a8b41a8123b2bf4ca19da1c88585a93e7cdcfedfb71984e2426d234b787ec"
+      "path": "downloads/MACHINE_IQ_MOBILE_HTML_20260913_r44.zip",
+      "sha256": "f8ce4703deb2708ccbfdfdcb42ff75b0ee7e8113e85ac25a22a6f0a3f21b8de7"
     }
   ]
 }

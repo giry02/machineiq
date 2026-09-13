@@ -71,10 +71,12 @@
 .customer-prototype [data-shortcut-kind="navigation"] .vehicle-compact-shortcut:active:not(:disabled) { border-color:var(--linq-color-text-muted); background:var(--linq-color-border-subtle); }
 @media (hover:hover) { .customer-prototype [data-shortcut-kind="navigation"] .vehicle-compact-shortcut:hover { border-color:var(--linq-color-text-muted); } }
 .customer-prototype .vehicle-compact-shortcut strong { font-size:14px; font-weight:600; font-variant-numeric:tabular-nums; color:var(--linq-color-text); }
-/* Web Lithium SOC thresholds; text only, no new gauge, icon or background. */
-.customer-prototype .battery-soc-value[data-soc-level="high"] { color:#37b24d; }
-.customer-prototype .battery-soc-value[data-soc-level="medium"] { color:#f59f00; }
-.customer-prototype .battery-soc-value[data-soc-level="low"] { color:#e03131; }
+/* Fixed-size battery interior indicates the SOC band, never a proportional fill. */
+.customer-prototype .battery-soc-icon { width:15px; height:15px; flex:none; color:var(--linq-color-text-muted); }
+.customer-prototype .battery-soc-icon[data-soc-level="high"] .battery-soc-fill { fill:#37b24d; }
+.customer-prototype .battery-soc-icon[data-soc-level="medium"] .battery-soc-fill { fill:#f59f00; }
+.customer-prototype .battery-soc-icon[data-soc-level="low"] .battery-soc-fill { fill:#e03131; }
+.customer-prototype .battery-soc-reading { display:inline-flex; align-items:center; gap:4px; vertical-align:middle; }
 .customer-prototype .vehicle-compact-shortcut.needs-action { color:var(--linq-color-danger); background:var(--linq-color-danger-soft); }
 .customer-prototype .vehicle-compact-shortcut.needs-action strong { color:var(--linq-color-danger); }
 .customer-prototype .vehicle-compact-shortcut.is-soon,.customer-prototype .vehicle-compact-shortcut.is-soon strong { color:var(--linq-color-warning-text); }
