@@ -27,6 +27,10 @@ assert(read('index.html').includes('data-screen-id="LQ-SVC-003-P02"'));
 assert(!manifest.files.some(item=>/map-config\.local|\.env(?:\.|$)/.test(item.path)));
 assert(read('customer.js').includes('data-logout')&&read('customer.js').includes('data-notification-category'));
 assert(!read('customer.js').includes('localhost:'));
+for(const file of ['index.html','customer.js','signup.html','signup.js']) {
+  assert(!/miqlocation:|installMachineIQLocation|QR 검색|getUserMedia|BarcodeDetector/.test(read(file)), 'QR test must remain APK-only: '+file);
+}
+assert(!manifest.files.some(item=>/location-ui\.js|QrScanActivity|zxing/i.test(item.path)), 'No native QR implementation in HTML delivery');
 const server=require('../serve.cjs');
 (async()=>{
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));

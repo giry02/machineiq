@@ -15,8 +15,7 @@
   "powerTypes": [
     "엔진",
     "납산",
-    "리튬",
-    "수소"
+    "리튬"
   ],
   "dashboardCompanies": [
     {

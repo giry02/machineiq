@@ -1,5 +1,9 @@
 # 고객 모바일 차트형 대시보드 메인 채택 — 2026-09-19
 
+## 후속 — 2026-09-20 GitHub 게시
+
+사용자 요청으로 현재 모바일을 기존 `giry02/machineiq` 저장소의 `/mobile/`에 게시했다. 커밋 `8173f5e`. [게시 범위·링크·검증](CUSTOMER_MOBILE_GITHUB_PUBLISH_20260920.md). 아래 ‘로컬만 반영’은 수정 당시 기록이며 모바일 정적 웹 게시만 후속 수행했다. ZIP/APK/iOS·실제 서버·WEB 대시보드·Figma 변경 없음.
+
 ## 후속 v5 — 2026-09-20 텍스트 링크 호버·하단 문구
 
 - LQ-DASH-001 유지. 대표/직원 메인 및 공유 비교안의 하단 ‘프로토타입 데이터’ 문단을 `owner-dashboard-preview.js / render`에서 제거하고 전용 `.od-prototype-note` CSS도 삭제.

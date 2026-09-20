@@ -1,18 +1,23 @@
 {
-  "revision": "2026-09-20-dashboard-v5",
+  "revision": "2026-09-20-r87",
   "entry": "login.html",
+  "androidTestApk": {"version":"0.1.3-location","versionCode":4,"qr":"APK-only test: read/copy; no auto-fill; excluded from HTML/ZIP"},
   "files": [
     {
+      "path": "downloads/Machine-IQ-Customer-Location-Notifications-QR-v0.1.3-20260920-r87-debug.apk",
+      "sha256": "16fa7106db105d6f20efa3b48beede66507bb1e4767b9f224930d47b1da0865c"
+    },
+    {
       "path": "index.html",
-      "sha256": "7018cd9e686eb26a71568ede2cc9a76bd4eb793a68de4a02a7d7aa7f2edf401a"
+      "sha256": "fdc5f41b8533fc5bb12b57858169282bf66c484208c7247295042b8aaac8a319"
     },
     {
       "path": "customer.js",
-      "sha256": "8dd4cc1ba3965a652a7c05a652d2da1fca9d09ab9930c41ac0cb026f5de547ab"
+      "sha256": "5dcfa609066f414e7df13b0bbc99e0edb1422c578f087b76c6a7c59dc4ae1224"
     },
     {
       "path": "customer.css",
-      "sha256": "23826a6b08b28750d5d024a4e22c19552406d5db155a987d32f38c79462d94d4"
+      "sha256": "d376862cb07a4244a5b7ee875b83ba7f88681c0ad2dc9a9f95453bbd13ae0943"
     },
     {
       "path": "error-documents.js",
@@ -28,7 +33,7 @@
     },
     {
       "path": "model.js",
-      "sha256": "64f037cbc048663259afb33a4e0a12a1af1ec3b0334fec1e1211df52b1a92e28"
+      "sha256": "de2dced29c72faba103a581c4f7baee33d818749663e6dfd4d794712aa878bb1"
     },
     {
       "path": "login.html",
@@ -72,7 +77,7 @@
     },
     {
       "path": "group-cards-preview.js",
-      "sha256": "3e5ac109b6ce66faf19350f0dda522e11a6ed3559e16474d96dc6a771114d7ce"
+      "sha256": "f0e9d7909e5a43ae6cdc07fa7aace9734253f0ffbc27a197ce84bd2d0fe91012"
     },
     {
       "path": "group-cards-preview.css",
@@ -80,15 +85,15 @@
     },
     {
       "path": "owner-dashboard-preview.html",
-      "sha256": "f20f881324800ae49664281c83edea6aac192423e580fc913f28370d5d794217"
+      "sha256": "1e945bd501f0f2b55d4645253e5270ca4e24a6041c2f60453e390116a00f8c91"
     },
     {
       "path": "owner-dashboard-preview.js",
-      "sha256": "854e0dfd34ec6effb137db9057ef994437a5853e16321e2b86fca96469029953"
+      "sha256": "93441dd8f70a1db96eb755cb5cda209856919372224fb72ab18c4673f5d814d2"
     },
     {
       "path": "owner-dashboard-preview.css",
-      "sha256": "3fdec8abe3c50811425c0ce75e7da7cf0f6db8d177ce50b7cfd439b021bf084f"
+      "sha256": "a21ab9f2086a93206494c912e730616cf75239bef226cb1bd44555ece9dda3d7"
     },
     {
       "path": "dashboard-backup-20260919.html",
@@ -680,7 +685,7 @@
     },
     {
       "path": "data/fleet.generated.js",
-      "sha256": "d8bca0b6a3fdf76ceace01835e5fbc152575ae6936a4414de9f1c495ad162c69"
+      "sha256": "52fa65a2dce156546aaab3ded1481c5d27700ca226307e976ef2b780572f9c84"
     },
     {
       "path": "serve.cjs",
@@ -688,11 +693,11 @@
     },
     {
       "path": "tests/package.cjs",
-      "sha256": "e930bbf0ffef23cab540e1b853cd8f9ce5bc4f863d6225e8d4d0efeeda74b32b"
+      "sha256": "61620988a1e6ffb77517335bcfe381fb48ab39c59b90e22592aa47eea54007aa"
     },
     {
       "path": "tests/dashboard.cjs",
-      "sha256": "10cb452b737ad37d860750c92af923a6efe9b2840c23a3e6896c19843e6bf5b3"
+      "sha256": "5cd62a27f8f8fffba6ee1288e21dffe829be45ea8096a603763692c2f223c14e"
     },
     {
       "path": "tests/auth.cjs",
@@ -700,11 +705,31 @@
     },
     {
       "path": "README.md",
-      "sha256": "e541c66c8320a90beab3bfcefacc6c85adda3a2726fd008ee74a72b8bad19cb3"
+      "sha256": "c0a4fbccd9bd044ddeb38d4e8b228ba9f3e37279245caa4d11bf689e44e13f12"
     },
     {
       "path": "docs/dashboard-main-20260919.md",
-      "sha256": "e5c8b88c1b0f6cfb705d279d7bf8403a5399b23da4b558c69ea76facd78efbe3"
+      "sha256": "61a9ba2cf9676014dbd3902867c4854d913cc77b6a43a4f6b2e777f82a31c189"
+    },
+    {
+      "path": "docs/missing-data-r87.md",
+      "sha256": "eb9df7dfc7785ea42cad6f28a6fb1b7268afa1a8e4d3bafe2c024c89ffe0141e"
+    },
+    {
+      "path": "docs/repair-history-r86.md",
+      "sha256": "e6f4e68575ec51744e64582bb30452eb18117a5a5727c49fd1447aa7a7041237"
+    },
+    {
+      "path": "docs/efficiency-label-r84.md",
+      "sha256": "15252630ba329bcd3ed996a9fef3cc5f83ce27005584d88757e18206fb4378d3"
+    },
+    {
+      "path": "docs/android-qr-test.md",
+      "sha256": "7c63c04a37ea7e524fa06f39fd8791e42f49caadd243860fe71e273ca43ab740"
+    },
+    {
+      "path": "docs/android-qr-registry.json",
+      "sha256": "17217b72b8edcd36693caf84e8edab8fd8f72010569a5b88b51c354113333bdf"
     },
     {
       "path": ".gitattributes",
@@ -712,7 +737,7 @@
     },
     {
       "path": "docs/screen-registry.json",
-      "sha256": "ae4c1eab7c8da166d89fed51d7f0f5753637d435309a103de576c421c7897b7a"
+      "sha256": "9d5eaf655279e4922663a5c0f91bb742d57afb3c37e7e9ee0a4b4bdfb1e7e3ef"
     },
     {
       "path": "docs/menu-page-registry.json",

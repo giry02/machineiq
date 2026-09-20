@@ -109,3 +109,5 @@
   .owner-dashboard-preview .od-content .od-group-issue { flex-direction:column; gap:0; padding:7px 2px; }
   .owner-dashboard-preview .od-content .od-trend-bars { gap:5px; }
 }
+/* Only the missing-data notice needs inset space; normal dashboard layout is unchanged. */
+.owner-dashboard-preview .od-priority > .od-missing-data { margin:0 12px 12px; }

@@ -9,8 +9,10 @@ const apiContext={module:{exports:{}},URLSearchParams};
 vm.runInNewContext(read('owner-dashboard-preview.js'),apiContext);
 const api=apiContext.module.exports;
 assert(read('index.html').includes('data-dashboard-mode="main"'));
-assert(read('index.html').includes('owner-dashboard-preview.css?v=20260920-5'));
-assert(read('index.html').includes('owner-dashboard-preview.js?v=20260920-5'));
+assert(read('index.html').includes('owner-dashboard-preview.css?v=20260920-6'));
+assert(read('index.html').includes('owner-dashboard-preview.js?v=20260920-6'));
+assert(read('index.html').includes('customer.js?v=20260920-r87'));
+assert(read('index.html').includes('model.js?v=20260920-r87'));
 assert(!read('dashboard-backup-20260919.html').includes('owner-dashboard-preview'));
 for(const role of ['customer_owner','customer_staff']){
   const data=api.build(M,rows,role),scoped=M.scope(rows,{role}),counts=M.counts(scoped);
@@ -28,6 +30,13 @@ for(const role of ['customer_owner','customer_staff']){
     assert(html.includes('내 그룹 작업 현황'));assert(!html.includes('data-owner-sort'));
   }else assert(html.includes('그룹별 운영 비교'));
 }
+assert.equal(M.fleetState(null).available,false);
+assert.equal(M.fleetState({vehicles:[]}).available,true);
+assert.equal(M.supplySummary([{supplies:null}]).due,null);
+assert.equal(M.supplySummary([{supplies:[]}]).due,0);
+assert.equal(M.supplyItems({equipmentId:'missing',supplies:[null]})[0].key,'unknown');
+assert(read('customer.js').includes('data-retry-data'));
+assert(read('customer.js').includes("['maintenance','수리이력','clipboard-check']"));
 assert(!fs.existsSync(path.join(app,'map-config.local.js')));
 assert(read('owner-dashboard-preview.css').includes('button.od-text-link:hover:not(:active):not(:disabled) { background:transparent; border-color:transparent; color:var(--linq-color-brand); }'));
 console.log('PASS public dashboard: adopted main, owner/staff data scope, seven-day report parity, backup, removed footer, text-only hover, no local map key.');

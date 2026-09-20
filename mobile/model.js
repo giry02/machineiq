@@ -83,14 +83,18 @@
     return W.service.supplyItems(v.vin).map((r,i)=>({itemId:'web-supply-'+i,name:r.name,cycleHours:r.cycle,usedHours:r.used,lastChangedAt:W.service.records.find(x=>x.kind==='supply'&&x.vin===v.vin)?.date||null}));
   }
   function supplyItems(v) {
-    return (v.supplies||[]).map(item=>{
+    // Unknown lists are not confirmed empty lists; malformed entries remain unknown.
+    return (Array.isArray(v.supplies)?v.supplies:[]).map((source,index)=>{
+      const present=source!==null&&typeof source==='object'&&!Array.isArray(source);
+      const item=present?{...source,itemId:source.itemId??'missing-'+index,name:source.name||'소모품 정보 없음'}:{itemId:'missing-'+index,name:'소모품 정보 없음'};
+      const count=present?1:0;
       const valid=Number.isFinite(item.cycleHours)&&item.cycleHours>0&&Number.isFinite(item.usedHours)&&item.usedHours>=0;
       const status=valid?W.service.supplyStatus(item.cycleHours,item.usedHours):{state:'unknown',percent:null};
       // Dashboard handoff: ROUND(raw usage %, 0) determines the current state.
       // Keep the existing two-decimal usage display; do not round twice for classification.
       const percent=status.percent,decisionPercent=valid?Math.round(item.usedHours/item.cycleHours*100):null;
       const key=decisionPercent==null?'unknown':decisionPercent>=90?'due':decisionPercent>=80?'soon':'normal';
-      return {...item,percent,decisionPercent,key,kind:'supplies',label:STATUS[key].label,count:1,id:v.equipmentId+'-supply-'+item.itemId,equipmentId:v.equipmentId,occurredAt:v.receivedAt||SNAPSHOT,resolved:false};
+      return {...item,percent,decisionPercent,key,kind:'supplies',label:STATUS[key].label,count,id:v.equipmentId+'-supply-'+item.itemId,equipmentId:v.equipmentId,occurredAt:v.receivedAt||SNAPSHOT,resolved:false};
     });
   }
   function currentSupplies(rows) {
@@ -99,6 +103,17 @@
       if(seen.has(item.id))return false;
       seen.add(item.id);return true;
     });
+  }
+  function supplySummary(rows) {
+    const items=currentSupplies(rows),hasUnknown=rows.some(v=>!Array.isArray(v.supplies))||items.some(i=>i.key==='unknown');
+    // A partial snapshot cannot prove a complete zero; retain known rows, with a notice.
+    return {hasUnknown,knownItems:items.filter(i=>i.key!=='unknown').length,
+      due:hasUnknown?null:items.filter(i=>i.key==='due').length,
+      soon:hasUnknown?null:items.filter(i=>i.key==='soon').length};
+  }
+  function fleetState(fleet) {
+    const valid=Array.isArray(fleet?.vehicles)&&fleet.vehicles.every(v=>v&&typeof v==='object'&&!Array.isArray(v)&&typeof v.vin==='string'&&v.vin.trim()&&typeof v.companyId==='string'&&v.companyId.trim());
+    return {available:!!valid};
   }
   let sourceFleet=[];
   function rawHistory() {
@@ -111,7 +126,7 @@
     return W.legacy.concat(generated.maintenance,generated.error,current,maintenance);
   }
   function buildVehicles(fleet) {
-    sourceFleet=fleet.vehicles.filter(v=>!v.catalogOnly);
+    sourceFleet=fleetState(fleet).available?fleet.vehicles.filter(v=>!v.catalogOnly):[];
     const history=rawHistory(),window=W.meeting.hourlyWindow(new Date());
     return sourceFleet.filter(v=>v.companyId===COMPANY).map((v,i)=>{
       const live=W.meeting.hourlyVehicle(v,window),supplies=sourceSupplies(v);
@@ -136,25 +151,25 @@
     for(const v of scope(rows,state))for(const item of supplyItems(v))if(requested.has(item.id)&&item.percent!=null&&item.usedHours>0)targets.push({v,item});
     if(targets.length!==requested.size)return [];
     const snapshots=targets.map(({v,item})=>({equipmentId:v.equipmentId,itemId:item.itemId,usedHours:item.usedHours,lastChangedAt:item.lastChangedAt}));
-    for(const {v,item} of targets){const source=v.supplies.find(s=>s.itemId===item.itemId);source.usedHours=0;source.lastChangedAt=SNAPSHOT;}
+    for(const {v,item} of targets){const source=v.supplies.find(s=>s?.itemId===item.itemId);source.usedHours=0;source.lastChangedAt=SNAPSHOT;}
     refreshSupplyCounts(rows);return snapshots;
   }
   function refreshSupplyCounts(rows) {
     for(const v of rows){const items=supplyItems(v);v.supplyDueCount=items.filter(i=>i.key==='due').length;v.supplySoonCount=items.filter(i=>i.key==='soon').length;}
     const infos=W.service.supplyItems().map(item=>{
-      const v=rows.find(v=>v.vin===item.vin),source=v?.supplies.find(r=>r.name===item.name),record=W.service.records.find(r=>r.kind==='supply'&&r.vin===item.vin)||{};
+      const v=rows.find(v=>v.vin===item.vin),source=(Array.isArray(v?.supplies)?v.supplies:[]).find(r=>r?.name===item.name),record=W.service.records.find(r=>r.kind==='supply'&&r.vin===item.vin)||{};
       return {...record,supplyName:item.name,supplyCycle:source?.cycleHours??item.cycle,supplyUsed:source?.usedHours??item.used};
     });
     W.service.replace('supply',infos);
   }
   function undoSupplyReset(rows,state,snapshots) {
     if(state.role!=='customer_owner'||!Array.isArray(snapshots)||!snapshots.length)return false;
-    const allowed=scope(rows,state),targets=snapshots.map(s=>({snapshot:s,item:allowed.find(v=>v.equipmentId===s.equipmentId)?.supplies?.find(i=>i.itemId===s.itemId)}));
+    const allowed=scope(rows,state),targets=snapshots.map(s=>{const supplies=allowed.find(v=>v.equipmentId===s.equipmentId)?.supplies;return {snapshot:s,item:(Array.isArray(supplies)?supplies:[]).find(i=>i?.itemId===s.itemId)};});
     if(targets.some(t=>!t.item||t.item.usedHours!==0))return false;
     targets.forEach(({item,snapshot})=>{item.usedHours=snapshot.usedHours;item.lastChangedAt=snapshot.lastChangedAt;});
     refreshSupplyCounts(rows);return true;
   }
-  function attention(v) { return !v.conn || v.activeErrorCount > 0 || v.supplyDueCount > 0 || v.supplySoonCount > 0; }
+  function attention(v) { return !v.conn || v.activeErrorCount > 0 || v.supplyDueCount > 0 || v.supplySoonCount > 0 || supplySummary([v]).hasUnknown; }
   // Reuse the existing confirmation fixtures, including the clearly labelled completed example.
   function serviceItems(v) {
     const maintenance=serviceHistory([v]).filter(r=>r.kind==='maintenance');
@@ -201,7 +216,7 @@
     });
   }
   function serviceRecords(rows,{kind='maintenance',from,to,focus='',origin='',through=SNAPSHOT}={}) {
-    if(kind==='supplies')return currentSupplies(rows).filter(i=>['due','soon'].includes(i.key)&&(!focus||i.key===focus));
+    if(kind==='supplies')return currentSupplies(rows).filter(i=>['due','soon','unknown'].includes(i.key)&&(!focus||i.key===focus));
     if(kind==='error'&&origin==='dashboard')return dashboardErrors(rows,{from,to,through});
     if(kind==='error'&&focus==='error')return serviceHistory(rows).filter(r=>r.kind==='error'&&!r.resolved);
     return serviceHistory(rows).filter(r=>r.kind===kind&&(!from||r.occurredAt.slice(0,10)>=from)&&(!to||r.occurredAt.slice(0,10)<=to)&&(!focus||focus!=='error'||!r.resolved));
@@ -266,10 +281,10 @@
   function counts(rows,options={}) {
     const connected = rows.filter(v=>v.conn).length;
     const running = rows.filter(v=>v.operating === true).length;
-    const supplies=currentSupplies(rows);
+    const supplies=supplySummary(rows);
     return {total:rows.length,connected,offline:rows.length-connected,running,idle:connected-running,
-      error:dashboardErrors(rows,options).length,due:supplies.filter(i=>i.key==='due').length,
-      soon:supplies.filter(i=>i.key==='soon').length,attention:rows.filter(attention).length,
+      error:dashboardErrors(rows,options).length,due:supplies.due,
+      soon:supplies.soon,attention:rows.filter(attention).length,
       normal:rows.filter(v=>!attention(v)).length,operatingRate:connected ? Math.round(running/connected*100) : null};
   }
   function dates(period) {
@@ -379,5 +394,5 @@
     return {equipmentId:v.equipmentId,companyId:COMPANY,group:v.group,startDate:state.from,endDate:state.to,
       periodType:state.period,date:state.from.replaceAll('-','')};
   }
-  return {SNAPSHOT,TODAY,DATA_START,ENERGY_MONTH,STATUS,DISPLAY,SHOCK_LEVELS,shockLevel,chargeWindow,assignedGroup,reportValues,web:W,createApprovalStore,periodWindow,hourlyWindow,dashboardWindow,dashboardErrors,currentSupplies,COMPANY,ROLE_LABELS,buildVehicles,scope,listed,attention,counts,dates,calendarDate,efficiencyRange,efficiencyPerformance,efficiencyWindow,efficiencyCalendar,metrics,performance,dailyEfficiency,serviceItems,supplyItems,resetSupplies,undoSupplyReset,serviceHistory,serviceRecords,pushHistory,pushPresentation,shockEvents,notificationWindow,recentNotifications,unreadPushCount,requestContext};
+  return {SNAPSHOT,TODAY,DATA_START,ENERGY_MONTH,STATUS,DISPLAY,SHOCK_LEVELS,shockLevel,chargeWindow,assignedGroup,reportValues,web:W,createApprovalStore,periodWindow,hourlyWindow,dashboardWindow,dashboardErrors,currentSupplies,supplySummary,fleetState,COMPANY,ROLE_LABELS,buildVehicles,scope,listed,attention,counts,dates,calendarDate,efficiencyRange,efficiencyPerformance,efficiencyWindow,efficiencyCalendar,metrics,performance,dailyEfficiency,serviceItems,supplyItems,resetSupplies,undoSupplyReset,serviceHistory,serviceRecords,pushHistory,pushPresentation,shockEvents,notificationWindow,recentNotifications,unreadPushCount,requestContext};
 });

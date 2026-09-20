@@ -1,5 +1,26 @@
 {
+  "repairHistoryWebParity20260920": {
+    "revision": "r86: 사용자 정정 — 기존 목록 유지, 선택 이력 상세만 WEB 항목 적용",
+    "screenIds": ["LQ-SVC-001", "LQ-SVC-002"],
+    "relatedScreenId": "LQ-OPS-002",
+    "menuId": "srvc/maintenance",
+    "roles": ["customer_owner", "customer_staff"],
+    "name": "수리이력",
+    "listOutput": "기존 차량 카드/기종·그룹 및 고장부위·짧은 일시·처리상태·화살표 행 그대로 유지",
+    "output": ["선택 이력 상세: 그룹", "기종", "호기", "수리일시", "고장부위", "현상", "완료여부"],
+    "policy": "목록 형태는 원본 유지. 항목 클릭 후 상세 화면만 현재 WEB 고객 두 역할과 동일하게 표시. 업체·상세내용/조치 내용 미표시. 대표 업체 전체/선택 그룹, 직원 배정 그룹 제한 유지.",
+    "report": "docs/handoff/CUSTOMER_MOBILE_REPAIR_HISTORY_20260920.md",
+    "implementation": "로컬 모바일 HTML 반영. WEB 원본·집계·서버/API·APK/iOS·GitHub 배포 미변경. FigJam 누적 반영 대기."
+  },
+  "efficiencyLabelWeight20260920": {
+    "revision": "r84",
+    "screenIds": ["LQ-REF-003", "LQ-REF-003-T01", "LQ-REF-003-T02"],
+    "scope": "날짜·요일/시간대 및 차량번호만 굵기 700. 기존 14px·색상·차량 두 줄 배치·기종 일반 굵기 유지. 입출력·권한·이동 불변.",
+    "report": "docs/handoff/CUSTOMER_MOBILE_EFFICIENCY_LABEL_WEIGHT_20260920.md",
+    "implementation": "로컬 모바일 HTML 반영. GitHub·APK·iOS·실제 서버 미반영. FigJam 누적 반영 대기."
+  },
   "ownerDashboardProposal20260919": {
+    "publication20260920": {"repository":"giry02/machineiq","commit":"8173f5eed4b588abc0a8a63d20c66d4ff2734baf","path":"https://giry02.github.io/machineiq/mobile/index.html#home","report":"docs/handoff/CUSTOMER_MOBILE_GITHUB_PUBLISH_20260920.md"},
     "revision": "v5 2026-09-20: 대표/직원 하단 프로토타입 데이터 문구 삭제, 차량 보기/리포트 텍스트 링크의 호버·포커스·누름은 투명 배경과 브랜드 글자색. 기본 크기/아이콘/집계/이동 유지",
     "screenId": "LQ-DASH-001",
     "status": "adopted-main",
@@ -492,6 +513,7 @@
       ],
       "out": [
         "vehicle cards",
+        "수리이력: 기존 차량 카드와 고장부위/짧은 일시/처리상태/화살표 목록 유지. 클릭 후 상세만 WEB 고객 항목 표시",
         "maintenance/error history within selected dates",
         "supplies current snapshot (ignores date range)",
         "category tab event/item counts, role/group/vehicle and active focus scoped",
@@ -520,8 +542,8 @@
         "notificationState"
       ],
       "out": [
-        "정비완료 예시 기록",
-        "selected record timestamp/status"
+        "수리이력: 그룹, 기종, 호기, 수리일시, 고장부위, 현상, 완료여부",
+        "목록 및 선택 이력 모두 상세내용/조치 내용 미표시 (고객대표·고객직원 WEB 기준)"
       ],
       "next": [
         "LQ-OPS-001",
