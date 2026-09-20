@@ -14,7 +14,7 @@ for(const item of manifest.files){
   }
 }
 const ctx=vm.createContext({window:{},Date});
-vm.runInContext(read('data/fleet.generated.js'),ctx);vm.runInContext(read('model.js'),ctx);
+vm.runInContext(read('data/fleet.generated.js'),ctx);vm.runInContext(read('web-contracts.generated.js'),ctx);vm.runInContext(read('model.js'),ctx);
 const M=ctx.window.CustomerPrototype,rows=M.buildVehicles(ctx.window.MIQ_MOCK_DATA.fleet);
 assert.equal(rows.length,13,'Current customer demo fleet');
 for(const role of Object.keys(M.ROLE_LABELS)){

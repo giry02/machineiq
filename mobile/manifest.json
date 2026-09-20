@@ -1,26 +1,26 @@
 {
-  "revision": "2026-09-13-r46",
+  "revision": "2026-09-20-dashboard-v5",
   "entry": "login.html",
   "files": [
     {
       "path": "index.html",
-      "sha256": "9fc80991d2c60a2d024443cc61def0f4019d5e4c8a602c70c393f1d253263bb6"
+      "sha256": "7018cd9e686eb26a71568ede2cc9a76bd4eb793a68de4a02a7d7aa7f2edf401a"
     },
     {
       "path": "customer.js",
-      "sha256": "65045a61d50391818a4c13c9a5fa37d735727facd0b8d7f345fad4f8e51a7e94"
+      "sha256": "8dd4cc1ba3965a652a7c05a652d2da1fca9d09ab9930c41ac0cb026f5de547ab"
     },
     {
       "path": "customer.css",
-      "sha256": "f59c92e7d628c785793878eabe1c52fc5a1f8ad9826cbca080dc6d4d13c01765"
+      "sha256": "23826a6b08b28750d5d024a4e22c19552406d5db155a987d32f38c79462d94d4"
     },
     {
       "path": "error-documents.js",
-      "sha256": "a5fd9bd4e41235125856e818b3883cc59c1a8822c761372ac73139fb59c22e97"
+      "sha256": "641b65ee6a18c1879750a386a60a73ca38e93bd90d12f0e4309cd50a589d76d2"
     },
     {
       "path": "lithium-status-model.js",
-      "sha256": "23c25ab2c12280c504659792befeaec6fc258becdb247cd78234934792466740"
+      "sha256": "f9eff23d5fdeb13b1383d8ebf149e3b0a4c4cee638b161a7dcd0b0b3302d2fb7"
     },
     {
       "path": "location-map.js",
@@ -28,23 +28,23 @@
     },
     {
       "path": "model.js",
-      "sha256": "ea5c97abe49db5c070856aadc1b329ae41e1ba0277e764539a791c1a99f32e96"
+      "sha256": "64f037cbc048663259afb33a4e0a12a1af1ec3b0334fec1e1211df52b1a92e28"
     },
     {
       "path": "login.html",
-      "sha256": "8ece4548b17f61caa67a2c3b2774ed77470190440ee133063609bc43477e1515"
+      "sha256": "82d5c7d2bf248744b6e6cb0fe7a7c2e3fcc4a8b20de869212c1b631eb0b97b7b"
     },
     {
       "path": "login.js",
-      "sha256": "219dddf77b2ba0e702fb437a9236b3f416625d5431f01ae3a3482b5b805af9fa"
+      "sha256": "398ff2e887f8c73a2ed61aaddcb9e4de418f76a0ea2898fa9a09e17c4c3f6a4b"
     },
     {
       "path": "signup.html",
-      "sha256": "4b4bc3fbf2d4b7acca43a285bb05d4d1a7e966dd0e7d2afbe2aba4c2f2781cfc"
+      "sha256": "177229945e42b81a912b22ac92aa686fff919acbd1afb999ead97ca7feedbdb5"
     },
     {
       "path": "signup.js",
-      "sha256": "ba2e40b79a02f51950ad77cffb5e6ed419b12728f1daa79e9a9742d479290044"
+      "sha256": "137ecfb94e657dd676e0f5a02e84bf494806ac4736f44dcc39051f4eff6cc3fb"
     },
     {
       "path": "signup-header.js",
@@ -52,11 +52,47 @@
     },
     {
       "path": "find-password.html",
-      "sha256": "538cd2738aba8791514e4ae419adcddfbf9bcfab3c5b5d0ac8704c49522ab5be"
+      "sha256": "22e2941d534f62021887350c92a85760f2d7e409aaf81d29b3d5109e139689b9"
     },
     {
       "path": "find-password.js",
       "sha256": "2c35c647d64ae53c0e2bd3936a35f34b63ea7486d682c347d50e2cbf981ec623"
+    },
+    {
+      "path": "web-contracts.generated.js",
+      "sha256": "891a3efa37cbb36159abbba52904ee663b020e77ddcaf52cbdb29a695bedc057"
+    },
+    {
+      "path": "web-guide-colors.css",
+      "sha256": "b5c4bb8138a8bc1508f507c1df20e40039acdff5b40c5141bd9145033e41cb4e"
+    },
+    {
+      "path": "group-cards-preview.html",
+      "sha256": "1dc5d0d1d23007603ad9881da9fc3ceaaab22c9ed03101bea5547feeea75f767"
+    },
+    {
+      "path": "group-cards-preview.js",
+      "sha256": "3e5ac109b6ce66faf19350f0dda522e11a6ed3559e16474d96dc6a771114d7ce"
+    },
+    {
+      "path": "group-cards-preview.css",
+      "sha256": "6d53027e46fe493959cbf97b806e9d0a06216682d4f658a90429e7da9900bb9a"
+    },
+    {
+      "path": "owner-dashboard-preview.html",
+      "sha256": "f20f881324800ae49664281c83edea6aac192423e580fc913f28370d5d794217"
+    },
+    {
+      "path": "owner-dashboard-preview.js",
+      "sha256": "854e0dfd34ec6effb137db9057ef994437a5853e16321e2b86fca96469029953"
+    },
+    {
+      "path": "owner-dashboard-preview.css",
+      "sha256": "3fdec8abe3c50811425c0ce75e7da7cf0f6db8d177ce50b7cfd439b021bf084f"
+    },
+    {
+      "path": "dashboard-backup-20260919.html",
+      "sha256": "1dc5d0d1d23007603ad9881da9fc3ceaaab22c9ed03101bea5547feeea75f767"
     },
     {
       "path": "shared/mobile-guide-tokens.css",
@@ -644,7 +680,7 @@
     },
     {
       "path": "data/fleet.generated.js",
-      "sha256": "f69042cf6b575c36299d4556484af87efd0607f9a66200e77b314a84bdf436d8"
+      "sha256": "d8bca0b6a3fdf76ceace01835e5fbc152575ae6936a4414de9f1c495ad162c69"
     },
     {
       "path": "serve.cjs",
@@ -652,7 +688,11 @@
     },
     {
       "path": "tests/package.cjs",
-      "sha256": "27d97bb0bd810e28e592cbb6762a3b61c0a9661bb597f776c3ebb20294796245"
+      "sha256": "e930bbf0ffef23cab540e1b853cd8f9ce5bc4f863d6225e8d4d0efeeda74b32b"
+    },
+    {
+      "path": "tests/dashboard.cjs",
+      "sha256": "10cb452b737ad37d860750c92af923a6efe9b2840c23a3e6896c19843e6bf5b3"
     },
     {
       "path": "tests/auth.cjs",
@@ -660,19 +700,23 @@
     },
     {
       "path": "README.md",
-      "sha256": "f0fc6d4d47f3a0ca08da6bebb6dd4555124b132872a385f3a95a2eec01bdefc7"
+      "sha256": "e541c66c8320a90beab3bfcefacc6c85adda3a2726fd008ee74a72b8bad19cb3"
+    },
+    {
+      "path": "docs/dashboard-main-20260919.md",
+      "sha256": "e5c8b88c1b0f6cfb705d279d7bf8403a5399b23da4b558c69ea76facd78efbe3"
     },
     {
       "path": ".gitattributes",
-      "sha256": "a51e29dff0184e5213ef78ac09f9029d6179e799854920d092a0e630a3856fc4"
+      "sha256": "b7036180f6a97bbdbb6ad4f1998a9c62b2cc4b2f85af3b333cfbc11b2511ac8f"
     },
     {
       "path": "docs/screen-registry.json",
-      "sha256": "c987391528e70e6731a7e5241b082b2e99a7fcdcc77d705df8081333b4c0646d"
+      "sha256": "ae4c1eab7c8da166d89fed51d7f0f5753637d435309a103de576c421c7897b7a"
     },
     {
       "path": "docs/menu-page-registry.json",
-      "sha256": "d4bed3b9bb9c06824854796c77d4aa0a1b8911ee7704554254f59c7dacb74f43"
+      "sha256": "1ad9bd4e0c2ee880fc9fbe31104d005775d236da099c75ae9edba308d4798e03"
     },
     {
       "path": "docs/figjam-detail-r46.json",
@@ -684,7 +728,7 @@
     },
     {
       "path": "docs/MACHINE_IQ_모바일_스타일가이드_20260913.pdf",
-      "sha256": "d18fd6a4931b08839701f45efb4a41c487e495efc722a27952ff3a29668eff66"
+      "sha256": "523d8ba9750455b266530594a420117decd8e70ecf72909ab199d766380bc970"
     },
     {
       "path": "docs/MACHINE_IQ_모바일_메뉴_페이지_구조도_20260913.xlsx",
@@ -692,7 +736,7 @@
     },
     {
       "path": "tests/supply-reset.cjs",
-      "sha256": "47c9cdf50f7d060a73f97f48821fd1c3c366c4136f6a10bde8ba410c6dc73931"
+      "sha256": "4edc1b6a0549b7e2ca845a69fd9698900b295cef5bc434a0ba64fc0ef718355e"
     },
     {
       "path": "tests/harness.js",
@@ -700,15 +744,15 @@
     },
     {
       "path": "tests/soc.cjs",
-      "sha256": "fce13030f152ec11a1b2db1df710d14a2cc9a6f800dcdfa04d958e0b017c8a76"
+      "sha256": "d85c12aae9fe85684a6d241e2c611b564ad9fa13c5ed362627bb440b45187401"
     },
     {
       "path": "tests/error.cjs",
-      "sha256": "5d61ac515706ba2a434682f4a1f40710fadf8f249496485ff95ade3be6781847"
+      "sha256": "92c9781948d7063477654a0ff971e5fc16c022fa0132c8ace651987a168790c1"
     },
     {
       "path": "tests/lithium-shock.cjs",
-      "sha256": "03877e5f325ae012f632d99fc511f9f3eda9da2e2a40ad3a77a1a3b6edc36d84"
+      "sha256": "6f46357c5d108cc2d3c292c1140d4f58372fd5f476ecea7c1868ab48545f7d50"
     },
     {
       "path": "docs/html-delivery.md",

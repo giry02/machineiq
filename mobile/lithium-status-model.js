@@ -1,6 +1,9 @@
 (function(root){
   'use strict';
   var errors = {
+    FBA32_DEMO_CS01: [
+      { st: 'cur', code: 'BM-0x0104', msg: '충전 전류 이상', lv: '주의', days: 0, done: null, act: '충전기 커넥터 접점 및 충전 케이블 단선 점검' }
+    ],
     FBA32_224250271: [
       { st: 'cur',  code: 'BM-0x0210', msg: '셀 과열 (43℃)',      lv: '주의', days: 0,  done: null,                 act: '차량 정지 후 30분 냉각, 배터리 팩 통풍구 이물 점검' },
       { st: 'past', code: 'BM-0x0308', msg: '셀 전압 편차 초과',   lv: '주의', days: 3,  done: '2026-08-09 15:22',   act: '밸런싱 모드로 완충 1회 실시 후 편차 재확인' },

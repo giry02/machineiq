@@ -1,13 +1,70 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-09-13",
+  "r65Revision": {
+    "revision": "2026-09-13-r65",
+    "screenIdsChanged": false,
+    "changes": "작업현황 미확인 0을 현재 통신 미연결 집계/차량 필터로 교정. 대표 전체 13=가동 3+미가동 6+미연결 4, 직원 미연결 1. 조회 기간 실적 유무와 통신 상태를 구분하며 기존 실적은 유지.",
+    "report": "docs/reports/CUSTOMER_MOBILE_R65_20260913.md",
+    "figjam": "사용자 명시적 요청 시 일괄 반영 대기. 원격 미변경."
+  },
+  "r64Revision": {
+    "revision": "2026-09-13-r64",
+    "screenIdsChanged": false,
+    "changes": "서비스 정비/소모품/에러: 대표 그룹+차량 선택, 직원 배정 그룹 내 차량 선택. serviceEquipmentId 직접 변경 및 진입 시 선택 유지. 중복 차량/에러 칩 제거. 조회 기준·목록 개수·필요/임박 상태 필터 유지.",
+    "report": "docs/reports/CUSTOMER_MOBILE_R64_20260913.md",
+    "figjam": "사용자 명시적 요청 시 일괄 반영 대기. 원격 미변경."
+  },
+  "r63Revision": {
+    "revision": "2026-09-13-r63",
+    "screenIdsChanged": false,
+    "changes": "LQ-SVC-001-T02: 대시보드 발생 기준 × 칩만 제거. serviceOrigin·집계 종료시각·에러 개수 유지. 차량 및 필요/임박 조건 해제 칩은 유지.",
+    "figjam": "사용자 요청에 따라 원격 반영 대기. 명시적으로 요청할 때 일괄 반영."
+  },
+  "r62Revision": {
+    "revision": "2026-09-13-r62",
+    "screenIdsChanged": false,
+    "colors": "WEB 스타일 가이드 20260913 기준 색상만 적용. 레이아웃·폰트·간격·입출력·권한 미변경. 배터리·충격의 기존 웹 컴포넌트 팔레트 유지.",
+    "precedingRequests": "r60–r61: 10종 에러 코드별 PDF, 건/개 숫자 옆 12px, 리포트 중복 차량 상세 링크 제거. 금일 에러·현재 소모품·배터리 상태/알림 샘플 보완 및 연결 숫자 일치.",
+    "report": "docs/reports/CUSTOMER_MOBILE_R61_R62_20260913.md"
+  },
+  "r59Revision": {
+    "revision": "2026-09-13-r59",
+    "screenIdsChanged": false,
+    "policy": "집계 기준은 r59와 DASHBOARD_MAINTENANCE_METRICS.md 0절을 이전 revision보다 우선한다.",
+    "error": "대시보드 금일 00:00~완료 정각의 발생 건수. 해제 포함, EE/FL 제외. serviceOrigin=dashboard 및 날짜·집계 종료시각 전달. 차량 현재 에러 바로가기는 발생일 무관 미해제 목록 유지.",
+    "supplies": "기간 미적용 현재 관리 항목 수(개). 정수 반올림한 사용률 90 이상 필요, 80~89 임박. 대시보드·서비스·리셋 동일 판정. /전체 차량 N대 제거.",
+    "implementation": "로컬 데이터와 화면 반영. WEB 정적 화면 및 실제 서버/API는 후속 구현 대상.",
+    "figjamRecord": "docs/ux/figjam-customer-mobile-dashboard-r59.json"
+  },
+  "r58Revision": {
+    "revision": "2026-09-13-r58",
+    "screenIdsChanged": false,
+    "errorShortcut": "현재 미해제 건수와 같은 목록을 발생일 제한 없이 조회. 이 상태에서는 날짜 컨트롤 숨김. 조건 해제/에러 탭 재선택 시 기간별 이력 복귀. 알림은 원래 발생일 이력 연결 유지.",
+    "efficiency": "일(d) 00~23시 24행. 주/월 일별 행. 웹 B안 작업÷기준시간 비율 및 기간 가중 합산 사용. 작업÷운행시간은 가동 중 작업 비중으로 별도 구분.",
+    "presentation": "고객 화면의 시연·예시·테스트 데이터 및 서버/장비 미연동 안내 제거. 원본 데이터/코드는 보존하고 설명 접두사·위치 접미사만 표시에서 제거.",
+    "figjamRecord": "docs/ux/figjam-customer-mobile-r58.json"
+  },
+  "webParityRevision": {
+    "revision": "2026-09-13-r57",
+    "source": "html/customer/mobile-prototype/web-contracts.generated.js",
+    "generator": "scripts/build-customer-web-contracts.cjs",
+    "policy": "현행 데이터/계산 기준은 이 r57 정의를 이전 revision보다 우선한다. 화면/메뉴 ID 유지.",
+    "roleScope": "웹 공통 권한: 대표 업체1933, 직원 물류1팀3대. 대표만 승인/리셋.",
+    "outputs": "웹 서비스 이력의 코드·설명·등급·SPN/FMI·발생/해제·정비 상태. 소모품90/80. 대응 메뉴별 기간 계산·지도·리튬 모델 재사용.",
+    "writes": "충전 localStorage linq.smartCharge.v1:{role}:{VIN}, 승인 sessionStorage linq.management.userRequests.v2. 실제 서버/계정/장비 미연동.",
+    "notifications": "웹 에러·충격 원본 변환, 최근30일. 현재 읽음 표시/열람 차감 없음.",
+    "exceptions": "원장에 없는 웹 과거 서비스 VIN 제외. 복수 그룹 리포트는 합산/그룹평균 확장. 실제 PUSH 원장 미연동.",
+    "report": "docs/reports/CUSTOMER_MOBILE_WEB_PARITY_R57_20260913.md",
+    "figjamRecord": "docs/ux/figjam-customer-mobile-web-parity-r57.json"
+  },
   "scope": "모바일 = 현재 고객용 모바일 프로토타입",
   "sourceRoot": "html/customer/mobile-prototype",
   "workbook": "outputs/01a065cf-a62e-7001-9333-b6e1fc0b5fa6/MACHINE_IQ_모바일_메뉴_페이지_구조도_20260913.xlsx",
   "idPolicy": {
-    "menuIds": "LQM-MNU-001~020은 모바일 관리 ID. 기존 _shared/nav.js MENU.key/subs.key는 별도 매핑으로 보존한다.",
-    "screenIds": "기존 20개 유지. 현재 구현된 가입·비밀번호 단계와 독립 서비스·알림 탭 10개에 미사용 ID 발급.",
-    "popup": "지도 모달과 대표 전용 소모품 교체 완료 확인 모달을 독립 페이지로 관리. 인라인 펼침·필터·토스트는 별도 페이지에서 제외."
+    "menuIds": "LQM-MNU-001~021은 모바일 관리 ID. 기존 _shared/nav.js MENU.key/subs.key는 별도 매핑으로 보존한다.",
+    "screenIds": "기존 활성 화면 ID 22개 참조 및 신규 단계/탭 10개 유지. 폐지된 모바일 에러 ID는 이력으로 보존. r47 승인 목록 T01/팝업 P01은 전역 활성 ID 재사용.",
+    "popup": "지도 모달·대표 전용 소모품 확인·대표 전용 사용자 승인/반려 확인을 독립 팝업으로 관리. 상태 필터는 페이지가 아님."
   },
   "runtimeChange": true,
   "supplyResetRevision": {
@@ -22,7 +79,9 @@
     "note": "r42에서 기존 모바일 서비스 영역에 대표 전용 Reset 팝업과 권한·입출력을 반영했다. 기존 위치는 유지했다. 앞서 문서화한 신규 세부 ID 10개 전체가 원격 반영되었다는 의미는 아니다. r46: 에러 상세를 파일 출력으로 바꾸고 알림 도착 화면·리튬 상태/충전·충격 출력 정의를 현재 위치에서 갱신.",
     "supplyResetRecord": "docs/ux/figjam-customer-mobile-supply-reset-20260913.json",
     "record": "docs/ux/figjam-customer-mobile-process-20260913.json",
-    "detailRecord": "docs/ux/figjam-customer-mobile-detail-r46.json"
+    "detailRecord": "docs/ux/figjam-customer-mobile-detail-r46.json",
+    "approvalRecord": "docs/ux/figjam-customer-mobile-approval-r47.json",
+    "notificationCountRecord": "docs/ux/figjam-customer-mobile-notification-count-r50.json"
   },
   "menus": [
     {
@@ -133,7 +192,18 @@
       "page": "LQ-ACC-001",
       "position": "하단 5",
       "description": "내 정보, 테스트 조회 역할, PUSH 수신 항목을 확인한다.",
-      "trigger": "계정 메뉴에 로그아웃 제공."
+      "trigger": "계정 메뉴에 로그아웃 제공. 고객대표에게 사용자 승인과 대기 건수 표시."
+    },
+    {
+      "id": "LQM-MNU-021",
+      "name": "사용자 승인",
+      "parent": "LQM-MNU-010",
+      "area": "설정",
+      "key": "mgmt/user",
+      "page": "LQ-MGT-001-T01",
+      "position": "계정 메뉴 · 로그아웃 위",
+      "description": "소속 업체의 고객 직원 가입 신청만 조회·승인·반려. 딜러 승인 화면의 상태/확인 절차를 현재 모바일 컴포넌트로 확장.",
+      "trigger": "고객대표만 진입. 처리 화면에서도 하단 설정 활성 유지."
     },
     {
       "id": "LQM-MNU-011",
@@ -257,7 +327,7 @@
       "description": "선택 품목·차량·건수를 확인한 후 교체 완료를 일괄 처리한다.",
       "input": "현재 조회 범위의 유효한 사용시간>0 품목 ID, 고객 대표, 확인/취소.",
       "output": "사용시간 0H·정상·최근 교체 시각, 홈/차량의 필요·임박 집계 갱신. 목록 복귀와 실행 취소.",
-      "exception": "직원·그룹장 선택/처리 차단. 그룹·차량·역할·화면 변경 시 선택 해제. 메모리 시연이며 새로고침 시 복원, 실제 서버/장비 변경 없음.",
+      "exception": "직원 선택/처리 차단. 그룹·차량·역할·화면 변경 시 선택 해제. 메모리 시연이며 새로고침 시 복원, 실제 서버/장비 변경 없음.",
       "route": "index.html#services?service=supplies → #supply-reset-dialog",
       "isNew": false
     },
@@ -323,11 +393,11 @@
       "type": "페이지",
       "parent": "",
       "area": "홈",
-      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
-      "description": "통신·가동 현황, 에러 발생·교체 필요/임박, 금일 작업과 그룹/차량별 현황을 보여준다.",
+      "roles": "고객 대표 · 고객 직원",
+      "description": "통신·가동 현황, 에러 발생·교체 필요/임박, 금일 작업과 그룹/차량별 현황을 보여준다. r55: 직원은 배정 그룹 요약 1개를 위에, 해당 그룹의 차량별 작업 현황을 아래에 표시한다.",
       "input": "통신/가동 범례, 점검 카드, 그룹·차량 행, 요약정보/리포트 버튼.",
-      "output": "조건별 차량 목록, 서비스 내역, 금일 리포트와 차량 상세로 이동.",
-      "exception": "대표: 업체 전체/선택 그룹. 직원·그룹장: 배정 그룹. 실제 서버 인가 미연결. 그룹 비교는 대표에게 제공. 수집 기준 시각과 미연결 상태를 구분한다.",
+      "output": "조건별 차량 목록, 서비스 내역, 금일 리포트와 차량 상세로 이동. 에러는 금일 발생 건수(건), 소모품은 기간 무관 현재 항목 수(개). 에러 진입 시 동일 날짜·완료 정각 전달. 필요/임박은 현재 분류만 전달.",
+      "exception": "대표: 업체 전체/선택 그룹. 직원: 배정 그룹 요약 1개·배정 차량만 표시. 그룹 행과 전체보기는 배정 그룹의 금일 리포트로 이동하며 다른 그룹 선택은 불가. 실제 서버 인가 미연결. 그룹 비교는 대표에게 제공. 수집 기준 시각과 미연결 상태를 구분한다. FigJam 홈 정의 888:9086 및 리포트 IN 888:9042 동기화.",
       "route": "index.html#home",
       "isNew": false
     },
@@ -337,11 +407,11 @@
       "type": "페이지",
       "parent": "",
       "area": "차량",
-      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "roles": "고객 대표 · 고객 직원",
       "description": "차량별 작업·대기·운행거리·운영효율 및 현재 점검 상태를 카드로 확인한다.",
       "input": "그룹(대표), 전체/개별 차량, 날짜, 금일·주·월. 홈의 통신·가동 조건을 이어받을 수 있다.",
       "output": "차량 카드에서 상세. 소모품/에러는 해당 차량 서비스, 배터리 잔량/충격은 해당 상세.",
-      "exception": "대표: 업체 전체/선택 그룹. 직원·그룹장: 배정 그룹. 실제 서버 인가 미연결. 그룹과 차량 선택을 위에, 날짜와 기간 단위를 아래에 배치. 미수신은 0과 구분.",
+      "exception": "대표: 업체 전체/선택 그룹. 직원: 배정 그룹. 실제 서버 인가 미연결. 그룹과 차량 선택을 위에, 날짜와 기간 단위를 아래에 배치. 미수신은 0과 구분.",
       "route": "index.html#summary",
       "isNew": false
     },
@@ -351,7 +421,7 @@
       "type": "페이지",
       "parent": "LQ-OPS-001",
       "area": "차량",
-      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "roles": "고객 대표 · 고객 직원",
       "description": "차량 식별·가동 상태, 현재 점검, 기간 운행, 에너지 정보, 최근 정비, 최종 위치와 기본정보를 보여준다. 리튬만 웹 온도·충전·배터리 상태와 스마트 충전 표시.",
       "input": "선택 차량, 조회 기간. 업무 현황·운영효율·충격 상세, 정비 기록, 지도 보기. 스마트 충전 on/off·시작/종료 시간·저장.",
       "output": "선택 차량/기간으로 리포트·충격·정비·서비스 이동. 지도 팝업 열기. 차량/역할별 브라우저 시연 저장. 자정 넘김과 동일 시간 24시간 지원. 충격 민감·주의·경고별 건수와 기준 안내(시연 강도; 총합 일치).",
@@ -365,7 +435,7 @@
       "type": "상세",
       "parent": "LQ-OPS-002",
       "area": "차량",
-      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "roles": "고객 대표 · 고객 직원",
       "description": "선택 차량의 운행시간·거리·작업시간·대기시간을 조회한다.",
       "input": "차량, 날짜, 금일·주·월.",
       "output": "이전 상세 또는 지정된 원래 목록으로 복귀.",
@@ -379,11 +449,11 @@
       "type": "상세",
       "parent": "LQ-OPS-002",
       "area": "차량",
-      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "roles": "고객 대표 · 고객 직원",
       "description": "선택 차량의 조회 기간 충격 건수를 확인한다.",
-      "input": "차량, 날짜, 금일·주·월. 알림에서 선택한 차량도 진입 가능.",
+      "input": "차량, 날짜, 금일·주·월. 충격 알림에서 선택한 차량과 발생일(from=to)을 전달.",
       "output": "선택 차량의 기간 충격 표시. 진입한 목록/상세/알림으로 복귀. 충격 민감·주의·경고별 건수와 기준 안내(시연 강도; 총합 일치).",
-      "exception": "발생 시각·강도 세부 이력은 미수신. 알림 진입이어도 특정 충격 이벤트 분석 화면은 아니다.",
+      "exception": "실제 센서 수신은 미연결. 공유된 PUSH 충격 사건의 차량·발생일시·강도를 해당 날짜 집계에 포함한다. 실제 사고 판정 또는 개별 이벤트 분석 화면은 아니다.",
       "route": "index.html#shock?equipmentId=demo-equipment-01",
       "isNew": false
     },
@@ -393,7 +463,7 @@
       "type": "상세",
       "parent": "LQ-OPS-002",
       "area": "차량",
-      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "roles": "고객 대표 · 고객 직원",
       "description": "엔진 차량의 월간 평균 연료소비량을 확인하는 기존 호환 화면.",
       "input": "엔진 차량 식별자.",
       "output": "월간 연료소비량 표시 및 원래 화면 복귀.",
@@ -407,7 +477,7 @@
       "type": "상세",
       "parent": "LQ-OPS-002",
       "area": "차량",
-      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "roles": "고객 대표 · 고객 직원",
       "description": "전동 차량의 배터리 종류·잔량·수신시각·월간 전력소비·전압·용량을 확인한다. 리튬만 웹 온도·충전·배터리 상태와 스마트 충전 표시.",
       "input": "차량 잔량 선택 또는 배터리 경고 알림. 스마트 충전 on/off·시작/종료 시간·저장.",
       "output": "배터리 수신 정보 표시 및 원래 목록/상세/알림 복귀. 차량/역할별 브라우저 시연 저장. 자정 넘김과 동일 시간 24시간 지원.",
@@ -421,7 +491,7 @@
       "type": "팝업",
       "parent": "LQ-OPS-002",
       "area": "차량",
-      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "roles": "고객 대표 · 고객 직원",
       "description": "최종 수신 위치의 지도, 주소·좌표와 차량 정보를 표시하는 모달. 하나의 독립 페이지로 관리한다.",
       "input": "차량 상세의 지도 보기. 전체보기/축소, 지도 이동·확대, 닫기.",
       "output": "전체보기는 같은 팝업의 확장 상태. 닫기/배경 클릭으로 원래 차량 상세 복귀.",
@@ -435,7 +505,7 @@
       "type": "페이지",
       "parent": "",
       "area": "서비스",
-      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "roles": "고객 대표 · 고객 직원",
       "description": "서비스 진입의 기본 정비 탭. 선택 기간 내 차량별 정비 이력과 처리 상태를 확인한다.",
       "input": "그룹(대표), 날짜, 금일·주·월. 차량/상태 조건은 진입 화면에서 전달 가능.",
       "output": "정비 이력 선택 시 정비 상세. 차량번호 선택 시 차량 상세. 소모품/에러 탭 전환.",
@@ -449,7 +519,7 @@
       "type": "상세",
       "parent": "LQ-SVC-001-T01",
       "area": "서비스",
-      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "roles": "고객 대표 · 고객 직원",
       "description": "선택 차량의 소모품별 교체주기·사용시간·사용률·최근 교체일·수집 기준을 확인하는 호환 화면.",
       "input": "차량 식별자, 선택 이력 식별자(호환).",
       "output": "소모품 정보 표시 및 지정된 이전 화면 복귀.",
@@ -463,7 +533,7 @@
       "type": "상세",
       "parent": "LQ-SVC-001-T02",
       "area": "서비스",
-      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "roles": "고객 대표 · 고객 직원",
       "description": "별도 에러 상세는 제공하지 않는다. ID는 폐지 이력으로 보존하며 웹의 동일 ID는 유지한다.",
       "input": "호환 주소의 차량·조회 기간.",
       "output": "서비스 에러 탭으로 대체 이동.",
@@ -478,7 +548,7 @@
       "type": "상세",
       "parent": "LQ-SVC-001",
       "area": "서비스",
-      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "roles": "고객 대표 · 고객 직원",
       "description": "선택한 정비 이력의 차량·항목·일시·처리상태 또는 차량 정비 기록 목록을 확인한다.",
       "input": "차량, 정비 이력 식별자 또는 기간.",
       "output": "서비스/차량 상세에서 진입하고 지정된 원래 화면으로 돌아간다.",
@@ -492,7 +562,7 @@
       "type": "페이지",
       "parent": "",
       "area": "리포트",
-      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "roles": "고객 대표 · 고객 직원",
       "description": "선택 범위의 운영효율·작업/대기, 기간 합계·대당 평균과 그룹/차량별 작업 현황을 확인한다.",
       "input": "그룹(대표), 전체/개별 차량, 날짜, 금일·주·월. 전체/긴 대기/미확인 필터.",
       "output": "차량 행에서 상세, 그룹 선택으로 해당 범위 리포트, 운영효율 탭으로 이동.",
@@ -506,7 +576,7 @@
       "type": "페이지",
       "parent": "LQ-RPT-001",
       "area": "리포트",
-      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "roles": "고객 대표 · 고객 직원",
       "description": "기간 운영효율과 일별 작업·대기·잔여(가정) 구성을 확인한다. 일자 상세를 인라인으로 펼친다.",
       "input": "그룹(대표), 차량, 일·주·월, 해당 단위의 날짜. 일자 펼침.",
       "output": "펼친 일자의 업무 리포트로 이동. 선택 차량의 상세 이동. 업무 현황 탭과 조건 공유.",
@@ -520,9 +590,9 @@
       "type": "페이지",
       "parent": "",
       "area": "설정",
-      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "roles": "고객 대표 · 고객 직원",
       "description": "내 정보와 화면 확인용 역할 선택, PUSH 수신 항목 및 로그아웃을 제공한다.",
-      "input": "고객 대표/직원/그룹장 테스트 역할. PUSH 전체·충격·차량 에러·배터리 경고·공지/마케팅 토글.",
+      "input": "고객 대표/직원 테스트 역할. PUSH 전체·충격·차량 에러·배터리 경고·공지/마케팅 토글.",
       "output": "역할별 화면 범위 전환. 로그아웃 즉시 로그인으로 이동.",
       "exception": "PUSH 전체 OFF는 하위도 OFF. 설정은 현재 실행 메모리만 유지. 실제 기기 권한/서버 PUSH 및 SMS 스위치 없음.",
       "route": "index.html#settings",
@@ -534,12 +604,40 @@
       "type": "페이지",
       "parent": "",
       "area": "알림",
-      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
-      "description": "기존 앱 PUSH 유형에 맞춘 수신 이력을 표시한다. 전체 탭이 기본이다.",
+      "roles": "고객 대표 · 고객 직원",
+      "description": "최근 30일의 알림 발생 이력을 최신순으로 표시한다. 실제 조회 기간과 보관·현재 경고 상태 구분 안내를 제공한다. 전체 탭이 기본이다.",
       "input": "전체/충격/차량 에러/배터리/기타 탭, 이동 가능한 알림 행.",
-      "output": "충격·차량 에러·배터리는 해당 차량 상세로 이동. 목록으로 돌아올 때 선택 탭 유지.",
-      "exception": "역할별 배정 차량 이력. 미읽음 배지는 별도 값이며 단순 조회로 읽음 처리하지 않는다. 실제 PUSH 수신 없음.",
+      "output": "충격은 해당 차량·발생일 상세, 차량 에러는 해당 차량·수신일 서비스 에러 목록, 배터리는 해당 차량 상세로 이동. 복귀 시 선택 탭 유지.",
+      "exception": "역할별 배정 차량 및 최근 30일 범위. 현재 종은 조회 기간 전체 건수이며 방문/선택으로 차감하지 않는다. 개별 읽음 표시 없음. 실제 구현 때만 화면 방문 기준으로 미확인 카운트를 갱신한다. 실제 PUSH 수신·서버 읽음 처리는 미구현. customer-mobile-notification-policy.md 참조.",
       "route": "index.html#notifications",
+      "isNew": false
+    },
+    {
+      "id": "LQ-MGT-001-T01",
+      "name": "사용자 승인",
+      "type": "화면",
+      "parent": "LQ-ACC-001",
+      "area": "설정",
+      "roles": "고객 대표만",
+      "description": "소속 업체의 고객 직원 가입 신청만 조회·승인·반려. 딜러 승인 화면의 상태/확인 절차를 현재 모바일 컴포넌트로 확장.",
+      "input": "대기/승인/반려/전체 필터, 이름·이메일 검색, 승인 시 소속 그룹 선택, 반려 시 사유 선택/직접 입력(1~500자).",
+      "output": "신청 상태·그룹/사유·처리자·처리일시와 건수 갱신. 취소는 무변경.",
+      "exception": "역할·업체·신청 역할·대기 상태·필수 입력·중복 계정을 처리 직전 재검증. 직원은 메뉴 숨김 및 직접 경로 차단. 메모리 예시 신청만 처리. 회원가입 폼 저장값·실제 계정·로그인 권한·메일/SMS·서버 저장은 미연결. 새로고침 시 초기화.",
+      "route": "index.html#approvals",
+      "isNew": false
+    },
+    {
+      "id": "LQ-MGT-001-P01",
+      "name": "사용자 승인·반려 확인",
+      "type": "팝업",
+      "parent": "LQ-MGT-001-T01",
+      "area": "설정",
+      "roles": "고객 대표만",
+      "description": "신청자를 확인하고 승인 그룹 또는 반려 사유를 입력하는 중앙 확인 모달.",
+      "input": "대기/승인/반려/전체 필터, 이름·이메일 검색, 승인 시 소속 그룹 선택, 반려 시 사유 선택/직접 입력(1~500자).",
+      "output": "신청 상태·그룹/사유·처리자·처리일시와 건수 갱신. 취소는 무변경.",
+      "exception": "역할·업체·신청 역할·대기 상태·필수 입력·중복 계정을 처리 직전 재검증. 직원은 메뉴 숨김 및 직접 경로 차단. 메모리 예시 신청만 처리. 회원가입 폼 저장값·실제 계정·로그인 권한·메일/SMS·서버 저장은 미연결. 새로고침 시 초기화.",
+      "route": "index.html#approvals → #customer-approval-dialog",
       "isNew": false
     }
   ],
@@ -606,7 +704,7 @@
       "type": "탭",
       "parent": "LQ-SVC-001",
       "area": "서비스",
-      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "roles": "고객 대표 · 고객 직원",
       "description": "차량별 현재 소모품과 사용률·교체 필요/임박을 확인한다.",
       "input": "그룹(대표), 진입 차량 조건, 조건 해제. 대표만 개별/전체 품목 선택 및 Reset.",
       "output": "차량별 현재 품목/사용률 표시. 차량번호는 차량 상세로 이동. 대표는 P02 확인 팝업과 실행 취소 제공. 정상 처리 후 필요·임박 집계 동기화.",
@@ -620,11 +718,11 @@
       "type": "탭",
       "parent": "LQ-SVC-001",
       "area": "서비스",
-      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "roles": "고객 대표 · 고객 직원",
       "description": "기간 내 차량 에러 발생 이력과 해제/미해제 상태를 확인한다. 코드·설명·발생/해제 일시를 목록에서 확인한다.",
       "input": "그룹(대표), 날짜, 금일·주·월, 진입 차량·미해제 조건 해제.",
       "output": "PDF가 있는 항목만 다운로드 아이콘. 파일 없으면 -. 별도 상세 이동 없음. 차량번호는 기존 차량 상세로 이동.",
-      "exception": "차량의 현재 에러 버튼으로 진입하면 해당 차량의 금일 미해제 조건을 적용한다.",
+      "exception": "차량 현재 에러 버튼은 발생일 무관 미해제 목록. 대시보드 에러 카드는 해당 집계 구간의 발생 목록(해제 포함, EE/FL 제외). 조건 해제 후 일반 기간 이력 복귀.",
       "route": "index.html#services?service=error",
       "isNew": true
     },
@@ -634,7 +732,7 @@
       "type": "탭",
       "parent": "LQ-COM-004",
       "area": "알림",
-      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "roles": "고객 대표 · 고객 직원",
       "description": "실시간 충격 유형의 수신 이력만 표시한다.",
       "input": "유형 탭 선택. 알림 행 선택.",
       "output": "충격 상세 및 원래 선택 탭 유지.",
@@ -648,7 +746,7 @@
       "type": "탭",
       "parent": "LQ-COM-004",
       "area": "알림",
-      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "roles": "고객 대표 · 고객 직원",
       "description": "실시간 차량 에러 유형의 수신 이력만 표시한다.",
       "input": "유형 탭 선택. 알림 행 선택.",
       "output": "에러 상세 및 원래 선택 탭 유지.",
@@ -662,7 +760,7 @@
       "type": "탭",
       "parent": "LQ-COM-004",
       "area": "알림",
-      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "roles": "고객 대표 · 고객 직원",
       "description": "실시간 배터리 경고 유형의 수신 이력만 표시한다.",
       "input": "유형 탭 선택. 알림 행 선택.",
       "output": "배터리 상세 및 원래 선택 탭 유지.",
@@ -676,7 +774,7 @@
       "type": "탭",
       "parent": "LQ-COM-004",
       "area": "알림",
-      "roles": "고객 대표 · 고객 직원 · 고객 그룹장",
+      "roles": "고객 대표 · 고객 직원",
       "description": "공지사항/마케팅 등 상세 이동이 정의되지 않은 기타 유형을 표시한다.",
       "input": "유형 탭 선택. ",
       "output": "목록 안에서 내용 확인 및 원래 선택 탭 유지.",
@@ -692,7 +790,7 @@
       "to": "LQ-SVC-003-P02",
       "state": "현재 범위의 품목 ID·차량·사용시간·건수",
       "back": "취소/닫기/Esc는 무변경 복귀",
-      "note": "직원·그룹장 불가. 선택 0개/미수신/0H는 실행 불가"
+      "note": "직원 불가. 선택 0개/미수신/0H는 실행 불가"
     },
     {
       "from": "LQ-SVC-003",
@@ -818,7 +916,7 @@
       "from": "LQ-DASH-001",
       "action": "에러 발생 카드",
       "to": "LQ-SVC-001-T02",
-      "state": "금일·미해제 조건",
+      "state": "serviceOrigin=dashboard·금일 날짜·serviceThrough=완료 정각·권한 범위. 해제 포함, EE/FL 제외",
       "back": "홈",
       "note": ""
     },
@@ -826,7 +924,7 @@
       "from": "LQ-DASH-001",
       "action": "교체 필요/임박 카드",
       "to": "LQ-SVC-001-T01",
-      "state": "due/soon 조건",
+      "state": "현재 due/soon 관리 항목 조건·권한 범위. 기간 미적용",
       "back": "홈",
       "note": ""
     },
@@ -1040,25 +1138,25 @@
     },
     {
       "from": "LQ-RPT-001",
-      "action": "차량 상세/차량 행",
-      "to": "LQ-OPS-002",
-      "state": "equipmentId·기간",
+      "action": "차량 목록 행/조회 차량 선택",
+      "to": "LQ-RPT-001",
+      "state": "reportVehicle·기간",
       "back": "리포트",
-      "note": ""
+      "note": "동일 리포트에서 선택 차량 실적 조회. 중복 주황색 차량 상세 링크는 r60에서 제거."
     },
     {
       "from": "LQ-REF-003",
-      "action": "차량 상세/차량 행",
-      "to": "LQ-OPS-002",
-      "state": "equipmentId·기간",
-      "back": "리포트",
-      "note": ""
+      "action": "조회 차량 선택",
+      "to": "LQ-REF-003",
+      "state": "reportVehicle·기간",
+      "back": "운영효율",
+      "note": "동일 운영효율에서 선택 차량 실적 조회. 중복 주황색 차량 상세 링크는 r60에서 제거."
     },
     {
       "from": "LQ-COM-004-T01",
       "action": "유형별 알림 행",
       "to": "LQ-OPS-005",
-      "state": "equipmentId·returnView=notifications·선택 탭",
+      "state": "equipmentId·알림 발생일(from=to)·returnView=notifications·선택 탭",
       "back": "선택한 알림 탭",
       "note": "전체 탭에서도 같은 유형 분기"
     },
@@ -1093,6 +1191,30 @@
       "state": "현재 역할·시연 로그인 상태 해제",
       "back": "",
       "note": "확인 팝업 없음"
+    },
+    {
+      "from": "LQ-ACC-001",
+      "action": "고객대표 · 사용자 승인 선택",
+      "to": "LQ-MGT-001-T01",
+      "state": "role=customer_owner; own company",
+      "back": "설정",
+      "note": "메모리 예시 신청만 처리. 회원가입 폼 저장값·실제 계정·로그인 권한·메일/SMS·서버 저장은 미연결. 새로고침 시 초기화."
+    },
+    {
+      "from": "LQ-MGT-001-T01",
+      "action": "대기 신청 승인/반려",
+      "to": "LQ-MGT-001-P01",
+      "state": "request ID + action + role",
+      "back": "목록",
+      "note": "역할·업체·신청 역할·대기 상태·필수 입력·중복 계정을 처리 직전 재검증. 직원은 메뉴 숨김 및 직접 경로 차단."
+    },
+    {
+      "from": "LQ-MGT-001-P01",
+      "action": "확인 / 취소·닫기",
+      "to": "LQ-MGT-001-T01",
+      "state": "확인 성공만 메모리 변경; 기존 필터 유지",
+      "back": "",
+      "note": "신청 상태·그룹/사유·처리자·처리일시와 건수 갱신. 취소는 무변경."
     }
   ],
   "inlineComponents": [
@@ -1169,5 +1291,45 @@
     "registeredPageCount": 31,
     "retiredMobileScreen": "LQ-SVC-004",
     "notes": "에러는 목록+PDF만. 리튬 상태3종/스마트 충전 및 충격 강도는 기존 상세 화면 내 확장. 새 페이지/팝업 발급 없음. 기존 엑셀은 당시 스냅샷."
+  },
+  "approvalRevision": {
+    "revision": "2026-09-13-r47",
+    "menuId": "LQM-MNU-021",
+    "screenIds": [
+      "LQ-MGT-001-T01",
+      "LQ-MGT-001-P01"
+    ],
+    "allowedRoles": [
+      "customer_owner"
+    ],
+    "scope": "소속 업체의 고객 직원 가입 신청만 조회·승인·반려. 딜러 승인 화면의 상태/확인 절차를 현재 모바일 컴포넌트로 확장.",
+    "input": "대기/승인/반려/전체 필터, 이름·이메일 검색, 승인 시 소속 그룹 선택, 반려 시 사유 선택/직접 입력(1~500자).",
+    "output": "신청 상태·그룹/사유·처리자·처리일시와 건수 갱신. 취소는 무변경.",
+    "guards": "역할·업체·신청 역할·대기 상태·필수 입력·중복 계정을 처리 직전 재검증. 직원은 메뉴 숨김 및 직접 경로 차단.",
+    "runtime": "메모리 예시 신청만 처리. 회원가입 폼 저장값·실제 계정·로그인 권한·메일/SMS·서버 저장은 미연결. 새로고침 시 초기화.",
+    "figjam": "docs/ux/figjam-customer-mobile-approval-r47.json",
+    "delivery": "로컬 검수본. 이번 요청에 따라 ZIP 생성/갱신하지 않음. Git 미게시.",
+    "activePageCount": 32,
+    "registeredPageCount": 33,
+    "popupCount": 3
+  },
+  "notificationBadgeRevision": {
+    "revision": "2026-09-13-r50",
+    "screenId": "LQ-COM-004",
+    "rule": "상단 종 배지 = 현재 역할의 알림 목록 전체 건수. 유형 필터 적용 전 목록을 전체 탭과 공유. 0건은 숨김. 유형 선택/상세 조회만으로 감소하지 않음.",
+    "source": "notificationItems(): 기존 알림 목록과 동일한 역할/차량 범위. unreadPushCount는 원본 참고용으로만 보존하고 화면에서는 사용하지 않음.",
+    "verified": "고객대표 종 5=전체 5, 직원 역할 범위 일치, 빈 목록 배지 숨김, 유형/화면 이동 건수 유지. customer-mobile-notification-count.cjs 통과.",
+    "figjamRecord": "docs/ux/figjam-customer-mobile-notification-count-r50.json",
+    "delivery": "로컬만 수정. Git/ZIP 갱신 안 함."
+  },
+  "customerRoleRevision": {
+    "revision": "2026-09-13-r52",
+    "roles": [
+      "customer_owner",
+      "customer_staff"
+    ],
+    "scope": "운전자 역할 없이 고객 대표와 고객 직원만 제공. 고객 직원은 기존 그룹장과 동일한 배정 그룹 조회 권한을 갖는다. 별도 그룹장 역할·선택·링크 없음.",
+    "preserved": "배정 그룹 조회와 대표 전용 승인·소모품 리셋 권한 유지. 승인 기간·도움말은 r51 그대로 유지. 기존 화면/메뉴 ID 유지.",
+    "figjamRecord": "docs/ux/figjam-customer-mobile-roles-r52.json"
   }
 }

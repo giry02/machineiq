@@ -1,6 +1,13 @@
 # MACHINE IQ 고객 모바일
 
-2026-09-13 r46. `mobile` 폴더만으로 정적 호스팅하는 HTML 프로토타입입니다. 최신 고객용 로그인·가입·비밀번호 찾기, 화면 정렬·기간 검색과 고객 대표 전용 소모품 Reset을 포함합니다. 리튬·납산 배터리 아이콘 내부는 60% 이상 녹색, 30% 이상~60% 미만 주황색, 30% 미만 빨간색입니다. 채움 크기는 고정이며 잔량에 비례하지 않습니다. 옆의 퍼센트 숫자는 원래 글자색입니다.
+2026-09-20 dashboard v5. `mobile` 폴더만으로 정적 호스팅하는 HTML 프로토타입입니다. 현재 대표/직원 차트형 대시보드, 14px 세부 글자, 일·주·월 조회, 정수 반올림, 항목별 상세 연결을 포함합니다. 대표는 업체 전체, 직원은 배정 그룹만 조회합니다. 카드 제목의 텍스트 링크는 배경 없이 글자색만 강조하고 하단 ‘프로토타입 데이터’ 문구는 제거했습니다. 데이터는 여전히 시연용이며 실제 서버 연결을 뜻하지 않습니다.
+
+- 대표 메인: `index.html#home?role=customer_owner`
+- 직원 메인: `index.html#home?role=customer_staff`
+- 이전 메인 보관: `dashboard-backup-20260919.html#home?role=customer_owner`
+- 변경 기록: `docs/dashboard-main-20260919.md`
+
+기존 고객 로그인·가입·비밀번호 찾기, 소모품 교체 처리, 리튬/납산 배터리 아이콘 구간색 등은 유지합니다.
 
 ## 실행
 
@@ -31,7 +38,7 @@ node mobile/serve.cjs
 
 지도 API 키와 `map-config.local.js`는 공개 파일에서 제외합니다. 키가 없는 공개 환경에서는 지도 안내와 Google 지도 외부 열기를 제공합니다. 지도 API를 사용하려면 게시 주소로 제한된 키를 별도로 설정해야 합니다.
 
-파일 더블클릭용 전달본은 `downloads/MACHINE_IQ_MOBILE_HTML_20260913_r46.zip`입니다. 모두 압축을 풀고 `시작.html`을 Chrome/Edge로 엽니다. 화면·폰트·아이콘·데이터를 단일 HTML에 포함하고 화면 전환 상태를 공유합니다. 지도는 인터넷 연결 후 새 창에서 확인합니다. 파일 주소의 자동 브라우저 검증은 보안 정책상 차단되었으며 구성·자산·라우팅·권한·인증·리셋 로직 검사를 수행했습니다.
+기존 `downloads/MACHINE_IQ_MOBILE_HTML_20260913_r46.zip`은 **2026-09-13 보관본**이며 이번 최신 화면을 포함하지 않습니다. 이번에는 정적 웹 화면만 갱신했고 ZIP/APK/iOS를 재생성하지 않았습니다.
 
 `docs/`에 메뉴·페이지 구조도 엑셀과 스타일 가이드 PDF를 함께 제공합니다. 두 문서는 소모품 Reset 추가 전 스냅샷이며, 최신 팝업·권한 정의는 JSON 등록부와 `supply-reset.md`를 참고합니다.
 
@@ -43,6 +50,7 @@ node mobile/serve.cjs
 
 ```sh
 node mobile/tests/package.cjs
+node mobile/tests/dashboard.cjs
 node mobile/tests/auth.cjs
 node mobile/tests/supply-reset.cjs
 node mobile/tests/soc.cjs

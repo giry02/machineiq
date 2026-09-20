@@ -398,7 +398,7 @@
       return;
     }
     $('#signup-submit').disabled = true;
-    setStatus($('#signup-form-status'), '가입 신청 완료 화면을 표시합니다. 실제 접수는 하지 않습니다.', 'success');
+    setStatus($('#signup-form-status'), '가입 신청이 완료되었습니다.', 'success');
     window.setTimeout(renderCompletion, 350);
   });
 

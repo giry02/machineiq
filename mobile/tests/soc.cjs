@@ -13,7 +13,7 @@ for(const type of ['리튬','납산'])for(const [soc,expected] of [[0,'low'],[29
 for(const type of ['리튬','납산'])for(const soc of [null,undefined,NaN,-1,101,'80'])assert.equal(level({type,soc}),'');
 for(const type of ['엔진','수소'])assert.equal(battery({type,soc:80}),'<i data-lucide="battery"></i>');
 const fleetPath=fs.existsSync(path.join(app,'data/fleet.generated.js'))?path.join(app,'data/fleet.generated.js'):path.resolve(app,'../../final-implementation/fleet-customer-requested-260813/_mock-data/generated/fleet.generated.js');
-const c=vm.createContext({window:{},Date});vm.runInContext(fs.readFileSync(fleetPath,'utf8'),c);vm.runInContext(fs.readFileSync(path.join(app,'model.js'),'utf8'),c);
+const c=vm.createContext({window:{},Date});vm.runInContext(fs.readFileSync(fleetPath,'utf8'),c);vm.runInContext(fs.readFileSync(path.join(app,'web-contracts.generated.js'),'utf8'),c);vm.runInContext(fs.readFileSync(path.join(app,'model.js'),'utf8'),c);
 const lead=c.window.CustomerPrototype.buildVehicles(c.window.MIQ_MOCK_DATA.fleet).find(v=>v.equipmentNumber==='FBA18_DEMO_CS02');
 assert.equal(lead.type,'납산');assert.equal(lead.soc,46);assert.equal(level(lead),'medium');assert(battery(lead).includes('width="12" height="6"'));
 assert(source.includes('${batteryIcon(v)}<strong>${value}</strong>'),'Plain numeric text in summary');

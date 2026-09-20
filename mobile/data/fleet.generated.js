@@ -49,7 +49,8 @@
       "replacementSoon": 3,
       "dashboardRoles": [
         "internal",
-        "dealer_owner"
+        "dealer_owner",
+        "dealer_staff"
       ]
     },
     {
@@ -65,7 +66,8 @@
       "replacementSoon": 1,
       "dashboardRoles": [
         "internal",
-        "dealer_owner"
+        "dealer_owner",
+        "dealer_staff"
       ]
     },
     {
@@ -81,7 +83,8 @@
       "replacementSoon": 0,
       "dashboardRoles": [
         "internal",
-        "dealer_owner"
+        "dealer_owner",
+        "dealer_staff"
       ]
     },
     {
@@ -113,7 +116,9 @@
       "replacementNeeded": 0,
       "replacementSoon": 1,
       "dashboardRoles": [
-        "internal"
+        "internal",
+        "dealer_owner",
+        "dealer_staff"
       ],
       "demo": true
     },
@@ -129,7 +134,9 @@
       "replacementNeeded": 3,
       "replacementSoon": 3,
       "dashboardRoles": [
-        "internal"
+        "internal",
+        "dealer_owner",
+        "dealer_staff"
       ],
       "demo": true
     },
@@ -145,7 +152,9 @@
       "replacementNeeded": 1,
       "replacementSoon": 5,
       "dashboardRoles": [
-        "internal"
+        "internal",
+        "dealer_owner",
+        "dealer_staff"
       ],
       "demo": true
     },
@@ -161,7 +170,9 @@
       "replacementNeeded": 4,
       "replacementSoon": 1,
       "dashboardRoles": [
-        "internal"
+        "internal",
+        "dealer_owner",
+        "dealer_staff"
       ],
       "demo": true
     },
@@ -177,7 +188,9 @@
       "replacementNeeded": 2,
       "replacementSoon": 3,
       "dashboardRoles": [
-        "internal"
+        "internal",
+        "dealer_owner",
+        "dealer_staff"
       ],
       "demo": true
     },
@@ -193,7 +206,9 @@
       "replacementNeeded": 0,
       "replacementSoon": 5,
       "dashboardRoles": [
-        "internal"
+        "internal",
+        "dealer_owner",
+        "dealer_staff"
       ],
       "demo": true
     },
@@ -209,7 +224,9 @@
       "replacementNeeded": 3,
       "replacementSoon": 1,
       "dashboardRoles": [
-        "internal"
+        "internal",
+        "dealer_owner",
+        "dealer_staff"
       ],
       "demo": true
     },
@@ -1773,7 +1790,7 @@
       "catalogOnly": false,
       "model": "B16S-7",
       "vin": "FBA16_224250045",
-      "group": "기본그룹",
+      "group": "물류2팀",
       "type": "리튬",
       "cumKm": 4530,
       "cumH": 1120,
@@ -1821,7 +1838,7 @@
       "catalogOnly": false,
       "model": "D18S-9",
       "vin": "FBD18_113920062",
-      "group": "기본그룹",
+      "group": "물류2팀",
       "type": "엔진",
       "cumKm": 21340,
       "cumH": 3970,

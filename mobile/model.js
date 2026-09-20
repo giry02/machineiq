@@ -1,10 +1,10 @@
-/* Confirmation-only adapter: archived IMQ equipmentId is NOT the displayed VIN.
-   No production API, authentication, native bridge or persistent write is used. */
+/* Web-backed prototype adapter: archived IMQ equipmentId is NOT the displayed VIN.
+   Browser session/local settings only; no production API, authentication or device command. */
 (function (root, factory) {
-  const api = factory();
+  const api = factory(typeof module === 'object' && module.exports ? require('./web-contracts.generated.js') : root.CustomerWebContracts);
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.CustomerPrototype = api;
-})(typeof window === 'undefined' ? globalThis : window, function () {
+})(typeof window === 'undefined' ? globalThis : window, function (W) {
   'use strict';
   // Local demo only: derive its cutoff from today's Korea time on page load.
   // This is generated fixture data, never an actual API collection timestamp.
@@ -20,33 +20,48 @@
     resolved:{label:'처리완료',icon:'circle-check',tone:'neutral'},
     unknown:{label:'미수신',icon:'circle-help',tone:'neutral'}
   };
+  // Presentation only: round once at the final boundary; retain raw metric precision.
+  const wholeNumber = value => Math.round(value).toLocaleString('ko-KR', {maximumFractionDigits:0});
   const DISPLAY = {
-    number:(value,unit='')=>Number.isFinite(value)?value.toLocaleString('ko-KR')+unit:'-',
-    duration:(minutes,compact=false)=>Number.isFinite(minutes)&&minutes>=0?(compact?`${Math.floor(minutes/60)}h ${minutes%60}m`:`${Math.floor(minutes/60)}시간 ${minutes%60}분`):'-',
-    efficiency:value=>Number.isFinite(value)?value.toLocaleString('ko-KR')+'%':'-'
+    number:(value,unit='')=>Number.isFinite(value)?wholeNumber(value)+unit:'-',
+    duration:(minutes,compact=false)=>Number.isFinite(minutes)&&minutes>=0?(minutes=Math.round(minutes),true)&&(compact?`${Math.floor(minutes/60)}h ${minutes%60}m`:`${Math.floor(minutes/60)}시간 ${minutes%60}분`):'-',
+    efficiency:value=>Number.isFinite(value)?wholeNumber(value)+'%':'-'
   };
   // Same default bands as web Shock/shock-tobe.html. These are not live sensor thresholds.
+  if(!W)throw new Error('Web data contracts must load before the mobile model');
   const SHOCK_LEVELS=[
     {key:'s3',label:'민감',level:'Lv3',min:1.2,max:1.8,color:'#2b8a3e',description:'노면이 고르지 않거나 과속 방지턱을 넘을 때 발생할 수 있는 정도'},
     {key:'s4',label:'주의',level:'Lv4',min:1.8,max:2.5,color:'#f59f00',description:'충분히 감속하지 않은 상태에서 화물을 들 때 발생할 수 있는 정도'},
     {key:'s5',label:'경고',level:'Lv5',min:2.5,max:null,color:'#e03131',description:'운전자가 느낄 수 있을 정도의 강한 충격'}
   ];
   function shockLevel(g) {return Number.isFinite(g)?[...SHOCK_LEVELS].reverse().find(level=>g>=level.min)?.key||null:null;}
-  // Deterministic demo event magnitudes, not an estimate of real severity from a total.
-  // A period selects the same ordinal events used by the existing monthly count allocation.
-  function demoShockBands(v,first,count) {
-    const bands={s3:0,s4:0,s5:0},magnitudes=[1.3,1.5,2.0,1.4,1.6,2.1,1.3,2.7,1.2,1.9];
-    const seed=Number(v.equipmentId?.match(/\d+$/)?.[0]||0);
-    for(let i=first;i<first+count;i++)bands[shockLevel(magnitudes[(i+seed)%magnitudes.length])]++;
-    return bands;
-  }
   // Match the web meeting-model charge window, including equal hours = 24 hours.
-  function chargeWindow(start,end) {
-    if(start==null||end==null||typeof start==='boolean'||typeof end==='boolean'||String(start).trim()===''||String(end).trim()==='')return null;
-    start=Number(start);end=Number(end);
-    if(!Number.isInteger(start)||!Number.isInteger(end)||start<0||start>23||end<0||end>23)return null;
-    const overnight=start>=end,duration=(end-start+24)%24||24,pad=n=>String(n).padStart(2,'0');
-    return {start,end,duration,overnight,startLabel:(overnight?'전일 ':'금일 ')+pad(start)+':00',endLabel:'금일 '+pad(end)+':00',fill:duration/24*100,midnight:overnight?(24-start)/24*100:null};
+  function chargeWindow(start,end) { return W.meeting.chargeWindow(start,end); }
+  // Dealer approval interaction adapted to customer-owned employee requests only.
+  // Same web session records; no real user, login grant, SMS or server write.
+  function createApprovalStore(vehicles,seed) {
+    const storageKey='linq.management.userRequests.v2',groups=[...new Set(vehicles.map(v=>v.group).filter(Boolean))];
+    let raw=seed?seed.map(r=>({...r,registered:r.createdAt,status:({pending:'REQ',approved:'APRV',rejected:'RJCT'})[r.status],role:!r.role||r.role==='customer_staff'?'고객 직원':r.role,approverId:r.approverId||W.principals.customer_owner})):W.approvalSeed();
+    function refresh(){if(seed)return;try{const saved=JSON.parse(sessionStorage.getItem(storageKey));if(Array.isArray(saved)&&saved.length)raw=saved;}catch{}}
+    function save(){if(seed)return;try{sessionStorage.setItem(storageKey,JSON.stringify(raw));}catch{}}
+    const eligible=(r,role)=>role==='customer_owner'&&W.common.roles.hasCapability(role,'approveUserRequest')&&r?.approverId===W.principals[role]&&r.role==='고객 직원'&&(!r.companyId||String(r.companyId)===COMPANY);
+    const copy=r=>({...r,status:({REQ:'pending',APRV:'approved',RJCT:'rejected'})[r.status],companyId:COMPANY,companyName:r.company,role:'customer_staff',createdAt:r.registered,processedAt:r.processed,processedBy:r.processor});
+    function list(role){refresh();return raw.filter(r=>eligible(r,role)).sort((a,b)=>b.registered.localeCompare(a.registered)).map(copy);}
+    function find(id,role){refresh();const r=raw.find(r=>r.id===id&&eligible(r,role));return r?copy(r):null;}
+    function process(id,role,action,{group='',reason=''}={}){
+      refresh();const r=raw.find(r=>r.id===id);
+      if(!eligible(r,role))return {ok:false,message:'고객 대표의 승인 범위에 속한 직원 신청만 처리할 수 있습니다.'};
+      if(r.status!=='REQ')return {ok:false,message:'이미 처리된 신청입니다. 목록을 다시 확인해 주세요.'};
+      if(!['approve','reject'].includes(action))return {ok:false,message:'처리 방식을 확인해 주세요.'};
+      if(r.email===W.principals[role])return {ok:false,message:'자기 계정 신청은 직접 승인할 수 없습니다.'};
+      reason=String(reason).trim();
+      if(action==='approve'&&!groups.includes(group))return {ok:false,message:'배정 그룹을 선택해 주세요.'};
+      if(action==='reject'&&(!reason||reason.length>500))return {ok:false,message:'반려 사유를 1~500자로 입력해 주세요.'};
+      if(action==='approve'&&(W.existingUsers.some(email=>email.toLowerCase()===r.email.toLowerCase())||raw.some(x=>x!==r&&x.status==='APRV'&&x.email.toLowerCase()===r.email.toLowerCase())))return {ok:false,message:'이미 등록되거나 승인된 계정입니다. 중복 신청을 확인해 주세요.'};
+      Object.assign(r,{status:action==='approve'?'APRV':'RJCT',group:action==='approve'?group:'',reason:action==='reject'?reason:'',processed:W.approvalReference,processor:'윤태호',processorRole:'고객 대표',addedToUsers:action==='approve'});
+      save();return {ok:true,request:copy(r),message:r.name+' 님의 신청을 '+(action==='approve'?'승인':'반려')+'했습니다.'};
+    }
+    return {list,find,process,groups:()=>groups.slice()};
   }
   function periodWindow(from,to) {
     const valid=Boolean(calendarDate(from)&&calendarDate(to)&&from<=to);
@@ -62,46 +77,58 @@
   }
   const COMPANY = '1933';
   const TYPES = { '엔진':'DI', '납산':'LA', '리튬':'LI', '수소':'HI' };
-  const ROLE_LABELS = {customer_owner:'고객 대표',customer_staff:'고객 직원',customer_group_leader:'고객 그룹장'};
-  // First vehicle's two records match web Service/service-supply-tobe.html.
-  // The other two VINs retain the mobile due/soon scenario with explicit display fixtures (not an API join).
-  const SUPPLY_ITEMS = {
-    FBA32_224250271:[{itemId:'transmission-oil',name:'트랜스미션 오일',cycleHours:100,usedHours:231,lastChangedAt:'2026-03-18 10:20'},{itemId:'hydraulic-filter',name:'작동유 필터',cycleHours:250,usedHours:231,lastChangedAt:'2026-03-18 10:20'}],
-    FBA20_224250312:[{itemId:'transmission-filter',name:'트랜스미션 오일 필터',cycleHours:100,usedHours:105,lastChangedAt:null}],
-    FBA25_224250188:[{itemId:'air-cleaner',name:'에어클리너',cycleHours:300,usedHours:251,lastChangedAt:null}]
-  };
+  const ROLE_LABELS = {customer_owner:'고객 대표',customer_staff:'고객 직원'};
+  // Original web supply records and VIN associations, without mobile-only examples.
+  function sourceSupplies(v) {
+    return W.service.supplyItems(v.vin).map((r,i)=>({itemId:'web-supply-'+i,name:r.name,cycleHours:r.cycle,usedHours:r.used,lastChangedAt:W.service.records.find(x=>x.kind==='supply'&&x.vin===v.vin)?.date||null}));
+  }
   function supplyItems(v) {
     return (v.supplies||[]).map(item=>{
       const valid=Number.isFinite(item.cycleHours)&&item.cycleHours>0&&Number.isFinite(item.usedHours)&&item.usedHours>=0;
-      const percent=valid?Math.round(item.usedHours/item.cycleHours*100):null;
-      const key=percent==null?'unknown':percent>=100?'due':percent>=80?'soon':'normal';
-      return {...item,percent,key,kind:'supplies',label:STATUS[key].label,count:1,id:v.equipmentId+'-supply-'+item.itemId,equipmentId:v.equipmentId,occurredAt:v.receivedAt||SNAPSHOT,resolved:false};
+      const status=valid?W.service.supplyStatus(item.cycleHours,item.usedHours):{state:'unknown',percent:null};
+      // Dashboard handoff: ROUND(raw usage %, 0) determines the current state.
+      // Keep the existing two-decimal usage display; do not round twice for classification.
+      const percent=status.percent,decisionPercent=valid?Math.round(item.usedHours/item.cycleHours*100):null;
+      const key=decisionPercent==null?'unknown':decisionPercent>=90?'due':decisionPercent>=80?'soon':'normal';
+      return {...item,percent,decisionPercent,key,kind:'supplies',label:STATUS[key].label,count:1,id:v.equipmentId+'-supply-'+item.itemId,equipmentId:v.equipmentId,occurredAt:v.receivedAt||SNAPSHOT,resolved:false};
     });
   }
+  function currentSupplies(rows) {
+    const seen=new Set();
+    return rows.flatMap(supplyItems).filter(item=>{
+      if(seen.has(item.id))return false;
+      seen.add(item.id);return true;
+    });
+  }
+  let sourceFleet=[];
+  function rawHistory() {
+    const day=W.common.dates.format(W.common.dates.yesterday(new Date()));
+    const generated=W.demo.create(sourceFleet,day);
+    // Keep the existing history; add today's completed occurrences using the same web fixture rules.
+    const today=W.demo.create(sourceFleet,TODAY);
+    const current=today.error.filter(r=>r.dateTime<SNAPSHOT);
+    const maintenance=today.maintenance.filter(r=>r.dateTime<SNAPSHOT);
+    return W.legacy.concat(generated.maintenance,generated.error,current,maintenance);
+  }
   function buildVehicles(fleet) {
-    return fleet.vehicles.filter(v => v.companyId === COMPANY && !v.catalogOnly).map((v, i) => ({
-      ...v, equipmentId:`demo-equipment-${String(i + 1).padStart(2,'0')}`,
-      // Current-month energy averages are independently generated from source baselines.
-      fc:demoEnergy(v.fc,TODAY),bc:demoEnergy(v.bc,TODAY),
-      equipmentNumber:v.vin, equipmentName:v.model, codeName:v.model,
-      fuelTypeCode:TYPES[v.type], modelYear:'2023',
-      operating:v.conn ? [0,3,5,7].includes(i) : null,
-      activeErrorCount:i === 0 ? 2 : i === 5 ? 1 : 0,
-      supplies:(SUPPLY_ITEMS[v.vin]||[]).map(item=>({...item})),
-      supplyDueCount:supplyItems({supplies:SUPPLY_ITEMS[v.vin]}).filter(r=>r.key==='due').length,
-      supplySoonCount:supplyItems({supplies:SUPPLY_ITEMS[v.vin]}).filter(r=>r.key==='soon').length,
-      receivedAt:v.conn ? SNAPSHOT : isoDay(shiftDay(calendarDate(TODAY),-1))+' 17:42',
-      // Explicitly added demo records; never claim these are source API responses.
-      position:i === 0 ? {lat:37.031991,lng:126.770275,address:'경기도 화성시 · 최종 수신 위치'} : null,
-      batteryVoltage:v.type === '리튬' ? 80 : null,
-      batteryCapacity:v.type === '리튬' ? 560 : null
-    }));
+    sourceFleet=fleet.vehicles.filter(v=>!v.catalogOnly);
+    const history=rawHistory(),window=W.meeting.hourlyWindow(new Date());
+    return sourceFleet.filter(v=>v.companyId===COMPANY).map((v,i)=>{
+      const live=W.meeting.hourlyVehicle(v,window),supplies=sourceSupplies(v);
+      return {...v,equipmentId:`demo-equipment-${String(i+1).padStart(2,'0')}`,equipmentNumber:v.vin,equipmentName:v.model,codeName:v.model,fuelTypeCode:TYPES[v.type],
+        modelYear:v.modelYear??null,operating:live.connected?live.running:null,
+        activeErrorCount:history.filter(r=>r.kind==='error'&&r.vin===v.vin&&r.errorState==='current').length,
+        supplies,supplyDueCount:supplyItems({supplies}).filter(r=>r.key==='due').length,supplySoonCount:supplyItems({supplies}).filter(r=>r.key==='soon').length,
+        receivedAt:live.dataTime,position:W.positions.find(p=>p.vin===v.vin)||null,batteryVoltage:v.batteryVoltage??null,batteryCapacity:v.batteryCapacity??null};
+    });
   }
-  function scope(rows, state) {
-    return rows.filter(v => state.role === 'customer_owner' || v.group === '기본그룹')
-      .filter(v => state.role !== 'customer_owner' || !state.group || v.group === state.group)
-      .filter(v => !state.type || v.type === state.type);
+  function scope(rows,state) {
+    if(!Object.hasOwn(ROLE_LABELS,state.role))return [];
+    return W.common.roles.filterVehicles(state.role,rows)
+      .filter(v=>state.role!=='customer_owner'||!state.group||v.group===state.group)
+      .filter(v=>!state.type||v.type===state.type);
   }
+  function assignedGroup(role) { return W.common.roles.targetPolicy(role).group; }
   // Prototype-only replacement transaction: no server/device writes.
   function resetSupplies(rows,state,ids) {
     if(state.role!=='customer_owner'||!Array.isArray(ids)||!ids.length)return [];
@@ -114,6 +141,11 @@
   }
   function refreshSupplyCounts(rows) {
     for(const v of rows){const items=supplyItems(v);v.supplyDueCount=items.filter(i=>i.key==='due').length;v.supplySoonCount=items.filter(i=>i.key==='soon').length;}
+    const infos=W.service.supplyItems().map(item=>{
+      const v=rows.find(v=>v.vin===item.vin),source=v?.supplies.find(r=>r.name===item.name),record=W.service.records.find(r=>r.kind==='supply'&&r.vin===item.vin)||{};
+      return {...record,supplyName:item.name,supplyCycle:source?.cycleHours??item.cycle,supplyUsed:source?.usedHours??item.used};
+    });
+    W.service.replace('supply',infos);
   }
   function undoSupplyReset(rows,state,snapshots) {
     if(state.role!=='customer_owner'||!Array.isArray(snapshots)||!snapshots.length)return false;
@@ -125,11 +157,12 @@
   function attention(v) { return !v.conn || v.activeErrorCount > 0 || v.supplyDueCount > 0 || v.supplySoonCount > 0; }
   // Reuse the existing confirmation fixtures, including the clearly labelled completed example.
   function serviceItems(v) {
+    const maintenance=serviceHistory([v]).filter(r=>r.kind==='maintenance');
     return [
       ...(v.activeErrorCount?[{kind:'error',key:'error',label:'에러',count:v.activeErrorCount,status:'확인 필요'}]:[]),
       ...(v.supplyDueCount?[{kind:'supplies',key:'due',label:'교체 필요',count:v.supplyDueCount,status:'교체 필요'}]:[]),
       ...(v.supplySoonCount?[{kind:'supplies',key:'soon',label:'교체 임박',count:v.supplySoonCount,status:'교체 예정'}]:[]),
-      {kind:'maintenance',key:'maintenance',label:'정기 점검',count:1,status:'처리완료',date:isoDay(shiftDay(calendarDate(TODAY),-3)),example:true}
+      ...(maintenance.length?[{kind:'maintenance',key:'maintenance',label:'정비',count:maintenance.length,status:maintenance[0].resolved?'처리완료':'진행중',date:maintenance[0].occurredAt.slice(0,10)}]:[])
     ];
   }
   function listed(rows, state) {
@@ -137,34 +170,45 @@
     return scope(rows,state).filter(v => !q || `${v.equipmentNumber} ${v.model} ${v.group}`.toLowerCase().includes(q))
       .filter(v => !state.live || (state.live === 'connected' ? v.conn : state.live === 'offline' ? !v.conn : state.live === 'running' ? v.operating === true : state.live === 'idle' ? v.operating === false : state.live === 'error' ? v.activeErrorCount > 0 : state.live === 'due' ? v.supplyDueCount > 0 : state.live === 'soon' ? v.supplySoonCount > 0 : true));
   }
-  // Same-VIN reference codes from the web error list. Dates remain explicit mobile demo fixtures.
-  function errorReference(v,index) {
-    if(v.equipmentNumber==='FBA32_224250271'&&index===0)return {code:'P0003',description:'연료량 조절 밸브 회로 이상',pdfKey:'p0003'};
-    if(v.equipmentNumber==='FBA32_224250271'&&index===1)return {code:'A7',description:'주행 제어 시스템 경고',pdfKey:null};
-    return {code:null,description:null,pdfKey:null};
-  }
-  // Explicit confirmation records. These dates are not inferred from active counters in a production API.
+  // Original web error/maintenance records restricted to accessible source VINs.
   function serviceHistory(rows) {
-    const months=[];
-    for(let date=calendarDate(DATA_START);isoDay(date).slice(0,7)<=TODAY.slice(0,7);date=new Date(Date.UTC(date.getUTCFullYear(),date.getUTCMonth()+1,1)))months.push(isoDay(date).slice(0,7));
-    return months.flatMap(month=>{
-      const current=month===TODAY.slice(0,7),anchor=calendarDate(current?TODAY:month+'-06');
-      const day=offset=>isoDay(shiftDay(anchor,offset)),suffix=current?'':'-'+month;
-      return rows.flatMap(v=>[
-        {id:v.equipmentId+'-maintenance-1'+suffix,equipmentId:v.equipmentId,kind:'maintenance',label:'정기 점검',occurredAt:day(-3)+' 10:00',resolvedAt:day(-3)+' 11:00',resolved:true,count:1},
-        ...Array.from({length:v.activeErrorCount},(_,i)=>({id:v.equipmentId+'-error-'+i+suffix,equipmentId:v.equipmentId,kind:'error',label:'차량 에러',...errorReference(v,i),occurredAt:day(0)+' '+(current?String(Math.max(0,Number(SNAPSHOT.slice(11,13))-(i?2:6))).padStart(2,'0'):(i?'13':'09'))+':00',resolvedAt:current?null:day(1)+' 09:00',resolved:!current,count:1})),
-        ...(v.equipmentId==='demo-equipment-01'?[{id:v.equipmentId+'-error-resolved'+suffix,equipmentId:v.equipmentId,kind:'error',label:'차량 에러',code:null,occurredAt:day(-4)+' 11:00',resolvedAt:day(-3)+' 09:00',resolved:true,count:1}]:[])
-      ]);
+    const allowed=new Map(rows.map(v=>[v.vin,v]));
+    return rawHistory().map((r,i)=>({...r,id:'web-'+r.kind+'-'+r.vin+'-'+(r.dateTime||r.date)+'-'+i})).filter(r=>allowed.has(r.vin)&&String(r.companyId)===String(COMPANY)).map(r=>{
+      const v=allowed.get(r.vin),resolved=r.kind==='error'?r.errorState==='past':r.completed===true;
+      return {...r,equipmentId:v.equipmentId,
+        label:r.kind==='error'?'차량 에러':r.part||'정비',description:r.description||r.symptom||'',detail:r.detail||'',
+        occurredAt:r.dateTime||r.date+' 00:00',resolvedAt:r.completedAt||null,resolved,count:1};
     }).sort((a,b)=>b.occurredAt.localeCompare(a.occurredAt)||a.id.localeCompare(b.id));
   }
-  function serviceRecords(rows,{kind='maintenance',from,to,focus=''}={}) {
-    if(kind==='supplies')return rows.flatMap(supplyItems).filter(i=>!focus||i.key===focus);
+  function dashboardWindow({from=TODAY,to=TODAY,through=SNAPSHOT}={}) {
+    const cutoff=hourlyWindow(through),valid=Boolean(calendarDate(from)&&calendarDate(to)&&from<=to&&cutoff&&calendarDate(cutoff.date));
+    if(!valid)return {valid:false,from,to,start:null,end:null,label:'집계 정보 없음'};
+    const start=from+' 00:00',next=isoDay(shiftDay(calendarDate(to),1))+' 00:00';
+    const end=[next,cutoff.end,SNAPSHOT].sort()[0];
+    const endLabel=end===next?to.slice(5).replace('-','.')+' 24:00':end.slice(5).replace('-','.');
+    return {valid:start<=end,from,to,start,end,label:'집계 '+from.slice(5).replace('-','.')+' 00:00~'+endLabel};
+  }
+  function dashboardErrors(rows,{records=serviceHistory(rows),...options}={}) {
+    const range=dashboardWindow(options),allowed=new Set(rows.map(v=>v.equipmentId)),seen=new Set();
+    if(!range.valid)return [];
+    return records.filter(r=>{
+      const at=String(r.occurredAt||'').replace('T',' '),code=String(r.code||'').toUpperCase();
+      if(r.kind!=='error'||!allowed.has(r.equipmentId)||['EE','FL'].includes(code)||!/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(at)||at<range.start||at>=range.end)return false;
+      // Distinct occurrences remain distinct, including multiple mapped battery error items.
+      const key=[r.equipmentId,r.eventId||r.id,r.errorItemId||code,at].join('|');
+      if(seen.has(key))return false;
+      seen.add(key);return true; // Resolution does not remove an occurrence from this window.
+    });
+  }
+  function serviceRecords(rows,{kind='maintenance',from,to,focus='',origin='',through=SNAPSHOT}={}) {
+    if(kind==='supplies')return currentSupplies(rows).filter(i=>['due','soon'].includes(i.key)&&(!focus||i.key===focus));
+    if(kind==='error'&&origin==='dashboard')return dashboardErrors(rows,{from,to,through});
+    if(kind==='error'&&focus==='error')return serviceHistory(rows).filter(r=>r.kind==='error'&&!r.resolved);
     return serviceHistory(rows).filter(r=>r.kind===kind&&(!from||r.occurredAt.slice(0,10)>=from)&&(!to||r.occurredAt.slice(0,10)<=to)&&(!focus||focus!=='error'||!r.resolved));
   }
-  // Source push.vue uses pushType/message/pushDatetime and equipmentId. These
-  // independent fixtures are not service counters or inferred warning thresholds.
+  // Adapt web history to the existing mobile pushType/message/pushDatetime fields.
   const PUSH_TYPES = {
-    shock:{label:'실시간 충격',icon:'zap',view:'shock'},
+    shock:{label:'실시간 충격',icon:'vibrate',view:'shock'},
     error:{label:'실시간 차량 에러',icon:'triangle-alert',view:'error'},
     'battery-li':{label:'실시간 배터리 경고',icon:'battery',view:'battery'},
     'battery-la':{label:'실시간 배터리 경고',icon:'battery',view:'battery'},
@@ -176,31 +220,56 @@
   function pushPresentation(item) {
     return Object.hasOwn(PUSH_TYPES,item.pushType)?PUSH_TYPES[item.pushType]:{label:'알림',icon:'bell',view:''};
   }
+  // A warning notification represents the first nonzero warning bucket per VIN.
+  // Its count already exists in the web series; never add it to the totals again.
+  function shockEvents(rows) {
+    const date=W.common.dates.format(W.common.dates.yesterday(new Date()));
+    return rows.flatMap(v=>{
+      const d=W.shocks([v],'d',date,date);
+      const hour=d.series.s5.findIndex(n=>n>0);
+      return hour<0?[]:[{id:'web-shock-'+v.vin+'-'+date,equipmentId:v.equipmentId,occurredAt:date+' '+String(hour).padStart(2,'0')+':00',g:2.5,count:d.series.s5[hour]}];
+    });
+  }
+  function notificationWindow(now=SNAPSHOT) {
+    const end=new Date(String(now).replace(' ','T')+':00Z');
+    const start=new Date(end.getTime()-30*86400000);
+    return {from:start.toISOString().slice(0,16).replace('T',' '),to:end.toISOString().slice(0,16).replace('T',' ')};
+  }
+  function recentNotifications(records,now=SNAPSHOT) {
+    const range=notificationWindow(now);
+    return records.filter(item=>typeof item.pushDatetime==='string'&&/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(item.pushDatetime)&&item.pushDatetime>range.from&&item.pushDatetime<=range.to)
+      .slice().sort((a,b)=>b.pushDatetime.localeCompare(a.pushDatetime));
+  }
   function pushHistory(rows,records) {
     if(!records){
-      const ago=minutes=>new Date(calendarDate(TODAY).getTime()+Number(SNAPSHOT.slice(11,13))*3600000-minutes*60000).toISOString().slice(0,16).replace('T',' ');
-      const fixtures=[
-        ['demo-equipment-01','shock','차량에 충격이 발생했습니다.',20],
-        ['demo-equipment-06','error','차량 에러가 발생했습니다.',65],
-        ['demo-equipment-04','battery-li','배터리 경고가 발생했습니다.',100],
-        ['demo-equipment-01','error','차량 에러가 발생했습니다.',160],
-        ['demo-equipment-08','shock','차량에 충격이 발생했습니다.',1500]
-      ];
-      records=fixtures.map(([equipmentId,pushType,message,minutes],i)=>({id:'push-'+(i+1),equipmentId,pushType,message:(rows.find(v=>v.equipmentId===equipmentId)?.equipmentNumber||'')+'\n'+message,pushDatetime:ago(minutes)}));
+      const errors=serviceHistory(rows).filter(r=>r.kind==='error').map(r=>({id:'push-'+r.id,equipmentId:r.equipmentId,pushType:'error',message:r.vin+ '\n'+r.code+' · '+r.description,pushDatetime:r.occurredAt,errorRecordId:r.id}));
+      const shocks=shockEvents(rows).map(e=>({id:'push-'+e.id,equipmentId:e.equipmentId,pushType:'shock',message:rows.find(v=>v.equipmentId===e.equipmentId).vin+'\n경고 충격 '+e.count+'건이 발생했습니다.',pushDatetime:e.occurredAt,shockEventId:e.id,shockG:e.g}));
+      const batteries=rows.flatMap(v=>{
+        if(v.type!=='리튬'||!v.receivedAt||v.receivedAt>SNAPSHOT)return [];
+        const info=W.lithium.snapshot(v);
+        if(!info.known)return [];
+        return [['temperature','온도'],['charge','충전'],['battery','배터리']].filter(([key])=>['주의','경고','이상'].includes(info[key])).map(([key,label])=>({
+          id:'push-battery-'+v.vin+'-'+TODAY+'-'+key,equipmentId:v.equipmentId,pushType:'battery-li',
+          message:v.vin+'\n'+label+' '+info[key]+' 상태가 확인되었습니다.',pushDatetime:v.receivedAt,batteryStateKey:key,batteryState:info[key]
+        }));
+      });
+      records=errors.concat(shocks,batteries).sort((a,b)=>b.pushDatetime.localeCompare(a.pushDatetime));
     }
-    // Preserve response order, as the source does; fixture order is newest first.
+    
+  // Preserve response order, as the source does; fixture order is newest first.
     return records.filter(item=>rows.some(v=>v.equipmentId===item.equipmentId))
       .map((item,i)=>({...item,id:item.id||'push-row-'+i}));
   }
-  // Separate dashboard response fixture: unreadPushCnt is neither unresolved
-  // service count nor history length. Source exposes no client read-update API.
-  function unreadPushCount(role) { return ({customer_owner:3,customer_staff:2,customer_group_leader:2})[role]??null; }
-  function counts(rows) {
+  // Legacy dashboard unread fixture, retained as an original-source reference only.
+  // r50: the mobile bell uses the scoped inbox total, not this unread value.
+  function unreadPushCount(role) { return ({customer_owner:3,customer_staff:2})[role]??null; }
+  function counts(rows,options={}) {
     const connected = rows.filter(v=>v.conn).length;
     const running = rows.filter(v=>v.operating === true).length;
+    const supplies=currentSupplies(rows);
     return {total:rows.length,connected,offline:rows.length-connected,running,idle:connected-running,
-      error:rows.filter(v=>v.activeErrorCount > 0).length,due:rows.filter(v=>v.supplyDueCount > 0).length,
-      soon:rows.filter(v=>v.supplySoonCount > 0).length,attention:rows.filter(attention).length,
+      error:dashboardErrors(rows,options).length,due:supplies.filter(i=>i.key==='due').length,
+      soon:supplies.filter(i=>i.key==='soon').length,attention:rows.filter(attention).length,
       normal:rows.filter(v=>!attention(v)).length,operatingRate:connected ? Math.round(running/connected*100) : null};
   }
   function dates(period) {
@@ -235,89 +304,69 @@
     return {from:from<DATA_START?DATA_START:from,to:to>TODAY?TODAY:to};
   }
   function efficiencyPerformance(rows,from,to,options={}) {
-    const available=efficiencyAvailableRange(from,to);
-    return performance(rows,available.from,available.to,options);
+    const result=webPerformance(rows,from,to,options);
+    if(!result.web)return result;
+    const period=resolvePeriod(from,to,options.period),base=period==='d'?1:10*(result.web.bucket||1);
+    const capacity=result.web.columns.reduce((n,c)=>n+(c?Math.max(base,c.work+c.idle)*rows.length*60:0),0);
+    return {...result,capacity,unused:Math.max(0,capacity-result.work-result.idle),rate:percent(result.work,capacity)};
   }
   function efficiencyWindow(from,to) {
-    const available=efficiencyAvailableRange(from,to);
-    return periodWindow(available.from,available.to);
+    return {valid:Boolean(calendarDate(from)&&calendarDate(to)&&from<=to),from,to,through:to,label:'집계 '+from.slice(5).replace('-','.')+' 00:00~'+to.slice(5).replace('-','.')+' 24:00'};
   }
   function efficiencyCalendar(rows,period,from,to,options={}) {
-    let start=calendarDate(from),end=calendarDate(to);
-    if(!start||!end||start>end)return [];
-    if(period==='m')end=new Date(Date.UTC(start.getUTCFullYear(),start.getUTCMonth()+1,0));
-    const count=Math.round((end-start)/86400000)+1;
-    if(count>31)return [];
-    return Array.from({length:count},(_,i)=>{const date=isoDay(shiftDay(start,i));return {date,...performance(rows,date,date,options)};});
+    if(!calendarDate(from)||!calendarDate(to)||from>to)return [];
+    const axis=W.charts.axis(period,from,to),whole=W.efficiency(rows,period,from,to),hourly=period==='d',base=hourly?60:600*(whole.bucket||1);
+    return whole.columns.map((column,i)=>{
+      const date=hourly?from:axis.dates[i],hour=hourly?String(i).padStart(2,'0')+'시':null;
+      const entries=rows.map(v=>{
+        const column=W.efficiency([v],period,from,to).columns[i],work=(column?.work||0)*60,idle=(column?.idle||0)*60;
+        const m={...metrics(v,date,date,period),work,idle,min:work+idle,efficiency:percent(work,work+idle)};
+        return {v,m,capacity:Math.max(base,work+idle),through:date,rate:percent(work,Math.max(base,work+idle)),idleRate:percent(idle,work+idle)};
+      });
+      const work=(column?.work||0)*rows.length*60,idle=(column?.idle||0)*rows.length*60,capacity=Math.max(rows.length*base,work+idle);
+      return {date,hour,total:rows.length,known:rows.length,unknown:0,entries,work,idle,capacity,unused:Math.max(0,capacity-work-idle),workShare:percent(work,work+idle),rate:percent(work,capacity)};
+    });
   }
-  // Deterministic monthly/daily fixtures, NOT telemetry. July source totals are preserved.
-  // Later months vary by month and vehicle; today's row includes completed hours only.
-  function demoFactor(month,v={equipmentId:'00'},offset=0) {
-    if(month.slice(0,7)==='2026-07')return 1;
-    return 0.86+((Number(month.slice(0,4))*12+Number(month.slice(5,7))+Number(v.equipmentId.slice(-2))+offset)%9)*0.04;
-  }
-  function demoEnergy(value,month) { return Number.isFinite(value)?Math.round(value*demoFactor(month)*10)/10:null; }
-  function dailyAllocation(total, v, first, last, offset=0, length=31, month='2026-07') {
-    const seed=Number(v.equipmentId.slice(-2));
-    const weights=Array.from({length},(_,i)=>[10,14,8,12,3,5,16][(i+seed+offset)%7]);
-    const sum=weights.reduce((a,b)=>a+b,0);
-    const before=weights.slice(0,first-1).reduce((a,b)=>a+b,0);
-    const through=weights.slice(0,last).reduce((a,b)=>a+b,0);
-    let value=Math.floor(total*through/sum)-Math.floor(total*before/sum);
-    if(month===TODAY.slice(0,7)&&last===Number(TODAY.slice(-2))){
-      const untilYesterday=weights.slice(0,last-1).reduce((a,b)=>a+b,0);
-      const fullDay=Math.floor(total*through/sum)-Math.floor(total*untilYesterday/sum);
-      value-=fullDay-Math.floor(fullDay*Number(SNAPSHOT.slice(11,13))/24);
-    }
-    return value;
-  }
-  function metrics(v, from, to) {
+  function resolvePeriod(from,to,period) {return ['d','w','m','c'].includes(period)?period:from===to?'d':'m';}
+  function metrics(v,from,to,period) {
     if(!calendarDate(from)||!calendarDate(to)||from>to)return null;
-    const available=efficiencyAvailableRange(from,to);
-    from=available.from;to=available.to;
-    if(from>to||(from===TODAY&&SNAPSHOT.slice(11,13)==='00'))return null;
-    if (!Number.isFinite(v.min)||v.min<0||!Number.isFinite(v.summaryDetail?.workMinutes)||v.summaryDetail.workMinutes<0) return null;
-    let work=0,idle=0,distance=0,shock=0;
-    const shockBands={s3:0,s4:0,s5:0};
-    for(let start=calendarDate(from);isoDay(start)<=to;){
-      const month=isoDay(start).slice(0,7),end=new Date(Date.UTC(start.getUTCFullYear(),start.getUTCMonth()+1,0));
-      const first=start.getUTCDate(),last=month===to.slice(0,7)?Number(to.slice(-2)):end.getUTCDate();
-      const allocate=(total,offset=0)=>dailyAllocation(Math.round(total*demoFactor(month,v,offset)),v,first,last,offset,end.getUTCDate(),month);
-      const monthlyWork=Math.min(v.min,v.summaryDetail.workMinutes);
-      work+=allocate(monthlyWork);idle+=allocate(v.min-monthlyWork,2);
-      distance+=allocate(Math.round((v.km||0)*10));
-      const monthShock=allocate(v.shock||0),before=first>1?dailyAllocation(Math.round((v.shock||0)*demoFactor(month,v,0)),v,1,first-1,0,end.getUTCDate(),month):0;
-      shock+=monthShock;
-      const bands=demoShockBands(v,before,monthShock);for(const key of Object.keys(shockBands))shockBands[key]+=bands[key];
-      start=shiftDay(end,1);
-    }
-    const min=work+idle;
-    return {min,work,idle,km:Number.isFinite(v.km)&&v.km>=0?distance/10:null,shock:Number.isFinite(v.shock)&&v.shock>=0?shock:null,shockBands:Number.isFinite(v.shock)&&v.shock>=0?shockBands:null,
-      efficiency:min ? Math.round(work/min*1000)/10 : null,fc:v.fc ?? null,bc:v.bc ?? null};
+    period=resolvePeriod(from,to,period);
+    const value=W.summaryValue(v,period,from,to),time=W.times(v,value.min),shock=W.shocks([v],period,from,to);
+    const shockBands=Object.fromEntries(Object.entries(shock.series).map(([key,values])=>[key,values.reduce((a,b)=>a+(b||0),0)]));
+    return {min:time.running,work:time.working,idle:time.idle,km:value.km,shock:Object.values(shockBands).reduce((a,b)=>a+b,0),shockBands,efficiency:value.efficiency,fc:value.fuel,bc:value.battery};
   }
+  function webPerformance(rows,from,to,options={}) {
+    if(options.source==='dashboard')return dashboardPerformance(rows,from,to);
+    const period=resolvePeriod(from,to,options.period),days=W.charts.axis(period,from,to).n;
+    const result=W.efficiency(rows,period,from,to);
+    const entries=rows.map(v=>{
+      const values=W.efficiency([v],period,from,to),work=values.columns.reduce((n,c)=>n+(c?.work||0)*60,0),idle=values.columns.reduce((n,c)=>n+(c?.idle||0)*60,0);
+      const m={...metrics(v,from,to,period),work,idle,min:work+idle,efficiency:percent(work,work+idle)};
+      const capacity=Math.max(days*(period==='d'?60:600),m.min);
+      return {v,m,through:to,capacity,rate:percent(work,capacity),idleRate:percent(idle,m.min)};
+    });
+    const work=entries.reduce((n,e)=>n+e.m.work,0),idle=entries.reduce((n,e)=>n+e.m.idle,0),capacity=entries.reduce((n,e)=>n+e.capacity,0);
+    return {total:rows.length,known:entries.length,unknown:0,days,entries,work,idle,capacity,unused:Math.max(0,capacity-work-idle),rate:percent(work,capacity),workShare:percent(work,work+idle),waiting:entries.filter(e=>e.idleRate>=30&&e.m.idle>=30),web:result};
+  }
+  function dashboardPerformance(rows,from,to) {
+    const window=W.meeting.hourlyWindow(new Date()),entries=rows.filter(v=>v.conn).map(v=>{
+      const live=W.meeting.hourlyVehicle(v,window),time=W.times(v,live.runH*60),m={...metrics(v,from,to,'d'),min:time.running,work:time.working,idle:time.idle,km:live.km};
+      m.efficiency=percent(m.work,m.min);
+      return {v,m,through:window.date,capacity:window.hours*60,rate:percent(m.work,window.hours*60),idleRate:percent(m.idle,m.min)};
+    }),work=entries.reduce((n,e)=>n+(e.m.work||0),0),idle=entries.reduce((n,e)=>n+(e.m.idle||0),0),capacity=entries.length*window.hours*60;
+    return {total:rows.length,known:entries.length,unknown:rows.length-entries.length,days:1,entries,work,idle,capacity,unused:Math.max(0,capacity-work-idle),rate:percent(work,capacity),workShare:percent(work,work+idle),waiting:entries.filter(e=>e.idleRate>=30&&e.m.idle>=30)};
+  }
+  function reportValues(rows,from,to,period) {
+    const groups=[...new Set(rows.map(v=>v.group))];
+    const keys=['eff','shock','fuel','batt','dist','hour'];
+    return Object.fromEntries(keys.map(key=>{
+      const values=groups.map(group=>W.reportValue(group,key,resolvePeriod(from,to,period),from,to));
+      return [key,values.length?(values[0].m.agg==='sum'?values.reduce((n,d)=>n+d.cur,0):values.reduce((n,d)=>n+d.cur,0)/values.length):null];
+    }));
+  }
+  
   const percent=(part,total)=>total ? Math.round(part/total*1000)/10 : null;
-  function performance(rows, from, to, {today=false}={}) {
-    const window=periodWindow(from,to),cutoff=SNAPSHOT.slice(0,10);
-    const days=window.valid ? Math.round((calendarDate(to)-calendarDate(from))/86400000)+1 : 0;
-    const all=rows.map(v=>{
-      const receivedDate=v.receivedAt?.slice(0,10)||cutoff;
-      const through=window.through&&receivedDate<window.through?receivedDate:window.through;
-      const eligible=through&&from<=through&&(!today||v.conn);
-      return {v,through,m:eligible?metrics(v,from,through):null};
-    });
-    const known=all.filter(x=>x.m);
-    const entries=known.map(x=>{
-      const observedDays=Math.round((calendarDate(x.through)-calendarDate(from))/86400000)+1;
-      const elapsed=x.through===cutoff?(observedDays-1)*600+Math.max(0,Number(hourlyWindow().end.slice(11,13))-8)*60:observedDays*600;
-      return {...x,capacity:Math.max(elapsed,x.m.min),rate:percent(x.m.work,Math.max(elapsed,x.m.min)),idleRate:percent(x.m.idle,x.m.min)};
-    });
-    const work=known.reduce((n,x)=>n+x.m.work,0),idle=known.reduce((n,x)=>n+x.m.idle,0);
-    const capacity=entries.reduce((n,x)=>n+x.capacity,0);
-    return {total:rows.length,known:known.length,unknown:rows.length-known.length,days,work,idle,
-      unused:Math.max(0,capacity-work-idle),capacity,rate:percent(work,capacity),workShare:percent(work,work+idle),
-      entries,
-      waiting:entries.filter(x=>x.idleRate>=30&&x.m.idle>=30).sort((a,b)=>b.idleRate-a.idleRate)};
-  }
+  function performance(rows,from,to,options={}) {return webPerformance(rows,from,to,options);}
   function dailyEfficiency(rows,from,to,options={}) {
     const report=performance(rows,from,to,options);
     if(!report.days||report.days>366)return [];
@@ -330,5 +379,5 @@
     return {equipmentId:v.equipmentId,companyId:COMPANY,group:v.group,startDate:state.from,endDate:state.to,
       periodType:state.period,date:state.from.replaceAll('-','')};
   }
-  return {SNAPSHOT,TODAY,DATA_START,ENERGY_MONTH,STATUS,DISPLAY,SHOCK_LEVELS,shockLevel,chargeWindow,periodWindow,hourlyWindow,COMPANY,ROLE_LABELS,buildVehicles,scope,listed,attention,counts,dates,calendarDate,efficiencyRange,efficiencyPerformance,efficiencyWindow,efficiencyCalendar,metrics,performance,dailyEfficiency,serviceItems,supplyItems,resetSupplies,undoSupplyReset,serviceHistory,serviceRecords,pushHistory,pushPresentation,unreadPushCount,requestContext};
+  return {SNAPSHOT,TODAY,DATA_START,ENERGY_MONTH,STATUS,DISPLAY,SHOCK_LEVELS,shockLevel,chargeWindow,assignedGroup,reportValues,web:W,createApprovalStore,periodWindow,hourlyWindow,dashboardWindow,dashboardErrors,currentSupplies,COMPANY,ROLE_LABELS,buildVehicles,scope,listed,attention,counts,dates,calendarDate,efficiencyRange,efficiencyPerformance,efficiencyWindow,efficiencyCalendar,metrics,performance,dailyEfficiency,serviceItems,supplyItems,resetSupplies,undoSupplyReset,serviceHistory,serviceRecords,pushHistory,pushPresentation,shockEvents,notificationWindow,recentNotifications,unreadPushCount,requestContext};
 });
