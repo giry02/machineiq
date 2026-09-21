@@ -1,19 +1,14 @@
 {
-  "revision": "2026-09-20-r87",
+  "revision": "2026-09-21-r88",
   "entry": "login.html",
-  "androidTestApk": {"version":"0.1.3-location","versionCode":4,"qr":"APK-only test: read/copy; no auto-fill; excluded from HTML/ZIP"},
   "files": [
     {
-      "path": "downloads/Machine-IQ-Customer-Location-Notifications-QR-v0.1.3-20260920-r87-debug.apk",
-      "sha256": "16fa7106db105d6f20efa3b48beede66507bb1e4767b9f224930d47b1da0865c"
-    },
-    {
       "path": "index.html",
-      "sha256": "fdc5f41b8533fc5bb12b57858169282bf66c484208c7247295042b8aaac8a319"
+      "sha256": "931a87b83902288aa723da96a3b05ac80ac40b122a63111daa0dd55ca8f1f31c"
     },
     {
       "path": "customer.js",
-      "sha256": "5dcfa609066f414e7df13b0bbc99e0edb1422c578f087b76c6a7c59dc4ae1224"
+      "sha256": "eec7b0b5cd755beb6de7679ee284feb692b4baacc5b6caf4b0a1c0573070feb9"
     },
     {
       "path": "customer.css",
@@ -37,31 +32,31 @@
     },
     {
       "path": "login.html",
-      "sha256": "82d5c7d2bf248744b6e6cb0fe7a7c2e3fcc4a8b20de869212c1b631eb0b97b7b"
+      "sha256": "60cea526eee1512bc4e9e0a49a0dba8a8cc35b017565ac5bb32a9980002a2072"
     },
     {
       "path": "login.js",
-      "sha256": "398ff2e887f8c73a2ed61aaddcb9e4de418f76a0ea2898fa9a09e17c4c3f6a4b"
+      "sha256": "adb7420522ebb774ba492c97dbd0d75b4a193d4fd02011250e619ba54e4d9b3d"
     },
     {
       "path": "signup.html",
-      "sha256": "177229945e42b81a912b22ac92aa686fff919acbd1afb999ead97ca7feedbdb5"
+      "sha256": "f9fb1a1f66bd321fb2d7f77b0415e113c30c22632e037c15681e0a1b5eb25158"
     },
     {
       "path": "signup.js",
-      "sha256": "137ecfb94e657dd676e0f5a02e84bf494806ac4736f44dcc39051f4eff6cc3fb"
+      "sha256": "42b369e0616608c29478e31b0d741518178c317aad851675c88cc32a506f1eed"
     },
     {
       "path": "signup-header.js",
-      "sha256": "9113be0eb0baf5ce8a918fa0adc77de9ac0b8a31732e19ebe56400cb10a6b910"
+      "sha256": "1996058272d8c1a5d12756ad544fab026b82d04022d70b3fcafb68a259f33f15"
     },
     {
       "path": "find-password.html",
-      "sha256": "22e2941d534f62021887350c92a85760f2d7e409aaf81d29b3d5109e139689b9"
+      "sha256": "0d1d3e51cfbcb8f77c6a0e267227988ce31f5b72d29b576c1cabe9ff67d2c139"
     },
     {
       "path": "find-password.js",
-      "sha256": "2c35c647d64ae53c0e2bd3936a35f34b63ea7486d682c347d50e2cbf981ec623"
+      "sha256": "7648323c882fbe6186fed976bb4039171ac657db80091e59599a8f8705267d73"
     },
     {
       "path": "web-contracts.generated.js",
@@ -85,15 +80,15 @@
     },
     {
       "path": "owner-dashboard-preview.html",
-      "sha256": "1e945bd501f0f2b55d4645253e5270ca4e24a6041c2f60453e390116a00f8c91"
+      "sha256": "cc13408a98b3be0550fb54bb4ebb9d7842576183a8973216687ff13e38a3dbc5"
     },
     {
       "path": "owner-dashboard-preview.js",
-      "sha256": "93441dd8f70a1db96eb755cb5cda209856919372224fb72ab18c4673f5d814d2"
+      "sha256": "6df9f2c67e23e9d99e4b84a4e755405f9f92ef9df3200f31c341328d06d6f29f"
     },
     {
       "path": "owner-dashboard-preview.css",
-      "sha256": "a21ab9f2086a93206494c912e730616cf75239bef226cb1bd44555ece9dda3d7"
+      "sha256": "c57f4305fd3703a43a588f9ce5603ae58972c41bbb94a5caf0dbec90e0c6bbd8"
     },
     {
       "path": "dashboard-backup-20260919.html",
@@ -697,19 +692,27 @@
     },
     {
       "path": "tests/dashboard.cjs",
-      "sha256": "5cd62a27f8f8fffba6ee1288e21dffe829be45ea8096a603763692c2f223c14e"
+      "sha256": "7ead4bfeba39a59b3821c9a73a1d4c71662c1d6458c3a08cebb5333f8ed6c30e"
     },
     {
       "path": "tests/auth.cjs",
-      "sha256": "f0e9c1ff1c625ba548d8c5886bee8d02d5d4c4049cab2e07e72fc5e2760d048f"
+      "sha256": "2aebcc4e685afe1480235c7d38b462bc55ee4ebf069c0e078f59f25155abf17a"
     },
     {
       "path": "README.md",
-      "sha256": "c0a4fbccd9bd044ddeb38d4e8b228ba9f3e37279245caa4d11bf689e44e13f12"
+      "sha256": "891807c98cd60ab402f62ce0dd1e6077a0c47be438a4a61770d107f07bfe7e12"
     },
     {
       "path": "docs/dashboard-main-20260919.md",
       "sha256": "61a9ba2cf9676014dbd3902867c4854d913cc77b6a43a4f6b2e777f82a31c189"
+    },
+    {
+      "path": "docs/staff-home-v7.md",
+      "sha256": "a49bb8189dcea50f94fcbdad8b0567837213c8491d51cd1dbd5f93052199e240"
+    },
+    {
+      "path": "docs/home-efficiency-r88.md",
+      "sha256": "ce43b68522c6c19107cb3d45461f1525b675976f50c1eac4ce098fb4a629b18e"
     },
     {
       "path": "docs/missing-data-r87.md",
@@ -721,11 +724,11 @@
     },
     {
       "path": "docs/efficiency-label-r84.md",
-      "sha256": "15252630ba329bcd3ed996a9fef3cc5f83ce27005584d88757e18206fb4378d3"
+      "sha256": "b374049f6a4b0ff527d833c8074d6d6c7896632c09e4333c5d6e74ef7fd9e0e8"
     },
     {
       "path": "docs/android-qr-test.md",
-      "sha256": "7c63c04a37ea7e524fa06f39fd8791e42f49caadd243860fe71e273ca43ab740"
+      "sha256": "8da8da86e6964372602af87a4991f3aed0543ae138de4a46c8ef11d0f49de2bb"
     },
     {
       "path": "docs/android-qr-registry.json",
@@ -737,7 +740,7 @@
     },
     {
       "path": "docs/screen-registry.json",
-      "sha256": "9d5eaf655279e4922663a5c0f91bb742d57afb3c37e7e9ee0a4b4bdfb1e7e3ef"
+      "sha256": "9b81da84d8d1deb35b3a6b4fcaa3be01093540d61610abcc6cd0a2399dc0d676"
     },
     {
       "path": "docs/menu-page-registry.json",
@@ -786,6 +789,10 @@
     {
       "path": "downloads/MACHINE_IQ_MOBILE_HTML_20260913_r46.zip",
       "sha256": "2f567cd0eab0e1e11e766aa33ff70c100550683781d2d297875c5342041a7566"
+    },
+    {
+      "path": "downloads/Machine-IQ-Customer-Location-Notifications-QR-v0.1.3-20260920-r87-debug.apk",
+      "sha256": "16fa7106db105d6f20efa3b48beede66507bb1e4767b9f224930d47b1da0865c"
     }
   ]
 }

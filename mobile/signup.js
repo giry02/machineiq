@@ -408,9 +408,6 @@
   });
   $('#signup-cancel').addEventListener('click', () => { window.location.href = document.body.dataset.mobileLogin || './login.html'; });
   $('#signup-to-login').addEventListener('click', () => { window.location.href = document.body.dataset.mobileLogin || './login.html'; });
-  $('#signup-language').addEventListener('change', event => {
-    if (event.target.value !== 'ko') event.target.value = 'ko';
-  });
   window.addEventListener('beforeunload', stopTimer);
 
   const initialRole = new URLSearchParams(window.location.search).get('role') === 'customer_staff' ? 'customer-employee' : 'customer-owner';

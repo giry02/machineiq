@@ -82,9 +82,6 @@
     try { await navigator.clipboard.writeText($('#temporary-password').textContent); showToast('임시 비밀번호를 복사했습니다.'); }
     catch (error) { showToast('임시 비밀번호: ' + $('#temporary-password').textContent); }
   });
-  $('#password-language').addEventListener('change', event => {
-    if (event.target.value !== 'ko') event.target.value = 'ko';
-  });
   window.addEventListener('beforeunload', () => { if (timerId) window.clearInterval(timerId); });
 
   showStep(1);

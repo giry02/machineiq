@@ -34,3 +34,13 @@ QR 원문(차량번호·한글·여러 줄·URL/스크립트 포함) 디코딩, 
 HTML 화면/데이터는 r87 전달본을 그대로 사용하며 QR는 APK의 별도 자산으로만 주입한다. 원격 Figma/FigJam은 변경하지 않고 로컬 등록부에 대기 기록만 남긴다.
 
 구현 참고: [ZXing Android Embedded 4.3.0](https://github.com/journeyapps/zxing-android-embedded/tree/v4.3.0). Apache 2.0 라이선스/고지는 APK의 `assets/licenses/`에 포함한다.
+
+## 설치 파일 검증
+
+`output/apk/Machine-IQ-Customer-Location-Notifications-QR-v0.1.3-20260920-r87-debug.apk` (5,172,998 bytes).
+
+- SHA-256: `16fa7106db105d6f20efa3b48beede66507bb1e4767b9f224930d47b1da0865c`.
+- APK 서명 검증 통과. 기존 v0.1.2 위치·알림 APK와 같은 서명 인증서 및 패키지명 확인.
+- 내장 HTML 해시 `66ad26a79de246214fb5c7357acb4433ebe792e6a59cc51f13789dc5498785da`로 r87 원본과 동일. 5개 해상도 아이콘 모두 이전 APK와 바이트 동일.
+- 최종 권한은 카메라·대략적/정확한 위치·알림 4개뿐. 인터넷·마이크·백그라운드 위치 권한 없음.
+- 기존 배포 ZIP은 보관본 그대로 두며, 이번에 HTML ZIP을 재생성하지 않음. HTML 향후 생성 시 QR 제외 검사를 계속 적용.

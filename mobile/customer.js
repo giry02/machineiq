@@ -600,6 +600,7 @@
     if(b.hasAttribute('data-return')) return go(state.returnView);
     if(b.hasAttribute('data-toggle-range')) {rangeOpen=!rangeOpen;render();$('[data-toggle-range]').focus();return;}
     if(b.hasAttribute('data-efficiency')) return go('efficiency',{...M.efficiencyRange('m',state.from||M.SNAPSHOT.slice(0,10)),efficiencyMode:'daily'});
+    if(b.hasAttribute('data-home-efficiency')) return go('efficiency',{...M.efficiencyRange('m',M.TODAY),efficiencyLayout:'menu',efficiencyMode:'daily',group:'',q:'',live:'',reportFocus:'all',reportVehicle:'',equipmentId:'',listVehicle:''});
     if(b.hasAttribute('data-clear-report-vehicle')) return go(state.view,{reportVehicle:''},true);
     if(b.hasAttribute('data-today-report')) return go('reports',{period:'d',from:M.TODAY,to:M.TODAY,reportFocus:b.dataset.focus||'all',reportVehicle:''});
     if(b.dataset.vehicleReport) return go(b.dataset.vehicleReport,{efficiencyMode:'daily',reportVehicle:b.dataset.equipment,group:state.role==='customer_owner'?(selected()?.group||state.group):'',q:'',live:''});

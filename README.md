@@ -4,7 +4,7 @@
 - 웹 소스: `web/`
 - 최초 화면: 대시보드. 상단 권한 선택으로 내부 사용자·딜러·고객 화면을 확인합니다.
 - 고객 모바일 실행: https://giry02.github.io/machineiq/mobile/login.html
-- 고객 모바일 소스와 문서: `mobile/` — 2026-09-20 r87. 차트형 메인, 대표 전체/직원 배정 그룹 범위, 14px 세부 글자, 일·주·월 조회, 정수 표시, 항목별 상세 이동. 효율 행 이름 굵기·수리이력 고객용 상세·미수신/빈 데이터 처리 반영. 기존 짧은 수리 목록 유지.
+- 고객 모바일 소스와 문서: `mobile/` — 2026-09-21 r88. 직원 홈의 중복 그룹 카드 및 인증 화면 언어 선택 제거. 최근 7일 추이 카드 전체에서 이번 달 운영효율로 이동. 차트형 메인·대표 전체/직원 배정 그룹 범위·14px 세부 글자·일주월 조회·효율 행 이름 굵기·수리이력 상세·미수신 처리 유지. 기존 APK/ZIP은 이번 r88 변경을 포함하지 않습니다.
 - [고객대표 메인](https://giry02.github.io/machineiq/mobile/index.html#home?role=customer_owner) · [고객직원 메인](https://giry02.github.io/machineiq/mobile/index.html#home?role=customer_staff)
 - [이전 메인 보관](https://giry02.github.io/machineiq/mobile/dashboard-backup-20260919.html#home?role=customer_owner)
 - [Android 테스트 APK v0.1.3](mobile/downloads/Machine-IQ-Customer-Location-Notifications-QR-v0.1.3-20260920-r87-debug.apk): 기존 앱 이름·딜러 아이콘·위치 동의·로컬 알림 유지. 설정 → QR 검색으로 원문 확인·복사·다시 스캔만 지원. 자동 입력·등록·실제 PUSH 서버·iOS는 미구현. 실제 카메라 검증은 설치 기기에서 필요합니다.

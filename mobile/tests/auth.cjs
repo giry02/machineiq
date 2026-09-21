@@ -30,8 +30,7 @@ function page(file,query='',storage=stores()){
     const n=element(tag,attrs);stack.at(-1).append(n);if(!['input','meta','link','img','br','hr','source'].includes(tag))stack.push(n);
   }
   document.body=nodes.find(n=>n.tagName==='BODY');document.documentElement=nodes.find(n=>n.tagName==='HTML');document.readyState='complete';document.createElement=tag=>element(tag);document.getElementById=id=>nodes.find(n=>n.id===id);
-  // The shared header script supplies this disabled language field before signup.js.
-  document.body.append(element('select',{id:file==='signup.html'?'signup-language':file==='login.html'?'login-language':'password-language'}));
+  // r88: no language select is injected; form initialization must not depend on it.
   for(const n of nodes.filter(n=>n.tagName==='SELECT'))n.value=n.options.find(o=>'selected'in o.attrs)?.value||n.options[0]?.value||'';
   const location={search:query,href:'http://localhost/'+file+query};
   const window={location,scrollTo(){},lucide:{createIcons(){}},addEventListener(){},setTimeout(fn){fn();},setInterval(fn){const id=++intervalId;intervals.set(id,fn);return id;},clearInterval(id){intervals.delete(id);},prompt(){}};

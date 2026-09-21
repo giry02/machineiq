@@ -69,9 +69,6 @@
     goHome();
   });
 
-  document.querySelector('#login-language').addEventListener('change', event => {
-    showToast(event.target.value === 'ko' ? '한국어로 설정되었습니다.' : 'English 화면은 추후 연결됩니다.');
-  });
   document.querySelectorAll('[data-demo-action]').forEach(button => button.addEventListener('click', () => showToast('현재 사용할 수 없습니다. 잠시 후 다시 시도해 주세요.')));
   window.lucide?.createIcons({attrs:{'stroke-width':2}});
 })();

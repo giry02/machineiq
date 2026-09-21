@@ -9,9 +9,9 @@ const apiContext={module:{exports:{}},URLSearchParams};
 vm.runInNewContext(read('owner-dashboard-preview.js'),apiContext);
 const api=apiContext.module.exports;
 assert(read('index.html').includes('data-dashboard-mode="main"'));
-assert(read('index.html').includes('owner-dashboard-preview.css?v=20260920-6'));
-assert(read('index.html').includes('owner-dashboard-preview.js?v=20260920-6'));
-assert(read('index.html').includes('customer.js?v=20260920-r87'));
+assert(read('index.html').includes('owner-dashboard-preview.css?v=20260921-8'));
+assert(read('index.html').includes('owner-dashboard-preview.js?v=20260921-8'));
+assert(read('index.html').includes('customer.js?v=20260921-r88'));
 assert(read('index.html').includes('model.js?v=20260920-r87'));
 assert(!read('dashboard-backup-20260919.html').includes('owner-dashboard-preview'));
 for(const role of ['customer_owner','customer_staff']){
@@ -27,7 +27,8 @@ for(const role of ['customer_owner','customer_staff']){
   }
   if(role==='customer_staff'){
     assert(data.groups.every(g=>g.group===M.assignedGroup(role)));
-    assert(html.includes('내 그룹 작업 현황'));assert(!html.includes('data-owner-sort'));
+    assert(!/내 그룹 작업 현황|od-groups|data-owner-sort/.test(html));
+    assert(/class="dashboard-panel od-today"[\s\S]*?<\/section>\s*<section class="dashboard-panel od-trend">/.test(html));
   }else assert(html.includes('그룹별 운영 비교'));
 }
 assert.equal(M.fleetState(null).available,false);

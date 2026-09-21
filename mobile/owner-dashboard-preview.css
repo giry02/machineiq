@@ -82,6 +82,10 @@
 .owner-dashboard-preview .od-content .od-group-issue > span { display:inline-flex; align-items:baseline; gap:2px; white-space:nowrap; }
 .owner-dashboard-preview .od-content .od-group-issue.has-value b { color:var(--linq-color-brand); }
 .owner-dashboard-preview .od-content .od-group-issue.has-value.od-soon b { color:var(--linq-color-warning); }
+.owner-dashboard-preview .od-content .od-trend { position:relative; }
+.owner-dashboard-preview .od-content .od-trend > .od-trend-link { position:absolute; inset:0; z-index:1; width:100%; height:100%; padding:0; border:0; border-radius:inherit; background:transparent; cursor:pointer; }
+.owner-dashboard-preview .od-content .od-trend .criteria-tip,
+.owner-dashboard-preview .od-content .od-trend .criteria-tip-panel { position:relative; z-index:2; }
 .owner-dashboard-preview .od-content .od-trend-summary { display:flex; justify-content:space-between; align-items:center; gap:10px; }
 .owner-dashboard-preview .od-content .od-trend-summary > div { display:flex; flex-direction:column; gap:4px; }
 .owner-dashboard-preview .od-content .od-trend-summary strong { font-size:24px; line-height:32px; letter-spacing:-.4px; }
