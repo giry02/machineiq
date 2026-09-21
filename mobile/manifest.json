@@ -700,7 +700,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "891807c98cd60ab402f62ce0dd1e6077a0c47be438a4a61770d107f07bfe7e12"
+      "sha256": "5acd8779a0ad93f422d2efac28857942f6b26e9b3bd8141ab719f8005bbe8198"
     },
     {
       "path": "docs/dashboard-main-20260919.md",
@@ -793,6 +793,14 @@
     {
       "path": "downloads/Machine-IQ-Customer-Location-Notifications-QR-v0.1.3-20260920-r87-debug.apk",
       "sha256": "16fa7106db105d6f20efa3b48beede66507bb1e4767b9f224930d47b1da0865c"
+    },
+    {
+      "path": "docs/android-github.md",
+      "sha256": "dad8aa4d10194d833c9798f9369d29090c024fe1fde4f6bdb1c0870635330156"
+    },
+    {
+      "path": "downloads/Machine-IQ-Customer-GitHub-v0.2.0-20260921-debug.apk",
+      "sha256": "71feff53754e9d38fdc4c4dd9df47b40052dc6dfe90e6cc42f1c541c8f1b9f40"
     }
   ]
 }

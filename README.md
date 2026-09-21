@@ -7,6 +7,7 @@
 - 고객 모바일 소스와 문서: `mobile/` — 2026-09-21 r88. 직원 홈의 중복 그룹 카드 및 인증 화면 언어 선택 제거. 최근 7일 추이 카드 전체에서 이번 달 운영효율로 이동. 차트형 메인·대표 전체/직원 배정 그룹 범위·14px 세부 글자·일주월 조회·효율 행 이름 굵기·수리이력 상세·미수신 처리 유지. 기존 APK/ZIP은 이번 r88 변경을 포함하지 않습니다.
 - [고객대표 메인](https://giry02.github.io/machineiq/mobile/index.html#home?role=customer_owner) · [고객직원 메인](https://giry02.github.io/machineiq/mobile/index.html#home?role=customer_staff)
 - [이전 메인 보관](https://giry02.github.io/machineiq/mobile/dashboard-backup-20260919.html#home?role=customer_owner)
+- [GitHub 연결형 APK v0.2.0 다운로드](mobile/downloads/Machine-IQ-Customer-GitHub-v0.2.0-20260921-debug.apk): GitHub Pages 최신 화면을 앱에서 바로 봅니다. 기존 위치·알림·QR 앱에 업데이트 설치할 수 있으며 이름/아이콘은 그대로입니다. 설정 → 최신 화면 새로고침. 인터넷 필요, QR·위치 동의·로컬 알림 테스트 유지. [설치·검증 안내](mobile/docs/android-github.md).
 - [Android 테스트 APK v0.1.3](mobile/downloads/Machine-IQ-Customer-Location-Notifications-QR-v0.1.3-20260920-r87-debug.apk): 기존 앱 이름·딜러 아이콘·위치 동의·로컬 알림 유지. 설정 → QR 검색으로 원문 확인·복사·다시 스캔만 지원. 자동 입력·등록·실제 PUSH 서버·iOS는 미구현. 실제 카메라 검증은 설치 기기에서 필요합니다.
 - QR 기능은 APK 전용입니다. 사용자 요청에 따라 현재 및 향후 HTML/ZIP에는 QR 메뉴·카메라 기능을 넣지 않습니다. 차량 시리얼번호·터미널 ID 입력 연결은 추후 별도 요청 대상입니다.
 - 기존 고객 전달용 HTML ZIP: [2026-09-13 보관본](mobile/downloads/MACHINE_IQ_MOBILE_HTML_20260913_r46.zip). 최신 화면은 웹 링크를 사용하세요. 이번 게시에서 ZIP/iOS는 재생성하지 않았습니다.
