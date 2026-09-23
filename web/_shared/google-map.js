@@ -94,7 +94,7 @@
       route.points = points; route.state = points.length ? 'ready' : 'empty';
       if (renderer) paintInteractive(); else {
         canvas.dataset.routeState = route.state; canvas.dataset.routePoints = String(points.length);
-        if (window.MIQMapRoutePreview) {
+        if (host.dataset.mapProvider==='google-embed' && window.MIQMapRoutePreview) {
           MIQMapRoutePreview.draw(canvas, points, selected); message(routeMessage());
         } else message(points.length ? '이동 경로는 지도 연결 설정 후 표시할 수 있습니다.' : routeMessage());
       }
@@ -123,6 +123,7 @@
         onSelect:function(vin){ MIQMapData.select(vin); }, onClose:function(){ MIQMapData.select(null); },
         onRoute:routeFor, detailHref:detailHref, onFailure:revertToEmbed});
       if (disposed) { next.destroy(); return; }
+      if(window.MIQMapRoutePreview)MIQMapRoutePreview.draw(canvas,[],selected);
       renderer = next; frame.remove(); host.dataset.mapProvider = 'google-api';
       canvas.dataset.mapState = 'ready'; paintInteractive();
     } catch (error) { if (!disposed) revertToEmbed(); }
