@@ -3,7 +3,7 @@ body.miq-current-shell.miq-lithium-list .miq-title-period-row.li-list-title-row{
 body.miq-current-shell.miq-lithium-list .li-list-title-row .miq-title-scope-heading{flex:1 1 auto}
 .miq-lithium-list .li-list-abnormal{display:inline-flex;align-items:center;gap:6px;margin-left:auto;flex:0 0 auto;white-space:nowrap;cursor:pointer;color:#555;font-size:13px}
 .miq-lithium-list .li-list-abnormal input{accent-color:#ff3600;width:16px;height:16px}
-.miq-lithium-list .li-list-table{table-layout:auto}
+.miq-lithium-list .li-list-table{table-layout:fixed;min-width:1080px}
 .miq-lithium-list .table-sort{display:inline-flex;align-items:center;gap:4px;padding:3px 0;border:0;background:transparent;color:inherit;font-size:13px;font-weight:700;white-space:nowrap;cursor:pointer}
 .miq-lithium-list .table-sort .sort-ind{width:9px;color:var(--bobcat-gray);font-size:11px;opacity:1}
 .miq-lithium-list .table-sort.is-sorted .sort-ind{color:var(--bobcat-red-active)}

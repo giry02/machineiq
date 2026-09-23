@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
+<head><script src="../_shared/demo-clock.js?rev=34d9d133492b"></script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>업체별 현황 · MACHINE IQ</title>
 <link rel="icon" type="image/x-icon" href="../_shared/favicon.ico"/>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
-<link rel="stylesheet" href="../_shared/mockup.css?rev=d24057a14011"/>
+<link rel="stylesheet" href="../_shared/offline-fonts.css?rev=b405f97e6cf9"><script type="module" blocking="render">await document.fonts.load('400 14px "Noto Sans KR"');await document.fonts.ready;</script>
+<link rel="stylesheet" href="../_shared/mockup.css?rev=bed1f0069135"/>
 <style>
 /* ── 페이지 전용 : 지표 카드 6종 · 지표 전환 · 일자별 막대(hover) ── */
 .filter-bar .inp--sm{width:116px;flex:0 0 auto;text-align:center}
@@ -67,84 +67,23 @@
 .tip-box .r i{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
 .tip-box .r span{margin-left:auto;font-weight:700}
 </style>
-<link rel="stylesheet" href="../_shared/content-system.css?v=20260902-readability&amp;rev=d8f94e7e5049"/>
-<link rel="stylesheet" href="../_shared/report-enhancements.css?v=20260905-common-header-r4&amp;rev=2636fe8efa69"/>
+<link rel="stylesheet" href="../_shared/content-system.css?rev=d8f94e7e5049"/>
+<link rel="stylesheet" href="../_shared/report-enhancements.css?rev=dceeccfe9513"/>
 <link rel="stylesheet" href="../_shared/chart-common.css?rev=fc1c23dcf6af"/>
-</head>
-<body data-period-presets="dwm" class="miq-content-system miq-report-enhanced" data-gnb="rpt" data-sub="rptstatus" data-variant="tobe" data-base="../">
-
-<div id="gnb"></div>
-
-<div class="layout">
-  <aside class="lnb" aria-label="리포트 메뉴"></aside>
-  <main class="main">
-    <div class="page-head">
-      <div class="page-head__title">업체별 현황</div>
-      <div class="page-head__bc">
-        리포트 &gt; 업체별 현황 ·
-        <a href="../Report%20Comparison/report-comparison-tobe.html">업체별 비교</a> ·
-        <a href="../Report%20Heatmap/report-heatmap-tobe.html">업체별 히트맵</a>
-      </div>
-    </div>
-
-    <!-- 기간 필터: 업체 선택은 업체별 비교와 같은 본문 보조 행으로 이동한다. -->
-    <div class="filter-bar">
-      <span class="co-k">업체</span>
-      <select class="inp inp--sm co-sel" id="coSel" aria-label="업체 선택"></select>
-      <div class="grow"></div>
-      <span class="period-tabs" id="periodTabs">
-        <button type="button" data-period="d">일</button>
-        <button type="button" data-period="w">주</button>
-        <button class="active" type="button" data-period="m">월</button>
-        </span>
-      <input class="inp inp--sm" id="dFrom" type="date" value="2026-08-01" aria-label="조회 시작일"/>
-      <span class="sep">~</span>
-      <input class="inp inp--sm" id="dTo" type="date" value="2026-08-31" aria-label="조회 종료일"/>
-      <button class="btn btn--sm btn--dark" type="button" id="btnSearch">조회</button>
-    </div>
-
-    <!-- ═══════ ① 지표 6종 (이전 기간 대비) ═══════ -->
-    <div class="kpi-grid" id="kpiGrid"></div>
-
-    <!-- ═══════ ② 지표별 일자 추이 ═══════ -->
-    <div class="metric-tabs" id="metricTabs"></div>
-    <div class="chart-box">
-      <div class="chart-head">
-        <span class="chart-head__name" id="chartName">운영효율</span>
-        <span class="lg">
-          <span class="li"><span class="sw" style="background:#e3e5e8"></span><span data-lbl-prev>전월</span></span>
-          <span class="li"><span class="sw" style="background:#ff3600"></span><span data-lbl-cur>금월</span></span>
-        </span>
-        <span class="chart-hint" id="chartHint"></span>
-      </div>
-      <div class="chart-wrap" id="chartWrap">
-        <svg class="bar-chart" viewBox="0 0 960 340" role="img" aria-label="지표 일자별 추이" id="chart"></svg>
-        <div class="tip-box" id="tip"></div>
-      </div>
-    </div>
-
-    <div class="note">
-      <b>TO-BE 개선 사항</b>
-      <ul>
-        <li><span class="tag-new">개선</span> <b>본문 업체 선택</b> — 전역 조회 대상을 제거하고 기간 조회 바로 아래에서 단일 업체를 선택합니다.</li>
-        <li><span class="tag-asis">삭제</span> <b>지표 카드 하단 표 제거</b> — 카드와 같은 값을 반복하던 전월/금월 표를 없애고, 세부 수치는 차트 <b>hover</b>로 확인합니다. 운영률·배터리 충전 횟수처럼 해석이 모호한 항목도 함께 정리했습니다.</li>
-        <li><span class="tag-new">신규</span> <b>제공 지표를 6종으로 확정</b> — 운영효율 · 충격횟수 · 연료소비량 · 배터리 충전량 · 운행거리 · 운행시간.</li>
-        <li><span class="tag-new">신규</span> <b>카드 값과 차트 값의 정합</b> — 카드 수치는 일자별 값의 합계(충격 · 거리 · 시간) 또는 평균(효율 · 연비 · 충전량)으로 계산해 차트와 어긋나지 않습니다.</li>
-        <li><span class="tag-new">신규</span> <b>월 조회에서 가로 스크롤 제거</b> — 막대 폭을 좁혀 31일을 화면 너비에 맞추고, <b>막대 위 수치 라벨 대신 hover 툴팁</b>으로 전월 · 금월 · 증감을 보여줍니다.</li>
-        <li><span class="tag-keep">유지</span> 업체 선택, 우측 상단 <b>일 / 주 / 월</b> 기간 조회, 지표 6종 탭 전환, 전월 대비 증감 배지.</li>
-      </ul>
-    </div>
-  </main>
-</div>
-
-<script src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script>
-<script src="../_shared/common-logic.js?v=20260907-common-logic-r42&amp;rev=fe89537280cd"></script>
-<script src="../_shared/chart-common.js?rev=26b243959957"></script>
-<script src="../_shared/nav.js?v=20260907-common-logic-r42&amp;rev=10146ec619b0"></script>
-<script src="../_mock-data/generated/fleet.generated.js?v=20260906-json-r1&amp;rev=f69042cf6b57"></script>
-<script src="../_shared/fleet.js?v=20260906-json-r1&amp;rev=9bc7caf2ff93"></script>
-<script src="../_shared/report-scope.js?rev=544a25c316d3"></script>
-<script>
+<link rel="stylesheet" href="../_shared/form-controls.css?rev=6fda272acdcc"/>
+<link rel="stylesheet" href="../_shared/list-pagination.css?rev=0069e48c1009">
+<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?rev=bb6d53aabb78"/>
+<link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?rev=1cffa21a9777"/>
+<style>body.miq-current-shell>#gnb{min-height:64px}</style>
+<script defer blocking="render" src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script>
+<script defer blocking="render" src="../_shared/common-logic.js?rev=efb7e741cd7b"></script>
+<script defer blocking="render" src="../_shared/chart-common.js?rev=15c74452f805"></script>
+<script defer blocking="render" src="../_shared/list-pagination.js?rev=33207bf33d11"></script>
+<script defer blocking="render" src="../_mock-data/generated/fleet.generated.js?rev=309d68875499"></script>
+<script defer blocking="render" src="../_shared/fleet.js?rev=dfdf98be0a95"></script>
+<script defer blocking="render" src="../_shared/nav.js?rev=049a18c69072"></script>
+<script defer blocking="render" src="../_shared/report-scope.js?rev=544a25c316d3"></script>
+<script type="module" blocking="render">
 /* ══════════════════════════════════════════════════════════════
    업체별 현황 Mock-up 인터랙션 (리포트 · LNB 없음)
      1) 업체 선택 + 기간(일 / 주 / 월)
@@ -195,7 +134,7 @@
   }
   function rd(n, d) { var p = Math.pow(10, d); return Math.round(n * p) / p; }
   function fmt(n, m) {
-    return rd(n, m.dec).toLocaleString('ko-KR', { minimumFractionDigits: m.dec, maximumFractionDigits: m.dec }) + m.unit;
+    return window.MIQCommon.numbers.integer(n, true) + m.unit;
   }
   function metric(key) { return METRICS.filter(function (m) { return m.key === key; })[0]; }
 
@@ -287,7 +226,7 @@
     var gridTicks = countAxis ? countAxis.ticks : Array.from({length:9}, function(_, index){return max * index / 8;});
     gridTicks.forEach(function (t) {
       svg += "<line class='grid' x1='" + L + "' y1='" + r2(y(t), 1) + "' x2='" + R + "' y2='" + r2(y(t), 1) + "'/>"
-        + "<text x='" + (L - 8) + "' y='" + r2(y(t) + 3, 1) + "' text-anchor='end'>" + rd(t, d.m.dec) + "</text>";
+        + "<text x='" + (L - 8) + "' y='" + r2(y(t) + 3, 1) + "' text-anchor='end'>" + window.MIQCommon.numbers.integer(t) + "</text>";
     });
     svg += "<line class='axis' x1='" + L + "' y1='" + B + "' x2='" + R + "' y2='" + B + "'/>"
       + "<line class='axis' x1='" + L + "' y1='" + T + "' x2='" + L + "' y2='" + B + "'/>";
@@ -337,7 +276,9 @@
     });
   }
 
+  var reportReady = false;
   function render() {
+    if (!reportReady) {  return; }
     renderKpis();
     renderTabs();
     var d = build(state.metric);
@@ -359,6 +300,7 @@
   co.addEventListener('change', function () { state.co = co.value; render(); });
 
   document.getElementById('periodTabs').addEventListener('click', function (e) {
+    if (this.closest('.finder, .filter-bar').__miqPeriodController) return;
     var b = e.target.closest('button[data-period]');
     if (!b) return;
     state.period = b.getAttribute('data-period');
@@ -380,6 +322,7 @@
     render();
   });
   document.getElementById('btnSearch').addEventListener('click', function () {
+    if (this.closest('.finder, .filter-bar').__miqPeriodController) return;
     if (state.period === 'c') {
       var from = document.getElementById('dFrom').value;
       var to = document.getElementById('dTo').value;
@@ -390,13 +333,92 @@
     render();
   });
 
-  var rz;
-  window.addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(render, 150); });
-
+  window.MIQReportInit = function () {
+    reportReady = true;
+    render();
   MIQCharts.observeSize(document.getElementById('chart'), function(){renderChart(build(state.metric));});
-  render();
+  };
 })();
 </script>
-<script src="../_shared/report-enhancements.js?v=20260903-status-local-company&amp;rev=a003bd77559b"></script>
+<script defer blocking="render" src="../_shared/report-enhancements.js?rev=62600e5241f4"></script>
+</head>
+<body data-current-bootstrap="ready" data-period-presets="dwm" class="miq-current-shell miq-content-system miq-report-enhanced" data-gnb="rpt" data-sub="rptstatus" data-variant="tobe" data-base="../">
+
+<div id="gnb"></div>
+
+<div class="layout">
+  <aside class="lnb" aria-label="리포트 메뉴"></aside>
+  <main class="main">
+    <div class="page-head">
+      <div class="page-head__title">업체별 현황</div>
+      <div class="page-head__bc">
+        리포트 &gt; 업체별 현황 ·
+        <a href="../Report%20Comparison/report-comparison-tobe.html">업체별 비교</a> ·
+        <a href="../Report%20Heatmap/report-heatmap-tobe.html">업체별 히트맵</a>
+      </div>
+    </div>
+
+    <!-- 기간 필터: 업체 선택은 업체별 비교와 같은 본문 보조 행으로 이동한다. -->
+    <div class="filter-bar">
+      <span class="co-k">업체</span>
+      <select class="inp inp--sm co-sel" id="coSel" aria-label="업체 선택"></select>
+      <div class="grow"></div>
+      <span class="period-tabs" id="periodTabs">
+        <button type="button" data-period="d">일</button>
+        <button type="button" data-period="w">주</button>
+        <button class="active" type="button" data-period="m">월</button>
+        </span>
+      <input class="inp inp--sm" id="dFrom" type="date" value="2026-08-01" aria-label="조회 시작일"/>
+      <span class="sep">~</span>
+      <input class="inp inp--sm" id="dTo" type="date" value="2026-08-31" aria-label="조회 종료일"/>
+      <button class="btn btn--sm btn--dark" type="button" id="btnSearch">조회</button>
+    </div>
+
+    <!-- ═══════ ① 지표 6종 (이전 기간 대비) ═══════ -->
+    <div class="kpi-grid" id="kpiGrid"></div>
+
+    <!-- ═══════ ② 지표별 일자 추이 ═══════ -->
+    <div class="metric-tabs" id="metricTabs"></div>
+    <div class="chart-box">
+      <div class="chart-head">
+        <span class="chart-head__name" id="chartName">운영효율</span>
+        <span class="lg">
+          <span class="li"><span class="sw" style="background:#e3e5e8"></span><span data-lbl-prev>전월</span></span>
+          <span class="li"><span class="sw" style="background:#ff3600"></span><span data-lbl-cur>금월</span></span>
+        </span>
+        <span class="chart-hint" id="chartHint"></span>
+      </div>
+      <div class="chart-wrap" id="chartWrap">
+        <svg class="bar-chart" viewBox="0 0 960 340" role="img" aria-label="지표 일자별 추이" id="chart"></svg>
+        <div class="tip-box" id="tip"></div>
+      </div>
+    </div>
+
+    <div class="note">
+      <b>TO-BE 개선 사항</b>
+      <ul>
+        <li><span class="tag-new">개선</span> <b>본문 업체 선택</b> — 전역 조회 대상을 제거하고 기간 조회 바로 아래에서 단일 업체를 선택합니다.</li>
+        <li><span class="tag-asis">삭제</span> <b>지표 카드 하단 표 제거</b> — 카드와 같은 값을 반복하던 전월/금월 표를 없애고, 세부 수치는 차트 <b>hover</b>로 확인합니다. 운영률·배터리 충전 횟수처럼 해석이 모호한 항목도 함께 정리했습니다.</li>
+        <li><span class="tag-new">신규</span> <b>제공 지표를 6종으로 확정</b> — 운영효율 · 충격횟수 · 연료소비량 · 배터리 충전량 · 운행거리 · 운행시간.</li>
+        <li><span class="tag-new">신규</span> <b>카드 값과 차트 값의 정합</b> — 카드 수치는 일자별 값의 합계(충격 · 거리 · 시간) 또는 평균(효율 · 연비 · 충전량)으로 계산해 차트와 어긋나지 않습니다.</li>
+        <li><span class="tag-new">신규</span> <b>월 조회에서 가로 스크롤 제거</b> — 막대 폭을 좁혀 31일을 화면 너비에 맞추고, <b>막대 위 수치 라벨 대신 hover 툴팁</b>으로 전월 · 금월 · 증감을 보여줍니다.</li>
+        <li><span class="tag-keep">유지</span> 업체 선택, 우측 상단 <b>일 / 주 / 월</b> 기간 조회, 지표 6종 탭 전환, 전월 대비 증감 배지.</li>
+      </ul>
+    </div>
+  </main>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
 </body>
 </html>

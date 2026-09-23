@@ -135,12 +135,6 @@ body[data-account-page] *,
 .aae-textarea { min-height: 72px; height: auto; padding: 10px 12px; resize: vertical; line-height: 20px; }
 .aae-control::placeholder,
 .aae-textarea::placeholder { color: #999; }
-.aae-control:focus,
-.aae-select:focus,
-.aae-textarea:focus {
-  border-color: var(--aae-brand-dark);
-  box-shadow: 0 0 0 2px rgba(255, 54, 0, .12);
-}
 .aae-control[readonly],
 .aae-control:disabled,
 .aae-select:disabled {

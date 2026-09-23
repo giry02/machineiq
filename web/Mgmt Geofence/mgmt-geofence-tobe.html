@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
+<head><script src="../_shared/demo-clock.js?rev=34d9d133492b"></script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>지오펜스 관리 | MACHINE IQ</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
-<link rel="stylesheet" href="../_shared/mockup.css?rev=d24057a14011"/>
+<link rel="stylesheet" href="../_shared/offline-fonts.css?rev=b405f97e6cf9"><script type="module" blocking="render">await document.fonts.load('400 14px "Noto Sans KR"');await document.fonts.ready;</script>
+<link rel="stylesheet" href="../_shared/mockup.css?rev=bed1f0069135"/>
 <style>
 .geo-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}
 .map-h{height:500px}
@@ -23,30 +23,25 @@
 .danger-box{background:#ffe3e3;border:1px solid #ffc9c9;border-radius:6px;padding:12px 14px;font-size:12px;color:#c92a2a;line-height:1.7}
 .zone-hint{position:absolute;left:12px;bottom:12px;background:rgba(255,255,255,.94);border:1px solid #e0e0e0;border-radius:4px;padding:6px 10px;font-size:11px;color:#666;z-index:5}
 </style>
-<link rel="stylesheet" href="../_shared/mgmt-secondary-enhancements.css?rev=8a2682948c00"/>
+<link rel="stylesheet" href="../_shared/mgmt-secondary-enhancements.css?rev=3bde1ff22c5d"/>
+<link rel="stylesheet" href="../_shared/form-controls.css?rev=6fda272acdcc"/>
+<link rel="stylesheet" href="../_shared/list-pagination.css?rev=0069e48c1009">
+<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?rev=bb6d53aabb78"/>
+<link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?rev=1cffa21a9777"/>
+<style>body.miq-current-shell>#gnb{min-height:64px}</style>
+<script defer blocking="render" src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script>
+<script defer blocking="render" src="../_shared/common-logic.js?rev=efb7e741cd7b"></script>
+<script defer blocking="render" src="../_shared/list-pagination.js?rev=33207bf33d11"></script>
+<script defer blocking="render" src="../_shared/nav.js?rev=049a18c69072"></script>
+<script defer blocking="render" src="../_shared/mgmt-secondary-enhancements.js?rev=aecc53f8567f"></script>
 </head>
-<body data-gnb="mgmt" data-sub="geofence" data-variant="tobe" data-base="../">
+<body class="miq-current-shell" data-current-bootstrap="ready" data-gnb="mgmt" data-sub="geofence" data-variant="tobe" data-base="../">
 
 <div id="gnb"></div>
 
 <div class="layout">
   <!-- ═══════ LNB : 관리기능 메뉴 ═══════ -->
-  <aside class="lnb">
-    <div class="lnb__company">(주)세종물류중부지점</div>
-    <div class="lnb__search">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-      <input placeholder="관리 메뉴 검색"/>
-    </div>
-    <div class="lnb__group-title">관리기능 <span>▲</span></div>
-    <a data-label="사용자" class="lnb__item" href="../Mgmt%20User/mgmt-user-tobe.html">사용자 <span class="cnt">10</span></a>
-    <a data-label="업체" class="lnb__item" href="../Mgmt%20Company/mgmt-company-tobe.html">업체 <span class="cnt">5</span></a>
-    <a data-label="그룹" class="lnb__item" href="../Mgmt%20Group/mgmt-group-tobe.html">그룹 <span class="cnt">4</span></a>
-    <a data-label="Geofence" class="lnb__item active" href="mgmt-geofence-tobe.html">Geofence <span class="cnt">7</span></a>
-    <a data-label="차량" class="lnb__item" href="../Mgmt%20Vehicle/mgmt-vehicle-tobe.html">차량 <span class="cnt">42</span></a>
-    <a data-label="계정신청관리" class="lnb__item" href="../Mgmt%20Account%20Request/mgmt-account-request-tobe.html">계정신청관리 <span class="cnt">4</span></a>
-    <a data-label="차량신청관리" class="lnb__item" href="../Mgmt%20Vehicle%20Request/mgmt-vehicle-request-tobe.html">차량신청관리 <span class="cnt">3</span></a>
-    <div class="lnb__hint">Geofence는 <b>그룹 단위</b>로 등록됩니다. 좌표는 <b>WKT + SRID 3857</b>로 저장됩니다.</div>
-  </aside>
+  <aside class="lnb"></aside>
 
   <!-- ═══════ MAIN ═══════ -->
   <main class="main">
@@ -337,9 +332,10 @@
   </div>
 </div>
 
-<script src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script>
-<script src="../_shared/common-logic.js?v=20260907-common-logic-r42&amp;rev=fe89537280cd"></script>
-<script src="../_shared/nav.js?v=20260907-common-logic-r42&amp;rev=10146ec619b0"></script>
-<script src="../_shared/mgmt-secondary-enhancements.js?rev=aecc53f8567f"></script>
+
+
+
+
+
 </body>
 </html>

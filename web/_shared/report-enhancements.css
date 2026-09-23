@@ -73,7 +73,7 @@ body.miq-report-enhanced .miq-report-company-controls select {
   min-height: 34px;
   border-color: var(--report-line);
   color: var(--report-charcoal);
-  font-size: 12px;
+  font-size: 13px;
 }
 body.miq-report-enhanced .miq-report-company-controls.is-single select {
   width: auto;
@@ -296,7 +296,7 @@ body.miq-report-enhanced .report-feedback.is-error {
   font-weight: 600;
 }
 
-body.miq-report-enhanced :is(button,input,select,[tabindex]):focus-visible {
+body.miq-report-enhanced :is(button,input,select,[tabindex]):focus-visible:not(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),select,textarea) {
   outline: 2px solid var(--report-brand);
   outline-offset: 2px;
 }

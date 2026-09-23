@@ -102,7 +102,7 @@
       if (!row.date) return '해당 일자 없음';
       if (value(row) === null) return '수집 전';
       if (key === 'hour') return Math.floor(row.minute / 60) + 'H ' + String(row.minute % 60).padStart(2, '0') + 'M';
-      return value(row).toLocaleString('ko-KR', { maximumFractionDigits: key === 'eff' ? 1 : 0 }) + METRICS[key].unit;
+      return value(row).toLocaleString('ko-KR', { maximumFractionDigits: 0 }) + METRICS[key].unit;
     }
     function actualDate(row) { return row.date ? row.date + (row.hour !== null ? ' ' + String(row.hour).padStart(2, '0') + '시' : '') : '해당 일자 없음'; }
     function draw() {
@@ -113,14 +113,15 @@
       var values = data.current.concat(data.previous).map(value).filter(function (v) { return v !== null; });
       var metric = METRICS[key];
       currentLegend.textContent = range.period === 'm' ? '선택 월' : '선택 기간';
-      unit.textContent = '단위: ' + metric.unit + ' · 목업 데이터';
+      unit.textContent = '단위: ' + metric.unit;
       empty.hidden = values.length > 0;
-      svg.hidden = !values.length;
+      // SVGElement does not reflect a .hidden property into the hidden attribute.
+      svg.toggleAttribute('hidden', !values.length);
       if (!values.length) { svg.innerHTML = ''; return; }
       var width = Math.max(640, Math.round(svg.getBoundingClientRect().width) || 960);
       var left = 48, right = width - 14, top = 20, bottom = 282, height = 330;
       svg.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
-      svg.setAttribute('aria-label', metric.label + ', ' + range.from + '부터 ' + range.to + '까지 전월 같은 일자 비교, 목업 데이터');
+      svg.setAttribute('aria-label', metric.label + ', ' + range.from + '부터 ' + range.to + '까지 전월 같은 일자 비교');
       var maximum = key === 'eff' ? 100 : Math.max.apply(null, values);
       var step = key === 'eff' ? 20 : .1;
       if (key === 'hour') {
@@ -155,7 +156,7 @@
       axis.labels.forEach(function (label, index) {
         var xx = number(x(index)), band = axis.n === 1 ? right - left : (right - left) / (axis.n - 1);
         var hitStart = Math.max(left, xx - band / 2), hitEnd = Math.min(right, xx + band / 2);
-        var tip = metric.label + ' · 목업 데이터\n' + currentLegend.textContent + ' ' + actualDate(data.current[index]) + ': ' + formatted(data.current[index])
+        var tip = metric.label + '\n' + currentLegend.textContent + ' ' + actualDate(data.current[index]) + ': ' + formatted(data.current[index])
           + '\n전월 ' + actualDate(data.previous[index]) + ': ' + formatted(data.previous[index]);
         html += '<g class="col history-point" data-history-index="' + index + '" ' + charts.tipAttrs(tip) + '>'
           + '<line class="vline" x1="' + xx + '" y1="' + top + '" x2="' + xx + '" y2="' + bottom + '"/>'

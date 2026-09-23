@@ -4,7 +4,7 @@
 .dashboard-company-field{display:flex;align-items:center;gap:8px;color:var(--bobcat-dark);font-size:13px;font-weight:500}
 .dashboard-company-filters input{height:40px;width:220px;padding:0 10px;border:1px solid var(--bobcat-steel);border-radius:4px;background:#fff;color:var(--bobcat-dark);font:inherit;font-size:13px}
 .dashboard-company-filters button{height:40px;padding:0 16px;border:1px solid var(--bobcat-steel);border-radius:4px;background:#fff;color:var(--bobcat-dark);font-size:13px}
-.dashboard-company-filters .dashboard-company-search{border-color:var(--bobcat-red-hover);background:var(--bobcat-red-hover);color:#fff;font-weight:700}
+.dashboard-company-filters .dashboard-company-search{border-color:var(--bobcat-red);background:var(--bobcat-red);color:#fff;font-weight:700}
 .dashboard-company-filters .dashboard-company-search:disabled{opacity:.45;cursor:default}
 .dashboard-company-input{position:relative}
 .dashboard-company-suggestions{position:absolute;top:calc(100% + 4px);left:0;right:0;max-height:260px;overflow-y:auto;z-index:30;border:1px solid var(--bobcat-steel);border-radius:4px;background:#fff;box-shadow:0 3px 10px #00000012}
@@ -26,5 +26,8 @@
 .dashboard-company-pager button.on{background:var(--bobcat-black);color:#fff;border-color:var(--bobcat-black);font-weight:700}
 .dashboard-company-pager button:disabled{cursor:default;opacity:.4}
 .dashboard-company-empty{height:100px!important;text-align:center!important;color:var(--bobcat-muted)}
-.dashboard-company-filters :focus-visible,.dashboard-company-pager :focus-visible{outline:2px solid var(--bobcat-red);outline-offset:2px}
+.dashboard-company-filters :focus-visible:not(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),select,textarea),.dashboard-company-pager :focus-visible{outline:2px solid var(--bobcat-red);outline-offset:2px}
 @media(max-width:760px){.dashboard-company-heading{row-gap:8px}.dashboard-company-filters{gap:8px;margin-left:0;padding-bottom:8px}.dashboard-company-filters input{width:180px}.dashboard-company-footer{flex-wrap:wrap;justify-content:center}}
+
+.dashboard-company-filters .dashboard-company-search:not(:disabled):hover,.dashboard-company-filters .dashboard-company-search:not(:disabled):focus-visible{border-color:#cc2b00;background:var(--bobcat-red-hover)}
+.dashboard-company-filters .dashboard-company-search:not(:disabled):active{border-color:#bf2900;background:var(--bobcat-red-active)}

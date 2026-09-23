@@ -1,8 +1,11 @@
 #googleMapCanvas{position:absolute;inset:0;width:100%;height:100%}
 #googleMapCanvas iframe{display:block;width:100%;height:100%;border:0}
+.miq-route-preview{position:absolute;inset:0;background:#fff;padding:20px 24px;box-sizing:border-box;font-size:13px;color:#333}
+.miq-route-preview__info{margin-top:8px;font-size:12px;color:#768396;min-height:18px}
+.miq-route-preview svg{display:block;width:100%;height:calc(100% - 55px)}
 #map[data-map-provider="google-embed"]>.map-type,#map[data-map-provider="google-embed"]>.map-ctl{display:none}
 #map[data-map-provider="google-api"]>#pop{display:none}
-#map #markers,#map #pop{display:none}
+#map #pop{display:none}
 #map[data-map-provider="google-embed"] #pop{display:block;position:absolute;right:12px;top:65px;z-index:6}
 #map[data-map-provider="google-embed"] #pop .map-pop{position:relative;left:auto!important;top:auto!important;transform:none!important}
 #map[data-map-mode="route"]>#pop{display:none}
@@ -15,3 +18,27 @@
 .mm-route-legend i{width:9px;height:9px;display:inline-block;border-radius:50%}
 .mm-route-legend .start{background:#158737}.mm-route-legend .end{background:#ff3600}
 .map-pop__route{border:0;background:none;cursor:pointer;font-family:inherit;padding:0;margin-left:14px}
+/* Map-only presentation follows the supplied dealer DashboardMap / EnergyIcon. */
+#map .cluster{width:42px;height:42px;border:2px solid #f1f1f1;background:rgba(138,170,190,.7);font-size:13px;font-weight:500;box-shadow:none}
+.miq-energy-pin{display:block;width:36px;height:46px}
+.miq-energy-pin>svg{display:block;width:100%;height:100%}
+.miq-energy-pin .energy-icon__marker,.miq-energy-pin .energy-icon__car{fill:#00b6b6}
+.miq-energy-pin.off .energy-icon__marker,.miq-energy-pin.off .energy-icon__car{fill:#bebebe}
+.miq-energy-pin.bad .energy-icon__marker,.miq-energy-pin.bad .energy-icon__car{fill:#ff3600}
+.miq-energy-pin.unknown .energy-icon__marker,.miq-energy-pin.unknown .energy-icon__car{fill:#fff}
+#map .marker.on .miq-energy-pin{filter:drop-shadow(0 0 3px #ff3600)}
+.st-lg .miq-energy-pin{width:19px;height:24px}
+.miq-map-summary{position:absolute;right:50px;bottom:100px;z-index:4;display:grid;grid-template-columns:repeat(2,110px);gap:8px;pointer-events:none}
+.miq-map-count{height:120px;overflow:hidden;display:flex;flex-direction:column;border:1px solid #333;border-radius:8px;background:#fff;text-align:center}
+.miq-map-count:first-child,.miq-map-count:last-child{grid-column:2}
+.miq-map-count>span{display:flex;align-items:center;justify-content:center;height:45px;background:#ff9f0a;color:#fff;font-size:14px;font-weight:600}
+.miq-map-count.is-supply>span{background:#158737}
+.miq-map-count>strong{display:flex;align-items:center;justify-content:center;flex:1;gap:3px;color:#111;font-size:28px}
+.miq-map-count b{font-weight:700}.miq-map-count small{font-size:12px;font-weight:400;color:#777}
+.miq-map-fullscreen{position:absolute;right:85px;bottom:20px;z-index:5;background:#111;color:#fff;border:0;border-radius:3px;min-height:40px;padding:0 14px;font:600 14px 'Noto Sans KR',sans-serif;cursor:pointer}
+#map>.map-type{top:10px;left:10px;z-index:5}
+#map>.map-ctl{top:auto;right:10px;bottom:10px;gap:0;z-index:5}
+#map:fullscreen{width:100vw;height:100vh;margin:0;border-radius:0}
+#map[data-map-mode="route"]>.miq-map-summary{display:none}
+#map[data-map-provider="loading"]>.map-type,#map[data-map-provider="loading"]>.map-ctl{display:none}
+@media(max-width:1100px){.miq-map-summary{right:50px;grid-template-columns:repeat(2,90px)}.miq-map-count{height:98px}.miq-map-count>span{height:36px}.miq-map-count>strong{font-size:24px}}

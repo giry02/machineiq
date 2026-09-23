@@ -25,14 +25,15 @@
   };
   var targetPolicies = {
     internal:       { hideCompany: false, hideGroup: true,  companyId: '', companyIds: null },
-    dealer_owner:   { hideCompany: false, hideGroup: true,  companyId: '', companyIds: null },
-    dealer_staff:   { hideCompany: false, hideGroup: true,  companyId: '', companyIds: ['1933', '3703'] },
+    dealer_owner:   { hideCompany: false, hideGroup: true,  companyId: '', companyIds: ["1933","12894","33767","364","3703","demo-company-006","demo-company-007","demo-company-008","demo-company-009","demo-company-010","demo-company-011","demo-company-012"] },
+    dealer_staff:   { hideCompany: false, hideGroup: true,  companyId: '', companyIds: ["1933","12894","33767","364","3703","demo-company-006","demo-company-007","demo-company-008","demo-company-009","demo-company-010","demo-company-011","demo-company-012"] },
     customer_owner: { hideCompany: true,  hideGroup: false, companyId: '1933', companyIds: ['1933'] },
     customer_staff: { hideCompany: true,  hideGroup: true,  companyId: '1933', companyIds: ['1933'] }
   };
   function resolveRole(value) { return codes.indexOf(value) > -1 ? value : 'customer_owner'; }
   function isDealer(role) { return role === 'dealer_owner' || role === 'dealer_staff'; }
   function isCustomer(role) { return role === 'customer_owner' || role === 'customer_staff'; }
+  function canUseFavorites(role) { return isDealer(role) || isCustomer(role); }
   function roleLabel(role) { return roles[codes.indexOf(resolveRole(role))].label; }
   function targetPolicy(role) {
     var policy = targetPolicies[resolveRole(role)];
@@ -125,8 +126,12 @@
       '../Vehicle%20Summary/vehicle-summary-tobe-3.html',
       '../Vehicle%20Summary/vehicle-summary-tobe-v2.html',
       '../Vehicle%20Summary/vehicle-summary-tobe-option-b-sort.html',
-      '../Vehicle%20Summary/vehicle-summary-tobe-option-c-reference-sort.html'];
-    if (isDealer(role)) paths.push('../Interest%20Vehicles/interest-vehicles-status-tobe.html');
+      '../Vehicle%20Summary/vehicle-summary-tobe-option-c-reference-sort.html',
+      '../Service/service-tobe-v2.html',
+      '../Service/service-maintenance-tobe.html',
+      '../Service/service-supply-tobe.html',
+      '../Service/service-error-tobe.html'];
+    if (canUseFavorites(role)) paths.push('../Interest%20Vehicles/interest-vehicles-status-tobe.html');
     try {
       var candidate = new URL(saved || '', base);
       if (saved && candidate.origin === destination.origin && paths.some(function (path) {
@@ -174,10 +179,21 @@
     return state;
   }
 
+  // Display only. Never feed rounded labels back into metrics, thresholds or coordinates.
+  function integer(value, grouped) {
+    if (value === null || value === undefined || value === '' || typeof value === 'boolean') return '-';
+    var numeric = Number(value);
+    if (!Number.isFinite(numeric)) return '-';
+    var rounded = Math.round(numeric);
+    if (Object.is(rounded, -0)) rounded = 0;
+    return grouped ? rounded.toLocaleString('ko-KR', { maximumFractionDigits: 0 }) : String(rounded);
+  }
+
   return {
+    numbers: { integer: integer },
     roles: {
       list: function () { return roles.map(function (role) { return { code: role.code, label: role.label }; }); },
-      resolve: resolveRole, label: roleLabel, isDealer: isDealer, isCustomer: isCustomer,
+      resolve: resolveRole, label: roleLabel, isDealer: isDealer, isCustomer: isCustomer, canUseFavorites: canUseFavorites,
       hasCapability: function (role, capability) { return codes.indexOf(role) > -1 && (!capability || capabilities[role].indexOf(capability) > -1); },
       targetPolicy: targetPolicy,
       filterVehicles: filterVehicles,

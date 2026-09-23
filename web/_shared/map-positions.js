@@ -238,7 +238,7 @@ window.MIQMapPositions = [
     "vin": "FBA32_DEMO_CS01",
     "lat": 37.035646,
     "lng": 126.787038,
-    "address": "경기도 화성시 우정읍 이화리 (시연 위치 1)",
+    "address": "경기도 화성시 우정읍 이화리",
     "lastDatetime": "2026-09-10 14:00:00",
     "demo": true
   },
@@ -246,7 +246,7 @@ window.MIQMapPositions = [
     "vin": "FBA18_DEMO_CS02",
     "lat": 37.035246,
     "lng": 126.787238,
-    "address": "경기도 화성시 우정읍 이화리 (시연 위치 2)",
+    "address": "경기도 화성시 우정읍 이화리",
     "lastDatetime": "2026-09-10 14:00:00",
     "demo": true
   },
@@ -254,7 +254,7 @@ window.MIQMapPositions = [
     "vin": "FBD30_DEMO_CS03",
     "lat": 37.035446,
     "lng": 126.787538,
-    "address": "경기도 화성시 우정읍 이화리 (시연 위치 3)",
+    "address": "경기도 화성시 우정읍 이화리",
     "lastDatetime": "2026-09-10 14:00:00",
     "demo": true
   }

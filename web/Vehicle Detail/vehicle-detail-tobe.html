@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
+<head><script src="../_shared/demo-clock.js?rev=34d9d133492b"></script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>차량 상세 · MACHINE IQ</title>
 <link rel="icon" type="image/x-icon" href="../_shared/favicon.ico"/>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
+<link rel="stylesheet" href="../_shared/offline-fonts.css?rev=b405f97e6cf9"><script type="module" blocking="render">await document.fonts.load('400 14px "Noto Sans KR"');await document.fonts.ready;</script>
 <link rel="stylesheet" href="../_shared/gnb.css?rev=b9f0ddfcf14c"/>
 <link rel="stylesheet" href="../_shared/chart-common.css?rev=fc1c23dcf6af"/>
-<link rel="stylesheet" href="../_shared/vehicle-history-chart.css?rev=8955fd2cacd6"/>
+<link rel="stylesheet" href="../_shared/vehicle-history-chart.css?rev=2f070e3ba21f"/>
+<link rel="stylesheet" href="../_shared/service-enhancements.css?rev=fb05756ae59b"/>
+<link rel="stylesheet" href="../_shared/vehicle-detail-errors.css?rev=73a4361e7d20"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Noto Sans KR',sans-serif;font-size:14px;background:#f4f5f7;color:#1a1a1a}
@@ -38,8 +40,7 @@ svg{display:block}
 .breadcrumb{display:flex;justify-content:flex-end;gap:4px;font-size:12px;color:#999}
 /* 숨은 상세 화면 : 요약정보에서만 진입 */
 .detail-nav{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
-.back-link{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:#ff3600;border:1px solid #ffd0c4;background:#fff5f3;border-radius:4px;padding:5px 12px;text-decoration:none}
-.back-link:hover{background:#ffe9e3}
+/* Previous-list button uses the shared current-shell.css rule. */
 .hidden-note{font-size:11px;color:#999}
 .detail-nav .breadcrumb{margin-left:auto;margin-bottom:0}
 .detail-nav .breadcrumb a{color:#999;text-decoration:none}
@@ -51,10 +52,10 @@ svg{display:block}
 .veh-head{display:flex;align-items:flex-start;gap:24px;padding:20px 26px;position:relative}
 .veh-head__body{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px}
 
-/* 1번째 줄: 모델/차대번호/통신/잔여배터리 (Vehicle Summary 1열) */
+/* 1번째 줄: 차대번호/모델/통신/잔여배터리 (차대번호 우선) */
 .v-row1{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.v-model{font-size:20px;font-weight:700}
-.v-vin{font-size:14px;color:#888;font-weight:500}
+.v-vin{font-size:20px;font-weight:700}
+.v-model{font-size:14px;color:#888;font-weight:500}
 .v-row1 .spacer{flex:1}
 .conn{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px}
 .conn.on{background:#e6f7ec;color:#2b8a3e}
@@ -208,21 +209,50 @@ a.metric:hover .metric__go{color:#ff3600}
 .supply-item__edit{border:none;background:none;font-family:inherit;padding:0}
 .supply-item__edit:hover{color:#ff3600}
 </style>
+<link rel="stylesheet" href="../_shared/form-controls.css?rev=6fda272acdcc"/>
+<link rel="stylesheet" href="../_shared/list-pagination.css?rev=0069e48c1009">
+<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?rev=bb6d53aabb78"/>
+<link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?rev=1cffa21a9777"/>
+<style>body.miq-current-shell>#gnb{min-height:64px}</style>
+<script defer blocking="render" src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script>
+<script defer blocking="render" src="../_shared/common-logic.js?rev=efb7e741cd7b"></script>
+<script type="module" blocking="render">
+(function () {
+  var query = new URLSearchParams(location.search), back = document.querySelector('.back-link');
+  back.href = MIQCommon.navigation.listReturnHref(query.get('returnTo'), '../Vehicle%20Summary/vehicle-summary-tobe-3.html', query.get('role'), location.href);
+  back.removeAttribute('aria-disabled');
+})();
+</script>
+<script defer blocking="render" src="../_shared/chart-common.js?rev=15c74452f805"></script>
+<script defer blocking="render" src="../_shared/list-pagination.js?rev=33207bf33d11"></script>
+<script defer blocking="render" src="../_mock-data/generated/fleet.generated.js?rev=309d68875499"></script>
+<script defer blocking="render" src="../_shared/fleet.js?rev=dfdf98be0a95"></script>
+<script defer blocking="render" src="../_shared/nav.js?rev=049a18c69072"></script>
+<script defer blocking="render" src="../_shared/lnb-tree.js?rev=fb81b76cb736"></script>
+<script defer blocking="render" src="../_shared/modals.js?rev=171c0ca12a0d"></script>
+<script defer blocking="render" src="../_shared/service-records.js?rev=4e2247047570"></script>
+<script defer blocking="render" src="../_shared/service-demo-data.js?rev=dcd01d3f4b36"></script>
+<script defer blocking="render" src="../_shared/summary-row-model.js?rev=8ec5759511a3"></script>
+<script defer blocking="render" src="../_shared/vehicle-detail-supplies.js?rev=e5920f028d5e"></script>
+<script defer blocking="render" src="../_shared/service-error-view.js?rev=f03971fdb153"></script>
+<script defer blocking="render" src="../_shared/vehicle-detail-errors.js?rev=275576bd4625"></script>
+<script defer blocking="render" src="../_shared/vehicle-detail-flow.js?rev=8bdad5758543"></script>
+<script defer blocking="render" src="../_shared/vehicle-history-chart.js?rev=5a108790074a"></script>
+<script defer blocking="render" src="../_shared/gauge-chart-details.js?rev=cad4ee666bfa"></script>
 </head>
-<body data-period-presets="dwm" data-gnb="anlz" data-sub="detail" data-variant="tobe" data-base="../">
+<body class="miq-current-shell" data-current-bootstrap="ready" data-period-presets="dwm" data-gnb="anlz" data-sub="detail" data-variant="tobe" data-base="../">
 
 <!-- GNB -->
 <div id="gnb"></div>
 
 <div class="layout">
-  <!-- LNB : 공용 컴포넌트(_shared/lnb-tree.js) — 그룹별 · 분류별 · 차량 -->
-  <aside class="lnb" data-lnb-tree data-vin="FBA32_224250271"
-         data-hint="그룹·분류로 목록을 좁힌 뒤 차량을 고르면 <b>선택 차량의 상세 화면</b>으로 전환됩니다."></aside>
+  <!-- Current navigation is initialized by nav.js. -->
+  <aside class="lnb" data-lnb-tree></aside>
 
   <!-- MAIN -->
   <main class="main">
     <div class="detail-nav">
-      <a class="back-link" href="../Vehicle%20Summary/vehicle-summary-tobe-3.html">‹ 요약정보 목록</a>
+      <a class="back-link" aria-disabled="true">‹ 이전 목록</a>
       <span class="hidden-note">운행이력 &gt; 요약정보에서 차량을 선택해 진입하는 <b>숨은 상세 화면</b>입니다 (GNB 직접 노출 없음)</span>
       <div class="breadcrumb"><a href="../Vehicle%20Summary/vehicle-summary-tobe-3.html">운행이력 &gt; 요약정보</a> &gt; 차량 상세</div>
     </div>
@@ -231,10 +261,10 @@ a.metric:hover .metric__go{color:#ff3600}
     <div class="card">
       <div class="veh-head">
         <div class="veh-head__body">
-          <!-- 1열: 모델/차대번호/통신/잔여배터리 -->
+          <!-- 1열: 차대번호/모델/통신/잔여배터리 -->
           <div class="v-row1">
-            <span class="v-model">B30S-7</span>
             <span class="v-vin">FBA32_224250271</span>
+            <span class="v-model">B30S-7</span>
             <span class="spacer"></span>
             <span class="conn on"><span class="dot"></span>연결됨</span>
             <span class="batt-mini">
@@ -369,22 +399,38 @@ a.metric:hover .metric__go{color:#ff3600}
       </div>
     </div>
 
+    <section class="card vehicle-errors" id="vehicleErrors" aria-labelledby="vehicleErrorsTitle">
+      <div class="sec-head"><h2 class="sec-title" id="vehicleErrorsTitle">차량 에러</h2><span class="vehicle-errors-count">총 <b data-error-count>0</b>건</span></div>
+      <div class="table-wrap"><table aria-label="선택 차량의 조회 기간별 에러"><colgroup><col style="width:10%"/><col style="width:10%"/><col style="width:20%"/><col style="width:30%"/><col style="width:22%"/><col style="width:8%"/></colgroup><thead><tr>
+<th scope="col" data-error-sort="errorState"><button type="button" data-error-sort-button>현재/과거 <span class="sort" aria-hidden="true">↕</span></button></th><th scope="col" data-error-sort="category"><button type="button" data-error-sort-button>구분 <span class="sort" aria-hidden="true">↕</span></button></th><th scope="col" data-error-sort="code"><button type="button" data-error-sort-button>에러코드 <small>코드 / SPN / FMI</small> <span class="sort" aria-hidden="true">↕</span></button></th><th scope="col" data-error-sort="description"><button type="button" data-error-sort-button>설명 <span class="sort" aria-hidden="true">↕</span></button></th><th scope="col" data-error-sort="dateTime"><button type="button" data-error-sort-button>발생 / 완료 일시 <span class="sort" aria-hidden="true">↕</span></button></th><th scope="col">조치</th></tr></thead><tbody><tr><td colspan="6" class="vehicle-errors-empty">차량 에러를 불러오는 중입니다.</td></tr></tbody></table></div>
+    </section>
+
   </main>
 </div>
 
-<script src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script>
-<script src="../_shared/common-logic.js?v=20260907-common-logic-r42&amp;rev=fe89537280cd"></script>
-<script src="../_shared/chart-common.js?rev=26b243959957"></script>
-<script src="../_shared/nav.js?v=20260907-common-logic-r42&amp;rev=10146ec619b0"></script>
-<script src="../_mock-data/generated/fleet.generated.js?v=20260906-json-r1&amp;rev=f69042cf6b57"></script>
-<script src="../_shared/fleet.js?v=20260906-json-r1&amp;rev=9bc7caf2ff93"></script>
-<script src="../_shared/lnb-tree.js?v=20260905-company-group-r3&amp;rev=11a580f70bf0"></script>
-<script src="../_shared/modals.js?rev=171c0ca12a0d"></script>
-<script src="../_shared/service-records.js?rev=eb2e027474df"></script>
-<script src="../_shared/service-demo-data.js?rev=695aeb6410b9"></script>
-<script src="../_shared/summary-row-model.js?rev=765d8e3e94af"></script>
-<script src="../_shared/vehicle-detail-flow.js?v=20260905-scope-r2&amp;rev=9c439812fc5d"></script>
-<script src="../_shared/vehicle-history-chart.js?rev=2afb5d466b31"></script>
-<script src="../_shared/gauge-chart-details.js?rev=cad4ee666bfa"></script>
+<dialog class="service-dialog" id="vehicleErrorDocument" aria-labelledby="vehicleErrorDocumentTitle" data-screen-id="LQ-SVC-004-P01">
+<div class="service-dialog__form"><header class="service-dialog__head"><h2 id="vehicleErrorDocumentTitle">에러 조치 정보</h2><button type="button" class="service-dialog__close" data-error-close aria-label="닫기">×</button></header><div class="service-dialog__body"></div><footer class="service-dialog__foot"><button type="button" class="service-dialog__button" data-error-close>닫기</button><button type="button" class="service-dialog__button primary" data-error-print>인쇄 / PDF 저장</button></footer></div>
+</dialog>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </body>
 </html>

@@ -31,15 +31,18 @@
     records.unshift({ id: uid('LOG'), date: now(), user: '운영 담당자', role: 'ADMIN', site: 'ADMIN', menu: target, action: action, result: '성공', ip: '현재 브라우저', detail: target + ' ' + action + ' 완료' });
     api.write(KEYS.history, records.slice(0, 500));
   }
-  function filters(html) { return '<form class="ops-filters">' + html + '<button type="submit" class="btn btn--pri">조회</button><button type="button" class="btn" data-reset>초기화</button></form>'; }
-  function bindFilters(host, commit, reset) {
+  function filters(html) { return '<form class="ops-filters">' + html + '<button type="submit" class="btn-search">조회</button></form>'; }
+  function bindFilters(host, commit) {
     var form = host.querySelector('.ops-filters');
     form.addEventListener('submit', function (event) { event.preventDefault(); commit(form); });
-    form.querySelector('[data-reset]').addEventListener('click', reset);
   }
   function actionHost(host, handler) { host.addEventListener('click', function (event) { var node = event.target.closest('[data-ops-action]'); if (node && host.contains(node)) handler(node.dataset.opsAction); }); }
   function tool(action, label, primary) { return button(action, label, primary).replace('data-action=', 'data-ops-action='); }
-  function grid(host, config) { api.grid(host, Object.assign({ pageSize: 15 }, config)); }
+  function grid(host, config) {
+    var header = host.previousElementSibling;
+    while (header && header.matches('input[hidden]')) header = header.previousElementSibling;
+    api.grid(host, Object.assign({ pageSize: 15, actionHeader: header && header.matches('.list-head') ? header : null }, config));
+  }
 
   function codeSeed() {
     var groups = [
@@ -51,7 +54,7 @@
       { id: 'LEGACY', name: '이전 분류', en: 'Previous category', ja: '旧区分', order: 6, active: false }
     ];
     var seeds = {
-      FUEL: [['LI', '리튬', 'Lithium', 'リチウム'], ['PB', '납산', 'Lead-acid', '鉛蓄電池'], ['DI', '디젤', 'Diesel', 'ディーゼル'], ['LP', 'LPG', 'LPG', 'LPG'], ['HY', '수소', 'Hydrogen', '水素']],
+      FUEL: [['LI', '리튬', 'Lithium', 'リチウム'], ['PB', '납산', 'Lead-acid', '鉛蓄電池'], ['DI', '디젤', 'Diesel', 'ディーゼル'], ['LP', 'LPG', 'LPG', 'LPG']],
       STATUS: [['RUN', '가동', 'Running', '稼働'], ['IDLE', '유휴', 'Idle', '待機'], ['OFF', '미연결', 'Disconnected', '未接続'], ['FAULT', '고장', 'Fault', '故障'], ['WAIT', '대기', 'Waiting', '待機中']],
       ROLE: roles.map(function (r) { return [r[0], r[1], r[0], '']; }),
       EVENT: [['SHOCK', '충격', 'Shock', '衝撃'], ['ERROR', '차량 에러', 'Vehicle error', '車両エラー'], ['SUPPLY', '소모품', 'Consumable', '消耗品'], ['BATTERY', '배터리', 'Battery', 'バッテリー'], ['CONNECTION', '통신', 'Connection', '通信']],
@@ -59,12 +62,14 @@
       LEGACY: [['OLD_A', '이전 상태 A', 'Previous A', ''], ['OLD_B', '이전 상태 B', 'Previous B', '']]
     };
     var codes = [];
-    Object.keys(seeds).forEach(function (group) { seeds[group].forEach(function (item, index) { codes.push({ id: group + ':' + item[0], group: group, code: item[0], name: item[1], en: item[2], ja: item[3], order: index + 1, active: group !== 'LEGACY' && item[0] !== 'HY', updated: day(-3) }); }); });
+    Object.keys(seeds).forEach(function (group) { seeds[group].forEach(function (item, index) { codes.push({ id: group + ':' + item[0], group: group, code: item[0], name: item[1], en: item[2], ja: item[3], order: index + 1, active: group !== 'LEGACY', updated: day(-3) }); }); });
     return { groups: groups, codes: codes };
   }
 
   api.register('codes', function (ctx) {
     var data = read('codes', codeSeed()), state = { group: 'FUEL', query: '', active: '' };
+    // Old browser ledgers must not restore a retired power type.
+    data.codes = data.codes.filter(function (row) { return row.group !== 'FUEL' || !/^(HI|HY|hydrogen|수소)$/i.test(String(row.code)) && !/^(hydrogen|수소|水素)$/i.test(String(row.name)); });
     function editGroup(existing) {
       var item = existing || { id: '', name: '', en: '', ja: '', order: data.groups.length + 1, active: true };
       api.modal({ title: existing ? '코드 그룹 수정' : '코드 그룹 추가', body: '<div class="form-grid">' +
@@ -98,12 +103,15 @@
         } });
     }
     function render() {
-      var groups = data.groups.slice().sort(function (a, b) { return a.order - b.order; }), group = groups.find(function (g) { return g.id === state.group; }) || groups[0]; state.group = group.id;
-      ctx.el.innerHTML = filters(field('코드 그룹', select('group', groups.map(function (g) { return [g.id, g.name + (g.active ? '' : ' · 중지')]; }), state.group)) + field('사용 여부', select('active', [['', '전체'], ['Y', '사용'], ['N', '중지']], state.active)) + field('검색', input('query', state.query, 'type="search" placeholder="코드·코드명"'))) +
-        '<div class="list-head"><span class="list-head__count">' + esc(group.name) + ' <span class="mm-list-summary__secondary">' + esc(group.id) + ' · ' + status(group.active) + '</span></span><div class="ops-actions">' + tool('add-group', '그룹 추가') + tool('edit-group', '그룹 수정') + tool('add-code', '코드 추가', true) + '</div></div><div data-grid></div>';
-      bindFilters(ctx.el, function (form) { state = { group: value(form, 'group'), active: value(form, 'active'), query: value(form, 'query') }; render(); }, function () { state.query = ''; state.active = ''; render(); });
+      var groups = data.groups.slice().sort(function (a, b) { return a.order - b.order; }), group = groups.find(function (g) { return g.id === state.group; }) || groups[0]; state.group = group ? group.id : '';
+      var groupOptions = groups.length ? groups.map(function (g) { return [g.id, g.name + (g.active ? '' : ' · 중지')]; }) : [['', '등록된 코드 그룹 없음']];
+      ctx.el.innerHTML = filters(field('코드 그룹', select('group', groupOptions, state.group)) + field('사용 여부', select('active', [['', '전체'], ['Y', '사용'], ['N', '중지']], state.active)) + field('검색', input('query', state.query, 'type="search" placeholder="코드·코드명"'))) +
+        '<div class="list-head"><span class="list-head__count">' + (group ? esc(group.name) + ' <span class="mm-list-summary__secondary">' + esc(group.id) + ' · ' + status(group.active) + '</span>' : '등록된 코드 그룹 없음') + '</span><div class="ops-actions">' + tool('add-group', '그룹 추가') + tool('edit-group', '그룹 수정') + tool('add-code', '코드 추가', true) + '</div></div><div data-grid></div>';
+      ctx.el.querySelector('[data-ops-action="edit-group"]').disabled = !group;
+      ctx.el.querySelector('[data-ops-action="add-code"]').disabled = !group;
+      bindFilters(ctx.el, function (form) { state = { group: value(form, 'group'), active: value(form, 'active'), query: value(form, 'query') }; render(); });
       actionHost(ctx.el.querySelector('.list-head'), function (action) { if (action === 'add-group') editGroup(); if (action === 'edit-group') editGroup(group); if (action === 'add-code') editCode(); });
-      grid(ctx.el.querySelector('[data-grid]'), { rows: data.codes.filter(function (r) { return r.group === state.group && (!state.active || r.active === (state.active === 'Y')) && matches(r.code + ' ' + r.name + ' ' + r.en + ' ' + r.ja, state.query); }), defaultSort: { key: 'order', dir: 'asc' }, columns: [
+      grid(ctx.el.querySelector('[data-grid]'), { rows: group ? data.codes.filter(function (r) { return r.group === state.group && (!state.active || r.active === (state.active === 'Y')) && matches(r.code + ' ' + r.name + ' ' + r.en + ' ' + r.ja, state.query); }) : [], emptyText: group ? undefined : '등록된 코드 그룹이 없습니다. 그룹을 추가해 주세요.', defaultSort: { key: 'order', dir: 'asc' }, columns: [
         { key: 'order', label: '순서', className: 'c' }, { key: 'code', label: '코드' }, { key: 'name', label: '한국어명' }, { key: 'en', label: 'English' }, { key: 'ja', label: '日本語' },
         { key: 'active', label: '사용 여부', render: function (r) { return status(r.active); }, exportValue: function (r) { return status(r.active); } }, { key: 'updated', label: '수정일' }, { key: 'actions', label: '관리', render: function (r) { return actions([rowButton('edit', '수정'), rowButton('toggle', r.active ? '중지' : '사용')]); } }
       ], onAction: function (action, row) { if (action === 'edit') editCode(row); if (action === 'toggle') api.confirm({ title: '코드 사용 여부 변경', body: esc(row.name) + ' 코드를 ' + (row.active ? '중지' : '사용') + '하시겠습니까?', onConfirm: function () { row.active = !row.active; row.updated = day(0); save('codes', data, '사용 여부 변경', row.code); render(); api.notify('변경했습니다.'); } }); } });
@@ -180,7 +188,7 @@
     function render() {
       var lang = data.languages.find(function (r) { return r.code === state.language; }) || data.languages[0]; state.language = lang.code;
       ctx.el.innerHTML = filters(field('언어', select('language', data.languages.map(function (r) { return [r.code, r.name + (r.active ? '' : ' · 중지')]; }), state.language)) + field('번역 상태', select('translated', [['','전체'],['Y','번역 완료'],['N','미번역']], state.translated)) + field('검색', input('query', state.query, 'type="search" placeholder="문구 코드·내용"'))) + '<div class="list-head"><span class="list-head__count">' + esc(lang.name) + ' <span class="mm-list-summary__secondary">' + status(lang.active) + '</span></span><div class="ops-actions">' + tool('add-language','언어 추가') + tool('edit-language','언어 수정') + tool('template','파일 양식') + tool('upload','파일 업로드') + tool('add-phrase','문구 추가',true) + '</div></div><input type="file" accept=".csv,text/csv" data-csv-upload hidden><div data-grid></div>';
-      bindFilters(ctx.el, function (form) { state = { language: value(form, 'language'), translated: value(form, 'translated'), query: value(form, 'query') }; render(); }, function () { state.query = ''; state.translated = ''; render(); });
+      bindFilters(ctx.el, function (form) { state = { language: value(form, 'language'), translated: value(form, 'translated'), query: value(form, 'query') }; render(); });
       ctx.el.querySelector('[data-csv-upload]').addEventListener('change', function (e) { upload(e.target.files[0]); e.target.value = ''; });
       actionHost(ctx.el.querySelector('.list-head'), function (action) {
         if (action === 'add-language') editLanguage(); if (action === 'edit-language') editLanguage(lang); if (action === 'add-phrase') editPhrase();
@@ -212,11 +220,15 @@
       } });
     }
     function detail(row) {
-      api.modal({ title: '공지 상세', wide: true, body: '<div class="form-grid">' + field('제목', '<strong>' + esc(row.title) + '</strong>', true) + field('게시 대상', esc(noticeTargets.find(function (t) { return t[0] === row.target; })[1])) + field('상태', noticeStatus(row)) + field('게시 기간', esc(row.from + ' ~ ' + row.to), true) + field('내용', '<div class="ops-pre">' + esc(row.body) + '</div>', true) + '</div>', submitLabel: '닫기', onSubmit: function (form, close) { close(); } });
+      api.modal({ title: '공지 상세', body: '<article class="ops-notice-detail"><h3 class="box__name">' + esc(row.title) + '</h3><div class="mm-request-detail"><dl>' +
+        '<div><dt>게시 대상</dt><dd>' + esc(noticeTargets.find(function (t) { return t[0] === row.target; })[1]) + '</dd></div>' +
+        '<div><dt>상태</dt><dd>' + esc(noticeStatus(row)) + '</dd></div>' +
+        '<div class="col-2"><dt>게시 기간</dt><dd>' + esc(row.from + ' ~ ' + row.to) + '</dd></div>' +
+        '</dl></div><section class="ops-notice-content" aria-label="공지 내용"><div class="ops-pre">' + esc(row.body) + '</div></section></article>', submitLabel: '닫기', onSubmit: function (form, close) { close(); } });
     }
     function render() {
       ctx.el.innerHTML = filters(field('게시 대상', select('target', [['','전체 대상']].concat(noticeTargets), state.target)) + field('게시 상태', select('status', [['','전체 상태'],['작성 중','작성 중'],['게시 중','게시 중'],['게시 예정','게시 예정'],['게시 종료','게시 종료'],['게시 중지','게시 중지']], state.status)) + field('검색', input('query', state.query, 'type="search" placeholder="제목·내용"'))) + '<div class="list-head"><span class="list-head__count">공지 목록</span><div class="ops-actions">' + tool('add','공지 등록',true) + '</div></div><div data-grid></div>';
-      bindFilters(ctx.el, function (form) { state = { target: value(form, 'target'), status: value(form, 'status'), query: value(form, 'query') }; render(); }, function () { state = { target: '', status: '', query: '' }; render(); });
+      bindFilters(ctx.el, function (form) { state = { target: value(form, 'target'), status: value(form, 'status'), query: value(form, 'query') }; render(); });
       actionHost(ctx.el.querySelector('.list-head'), function () { edit(); });
       grid(ctx.el.querySelector('[data-grid]'), { rows: data.filter(function (r) { return (!state.target || r.target === state.target) && (!state.status || noticeStatus(r) === state.status) && matches(r.title + ' ' + r.body, state.query); }), defaultSort: { key: 'updated', dir: 'desc' }, columns: [
         { key: 'pinned', label: '구분', render: function (r) { return r.pinned ? '고정' : '일반'; }, exportValue: function (r) { return r.pinned ? '고정' : '일반'; } }, { key: 'title', label: '제목', render: function (r) { return '<button type="button" class="ops-text-button" data-action="detail">' + esc(r.title) + '</button>'; } },
@@ -265,7 +277,7 @@
     function render() {
       ctx.el.innerHTML = '<div class="tabs" role="tablist" aria-label="메뉴 관리 구분"><button type="button" role="tab" data-tab="structure" class="' + (state.tab === 'structure' ? 'active' : '') + '" aria-selected="' + (state.tab === 'structure') + '">메뉴 구성</button><button type="button" role="tab" data-tab="access" class="' + (state.tab === 'access' ? 'active' : '') + '" aria-selected="' + (state.tab === 'access') + '">역할별 접근</button></div>' + filters(field('사이트', select('site', sites, state.site)) + field('사용 여부', select('active', [['','전체'],['Y','사용'],['N','중지']], state.active)) + field('검색', input('query', state.query, 'type="search" placeholder="메뉴 ID·메뉴명"'))) + '<div class="list-head"><span class="list-head__count">' + esc(sites.find(function (s) { return s[0] === state.site; })[1]) + (state.tab === 'access' ? ' 역할별 접근' : ' 메뉴 원장') + '</span><div class="ops-actions">' + (state.tab === 'structure' ? tool('add','메뉴 추가',true) : '') + '</div></div><div data-grid class="' + (state.tab === 'access' ? 'ops-matrix' : '') + '"></div>';
       ctx.el.querySelectorAll('[data-tab]').forEach(function (tab) { tab.addEventListener('click', function () { state.tab = tab.dataset.tab; render(); }); });
-      bindFilters(ctx.el, function (form) { state.site = value(form, 'site'); state.query = value(form, 'query'); state.active = value(form, 'active'); render(); }, function () { state.query = ''; state.active = ''; render(); });
+      bindFilters(ctx.el, function (form) { state.site = value(form, 'site'); state.query = value(form, 'query'); state.active = value(form, 'active'); render(); });
       actionHost(ctx.el.querySelector('.list-head'), function () { edit(); });
       var rows = data.filter(function (r) { return r.site === state.site && (!state.active || r.active === (state.active === 'Y')) && matches(r.id + ' ' + r.name, state.query); });
       var visibleRoles = roles.filter(function (r) { return state.site === 'ADMIN' ? ['ADMIN','SERVICE','SALES','MANAGER'].indexOf(r[0]) >= 0 : state.site === 'RENTAL' ? ['ADMIN','MANAGER','RENTAL','RENTAL_GROUP'].indexOf(r[0]) >= 0 : state.site === 'APP' ? ['ADMIN','FLEET','FLEET_GROUP','DEALER','DEALER_GROUP'].indexOf(r[0]) >= 0 : ['ADMIN','SERVICE','SALES','MANAGER','FLEET','FLEET_GROUP','DEALER','DEALER_GROUP'].indexOf(r[0]) >= 0; });
@@ -304,7 +316,7 @@
     }
     function render() {
       ctx.el.innerHTML = filters(field('시작일', input('from', state.from, 'type="date"')) + field('종료일', input('to', state.to, 'type="date"')) + field('사이트', select('site', [['','전체 사이트']].concat(sites), state.site)) + field('역할', select('role', [['','전체 역할']].concat(roles), state.role)) + field('결과', select('result', [['','전체 결과'],['성공','성공'],['접근 제한','접근 제한']], state.result)) + field('검색', input('query', state.query, 'type="search" placeholder="사용자·메뉴·작업"'))) + '<div data-grid></div>';
-      bindFilters(ctx.el, function (form) { var from = value(form,'from'), to = value(form,'to'); if (!validRange(from,to)) return api.notify('종료일은 시작일 이후로 선택해 주세요.'); state = { from: from, to: to, site: value(form,'site'), role: value(form,'role'), result: value(form,'result'), query: value(form,'query') }; data = read('history', historySeed()); render(); }, function () { state = { from: day(-7), to: day(0), query: '', site: '', role: '', result: '' }; render(); });
+      bindFilters(ctx.el, function (form) { var from = value(form,'from'), to = value(form,'to'); if (!validRange(from,to)) return api.notify('종료일은 시작일 이후로 선택해 주세요.'); state = { from: from, to: to, site: value(form,'site'), role: value(form,'role'), result: value(form,'result'), query: value(form,'query') }; data = read('history', historySeed()); render(); });
       grid(ctx.el.querySelector('[data-grid]'), { rows: data.filter(function (r) { var d = r.date.slice(0,10); return (!state.from || d >= state.from) && (!state.to || d <= state.to) && (!state.site || r.site === state.site) && (!state.role || r.role === state.role) && (!state.result || r.result === state.result) && matches(r.user + ' ' + r.menu + ' ' + r.action, state.query); }), defaultSort: { key: 'date', dir: 'desc' }, columns: [
         { key: 'date', label: '일시' }, { key: 'user', label: '사용자' }, { key: 'role', label: '역할', render: function (r) { return esc((roles.find(function (x) { return x[0] === r.role; }) || ['',r.role])[1]); }, exportValue: function (r) { return (roles.find(function (x) { return x[0] === r.role; }) || ['',r.role])[1]; } }, { key: 'site', label: '사이트', render: function (r) { return esc((sites.find(function (s) { return s[0] === r.site; }) || ['',r.site])[1]); }, exportValue: function (r) { return (sites.find(function (s) { return s[0] === r.site; }) || ['',r.site])[1]; } }, { key: 'menu', label: '메뉴' }, { key: 'action', label: '작업' }, { key: 'result', label: '결과' }, { key: 'ip', label: '접속 IP' }, { key: 'actions', label: '상세', render: function () { return rowButton('detail','보기'); } }
       ], onAction: function (action,row) { if (action === 'detail') detail(row); } });

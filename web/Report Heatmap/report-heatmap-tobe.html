@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
+<head><script src="../_shared/demo-clock.js?rev=34d9d133492b"></script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>업체별 히트맵 · MACHINE IQ</title>
 <link rel="icon" type="image/x-icon" href="../_shared/favicon.ico"/>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
-<link rel="stylesheet" href="../_shared/mockup.css?rev=d24057a14011"/>
+<link rel="stylesheet" href="../_shared/offline-fonts.css?rev=b405f97e6cf9"><script type="module" blocking="render">await document.fonts.load('400 14px "Noto Sans KR"');await document.fonts.ready;</script>
+<link rel="stylesheet" href="../_shared/mockup.css?rev=bed1f0069135"/>
 <style>
 /* ── 페이지 전용 : 업체 선택(최대 5) · 지표 전환 · 업체 × 일자 히트맵 ── */
 .filter-bar .inp--sm{width:116px;flex:0 0 auto;text-align:center}
@@ -54,11 +54,272 @@
 .tip-box .r{display:flex;gap:10px}
 .tip-box .r span{margin-left:auto;font-weight:700}
 </style>
-<link rel="stylesheet" href="../_shared/content-system.css?v=20260902-readability&amp;rev=d8f94e7e5049"/>
-<link rel="stylesheet" href="../_shared/report-enhancements.css?v=20260905-common-header-r4&amp;rev=2636fe8efa69"/>
+<link rel="stylesheet" href="../_shared/content-system.css?rev=d8f94e7e5049"/>
+<link rel="stylesheet" href="../_shared/report-enhancements.css?rev=dceeccfe9513"/>
 <link rel="stylesheet" href="../_shared/chart-common.css?rev=fc1c23dcf6af"/>
+<link rel="stylesheet" href="../_shared/form-controls.css?rev=6fda272acdcc"/>
+<link rel="stylesheet" href="../_shared/list-pagination.css?rev=0069e48c1009">
+<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?rev=bb6d53aabb78"/>
+<link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?rev=1cffa21a9777"/>
+<style>body.miq-current-shell>#gnb{min-height:64px}</style>
+<script defer blocking="render" src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script>
+<script defer blocking="render" src="../_shared/common-logic.js?rev=efb7e741cd7b"></script>
+<script defer blocking="render" src="../_shared/chart-common.js?rev=15c74452f805"></script>
+<script defer blocking="render" src="../_shared/list-pagination.js?rev=33207bf33d11"></script>
+<script defer blocking="render" src="../_mock-data/generated/fleet.generated.js?rev=309d68875499"></script>
+<script defer blocking="render" src="../_shared/fleet.js?rev=dfdf98be0a95"></script>
+<script defer blocking="render" src="../_shared/nav.js?rev=049a18c69072"></script>
+<script defer blocking="render" src="../_shared/report-scope.js?rev=544a25c316d3"></script>
+<script type="module" blocking="render">
+/* ══════════════════════════════════════════════════════════════
+   업체별 히트맵 Mock-up 인터랙션 (리포트 · LNB 없음)
+     1) 업체를 최대 5개까지 추가 · 제거 (중복 선택 불가)
+     2) 기간 : 일 / 주 / 월 — 다른 화면과 동일한 구성
+     3) 비율 지표 2종을 탭으로 전환 · 색 구간은 0~100% 고정 4단계
+     4) 집계 전 구간은 0 이 아니라 '-' 로 구분하고, 셀 hover 로 정확한 값 확인
+   ══════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+
+  var SCOPE = window.MIQReportScope;
+  var COMPANIES = SCOPE.items;
+  var MAX = SCOPE.readOnly ? 1 : Math.min(5, COMPANIES.length);
+  var METRICS = [
+    { key: 'eff',   label: '운영효율',      unit: '%',   lo: 40,  hi: 98,  dec: 1 },
+    { key: 'batt',  label: '배터리 충전량', unit: '%',   lo: 10,  hi: 36,  dec: 1 },
+    // 2026-09-20: 비율이 아닌 지표는 숨김. 아래 /* */만 제거하면 4개 탭을 복원할 수 있다.
+    // 데이터 생성·색상·툴팁의 공통 처리는 보존하며, 복원 지표는 기존 상대 색상 구간을 사용한다.
+    /*
+    { key: 'shock', label: '충격횟수',      unit: '건',  lo: 0,   hi: 90,  dec: 0 },
+    { key: 'fuel',  label: '연료소비량',    unit: 'L/H', lo: 2.8, hi: 5.2, dec: 1 },
+    { key: 'dist',  label: '운행거리',      unit: 'Km',  lo: 2,   hi: 260, dec: 1 },
+    { key: 'hour',  label: '운행시간',      unit: 'H',   lo: 0,   hi: 24,  dec: 1 }
+    */
+  ];
+  var PAGE_QUERY = new URLSearchParams(location.search);
+  function dateValue(date) { return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0'); }
+  var latestDate = new Date(); latestDate.setHours(12, 0, 0, 0); latestDate.setDate(latestDate.getDate() - 1);
+  var weekStart = new Date(latestDate.getTime()); weekStart.setDate(weekStart.getDate() - 6);
+  var monthStart = new Date(latestDate.getFullYear(), latestDate.getMonth(), 1, 12, 0, 0, 0);
+  var PERIOD = {
+    d: { from: dateValue(latestDate), to: dateValue(latestDate) },
+    w: { from: dateValue(weekStart), to: dateValue(latestDate) },
+    m: { from: dateValue(monthStart), to: dateValue(latestDate) },
+    c: { from: PAGE_QUERY.get('from') || dateValue(monthStart), to: PAGE_QUERY.get('to') || dateValue(latestDate) }
+  };
+  var initialPeriod = { day: 'd', week: 'w', month: 'm', custom: 'c' }[PAGE_QUERY.get('period')] || PAGE_QUERY.get('period') || 'm';
+  if (!PERIOD[initialPeriod]) initialPeriod = 'm';
+  if (PAGE_QUERY.get('from') && PAGE_QUERY.get('to') && MIQCharts.axis(initialPeriod,PAGE_QUERY.get('from'),PAGE_QUERY.get('to')).n) PERIOD[initialPeriod] = {from:PAGE_QUERY.get('from'),to:PAGE_QUERY.get('to')};
+  var state = {
+    cos: COMPANIES.slice(0, MAX),
+    period: initialPeriod,
+    metric: 'eff',
+    customFrom: PERIOD.c.from,
+    customTo: PERIOD.c.to
+  };
+
+  function seeded(key) {
+    var s = 0;
+    for (var i = 0; i < key.length; i++) s = (s * 31 + key.charCodeAt(i)) >>> 0;
+    return function () { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; };
+  }
+  function rd(n, d) { var p = Math.pow(10, d); return Math.round(n * p) / p; }
+  function fmt(n, m) {
+    return window.MIQCommon.numbers.integer(n, true) + m.unit;
+  }
+  function metric(key) { return METRICS.filter(function (m) { return m.key === key; })[0]; }
+
+  function buckets() {
+    return MIQCharts.axis(state.period, PERIOD[state.period].from, PERIOD[state.period].to);
+  }
+
+  /* 업체 × 구간 값 (집계 전은 null) */
+  function build() {
+    var m = metric(state.metric), b = buckets();
+    var rows = state.cos.map(function (co) {
+      var rnd = seeded(co + state.metric + state.period + PERIOD[state.period].from + PERIOD[state.period].to), vals = [];
+      for (var i = 0; i < b.n; i++) {
+        if (i >= b.filled) { vals.push(null); continue; }
+        var v = 0;
+        for (var k = 0; k < b.bucket; k++) v += m.lo + rnd() * (m.hi - m.lo);
+        vals.push(rd(v / b.bucket, m.dec));
+      }
+      return { co: co, vals: vals };
+    });
+    var flat = [];
+    rows.forEach(function (r) { r.vals.forEach(function (v) { if (v !== null) flat.push(v); }); });
+    var max = Math.max.apply(null, flat.length ? flat : [1]);
+    var min = Math.min.apply(null, flat.length ? flat : [0]);
+    // 비율은 일·주·월과 선택 업체/그룹에 관계없이 같은 0~100% 색상 기준을 사용한다.
+    // 위의 비율 외 지표를 복원하면 조회 결과의 최저~최고 기준이 유지된다.
+    if (m.unit === '%') { min = 0; max = 100; }
+    return { m: m, labels: b.labels, detailLabels: b.detailLabels, rows: rows, min: min, max: max, filled: b.filled };
+  }
+
+  /* 색 구간 : 비율은 [0,25), [25,50), [50,75), [75,100]. 집계 전(null)은 별도로 표시한다. */
+  function band(v, min, max) {
+    var span = max - min;
+    var r = span ? (v - min) / span : 0;
+    return r < 0.25 ? 0 : r < 0.5 ? 1 : r < 0.75 ? 2 : 3;
+  }
+
+  /* ── 업체 선택 ── */
+  function renderCos() {
+    document.getElementById('coWrap').innerHTML = state.cos.map(function (co, i) {
+      var opts = COMPANIES.map(function (c) {
+        var taken = state.cos.indexOf(c) >= 0 && c !== co;
+        return "<option" + (c === co ? ' selected' : '') + (taken ? ' disabled' : '') + ">" + c + "</option>";
+      }).join('');
+      return "<select class='inp inp--sm' data-ci='" + i + "' aria-label='업체 " + (i + 1) + "'>" + opts + "</select>";
+    }).join('');
+    document.getElementById('btnAdd').disabled = state.cos.length >= MAX;
+    document.getElementById('btnDel').disabled = state.cos.length <= 1;
+    document.getElementById('coHint').textContent = state.cos.length + ' / ' + MAX + '개 업체';
+  }
+
+  function renderTabs() {
+    document.getElementById('metricTabs').innerHTML = METRICS.map(function (m) {
+      return "<button type='button' data-metric='" + m.key + "'" + (state.metric === m.key ? " class='active'" : "") + ">"
+        + m.label + "</button>";
+    }).join('');
+  }
+
+  /* ── 히트맵 ── */
+  function renderHeat(d) {
+    var hm = document.getElementById('hm');
+    hm.style.gridTemplateColumns = '112px repeat(' + d.labels.length + ',minmax(0,1fr))';
+
+    var short = d.labels.length > 14;                   /* 칸이 좁으면 정수로 축약 · 정확한 값은 hover */
+    var html = '';
+    d.rows.forEach(function (r, ri) {
+      html += "<div class='hm__rh' title='" + r.co + "'>" + r.co + "</div>";
+      r.vals.forEach(function (v, ci) {
+        if (v === null) {
+          html += "<div class='hm__c na' data-r='" + ri + "' data-c='" + ci + "'>-</div>";
+          return;
+        }
+        html += "<div class='hm__c b" + band(v, d.min, d.max) + "' data-r='" + ri + "' data-c='" + ci + "'>"
+          + window.MIQCommon.numbers.integer(v) + "</div>";
+      });
+    });
+    html += "<div class='hm__rh'></div>";
+    var labelWidth = Math.max(240, hm.getBoundingClientRect().width - 112);
+    d.labels.forEach(function (lab, i) { html += "<div class='hm__x' data-full-label='" + MIQCharts.escape(d.detailLabels[i]) + "'>" + MIQCharts.tickLabel(d.labels, i, labelWidth) + "</div>"; });
+    document.getElementById('tip').style.display = 'none';
+    hm.innerHTML = html;
+
+    /* 범례 : 셀과 같은 기준의 4구간. 비율은 항상 0 / 25 / 50 / 75 / 100%. */
+    var q = [0, 0.25, 0.5, 0.75, 1].map(function (x) { return window.MIQCommon.numbers.integer(d.min + (d.max - d.min) * x); });
+    var COL = ['#fff1ed', '#ffd4c9', '#ff8f73', '#ff3600'];
+    document.getElementById('hmLegend').innerHTML = COL.map(function (c, i) {
+      return "<span class='li'><span class='sw' style='background:" + c + "'></span>"
+        + q[i] + '~' + q[i + 1] + d.m.unit + "</span>";
+    }).join('') + "<span class='li'><span class='sw' style='background:#f4f5f7'></span>집계 전</span>";
+
+    /* hover 툴팁 */
+    var tip = document.getElementById('tip'), wrap = document.getElementById('hmWrap');
+    Array.prototype.forEach.call(hm.querySelectorAll('.hm__c'), function (cell) {
+      var ri = +cell.getAttribute('data-r'), ci = +cell.getAttribute('data-c');
+      var v = d.rows[ri].vals[ci];
+      cell.addEventListener('mouseenter', function (ev) {
+        cell.classList.add('on');
+        tip.innerHTML = "<b>" + d.rows[ri].co + "</b>"
+          + "<div class='r'>" + d.detailLabels[ci] + "<span>" + (v === null ? '집계 전' : fmt(v, d.m)) + "</span></div>"
+          + "<div class='r'>지표<span>" + d.m.label + "</span></div>";
+        tip.style.display = 'block';
+        move(ev);
+      });
+      cell.addEventListener('mousemove', move);
+      cell.addEventListener('mouseleave', function () { cell.classList.remove('on'); tip.style.display = 'none'; });
+      function move(ev) {
+        var box = wrap.getBoundingClientRect();
+        var x = (ev.clientX || 0) - box.left, yy = (ev.clientY || 0) - box.top;
+        tip.style.left = Math.max(0, Math.min(box.width - 200, x + 12)) + 'px';
+        tip.style.top = Math.max(0, yy - 74) + 'px';
+      }
+    });
+  }
+
+  var reportReady = false;
+  function render() {
+    if (!reportReady) { renderCos(); return; }
+    renderCos();
+    renderTabs();
+    var d = build();
+    document.getElementById('hmName').textContent = d.m.label;
+    renderHeat(d);
+    document.getElementById('hmHint').textContent =
+      (state.period === 'd' ? 'ⓘ 시간대별 값입니다.'
+       : state.period === 'c' ? 'ⓘ 선택 기간의 일자별 값입니다.'
+       : 'ⓘ 일자별 값입니다.')
+      + ' 칸에 마우스를 올리면 정확한 값이 표시됩니다.';
+  }
+
+  /* ── 이벤트 ── */
+  document.getElementById('btnAdd').addEventListener('click', function () {
+    if (state.cos.length >= MAX) return;
+    var next = COMPANIES.filter(function (c) { return state.cos.indexOf(c) < 0; })[0];
+    if (!next) return;
+    state.cos.push(next);
+    render();
+  });
+  document.getElementById('btnDel').addEventListener('click', function () {
+    if (state.cos.length <= 1) return;
+    state.cos.pop();
+    render();
+  });
+  document.getElementById('coWrap').addEventListener('change', function (e) {
+    var s = e.target.closest('select[data-ci]');
+    if (!s) return;
+    if(SCOPE.readOnly || COMPANIES.indexOf(s.value)<0)return;
+    state.cos[+s.getAttribute('data-ci')] = s.value;
+    render();
+  });
+  document.getElementById('periodTabs').addEventListener('click', function (e) {
+    if (this.closest('.finder, .filter-bar').__miqPeriodController) return;
+    var b = e.target.closest('button[data-period]');
+    if (!b) return;
+    state.period = b.getAttribute('data-period');
+    render();
+  });
+  (document.getElementById('periodTabs').closest('.finder, .filter-bar') || document.getElementById('periodTabs')).addEventListener('miq:period-change', function (event) {
+    var detail = event.detail || {};
+    state.period = detail.period || state.period;
+    if (!PERIOD[state.period]) state.period = 'm';
+    PERIOD[state.period].from = detail.startDate || PERIOD[state.period].from;
+    PERIOD[state.period].to = detail.endDate || PERIOD[state.period].to;
+    if (state.period === 'c') { state.customFrom = PERIOD.c.from; state.customTo = PERIOD.c.to; }
+    render();
+  });
+  document.getElementById('metricTabs').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-metric]');
+    if (!b) return;
+    state.metric = b.getAttribute('data-metric');
+    render();
+  });
+  document.getElementById('btnSearch').addEventListener('click', function () {
+    if (this.closest('.finder, .filter-bar').__miqPeriodController) return;
+    if (state.period === 'c') {
+      var from = document.getElementById('dFrom').value;
+      var to = document.getElementById('dTo').value;
+      if (!from || !to || from > to) return;
+      state.customFrom = from;
+      state.customTo = to;
+    }
+    render();
+  });
+
+  renderCos();
+  window.MIQReportInit = function () {
+    reportReady = true;
+    render();
+  MIQCharts.observeSize(document.getElementById('hm'), function(){renderHeat(build());});
+  };
+})();
+</script>
+<script defer blocking="render" src="../_shared/report-enhancements.js?rev=62600e5241f4"></script>
 </head>
-<body data-period-presets="dwm" class="miq-content-system miq-report-enhanced" data-gnb="rpt" data-sub="rptheat" data-variant="tobe" data-base="../">
+<body data-current-bootstrap="ready" data-period-presets="dwm" class="miq-current-shell miq-content-system miq-report-enhanced" data-gnb="rpt" data-sub="rptheat" data-variant="tobe" data-base="../">
 
 <div id="gnb"></div>
 
@@ -120,247 +381,17 @@
   </main>
 </div>
 
-<script src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script>
-<script src="../_shared/common-logic.js?v=20260907-common-logic-r42&amp;rev=fe89537280cd"></script>
-<script src="../_shared/chart-common.js?rev=26b243959957"></script>
-<script src="../_shared/nav.js?v=20260907-common-logic-r42&amp;rev=10146ec619b0"></script>
-<script src="../_mock-data/generated/fleet.generated.js?v=20260906-json-r1&amp;rev=f69042cf6b57"></script>
-<script src="../_shared/fleet.js?v=20260906-json-r1&amp;rev=9bc7caf2ff93"></script>
-<script src="../_shared/report-scope.js?rev=544a25c316d3"></script>
-<script>
-/* ══════════════════════════════════════════════════════════════
-   업체별 히트맵 Mock-up 인터랙션 (리포트 · LNB 없음)
-     1) 업체를 최대 5개까지 추가 · 제거 (중복 선택 불가)
-     2) 기간 : 일 / 주 / 월 — 다른 화면과 동일한 구성
-     3) 지표 6종을 탭으로 전환 · 색 구간은 조회 결과 기준으로 4단계
-     4) 집계 전 구간은 0 이 아니라 '-' 로 구분하고, 셀 hover 로 정확한 값 확인
-   ══════════════════════════════════════════════════════════════ */
-(function () {
-  'use strict';
 
-  var SCOPE = window.MIQReportScope;
-  var COMPANIES = SCOPE.items;
-  var MAX = SCOPE.readOnly ? 1 : Math.min(5, COMPANIES.length);
-  var METRICS = [
-    { key: 'eff',   label: '운영효율',      unit: '%',   lo: 40,  hi: 98,  dec: 1 },
-    { key: 'shock', label: '충격횟수',      unit: '건',  lo: 0,   hi: 90,  dec: 0 },
-    { key: 'fuel',  label: '연료소비량',    unit: 'L/H', lo: 2.8, hi: 5.2, dec: 1 },
-    { key: 'batt',  label: '배터리 충전량', unit: '%',   lo: 10,  hi: 36,  dec: 1 },
-    { key: 'dist',  label: '운행거리',      unit: 'Km',  lo: 2,   hi: 260, dec: 1 },
-    { key: 'hour',  label: '운행시간',      unit: 'H',   lo: 0,   hi: 24,  dec: 1 }
-  ];
-  var PAGE_QUERY = new URLSearchParams(location.search);
-  function dateValue(date) { return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0'); }
-  var latestDate = new Date(); latestDate.setHours(12, 0, 0, 0); latestDate.setDate(latestDate.getDate() - 1);
-  var weekStart = new Date(latestDate.getTime()); weekStart.setDate(weekStart.getDate() - 6);
-  var monthStart = new Date(latestDate.getFullYear(), latestDate.getMonth(), 1, 12, 0, 0, 0);
-  var PERIOD = {
-    d: { from: dateValue(latestDate), to: dateValue(latestDate) },
-    w: { from: dateValue(weekStart), to: dateValue(latestDate) },
-    m: { from: dateValue(monthStart), to: dateValue(latestDate) },
-    c: { from: PAGE_QUERY.get('from') || dateValue(monthStart), to: PAGE_QUERY.get('to') || dateValue(latestDate) }
-  };
-  var initialPeriod = { day: 'd', week: 'w', month: 'm', custom: 'c' }[PAGE_QUERY.get('period')] || PAGE_QUERY.get('period') || 'm';
-  if (!PERIOD[initialPeriod]) initialPeriod = 'm';
-  if (PAGE_QUERY.get('from') && PAGE_QUERY.get('to') && MIQCharts.axis(initialPeriod,PAGE_QUERY.get('from'),PAGE_QUERY.get('to')).n) PERIOD[initialPeriod] = {from:PAGE_QUERY.get('from'),to:PAGE_QUERY.get('to')};
-  var state = {
-    cos: COMPANIES.slice(0, MAX),
-    period: initialPeriod,
-    metric: 'eff',
-    customFrom: PERIOD.c.from,
-    customTo: PERIOD.c.to
-  };
 
-  function seeded(key) {
-    var s = 0;
-    for (var i = 0; i < key.length; i++) s = (s * 31 + key.charCodeAt(i)) >>> 0;
-    return function () { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; };
-  }
-  function rd(n, d) { var p = Math.pow(10, d); return Math.round(n * p) / p; }
-  function fmt(n, m) {
-    return rd(n, m.dec).toLocaleString('ko-KR', { minimumFractionDigits: m.dec, maximumFractionDigits: m.dec }) + m.unit;
-  }
-  function metric(key) { return METRICS.filter(function (m) { return m.key === key; })[0]; }
 
-  function buckets() {
-    return MIQCharts.axis(state.period, PERIOD[state.period].from, PERIOD[state.period].to);
-  }
 
-  /* 업체 × 구간 값 (집계 전은 null) */
-  function build() {
-    var m = metric(state.metric), b = buckets();
-    var rows = state.cos.map(function (co) {
-      var rnd = seeded(co + state.metric + state.period + PERIOD[state.period].from + PERIOD[state.period].to), vals = [];
-      for (var i = 0; i < b.n; i++) {
-        if (i >= b.filled) { vals.push(null); continue; }
-        var v = 0;
-        for (var k = 0; k < b.bucket; k++) v += m.lo + rnd() * (m.hi - m.lo);
-        vals.push(rd(v / b.bucket, m.dec));
-      }
-      return { co: co, vals: vals };
-    });
-    var flat = [];
-    rows.forEach(function (r) { r.vals.forEach(function (v) { if (v !== null) flat.push(v); }); });
-    var max = Math.max.apply(null, flat.length ? flat : [1]);
-    var min = Math.min.apply(null, flat.length ? flat : [0]);
-    return { m: m, labels: b.labels, detailLabels: b.detailLabels, rows: rows, min: min, max: max, filled: b.filled };
-  }
 
-  /* 색 구간 : 조회 결과의 최저~최고를 4단계로 나눈다 (0 기준이면 하위 구간이 비어 보임) */
-  function band(v, min, max) {
-    var span = max - min;
-    var r = span ? (v - min) / span : 0;
-    return r < 0.25 ? 0 : r < 0.5 ? 1 : r < 0.75 ? 2 : 3;
-  }
 
-  /* ── 업체 선택 ── */
-  function renderCos() {
-    document.getElementById('coWrap').innerHTML = state.cos.map(function (co, i) {
-      var opts = COMPANIES.map(function (c) {
-        var taken = state.cos.indexOf(c) >= 0 && c !== co;
-        return "<option" + (c === co ? ' selected' : '') + (taken ? ' disabled' : '') + ">" + c + "</option>";
-      }).join('');
-      return "<select class='inp inp--sm' data-ci='" + i + "' aria-label='업체 " + (i + 1) + "'>" + opts + "</select>";
-    }).join('');
-    document.getElementById('btnAdd').disabled = state.cos.length >= MAX;
-    document.getElementById('btnDel').disabled = state.cos.length <= 1;
-    document.getElementById('coHint').textContent = state.cos.length + ' / ' + MAX + '개 업체';
-  }
 
-  function renderTabs() {
-    document.getElementById('metricTabs').innerHTML = METRICS.map(function (m) {
-      return "<button type='button' data-metric='" + m.key + "'" + (state.metric === m.key ? " class='active'" : "") + ">"
-        + m.label + "</button>";
-    }).join('');
-  }
 
-  /* ── 히트맵 ── */
-  function renderHeat(d) {
-    var hm = document.getElementById('hm');
-    hm.style.gridTemplateColumns = '112px repeat(' + d.labels.length + ',minmax(0,1fr))';
 
-    var short = d.labels.length > 14;                   /* 칸이 좁으면 정수로 축약 · 정확한 값은 hover */
-    var html = '';
-    d.rows.forEach(function (r, ri) {
-      html += "<div class='hm__rh' title='" + r.co + "'>" + r.co + "</div>";
-      r.vals.forEach(function (v, ci) {
-        if (v === null) {
-          html += "<div class='hm__c na' data-r='" + ri + "' data-c='" + ci + "'>-</div>";
-          return;
-        }
-        html += "<div class='hm__c b" + band(v, d.min, d.max) + "' data-r='" + ri + "' data-c='" + ci + "'>"
-          + (short ? Math.round(v) : rd(v, d.m.dec)) + "</div>";
-      });
-    });
-    html += "<div class='hm__rh'></div>";
-    var labelWidth = Math.max(240, hm.getBoundingClientRect().width - 112);
-    d.labels.forEach(function (lab, i) { html += "<div class='hm__x' data-full-label='" + MIQCharts.escape(d.detailLabels[i]) + "'>" + MIQCharts.tickLabel(d.labels, i, labelWidth) + "</div>"; });
-    document.getElementById('tip').style.display = 'none';
-    hm.innerHTML = html;
 
-    /* 범례 : 조회 결과의 최저~최고를 4구간으로 */
-    var q = [0, 0.25, 0.5, 0.75, 1].map(function (x) { return rd(d.min + (d.max - d.min) * x, d.m.dec); });
-    var COL = ['#fff1ed', '#ffd4c9', '#ff8f73', '#ff3600'];
-    document.getElementById('hmLegend').innerHTML = COL.map(function (c, i) {
-      return "<span class='li'><span class='sw' style='background:" + c + "'></span>"
-        + q[i] + '~' + q[i + 1] + d.m.unit + "</span>";
-    }).join('') + "<span class='li'><span class='sw' style='background:#f4f5f7'></span>집계 전</span>";
 
-    /* hover 툴팁 */
-    var tip = document.getElementById('tip'), wrap = document.getElementById('hmWrap');
-    Array.prototype.forEach.call(hm.querySelectorAll('.hm__c'), function (cell) {
-      var ri = +cell.getAttribute('data-r'), ci = +cell.getAttribute('data-c');
-      var v = d.rows[ri].vals[ci];
-      cell.addEventListener('mouseenter', function (ev) {
-        cell.classList.add('on');
-        tip.innerHTML = "<b>" + d.rows[ri].co + "</b>"
-          + "<div class='r'>" + d.detailLabels[ci] + "<span>" + (v === null ? '집계 전' : fmt(v, d.m)) + "</span></div>"
-          + "<div class='r'>지표<span>" + d.m.label + "</span></div>";
-        tip.style.display = 'block';
-        move(ev);
-      });
-      cell.addEventListener('mousemove', move);
-      cell.addEventListener('mouseleave', function () { cell.classList.remove('on'); tip.style.display = 'none'; });
-      function move(ev) {
-        var box = wrap.getBoundingClientRect();
-        var x = (ev.clientX || 0) - box.left, yy = (ev.clientY || 0) - box.top;
-        tip.style.left = Math.max(0, Math.min(box.width - 200, x + 12)) + 'px';
-        tip.style.top = Math.max(0, yy - 74) + 'px';
-      }
-    });
-  }
 
-  function render() {
-    renderCos();
-    renderTabs();
-    var d = build();
-    document.getElementById('hmName').textContent = d.m.label;
-    renderHeat(d);
-    document.getElementById('hmHint').textContent =
-      (state.period === 'd' ? 'ⓘ 시간대별 값입니다.'
-       : state.period === 'c' ? 'ⓘ 선택 기간의 일자별 값입니다.'
-       : 'ⓘ 일자별 값입니다.')
-      + ' 칸에 마우스를 올리면 정확한 값이 표시됩니다.';
-  }
-
-  /* ── 이벤트 ── */
-  document.getElementById('btnAdd').addEventListener('click', function () {
-    if (state.cos.length >= MAX) return;
-    var next = COMPANIES.filter(function (c) { return state.cos.indexOf(c) < 0; })[0];
-    if (!next) return;
-    state.cos.push(next);
-    render();
-  });
-  document.getElementById('btnDel').addEventListener('click', function () {
-    if (state.cos.length <= 1) return;
-    state.cos.pop();
-    render();
-  });
-  document.getElementById('coWrap').addEventListener('change', function (e) {
-    var s = e.target.closest('select[data-ci]');
-    if (!s) return;
-    if(SCOPE.readOnly || COMPANIES.indexOf(s.value)<0)return;
-    state.cos[+s.getAttribute('data-ci')] = s.value;
-    render();
-  });
-  document.getElementById('periodTabs').addEventListener('click', function (e) {
-    var b = e.target.closest('button[data-period]');
-    if (!b) return;
-    state.period = b.getAttribute('data-period');
-    render();
-  });
-  (document.getElementById('periodTabs').closest('.finder, .filter-bar') || document.getElementById('periodTabs')).addEventListener('miq:period-change', function (event) {
-    var detail = event.detail || {};
-    state.period = detail.period || state.period;
-    if (!PERIOD[state.period]) state.period = 'm';
-    PERIOD[state.period].from = detail.startDate || PERIOD[state.period].from;
-    PERIOD[state.period].to = detail.endDate || PERIOD[state.period].to;
-    if (state.period === 'c') { state.customFrom = PERIOD.c.from; state.customTo = PERIOD.c.to; }
-    render();
-  });
-  document.getElementById('metricTabs').addEventListener('click', function (e) {
-    var b = e.target.closest('button[data-metric]');
-    if (!b) return;
-    state.metric = b.getAttribute('data-metric');
-    render();
-  });
-  document.getElementById('btnSearch').addEventListener('click', function () {
-    if (state.period === 'c') {
-      var from = document.getElementById('dFrom').value;
-      var to = document.getElementById('dTo').value;
-      if (!from || !to || from > to) return;
-      state.customFrom = from;
-      state.customTo = to;
-    }
-    render();
-  });
-
-  var resizeTimer;
-  window.addEventListener('resize', function () { clearTimeout(resizeTimer); resizeTimer = setTimeout(function(){renderHeat(build());},150); });
-  MIQCharts.observeSize(document.getElementById('hm'), function(){renderHeat(build());});
-  render();
-})();
-</script>
-<script src="../_shared/report-enhancements.js?v=20260903-report-targets&amp;rev=a003bd77559b"></script>
 </body>
 </html>

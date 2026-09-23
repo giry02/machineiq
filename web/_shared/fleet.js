@@ -32,12 +32,12 @@
       return metric;
     });
 
-  invariant(catalog.length === 45, 'fleet catalog must contain 42 original and 3 customer-staff demo vehicles');
+  invariant(catalog.length === 235, 'demo catalog must match company totals');
   invariant(fleet.length === 13, 'metric fleet must contain 10 original and 3 customer-staff demo vehicles');
 
   var MIQ = global.MIQ = global.MIQ || {};
   MIQ.COMPANY = source.defaultCompany.companyName;
-  MIQ.TYPES = source.powerTypes.filter(function(type){return type !== '수소';});
+  MIQ.TYPES = source.powerTypes.slice();
   MIQ.FLEET = fleet;
   MIQ.FLEET_METRICS = MIQ.FLEET;
   MIQ.FLEET_CATALOG = catalog;

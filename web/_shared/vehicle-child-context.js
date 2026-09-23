@@ -67,6 +67,8 @@
   document.addEventListener('click', function (event) {
     var button = event.target.closest('.period-tabs button[data-period]');
     if (!button || !button.closest('[data-chart]')) return;
+    var filter = button.closest('.miq-period-filter');
+    if (filter && filter.__miqPeriodController) return;
     currentPeriod = button.dataset.period || currentPeriod;
     var query = currentQuery();
     query.set('period', currentPeriod);

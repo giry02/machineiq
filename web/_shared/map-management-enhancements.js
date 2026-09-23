@@ -8,6 +8,8 @@
   var page = body.getAttribute('data-sub') || '';
   var query = new URLSearchParams(window.location.search);
   var managementHeader = window.MIQManagementHeader || null;
+  // The management vehicle seed contains 42 vehicles across these four groups.
+  var customerVehicleGroupTotals = { '미배정': 2, '기본그룹': 18, '테스트그룹': 12, '물류1팀': 10 };
 
   function esc(value) {
     return String(value == null ? '' : value)
@@ -16,6 +18,19 @@
   }
   var common = window.MIQCommon;
   var norm = common.search.normalize;
+  function currentDemoRequests(legacy, ageDays) {
+    return legacy.map(function (record, index) {
+      var date = common.dates.addDays(common.dates.today(), -ageDays[index]);
+      var registered = common.dates.format(date) + record.registered.slice(10);
+      var processed = '';
+      if (record.processed) {
+        var elapsed = Date.parse(record.processed.replace(' ', 'T')) - Date.parse(record.registered.replace(' ', 'T'));
+        var completed = new Date(Date.parse(registered.replace(' ', 'T')) + elapsed);
+        processed = common.dates.format(completed) + ' ' + String(completed.getHours()).padStart(2, '0') + ':' + String(completed.getMinutes()).padStart(2, '0');
+      }
+      return Object.assign({}, record, { registered: registered, processed: processed, demoDateRevision: '20260915-current' });
+    });
+  }
   function initRequestPeriod(onChange) {
     var control = document.querySelector('[data-request-period-control]');
     control.addEventListener('click', function (event) {
@@ -26,7 +41,7 @@
         button.classList.toggle('active', active);
         button.setAttribute('aria-pressed', active ? 'true' : 'false');
       });
-      onChange();
+      // The existing 조회 button applies this draft together with the other filters.
     });
     return {
       read: function () {
@@ -144,11 +159,11 @@
       if (row.children[index]) row.children[index].classList.toggle('mm-role-hidden', !visible);
     });
   }
-  function addEmpty(tbody, colspan, message) {
+  function addEmpty(tbody, message) {
     if (tbody.querySelector('.mm-empty')) return;
     var row = document.createElement('tr');
     row.className = 'mm-empty';
-    row.innerHTML = '<td colspan="' + colspan + '">' + esc(message) + '</td>';
+    row.innerHTML = '<td colspan="' + MIQTableLayout.columnCount(tbody.closest('table')) + '">' + esc(message) + '</td>';
     tbody.appendChild(row);
   }
   function clearEmpty(tbody) {
@@ -174,48 +189,12 @@
       tabs[index].focus();
     });
   }
-  function wireColumnSettings(button, table, indexes) {
-    if (!button || !table || button.dataset.mmColumnsReady) return;
-    button.dataset.mmColumnsReady = '1';
-    button.setAttribute('aria-haspopup', 'true');
-    button.setAttribute('aria-expanded', 'false');
-    button.addEventListener('click', function () {
-      var old = button.parentNode.querySelector('.mm-column-popover');
-      if (old) {
-        old.remove();
-        button.setAttribute('aria-expanded', 'false');
-        return;
-      }
-      var pop = document.createElement('div');
-      pop.className = 'mm-column-popover';
-      pop.setAttribute('role', 'group');
-      pop.setAttribute('aria-label', '표시할 열 선택');
-      indexes.forEach(function (index) {
-        var heading = table.tHead && table.tHead.rows[0] && table.tHead.rows[0].children[index];
-        if (!heading) return;
-        var label = document.createElement('label');
-        label.innerHTML = '<input type="checkbox" checked data-mm-column="' + index + '"> ' + esc(heading.textContent.trim());
-        pop.appendChild(label);
-      });
-      button.parentNode.appendChild(pop);
-      button.setAttribute('aria-expanded', 'true');
-      pop.addEventListener('change', function (event) {
-        var index = parseInt(event.target.dataset.mmColumn, 10);
-        if (isNaN(index)) return;
-        var show = event.target.checked;
-        Array.prototype.forEach.call(table.rows, function (row) {
-          if (row.children[index]) row.children[index].style.display = show ? '' : 'none';
-        });
-      });
-    });
-  }
 
   /* ───────────────────────────────────────────── Map */
   function initMap() {
     var map = document.getElementById('map');
     var tbody = document.getElementById('eqBody');
-    var markers = document.getElementById('markers');
-    if (!map || !tbody || !markers || !window.MIQ || (!MIQ.FLEET_CATALOG && !MIQ.FLEET)) return;
+    if (!map || !tbody || !window.MIQ || (!MIQ.FLEET_CATALOG && !MIQ.FLEET)) return;
 
     /* nav.js normalizes the hierarchy before this module starts on DOMContentLoaded.
        Re-read the canonical URL/context so the map never restores a stale bare group. */
@@ -262,10 +241,8 @@
         '<span class="mm-route-legend"><i class="start"></i>시작 <i class="end"></i>종료</span>' +
       '</div>' +
       '<div class="mm-map-toolbar__filters" data-mm-map-filters></div>' +
-      '<span class="mm-map-toolbar__hint" data-mm-map-hint>차량을 선택하면 위치와 상세 정보를 확인할 수 있습니다.</span>';
+      '<span class="mm-map-toolbar__hint" data-mm-map-hint>아래 장비목록의 차대번호를 누르면 지도에서 차량이 선택됩니다.</span>';
     map.parentNode.insertBefore(toolbar, map);
-
-    var resetButton = document.getElementById('btnMapReset');
 
     var zoomBox = document.createElement('span');
     zoomBox.className = 'mm-zoom-level';
@@ -274,15 +251,17 @@
     controls.insertBefore(zoomBox, controls.children[1]);
 
     function rowFault(row) {
+      if(!row.children)return Number(row.err)||0;
       var cell = row.children[6];
       return cell ? parseInt(cell.textContent.replace(/[^0-9-]/g, ''), 10) || 0 : 0;
     }
     function rowRun(row) {
+      if(!row.children)return Number(row.runH)||0;
       var cell = row.children[3];
       return cell ? parseFloat(cell.textContent.replace(/[^0-9.-]/g, '')) || 0 : 0;
     }
     function allowed(row) {
-      var vin = row.getAttribute('data-vin');
+      var vin = row.getAttribute?row.getAttribute('data-vin'):row.vin;
       var vehicle = vinMap[vin];
       if (!vehicle && ['dealer_staff', 'customer_staff'].indexOf(managementRole()) > -1) return false;
       if (filters.companyId !== 'all' && (!vehicle || String(vehicle.companyId || '1933') !== String(filters.companyId))) return false;
@@ -320,25 +299,26 @@
       Array.prototype.forEach.call(tbody.querySelectorAll('tr[data-vin]'), function (row) {
         row.tabIndex = 0;
         var cell = row.querySelector('td.vin');
-        if (cell && !cell.querySelector('a')) {
+        if (cell && !cell.querySelector('[data-mm-map-select]')) {
           var vin = row.getAttribute('data-vin');
-          cell.innerHTML = '<a href="' + detailUrl(vin, 'map-list') + '">' + esc(vin) + '</a>';
-          cell.querySelector('a').addEventListener('click', function (event) { event.stopPropagation(); });
+          cell.innerHTML = '<button type="button" class="mm-map-select" data-mm-map-select aria-label="' + esc(vin) + ' 지도에서 선택">' + esc(vin) + '</button>';
+          cell.querySelector('button').addEventListener('click', function (event) {
+            event.stopPropagation();
+            MIQMapData.select(vin);
+            if (event.detail === 0) {
+              var nextRow = Array.prototype.find.call(tbody.querySelectorAll('tr[data-vin]'), function (item) { return item.getAttribute('data-vin') === vin; });
+              var nextButton = nextRow && nextRow.querySelector('[data-mm-map-select]');
+              if (nextButton) nextButton.focus({ preventScroll: true });
+            }
+          });
         }
+        var selectButton = cell && cell.querySelector('[data-mm-map-select]');
+        if (selectButton) selectButton.setAttribute('aria-pressed', String(row.classList.contains('sel')));
         if (!row.dataset.mmKeyboard) {
           row.dataset.mmKeyboard = '1';
           row.addEventListener('keydown', function (event) {
+            if (event.target !== row || event.repeat) return;
             if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); row.click(); }
-          });
-        }
-      });
-      Array.prototype.forEach.call(markers.querySelectorAll('.marker[data-vin]'), function (marker) {
-        marker.tabIndex = 0;
-        marker.setAttribute('role', 'button');
-        if (!marker.dataset.mmKeyboard) {
-          marker.dataset.mmKeyboard = '1';
-          marker.addEventListener('keydown', function (event) {
-            if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); marker.click(); }
           });
         }
       });
@@ -358,7 +338,7 @@
       if (window.MIQGoogleMap) MIQGoogleMap.sync({ visibleVins: visible, selectedVin: vin, routeMode: routeMode, from: routeFrom, to: routeTo, requestId: routeRequestId });
       toolbar.querySelector('[data-mm-map-hint]').textContent = routeMode && vin
         ? vin + ' · ' + routeFrom + (routeFrom === routeTo ? '' : ' ~ ' + routeTo) + ' 이동 경로'
-        : '차량을 선택하면 위치와 상세 정보를 확인할 수 있습니다.';
+        : '아래 장비목록의 차대번호를 누르면 지도에서 차량이 선택됩니다.';
     }    function paintFilterChips() {
       var box = toolbar.querySelector('[data-mm-map-filters]');
       var items = [];
@@ -428,43 +408,16 @@
     function applyFilters() {
       if (applying) return;
       applying = true;
+      MIQMapData.setFilter(allowed);
+      MIQMapData.refresh();
       decorateRows();
-      var visible = {};
-      var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr[data-vin]'));
-      rows.forEach(function (row) {
-        var show = allowed(row);
-        row.classList.toggle('mm-filter-hidden', !show);
-        if (show) visible[row.getAttribute('data-vin')] = row;
-      });
-      Array.prototype.forEach.call(markers.querySelectorAll('.marker[data-vin]'), function (marker) {
-        marker.classList.toggle('mm-filter-hidden', !visible[marker.getAttribute('data-vin')]);
-      });
-      var counts = { off: 0, unknown: 0, bad: 0, ok: 0, run: 0 };
-      Object.keys(visible).forEach(function (vin) {
-        var row = visible[vin];
-        var vehicle = vinMap[vin];
-        if (!vehicle || (vehicle.conn !== true && vehicle.conn !== false)) counts.unknown++;
-        else if (vehicle.conn === false) counts.off++;
-        else if (rowFault(row) > 0) counts.bad++;
-        else counts.ok++;
-        if (rowRun(row) > 0) counts.run++;
-      });
-      document.getElementById('cntOff').textContent = counts.off;
-      var unknownCount = document.getElementById('cntUnknown');
-      if (unknownCount) unknownCount.textContent = counts.unknown;
-      document.getElementById('cntBad').textContent = counts.bad;
-      document.getElementById('cntOk').textContent = counts.ok;
-      document.getElementById('runCnt').textContent = counts.run;
-      renderMapScope(Object.keys(visible).length);
+      renderMapScope(MIQMapData.getVisibleRows().length);
       updatePopupLink();
       paintFilterChips();
       updateScopeLabel();
       renderRoute();
       applying = false;
     }
-    var observer = new MutationObserver(function () { window.setTimeout(applyFilters, 0); });
-    observer.observe(tbody, { childList: true });
-    observer.observe(markers, { childList: true });
     var searchInput = document.getElementById('eqQ');
     searchInput.value = query.get('q') || '';
     var searchState = common.search.bind(searchInput, document.getElementById('btnMapSearch'), applyMapSearch);
@@ -475,7 +428,6 @@
     }
     applyMapSearch();
     tbody.addEventListener('click', function () { window.setTimeout(function () { updatePopupLink(); renderRoute(); }, 0); });
-    markers.addEventListener('click', function () { window.setTimeout(function () { updatePopupLink(); renderRoute(); }, 0); });
     toolbar.addEventListener('click', function (event) {
       var button = event.target.closest('[data-mm-map-mode]');
       if (!button) return;
@@ -485,7 +437,6 @@
       });
       toolbar.classList.toggle('is-route', routeMode);
       setQuery({ route: routeMode ? '1' : null, routeVin: routeMode ? selectedVin() || null : null });
-      if (!routeMode) toolbar.querySelector('[data-mm-map-hint]').textContent = '차량을 선택하면 위치와 상세 정보를 확인할 수 있습니다.';
       renderRoute();
     });
     function paintRoutePeriod() {
@@ -507,7 +458,7 @@
       if (!event.target.closest('[data-mm-route-search]')) return;
       var from = toolbar.querySelector('[data-mm-route-from]').value, to = toolbar.querySelector('[data-mm-route-to]').value;
       if (!common.dates.parse(from) || !common.dates.parse(to) || from > to) { toast('조회 시작일과 종료일을 확인해 주세요.', 'error'); return; }
-      if (!selectedVin()) { toast('장비목록에서 차량 1대를 선택해 주세요.', 'error'); return; }
+      if (!selectedVin()) { toast('아래 장비목록의 차대번호를 눌러 차량을 선택해 주세요.', 'error'); return; }
       routeFrom = from; routeTo = to; routeRequestId++;
       setQuery({routeFrom:routeFrom,routeTo:routeTo,routePeriod:routePeriod,routeVin:selectedVin()}); renderRoute();
     });
@@ -526,10 +477,16 @@
     ctlButtons[0].addEventListener('click', function () { if (window.MIQGoogleMap) MIQGoogleMap.zoomBy(1); });
     ctlButtons[ctlButtons.length - 1].addEventListener('click', function () { if (window.MIQGoogleMap) MIQGoogleMap.zoomBy(-1); });
     document.getElementById('btnExport').addEventListener('click', function () {
-      var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr[data-vin]:not(.mm-filter-hidden)'));
-      var heads = Array.prototype.map.call(document.querySelectorAll('#eqHead th'), function (th) { return '"' + th.textContent.replace(/[▲▼↕]/g, '').trim().replace(/"/g, '""') + '"'; });
+      var rows = MIQMapData.getVisibleRows();
+      var columns = ['model', 'vin', 'dataTime', 'runH', 'conn', 'idle', 'err', 'battErr', 'posTime', 'addr'];
+      var heads = Array.prototype.map.call(document.querySelectorAll('#eqHead th'), function (th) { return '"' + th.textContent.replace(/[▲▼↕↑↓]/g, '').trim().replace(/"/g, '""') + '"'; });
       var lines = [heads.join(',')].concat(rows.map(function (row) {
-        return Array.prototype.map.call(row.children, function (cell) { return '"' + cell.textContent.trim().replace(/"/g, '""') + '"'; }).join(',');
+        return columns.map(function (key) {
+          var value = row[key];
+          if (value === null || value === undefined || value === '') value = '-';
+          else if (typeof value === 'number') value = common.numbers.integer(value);
+          return '"' + String(value).replace(/"/g, '""') + '"';
+        }).join(',');
       }));
       var blob = new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
       var link = document.createElement('a');
@@ -538,22 +495,6 @@
       document.body.appendChild(link); link.click(); link.remove();
       window.setTimeout(function () { URL.revokeObjectURL(link.href); }, 0);
       toast('현재 조회 결과 ' + rows.length + '대를 CSV로 내보냈습니다.', 'success');
-    });
-    resetButton.addEventListener('click', function () {
-      filters.connection = filters.operation = filters.fault = '';
-      setQuery({}, ['connection', 'operation', 'fault', 'state', 'q', 'route', 'routeVin', 'routeFrom', 'routeTo', 'routePeriod']);
-      routeMode = false;
-      routeToday = window.MIQMeeting ? MIQMeeting.hourlyWindow().date : common.dates.format(new Date());
-      routePeriod = 'd'; routeFrom = routeTo = routeToday;
-      toolbar.querySelector('[data-mm-route-from]').value = routeFrom;
-      toolbar.querySelector('[data-mm-route-to]').value = routeTo;
-      paintRoutePeriod();
-      toolbar.classList.remove('is-route');
-      toolbar.querySelector('[data-mm-map-mode="position"]').click();
-      searchInput.value = '';
-      searchState.commit('');
-      applyMapSearch();
-      window.setTimeout(applyFilters, 0);
     });
     document.addEventListener('miq:target-change', function (event) {
       var target = event.detail || {};
@@ -568,7 +509,7 @@
     });
 
     // Restore the current scope and zoom before refreshed hourly rows are painted.
-    document.addEventListener('miq:map-rendered', function () { applyFilters(); applyZoom(); });
+    document.addEventListener('miq:map-rendered', function () { if(!applying){decorateRows();renderMapScope(MIQMapData.getVisibleRows().length);} applyZoom(); });
 
     applyFilters();
     var restoreRouteVin = query.get('routeVin');
@@ -583,6 +524,9 @@
     var table = document.getElementById('userTable');
     if (!table) return;
     var tbody = table.tBodies[0];
+    var userRows=Array.from(tbody.querySelectorAll('tr[data-owner]'));
+    var userPager=MIQ.createListPager(table.parentElement,{pageSize:20,presentation:'operations',unit:'건',onChange:applyFilters});
+    var userRequestPager=MIQ.createListPager(document.getElementById('userRequestBody').closest('.tbl-wrap'),{pageSize:20,presentation:'operations',unit:'건',onChange:renderUserRequests});
     var filterBar = document.querySelector('.filter-bar');
     var search = managementHeader ? managementHeader.getControl('query') : filterBar.querySelector('input');
     var searchButton = filterBar.querySelector('[data-mgmt-search-submit], .btn-search');
@@ -592,30 +536,18 @@
     var roleFilter = managementHeader ? managementHeader.getControl('userRole') : filterBar.querySelector('[data-mgmt-filter="userRole"]');
     var groupFilter = managementHeader ? managementHeader.getControl('groupName') : filterBar.querySelector('[data-mgmt-filter="userGroup"]');
     var userContext = document.getElementById('userContext');
-    var vehicleSamples = {
-      '기본그룹': [['B30S-7', 'FBA32_000271', '리튬'], ['D25S-9', 'FBD25_000044', '엔진'], ['B18S-7', 'FBA18_000094', '납산']],
-      '테스트그룹': [['B16S-7', 'FBA16_000311', '납산'], ['B25S-7', 'FBA25_000012', '리튬'], ['D18S-9', 'FBD18_000156', '엔진']],
-      '물류1팀': [['B35S-7', 'FBA35_000427', '리튬'], ['B22S-7', 'FBA22_000388', '납산'], ['D30S-9', 'FBD30_000028', '엔진']]
-    };
     var userScopeByRoleName = {
       '내부 사용자': 'internal', '딜러 대표': 'dealer_owner', '딜러 직원': 'dealer_staff',
       '고객 대표': 'customer_owner', '고객 직원': 'customer_staff'
     };
-    var vehicleSamplesByScope = {
-      internal: vehicleSamples['기본그룹'],
-      dealer_owner: [['B30S-7', 'FBA32_000271', '리튬'], ['B18S-7', 'FBA18_000094', '납산'], ['B25S-7', 'FBA25_000118', '리튬']],
-      dealer_staff: [['B30S-7', 'FBA32_000271', '리튬'], ['B25S-7', 'FBA25_000118', '리튬'], ['B25S-7', 'FBA25_000012', '리튬']],
-      customer_owner: vehicleSamples['기본그룹'],
-      customer_staff: vehicleSamples['물류1팀']
-    };
     function accessibleVehicleCount(row) {
       var name = row.children[2].textContent.trim();
       var companyName = row.children[3].textContent.trim();
-      var group = selectedGroup(row);
+      var group = assignedUserGroup(row);
       if ((name === '고객 대표' || name === '고객 직원') && companyName !== '(주)세종물류중부지점') {
         return { count: null, basis: '조회 가능한 차량 정보가 없습니다.' };
       }
-      if (name === '고객 직원') return { count: { '기본그룹': 18, '테스트그룹': 14, '물류1팀': 10 }[group] || 0, basis: '소속 그룹' };
+      if (name === '고객 직원') return { count: customerVehicleGroupTotals[group] || 0, basis: '소속 그룹' };
       if (name === '딜러 직원') return { count: 11, basis: '담당 업체' };
       if (name === '딜러 대표') return { count: 22, basis: '관리 업체' };
       return { count: 42, basis: name === '고객 대표' ? '내 업체' : '전체 지원 범위' };
@@ -659,38 +591,23 @@
       link.title = info.count == null ? info.basis : '';
       link.textContent = info.count == null ? '조회 가능 차량 없음' : '조회 차량 ' + info.count + '대';
     }
-    Array.prototype.forEach.call(tbody.querySelectorAll('tr[data-owner]'), function (row) {
+    Array.prototype.forEach.call(rowsNow(), function (row) {
       normaliseCustomerGroup(row);
       ensureVehicleLink(row);
     });
 
-    var vehicleModal = document.createElement('div');
-    vehicleModal.className = 'dim';
-    vehicleModal.id = 'userVehiclesModal';
-    vehicleModal.innerHTML = '<div class="modal"><div class="modal__head"><div class="modal__title">조회 가능 차량</div><button class="modal__x" data-modal-close>✕</button></div>' +
-      '<div class="modal__body"><div class="mm-context-banner" data-user-vehicle-context></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>기종</th><th>차대번호</th><th>분류</th><th>조회 범위</th></tr></thead><tbody></tbody></table></div></div>' +
-      '<div class="modal__foot"><a class="btn" data-user-vehicle-link href="#">차량 목록 열기</a><button class="btn btn--pri" data-modal-close>확인</button></div></div>';
-    document.body.appendChild(vehicleModal);
+    // 조회 차량 건수는 기존 차량 목록으로 바로 이동한다.
     document.addEventListener('click', function (event) {
       var trigger = event.target.closest('[data-user-vehicles]');
       if (!trigger) return;
       var row = trigger.closest('tr');
-      var group = selectedGroup(row);
+      var group = assignedUserGroup(row);
       var info = accessibleVehicleCount(row);
       if (info.count == null) return;
       var userScope = userScopeByRoleName[row.children[2].textContent.trim()] || currentRole;
-      var samples = userScope === 'customer_staff'
-        ? vehicleSamples[group] || vehicleSamplesByScope.customer_staff
-        : vehicleSamplesByScope[userScope] || vehicleSamplesByScope.internal;
-      vehicleModal.querySelector('.modal__title').textContent = row.children[1].textContent.trim() + ' · 조회 가능 차량 ' + info.count + '대';
-      vehicleModal.querySelector('[data-user-vehicle-context]').innerHTML = '<strong>조회 기준 · ' + esc(info.basis) + '</strong><span>총 ' + info.count + '대 중 일부 차량입니다. 전체 목록은 차량 목록 열기에서 확인할 수 있습니다.</span>';
-      vehicleModal.querySelector('tbody').innerHTML = samples.map(function (item) {
-        return '<tr><td class="strong">' + esc(item[0]) + '</td><td>' + esc(item[1]) + '</td><td>' + esc(item[2]) + '</td><td>' + esc(info.basis) + '</td></tr>';
-      }).join('');
       var values = { userScope: userScope };
       if (row.children[2].textContent.trim() === '고객 직원' && group && group !== '전체') values.group = group;
-      vehicleModal.querySelector('[data-user-vehicle-link]').href = managementHeader.withRole('../Mgmt%20Vehicle/mgmt-vehicle-tobe.html', values);
-      vehicleModal.classList.add('open');
+      location.href = managementHeader.withRole('../Mgmt%20Vehicle/mgmt-vehicle-tobe.html', values);
     });
     var explicitCompany = query.get('company') || '';
     var principals = {
@@ -703,7 +620,7 @@
     };
     function rowRole(row) { return row.children[2] ? row.children[2].textContent.trim() : ''; }
     function dealerOwnerForStaff(email) {
-      var row = Array.prototype.filter.call(tbody.querySelectorAll('tr[data-owner]'), function (item) { return item.dataset.owner === email; })[0];
+      var row = Array.prototype.filter.call(rowsNow(), function (item) { return item.dataset.owner === email; })[0];
       return row && row.dataset.managedBy ? row.dataset.managedBy : principals.dealer_owner;
     }
     function inRoleScope(row) {
@@ -727,7 +644,7 @@
       currentRole = managementRole();
       var showGroupColumn = currentRole !== 'dealer_owner' && currentRole !== 'dealer_staff';
       var showManagementColumn = currentRole === 'customer_owner';
-      Array.prototype.forEach.call(tbody.querySelectorAll('tr[data-owner]'), function (row) {
+      Array.prototype.forEach.call(rowsNow(), function (row) {
         var show = inRoleScope(row);
         var editableCustomerStaff = hasCapability('assignUserGroup') && rowRole(row) === '고객 직원';
         row.classList.toggle('row-hidden', !show);
@@ -741,27 +658,18 @@
       var approvalTab = document.getElementById('userTabApprovalBtn');
       var canApproveRequests = hasCapability('approveUserRequest');
       if (approvalTab) approvalTab.classList.toggle('is-hidden', !canApproveRequests);
-      var userListNote = document.getElementById('userListNote');
-      if (userListNote) {
-        userListNote.hidden = false;
-        userListNote.removeAttribute('aria-hidden');
-        var policyByRole = {
-          internal: '전체 사용자 현황을 조회하는 읽기 전용 권한입니다.',
-          dealer_owner: '담당 딜러 직원·고객 대표를 조회하고 계정신청을 승인·반려합니다.',
-          dealer_staff: '본인과 담당 고객 대표 계정을 조회하는 읽기 전용 권한입니다.',
-          customer_owner: '자기 업체의 고객 직원 그룹을 변경하고 계정신청을 승인·반려합니다.',
-          customer_staff: '자기 계정 정보만 조회할 수 있습니다.'
-        };
-        userListNote.innerHTML = '<strong>사용자 관리 안내</strong><span>' + (policyByRole[currentRole] || policyByRole.internal) + '</span>';
-      }
       if (!canApproveRequests && activeUserTab === 'approval') setUserTab('list');
     }
-    function rowsNow() { return Array.prototype.slice.call(tbody.querySelectorAll('tr[data-owner]')); }
+    function rowsNow() { return userRows.slice(); }
     function selectedGroup(row) {
       var select = row.querySelector('.group-select');
       var view = row.querySelector('.role-view-only');
       if (select && !select.classList.contains('is-hidden')) return select.value.trim();
       return view ? view.textContent.trim() : '';
+    }
+    function assignedUserGroup(row) {
+      var view = row.querySelector('.role-view-only');
+      return view ? view.textContent.trim() : selectedGroup(row);
     }
     function searchableUserText(row) {
       /* 검색 안내에 명시한 ID·이름·연락처와 허용된 기본 소속만 사용한다.
@@ -780,11 +688,13 @@
         row.classList.toggle('mm-filter-hidden', !pass);
         if (pass && !row.classList.contains('row-hidden')) shown++;
       });
-      if (!shown) addEmpty(tbody, 9, '조회 조건에 해당하는 사용자가 없습니다.');
+      tbody.replaceChildren.apply(tbody,userPager.slice(rowsNow().filter(function(row){return !row.classList.contains('mm-filter-hidden')&&!row.classList.contains('row-hidden')})));
+      setColumnVisible(table,3,currentRole!=='customer_owner'&&currentRole!=='customer_staff');
+      setColumnVisible(table,4,currentRole!=='dealer_owner'&&currentRole!=='dealer_staff');
+      setColumnVisible(table,8,currentRole==='customer_owner');
+      if (!shown) addEmpty(tbody, '조회 조건에 해당하는 사용자가 없습니다.');
       document.getElementById('userCount').textContent = shown;
       if (userContext) userContext.textContent = scopeLabels[currentRole];
-      var userFoot = document.getElementById('userFoot');
-      if (userFoot) userFoot.textContent = '조회 결과 ' + shown + '명';
     }
     var activeUserTab = 'list';
     var activeUserRequestView = 'all';
@@ -793,7 +703,7 @@
     var modalUserDecision = 'APRV';
     var userRequestModalTrigger = null;
     var USER_REQUEST_STORAGE_KEY = 'linq.management.userRequests.v2';
-    var USER_REQUEST_REFERENCE = '2026-07-06 14:30';
+    var USER_REQUEST_REFERENCE = nowText();
     var USER_REQUEST_STATUS = {
       REQ: { label: '신청', cls: 'warn' },
       APRV: { label: '승인', cls: 'ok' },
@@ -811,11 +721,22 @@
       ];
     }
     function loadUserRequests() {
+      var legacy = seedUserRequests();
+      var current = currentDemoRequests(legacy, [1, 2, 3, 4, 10, 16, 22]);
       try {
         var saved = JSON.parse(sessionStorage.getItem(USER_REQUEST_STORAGE_KEY) || 'null');
-        if (Array.isArray(saved) && saved.length) return saved;
+        if (Array.isArray(saved)) {
+          var migrated = saved.map(function (record) {
+            var index = legacy.findIndex(function (seed) { return seed.id === record.id; });
+            var seed = legacy[index];
+            if (!seed || record.demoDateRevision || record.registered !== seed.registered || record.processed !== seed.processed || record.status !== seed.status) return record;
+            return Object.assign({}, record, { registered: current[index].registered, processed: current[index].processed, demoDateRevision: current[index].demoDateRevision });
+          });
+          try { sessionStorage.setItem(USER_REQUEST_STORAGE_KEY, JSON.stringify(migrated)); } catch (ignoreWrite) {}
+          return migrated;
+        }
       } catch (error) {}
-      return seedUserRequests();
+      return current;
     }
     var userRequests = loadUserRequests();
     function saveUserRequests() {
@@ -849,8 +770,6 @@
         listPanel.classList.toggle('is-hidden', activeUserTab !== 'list');
         listPanel.setAttribute('aria-hidden', activeUserTab === 'list' ? 'false' : 'true');
       }
-      var userListNote = document.getElementById('userListNote');
-      if (userListNote) userListNote.classList.toggle('is-hidden', activeUserTab !== 'list');
       var panel = document.getElementById('reqPanel');
       panel.classList.toggle('is-hidden', activeUserTab !== 'approval');
       panel.setAttribute('aria-hidden', activeUserTab === 'approval' ? 'false' : 'true');
@@ -900,13 +819,15 @@
       return Object.keys(selectedUserRequests).filter(function (id) { return visible[id]; }).map(userRequestById).filter(Boolean);
     }
     function renderUserRequestSummary() {
+      var referenceLabel = document.querySelector('#reqPanel .mm-request-reference');
+      if (referenceLabel) referenceLabel.textContent = '데이터 기준 ' + USER_REQUEST_REFERENCE;
       var scoped = userRequestsInScope();
       var pending = scoped.filter(function (record) { return record.status === 'REQ'; });
       var approved = scoped.filter(function (record) { return record.status === 'APRV'; });
       var rejected = scoped.filter(function (record) { return record.status === 'RJCT'; });
       var completed = scoped.filter(function (record) { return record.processed; });
       var hours = completed.map(function (record) { return Math.max(0, (parseUserRequestDate(record.processed) - parseUserRequestDate(record.registered)) / 3600000); });
-      var average = hours.length ? (hours.reduce(function (sum, value) { return sum + value; }, 0) / hours.length).toFixed(1) + '시간' : '-';
+      var average = hours.length ? window.MIQCommon.numbers.integer((hours.reduce(function (sum, value) { return sum + value; }, 0) / hours.length)) + '시간' : '-';
       var reference = parseUserRequestDate(USER_REQUEST_REFERENCE);
       var longest = pending.length ? Math.max.apply(null, pending.map(function (record) { return Math.max(1, Math.ceil((reference - parseUserRequestDate(record.registered)) / 86400000)); })) + '일' : '-';
       document.getElementById('userRequestSummary').innerHTML = [
@@ -928,17 +849,17 @@
       var scopeAll = userRequestsInScope();
       var pendingAll = scopeAll.filter(function (record) { return record.status === 'REQ'; });
       var body = document.getElementById('userRequestBody');
-      body.innerHTML = filtered.length ? filtered.map(function (record) {
+      body.innerHTML = filtered.length ? userRequestPager.slice(filtered).map(function (record) {
         var status = USER_REQUEST_STATUS[record.status] || USER_REQUEST_STATUS.REQ;
         var selectable = record.status === 'REQ';
         var checked = !!selectedUserRequests[record.id];
         return '<tr data-user-request-id="' + esc(record.id) + '"><td class="c">' + (selectable ? '<input type="checkbox" data-user-request-select="' + esc(record.id) + '" aria-label="' + esc(record.name) + ' 신청 선택"' + (checked ? ' checked' : '') + '/>' : '<span class="mute">-</span>') + '</td>' +
-          '<td class="strong">' + esc(record.email) + '</td><td class="c"><span class="badge ' + status.cls + '" data-status-code="' + esc(record.status) + '">' + status.label + '</span></td><td>' + esc(record.name) + '</td><td>' + esc(record.role) + '</td><td>' + esc(record.company) + '</td><td>' + esc(record.registered) + '</td><td>' + esc(record.processed || '-') + '</td><td>' + esc(record.processor || '-') + '</td><td class="mm-request-reason" title="' + esc(record.reason || '') + '">' + esc(record.reason || '-') + '</td><td class="c"><button class="btn btn--sm ' + (selectable ? 'btn--pri' : '') + '" type="button" ' + (selectable ? 'data-user-request-process' : 'data-user-request-detail') + '="' + esc(record.id) + '">' + (selectable ? '처리' : '상세') + '</button></td></tr>';
-      }).join('') : '<tr class="empty"><td colspan="11">조회 조건에 해당하는 계정 신청이 없습니다.</td></tr>';
+          '<td class="strong">' + esc(record.email) + '</td><td class="c"><span class="badge ' + status.cls + '" data-status-code="' + esc(record.status) + '">' + status.label + '</span></td><td>' + esc(record.name) + '</td><td>' + esc(record.role) + '</td><td>' + esc(record.company) + '</td><td>' + esc(record.registered) + '</td><td>' + esc(record.processed || '-') + '</td><td>' + esc(record.processor || '-') + '</td><td class="c"><button class="btn btn--sm ' + (selectable ? 'btn--pri' : '') + '" type="button" ' + (selectable ? 'data-user-request-process' : 'data-user-request-detail') + '="' + esc(record.id) + '">' + (selectable ? '처리' : '상세') + '</button></td></tr>';
+      }).join('') : '<tr class="empty"><td colspan="10">조회 조건에 해당하는 계정 신청이 없습니다.</td></tr>';
+      if (!filtered.length) userRequestPager.slice([]);
       document.getElementById('userRequestAllCount').textContent = scopeAll.length;
       document.getElementById('userRequestPendingCount').textContent = pendingAll.length;
       document.getElementById('userRequestResultCount').textContent = filtered.length;
-      document.getElementById('userRequestFoot').textContent = '조회 결과 ' + filtered.length + '건 · 신청 ' + pendingAll.length + '건';
       var selected = selectedScopedUserRequests();
       document.getElementById('userRequestSelectedCount').textContent = selected.length;
       document.getElementById('userRequestBulkApprove').disabled = !selected.length;
@@ -959,7 +880,7 @@
       tr.innerHTML = '<td class="strong">' + esc(record.email) + '</td><td>' + esc(record.name) + '</td><td>' + esc(record.role) + '</td><td>' + esc(record.company) + '</td>' +
         '<td><select class="inp group-select" aria-label="' + esc(record.name) + ' 그룹">' + groupOptions + '</select><span class="mute role-view-only is-hidden">' + esc(group) + '</span></td>' +
         '<td>' + esc(record.phone || '-') + '</td><td>' + esc(record.registered) + '</td><td>' + esc(record.processed) + '</td><td class="c"><span class="mm-inline-actions"><button class="btn btn--sm btn--pri" data-group-mode>그룹 저장</button> <button class="btn btn--sm btn--danger" data-modal-open="delModal">삭제</button></span></td>';
-      tbody.insertBefore(tr, tbody.firstChild); normaliseCustomerGroup(tr); ensureVehicleLink(tr); tr.classList.add('mm-just-saved');
+      userRows.unshift(tr); tbody.insertBefore(tr, tbody.firstChild); normaliseCustomerGroup(tr); ensureVehicleLink(tr); tr.classList.add('mm-just-saved');
     }
     var userRequestModal = document.getElementById('userRequestModal');
     var userRejection = initRejectionReason(document.getElementById('userRequestReason'), 'account', document.getElementById('userRequestReasonError'));
@@ -1032,7 +953,7 @@
       if (modalUserDecision === 'APRV' && duplicate.length) { toast(duplicate[0].email + '은(는) 이미 등록된 사용자입니다.', 'danger'); return; }
       var operator = window.MIQ && window.MIQ.MANAGEMENT_IDENTITY ? window.MIQ.MANAGEMENT_IDENTITY.operator : (currentRole === 'customer_owner' ? '윤태호' : '박민아');
       targets.forEach(function (record) {
-        record.status = modalUserDecision; record.processed = USER_REQUEST_REFERENCE; record.processor = operator; record.processorRole = currentRole === 'customer_owner' ? '고객 대표' : '딜러 대표'; record.reason = modalUserDecision === 'RJCT' ? reason : ''; record.group = record.role === '고객 직원' ? group : '전체';
+        record.status = modalUserDecision; record.processed = nowText(); record.processor = operator; record.processorRole = currentRole === 'customer_owner' ? '고객 대표' : '딜러 대표'; record.reason = modalUserDecision === 'RJCT' ? reason : ''; record.group = record.role === '고객 직원' ? group : '전체';
         record.reasonType = modalUserDecision === 'RJCT' ? rejection.type : '';
         if (modalUserDecision === 'APRV') { record.addedToUsers = true; addApprovedUser(record); }
         delete selectedUserRequests[record.id];
@@ -1076,7 +997,11 @@
       var button = event.target.closest('[data-user-request-view]'); if (!button) return; activeUserRequestView = button.dataset.userRequestView;
       Array.prototype.forEach.call(this.querySelectorAll('[data-user-request-view]'), function (tab) { var active = tab === button; tab.classList.toggle('active', active); tab.setAttribute('aria-pressed', active ? 'true' : 'false'); }); renderUserRequests();
     });
-    document.getElementById('userRequestStatus').addEventListener('change', applyUserRequestFilters);
+    document.getElementById('userRequestStatus').addEventListener('change', function () {
+      appliedUserRequestFilters.status = this.value;
+      selectedUserRequests = {};
+      renderUserRequests();
+    });
     document.getElementById('userRequestExport').addEventListener('click', function () {
       if (!hasCapability('approveUserRequest')) { toast('승인 권한이 있는 사용자만 신청 목록을 내보낼 수 있습니다.', 'danger'); return; }
       var values = [['사용자ID(이메일)','처리상태','사용자명','신청 권한','업체명','신청일시','처리일시','처리자','반려 사유']].concat(scopedFilteredUserRequests().map(function (record) {
@@ -1108,6 +1033,7 @@
     deleteConfirm.addEventListener('click', function () {
       if (!deleting || !hasCapability('deactivateCustomerStaff') || rowRole(deleting) !== '고객 직원') return;
       var name = deleting.children[1].textContent.trim();
+      userRows=userRows.filter(function(row){return row!==deleting});
       deleting.remove(); deleting = null;
       document.getElementById('delModal').classList.remove('open');
       applyFilters(); toast(name + ' 계정을 미사용 상태로 전환했습니다.', 'success');
@@ -1123,6 +1049,8 @@
     var table = document.querySelector('.tbl');
     if (!table || !table.tBodies.length) return;
     var tbody = table.tBodies[0];
+    var companyRows=Array.from(tbody.rows);
+    var companyPager=MIQ.createListPager(table.parentElement,{pageSize:20,presentation:'operations',unit:'건',onChange:apply});
     var filter = document.querySelector('.filter-bar');
     var search = managementHeader ? managementHeader.getControl('query') : filter.querySelector('input');
     var button = filter.querySelector('[data-mgmt-search-submit], .btn-search');
@@ -1174,24 +1102,20 @@
     function apply() {
       clearEmpty(tbody);
       var q = searchState.read(), shown = 0, vehicles = 0;
-      Array.prototype.forEach.call(tbody.querySelectorAll('tr[data-company]'), function (row) {
+      companyRows.forEach( function (row) {
         var pass = inRoleScope(row) && (!q || norm(row.textContent).indexOf(q) > -1) && (!exact || row.dataset.company === exact);
         row.classList.toggle('mm-filter-hidden', !pass);
         if (pass) { shown++; vehicles += parseInt(row.children[2].textContent, 10) || 0; }
       });
-      if (!shown) addEmpty(tbody, 4, '조회 조건에 해당하는 업체가 없습니다.');
+      tbody.replaceChildren.apply(tbody,companyPager.slice(companyRows.filter(function(row){return !row.classList.contains('mm-filter-hidden')})));
+      if (!shown) addEmpty(tbody, '조회 조건에 해당하는 업체가 없습니다.');
       var count = document.getElementById('companyCount'); if (count) count.textContent = shown;
       var vehicleCount = document.getElementById('companyVehicleCount'); if (vehicleCount) vehicleCount.textContent = vehicles;
-      var companyFoot = document.getElementById('companyFoot');
-      if (companyFoot) companyFoot.textContent = '조회 결과 ' + shown + '개 업체 · 보유 차량 ' + vehicles + '대';
     }
     if (exact) {
       var exactRow = Array.prototype.filter.call(tbody.querySelectorAll('tr[data-company]'), function (row) { return row.dataset.company === exact; })[0];
       if (!exactRow || !inRoleScope(exactRow)) exact = '';
     }
-    Array.prototype.forEach.call(document.querySelectorAll('.pager button'), function (pager, index) {
-      if (index !== 1) { pager.disabled = true; pager.title = '현재 1페이지입니다.'; }
-    });
     apply();
   }
 
@@ -1201,6 +1125,8 @@
     if (!listPane) return;
     var table = listPane.querySelector('.tbl');
     var tbody = table.tBodies[0];
+    var groupRows=Array.from(tbody.rows);
+    var groupPager=MIQ.createListPager(table.parentElement,{pageSize:20,presentation:'operations',unit:'건',onChange:applyFilter});
     var filterBar = document.querySelector('.filter-bar');
     var search = managementHeader ? managementHeader.getControl('query') : filterBar.querySelector('input');
     var timezone = managementHeader ? managementHeader.getControl('timezone') : filterBar.querySelector('select.inp');
@@ -1226,11 +1152,9 @@
       }
       var primaryActions = document.querySelector('[data-mgmt-primary-actions]');
       if (primaryActions) primaryActions.classList.toggle('is-hidden', tabKey !== 'tabList');
-      var groupListNote = document.getElementById('groupListNote');
-      if (groupListNote) groupListNote.classList.toggle('is-hidden', tabKey !== 'tabList');
     }
     function operatingGroupCount() {
-      return Array.prototype.filter.call(tbody.rows, function (row) {
+      return Array.prototype.filter.call(groupRows, function (row) {
         return row.children[1] && row.children[1].textContent.trim() !== '미배정' && !row.classList.contains('mm-empty');
       }).length;
     }
@@ -1280,7 +1204,6 @@
     }
     setGroupControlContext('tabList');
 
-    wireColumnSettings(document.querySelector('#tabList [data-mm-columns]'), table, [2, 3, 4]);
 
     function inRoleScope(row) {
       if (role === 'customer_staff') return row.children[1] && row.children[1].textContent.trim() === '물류1팀';
@@ -1310,13 +1233,13 @@
 
     function readCounts() {
       baseCounts = {};
-      Array.prototype.forEach.call(tbody.rows, function (row) {
+      Array.prototype.forEach.call(groupRows, function (row) {
         if (row.classList.contains('mm-empty')) return;
         baseCounts[row.children[1].textContent.trim()] = parseInt(row.children[5].textContent, 10) || 0;
       });
     }
     function groupRowByName(name) {
-      return Array.prototype.filter.call(tbody.rows, function (row) {
+      return Array.prototype.filter.call(groupRows, function (row) {
         return row.children[1] && row.children[1].textContent.trim() === name;
       })[0] || null;
     }
@@ -1366,7 +1289,7 @@
       }
     }
     function refreshLabels(shown) {
-      var rows = Array.prototype.filter.call(tbody.rows, function (row) {
+      var rows = Array.prototype.filter.call(groupRows, function (row) {
         return !row.classList.contains('mm-empty') && !row.classList.contains('mm-filter-hidden');
       });
       var registered = rows.filter(function (row) { return row.children[1].textContent.trim() !== '미배정'; }).length;
@@ -1375,7 +1298,7 @@
       if (groupRegistered) groupRegistered.textContent = registered;
       if (groupUnassigned) groupUnassigned.textContent = unassigned;
       if (groupAssignmentTabCount) {
-        groupAssignmentTabCount.textContent = Array.prototype.reduce.call(tbody.rows, function (sum, row) {
+        groupAssignmentTabCount.textContent = Array.prototype.reduce.call(groupRows, function (sum, row) {
           if (!row.children[5] || row.classList.contains('mm-empty')) return sum;
           return sum + (parseInt(row.children[5].textContent, 10) || 0);
         }, 0);
@@ -1385,13 +1308,15 @@
     function applyFilter() {
       clearEmpty(tbody);
       var q = searchState.read(), tz = timezone.selectedIndex > 0 ? 'Asia/Seoul' : '', shown = 0;
-      Array.prototype.forEach.call(tbody.rows, function (row) {
+      Array.prototype.forEach.call(groupRows, function (row) {
         if (!row.children[1]) return;
         var searchable = [row.children[1].textContent, row.children[2].textContent].join(' ');
         var pass = inRoleScope(row) && (!q || norm(searchable).indexOf(q) > -1) && (!tz || row.children[3].textContent.indexOf(tz) > -1);
         row.classList.toggle('mm-filter-hidden', !pass); if (pass) shown++;
       });
-      if (!shown) addEmpty(tbody, 8, '조회 조건에 해당하는 그룹이 없습니다.');
+      tbody.replaceChildren.apply(tbody,groupPager.slice(groupRows.filter(function(row){return !row.classList.contains('mm-filter-hidden')})));
+      setColumnVisible(table,7,canManage);
+      if (!shown) addEmpty(tbody, '조회 조건에 해당하는 그룹이 없습니다.');
       refreshLabels(shown);
     }
     document.addEventListener('click', function (event) {
@@ -1440,7 +1365,7 @@
       var timezoneValue = modal.querySelector('.form-grid select').value.split(' ')[0];
       var name = inputs[1].value.trim(), locationText = inputs[2].value.trim();
       if (!name) { toast('그룹명을 입력해 주세요.', 'danger'); inputs[1].focus(); return; }
-      if (Array.prototype.some.call(tbody.rows, function (row) { return row !== editingRow && row.children[1] && row.children[1].textContent.trim() === name; })) {
+      if (Array.prototype.some.call(groupRows, function (row) { return row !== editingRow && row.children[1] && row.children[1].textContent.trim() === name; })) {
         toast('이미 존재하는 그룹명입니다.', 'danger'); inputs[1].focus(); return;
       }
       var levels = Array.prototype.map.call(document.querySelectorAll('#grpZones .zone b'), function (node) {
@@ -1450,8 +1375,9 @@
       if (pendingMode === 'create') {
         var row = document.createElement('tr');
         row.innerHTML = '<td>' + esc(inputs[0].value) + '</td><td class="strong">' + esc(name) + '</td><td>' + esc(locationText || '-') + '</td><td>' + esc(timezoneValue) + '</td><td class="c thr-cell">' + esc(levels.join(' / ')) + '</td><td class="r">0</td><td class="r">0</td><td class="c"><button class="btn btn--sm role-gated" data-modal-open="grpModal" data-group-mode="edit" data-shock="' + esc(levels.join(',')) + '" data-veh="0" data-ovr="0">수정</button> <button class="btn btn--sm btn--danger role-gated" data-modal-open="delModal">삭제</button></td>';
-        var unassigned = Array.prototype.filter.call(tbody.rows, function (tr) { return tr.children[1] && tr.children[1].textContent.trim() === '미배정'; })[0];
-        tbody.insertBefore(row, unassigned || null);
+        var unassigned = Array.prototype.filter.call(groupRows, function (tr) { return tr.children[1] && tr.children[1].textContent.trim() === '미배정'; })[0];
+        groupRows.splice(unassigned?groupRows.indexOf(unassigned):groupRows.length,0,row);
+        tbody.insertBefore(row,unassigned&&unassigned.parentNode===tbody?unassigned:null);
         assignmentChange = { type: 'create', name: name };
         toast(name + ' 그룹을 등록했습니다.', 'success');
       } else if (editingRow) {
@@ -1500,6 +1426,7 @@
       if (vehicleTargetRow && vehicleTargetRow !== deleting) setGroupVehicleCount(vehicleTargetRow, (parseInt(vehicleTargetRow.children[5].textContent, 10) || 0) + vehicleCount);
       var userTargetRow = groupRowByName(userTarget);
       if (userTargetRow && userTargetRow !== deleting) userTargetRow.children[6].textContent = (parseInt(userTargetRow.children[6].textContent, 10) || 0) + userCount;
+      groupRows=groupRows.filter(function(row){return row!==deleting});
       deleting.remove(); deleting = null; document.getElementById('delModal').classList.remove('open');
       readCounts();
       syncAssignmentCatalog({ type: 'delete', oldName: name, destination: vehicleTarget });
@@ -1720,7 +1647,7 @@
         var changed = dirtyItems().slice();
         if (!changed.length) { confirmModal.classList.remove('open'); return; }
         var counts = currentCounts();
-        Array.prototype.forEach.call(tbody.rows, function (row) {
+        Array.prototype.forEach.call(groupRows, function (row) {
           var name = row.children[1] && row.children[1].textContent.trim();
           if (name && counts[name] != null) setGroupVehicleCount(row, counts[name]);
         });
@@ -1852,6 +1779,8 @@
     }, true);
     document.addEventListener('miq:modal-closed', restoreManagedModalFocus);
     var table = tbody.closest('table');
+    var cachedVehicleRows=[], vehicleReady=false;
+    var vehiclePager=MIQ.createListPager(table.parentElement,{pageSize:20,presentation:'operations',unit:'건',onChange:applyFilter});
     var filterBar = document.querySelector('.filter-bar');
     var search = managementHeader ? managementHeader.getControl('query') : filterBar.querySelector('input');
     var selects = filterBar.querySelectorAll('select.inp');
@@ -1874,6 +1803,9 @@
       customer_staff: ['customer_staff']
     };
     var vehicleScopeRole = (allowedUserScopes[role] || [role]).indexOf(requestedUserScope) > -1 ? requestedUserScope : role;
+    // Staff viewing their own list remain in their assigned scope. Authorized
+    // managers following a user shortcut must use that user's saved group.
+    var vehicleScopeGroup = role === 'customer_staff' ? '물류1팀' : (query.get('group') || '물류1팀');
     var baseRoleTotals = {
       internal: 42,
       dealer_owner: 22,
@@ -1890,7 +1822,6 @@
         button.setAttribute('aria-selected', active ? 'true' : 'false');
       });
     }
-    wireColumnSettings(document.querySelector('#tabList [data-mm-columns]'), table, [0, 3, 6, 8, 9, 10]);
     if (groupFilter && query.get('group')) Array.prototype.forEach.call(groupFilter.options, function (option) { if (option.textContent.indexOf(query.get('group')) === 0) option.selected = true; });
     if (query.get('type')) Array.prototype.forEach.call(typeFilter.options, function (option) { if (option.textContent.indexOf(query.get('type')) === 0) option.selected = true; });
     if (query.get('q')) search.value = query.get('q');
@@ -1900,7 +1831,7 @@
     function applyRole() {
       role = managementRole();
       var canEdit = hasCapability('editVehicle');
-      var dealerRole = role === 'dealer_owner' || role === 'dealer_staff';
+      var hideCustomerVehicleFields = role === 'internal' || role === 'dealer_owner' || role === 'dealer_staff';
       var canOpenVehicle = canEdit || role === 'customer_staff';
       Array.prototype.forEach.call(tbody.querySelectorAll('[data-modal-open="vehModal"]'), function (button) {
         button.classList.toggle('is-hidden', !canOpenVehicle);
@@ -1909,10 +1840,10 @@
         button.disabled = !canOpenVehicle;
         button.setAttribute('aria-label', canEdit ? '차량 정보 수정' : '차량 정보 보기');
       });
-      setColumnVisible(table, 2, !dealerRole);
-      setColumnVisible(table, 3, !dealerRole);
-      setColumnVisible(table, 9, !dealerRole);
-      setColumnVisible(table, 10, role === 'internal' || role === 'customer_owner');
+      setColumnVisible(table, 2, !hideCustomerVehicleFields);
+      setColumnVisible(table, 3, !hideCustomerVehicleFields);
+      setColumnVisible(table, 9, !hideCustomerVehicleFields);
+      setColumnVisible(table, 10, role === 'customer_owner');
       setColumnVisible(table, 11, canOpenVehicle);
       var requestButton = document.getElementById('btnReq');
       if (requestButton) requestButton.classList.toggle('is-hidden', !hasCapability('requestVehicle'));
@@ -1927,7 +1858,7 @@
       }
       syncTabStops(document.querySelector('.mm-vehicle-tabs'));
     }
-    function allRows() { return Array.prototype.slice.call(tbody.querySelectorAll('tr[data-vin]')); }
+    function allRows() { tbody.querySelectorAll('tr[data-vin]').forEach(function(row){if(cachedVehicleRows.indexOf(row)<0)cachedVehicleRows.push(row)});return cachedVehicleRows; }
     function markInitialDealerStaffScope() {
       var dealerIndex = 0;
       allRows().forEach(function (row) {
@@ -1941,7 +1872,7 @@
       if (vehicleScopeRole === 'internal') return true;
       if (vehicleScopeRole === 'dealer_owner') return row.children[0].textContent.trim() === '밥캣코리아 중부딜러';
       if (vehicleScopeRole === 'dealer_staff') return row.children[0].textContent.trim() === '밥캣코리아 중부딜러' && row.dataset.dealerStaffScope === '1';
-      if (vehicleScopeRole === 'customer_staff') return row.children[2].textContent.trim() === '물류1팀';
+      if (vehicleScopeRole === 'customer_staff') return row.children[2].textContent.trim() === vehicleScopeGroup;
       return true;
     }
     function searchableVehicleText(row) {
@@ -1951,16 +1882,17 @@
       }).join(' ');
     }
     function roleTotal() {
+      if (vehicleScopeRole === 'customer_staff') return allRows().filter(inRoleScope).length;
       var approvedInScope = allRows().filter(function (row) {
         return row.dataset.approvedNew === '1' && inRoleScope(row);
       }).length;
       return (baseRoleTotals[vehicleScopeRole] || baseRoleTotals.customer_owner) + approvedInScope;
     }
     var roleGroupTotals = {
-      internal: { '미배정': 2, '기본그룹': 18, '테스트그룹': 12, '물류1팀': 10 },
+      internal: customerVehicleGroupTotals,
       dealer_owner: { '미배정': 1, '기본그룹': 10, '테스트그룹': 6, '물류1팀': 5 },
       dealer_staff: { '미배정': 1, '기본그룹': 5, '테스트그룹': 3, '물류1팀': 2 },
-      customer_owner: { '미배정': 2, '기본그룹': 18, '테스트그룹': 12, '물류1팀': 10 },
+      customer_owner: customerVehicleGroupTotals,
       customer_staff: { '미배정': 0, '기본그룹': 0, '테스트그룹': 0, '물류1팀': 10 }
     };
     var roleTypeTotals = {
@@ -1973,6 +1905,14 @@
     function totalsWithApproved(base, cellIndex) {
       var totals = {};
       Object.keys(base || {}).forEach(function (key) { totals[key] = base[key]; });
+      if (vehicleScopeRole === 'customer_staff') {
+        Object.keys(totals).forEach(function (key) { totals[key] = 0; });
+        allRows().filter(inRoleScope).forEach(function (row) {
+          var key = row.children[cellIndex].textContent.trim();
+          totals[key] = (totals[key] || 0) + 1;
+        });
+        return totals;
+      }
       allRows().forEach(function (row) {
         if (row.dataset.approvedNew !== '1' || !inRoleScope(row)) return;
         var key = row.children[cellIndex].textContent.trim();
@@ -1987,19 +1927,8 @@
         option.textContent = option.value + ' (' + (totals[option.value] || 0) + ')';
       });
     }
-    function updateLoaderStatus() {
-      if (!loaderHost) return;
-      var loaded = allRows().filter(inRoleScope).length;
-      var total = roleTotal();
-      var visible = allRows().filter(function (row) {
-        return inRoleScope(row) && !row.classList.contains('mm-filter-hidden');
-      }).length;
-      loaderHost.textContent = visible === total
-        ? '현재 권한의 전체 ' + total + '대를 표시했습니다.'
-        : '조회 조건에 해당하는 ' + visible + '대를 표시했습니다. · 전체 ' + total + '대';
-      loaderHost.classList.toggle('is-complete', generated >= 30);
-    }
     function applyFilter() {
+      if (!vehicleReady) return;
       clearEmpty(tbody);
       updateSelectCounts(groupFilter, totalsWithApproved(roleGroupTotals[vehicleScopeRole], 2));
       updateSelectCounts(typeFilter, totalsWithApproved(roleTypeTotals[vehicleScopeRole], 5));
@@ -2011,11 +1940,11 @@
         var pass = inRoleScope(row) && (!q || norm(searchableVehicleText(row)).indexOf(q) > -1) && (!group || row.children[2].textContent.trim() === group) && (!type || row.children[5].textContent.trim() === type) && (!company || row.children[1].textContent.trim() === company);
         row.classList.toggle('mm-filter-hidden', !pass); if (pass) shown++;
       });
-      if (!shown) addEmpty(tbody, 12, '조회 조건에 해당하는 차량이 없습니다.');
+      tbody.replaceChildren.apply(tbody,vehiclePager.slice(allRows().filter(function(row){return !row.classList.contains('mm-filter-hidden')})));
+      if (!shown) addEmpty(tbody, '조회 조건에 해당하는 차량이 없습니다.');
       if (vehicleResult) vehicleResult.textContent = shown;
       if (vehicleLoaded) vehicleLoaded.textContent = allRows().filter(inRoleScope).length;
       if (vehicleTotal) vehicleTotal.textContent = roleTotal();
-      updateLoaderStatus();
       setQuery({ q: searchState.value() || null, group: group || null, type: type || null, company: company || null });
     }
     function applyCompleteVehicleFilter() {
@@ -2054,15 +1983,12 @@
       else applyFilter();
     });
 
-    /* 차량관리의 합계·필터·표가 같은 42대 명부를 사용한다.
-       전체 행은 처음부터 생성하고 화면 자체의 세로 스크롤로 탐색한다. */
-    var loaderHost = document.querySelector('#tabList .loading');
+    /* Prepare the source catalog once. Filtering and pagination render only
+       the current page after requests and role scope have been initialized. */
     var generated = 0;
-    var autoLoadObserver = null;
-    var autoLoading = false;
     function appendMore(requestedAmount) {
       var remaining = 30 - generated;
-      if (remaining <= 0) { updateLoaderStatus(); return; }
+      if (remaining <= 0) return;
       /* 고객 직원은 전체 명부 뒤쪽의 배정 그룹만 보이므로 첫 요청에서 해당 7대를 함께 로드한다. */
       var amount = typeof requestedAmount === 'number'
         ? Math.min(Math.max(requestedAmount, 1), remaining)
@@ -2084,32 +2010,6 @@
       }
       generated += amount;
       applyRole(); applyFilter();
-      if (generated >= 30 && autoLoadObserver) autoLoadObserver.disconnect();
-    }
-    if (loaderHost) {
-      loaderHost.classList.add('mm-auto-load-status');
-      function loaderIsNearViewport() {
-        var rect = loaderHost.getBoundingClientRect();
-        return rect.bottom >= -320 && rect.top <= window.innerHeight + 320;
-      }
-      function queueAutoLoad() {
-        if (autoLoading || generated >= 30 || document.getElementById('tabList').classList.contains('active') === false) return;
-        autoLoading = true; loaderHost.classList.add('is-loading');
-        loaderHost.textContent = '다음 차량을 불러오는 중입니다…';
-        window.requestAnimationFrame(function () {
-          appendMore(); autoLoading = false; loaderHost.classList.remove('is-loading'); updateLoaderStatus();
-          /* 큰 뷰포트에서는 행을 추가해도 sentinel이 계속 관찰 범위 안에 남아
-             교차 상태 변화가 다시 발생하지 않는다. 현재 화면을 채울 때까지 같은
-             페이지 스크롤 기준으로 다음 묶음을 이어서 준비한다. */
-          if (generated < 30) window.requestAnimationFrame(function () { if (loaderIsNearViewport()) queueAutoLoad(); });
-        });
-      }
-      if ('IntersectionObserver' in window) {
-        autoLoadObserver = new IntersectionObserver(function (entries) {
-          if (entries.some(function (entry) { return entry.isIntersecting; })) queueAutoLoad();
-        }, { root: null, rootMargin: '0px 0px 320px 0px', threshold: 0 });
-        autoLoadObserver.observe(loaderHost);
-      } else appendMore(30);
     }
 
     /* Vehicle request workflow: one state powers customer history, dealer approval,
@@ -2118,7 +2018,7 @@
     var CURRENT_COMPANY = '(주)세종물류중부지점';
     var CURRENT_DEALER_ID = 151;
     var CURRENT_COMPANY_ID = 33767;
-    var FIXTURE_REFERENCE = '2026-07-06 14:30';
+    var FIXTURE_REFERENCE = common.dates.format(common.dates.today()) + ' 00:00';
     var REQUEST_STORAGE_KEY = 'linq.management.vehicleRequests.v5:' + CURRENT_COMPANY_ID + ':' + CURRENT_DEALER_ID;
     var REQUESTER_IDS = {
       customer_owner: 'CUS-OWNER-' + CURRENT_COMPANY_ID,
@@ -2158,13 +2058,29 @@
         return record;
       });
     }
+    function currentRequestSeed(legacy) {
+      return currentDemoRequests(legacy, [1, 3, 4, 7, 10, 13, 16, 19, 22, 25]);
+    }
     function loadRequests() {
       if (query.get('approvalState') === 'empty') return [];
+      var legacy = requestSeed(), current = currentRequestSeed(legacy);
       try {
         var stored = JSON.parse(sessionStorage.getItem(REQUEST_STORAGE_KEY) || 'null');
-        if (Array.isArray(stored)) return stored;
+        if (Array.isArray(stored)) {
+          var changed = false;
+          var migrated = stored.map(function (record) {
+            var index = legacy.findIndex(function (seed) { return seed.id === record.id; });
+            var seed = legacy[index];
+            // Refresh only untouched old fixtures; keep user-created and processed records.
+            if (!seed || record.demoDateRevision || record.registered !== seed.registered || record.processed !== seed.processed || record.status !== seed.status) return record;
+            changed = true;
+            return Object.assign({}, record, {registered:current[index].registered, processed:current[index].processed, demoDateRevision:current[index].demoDateRevision});
+          });
+          if (changed) { try { sessionStorage.setItem(REQUEST_STORAGE_KEY, JSON.stringify(migrated)); } catch (ignoreWrite) {} }
+          return migrated;
+        }
       } catch (ignore) {}
-      return requestSeed();
+      return current;
     }
     function saveRequests() {
       try { sessionStorage.setItem(REQUEST_STORAGE_KEY, JSON.stringify(requests)); } catch (ignore) {}
@@ -2203,10 +2119,7 @@
       if (!name) return '<span class="mute">-</span>';
       return '<span class="mm-request-person">' + esc(name) + '<small>' + esc(personRole || '') + '</small></span>';
     }
-    function requestReason(record) {
-      var value = record.reason || '-';
-      return '<span class="mm-request-reason' + (record.reason ? '' : ' mute') + '" title="' + esc(value) + '">' + esc(value) + '</span>';
-    }
+
     function requestById(id) {
       return requests.filter(function (record) { return record.id === id; })[0] || null;
     }
@@ -2220,7 +2133,7 @@
       return '<span class="cls-badge ' + className + '">' + esc(type) + '</span>';
     }
     function appendApprovedVehicle(record) {
-      if (!record.linkedNew || tbody.querySelector('tr[data-vin="' + record.vin + '"]')) return;
+      if (!record.linkedNew || allRows().some(function(row){return row.dataset.vin===record.vin})) return;
       var linkedGroup = record.linkedGroup || '미배정';
       var linkedNickname = record.linkedNickname || record.model;
       var linkedOverride = record.shockMode === 'override';
@@ -2255,6 +2168,9 @@
     var requestAllBody = document.getElementById('requestAllBody');
     var requestPendingBody = document.getElementById('requestPendingBody');
     var myRequestBody = document.getElementById('myReqBody');
+    var myRequestPager=MIQ.createListPager(myRequestBody.closest('.tbl-wrap'),{pageSize:20,presentation:'operations',unit:'건',onChange:renderMyRequests});
+    var requestAllPager=MIQ.createListPager(requestAllBody.closest('.tbl-wrap'),{pageSize:20,presentation:'operations',unit:'건',onChange:renderAdminRequests});
+    var requestPendingPager=MIQ.createListPager(requestPendingBody.closest('.tbl-wrap'),{pageSize:20,presentation:'operations',unit:'건',onChange:renderAdminRequests});
     var appliedRequestFilters = {
       query: requestSearch.read(),
       status: requestStatusSelect ? requestStatusSelect.value : '',
@@ -2269,17 +2185,15 @@
       var mine = requests.filter(function (record) {
         return Number(record.companyId) === CURRENT_COMPANY_ID && (record.requesterId ? record.requesterId === requesterId : record.requesterName === requester);
       }).sort(function (a, b) { return b.registered.localeCompare(a.registered); });
-      myRequestBody.innerHTML = mine.map(function (record) {
-        return '<tr data-request-id="' + esc(record.id) + '"><td class="strong">' + esc(record.vin) + '</td><td>' + esc(record.terminal) + '</td><td>' + esc(record.dealer) + '</td><td>' + esc(record.registered) + '</td><td class="c">' + requestStatusBadge(record) + '</td><td class="' + (record.processed ? '' : 'mute') + '">' + esc(record.processed || '-') + '</td><td>' + requestReason(record) + '</td><td class="c"><button class="btn btn--sm" type="button" data-request-detail="' + esc(record.id) + '">상세</button></td></tr>';
+      myRequestBody.innerHTML = myRequestPager.slice(mine).map(function (record) {
+        return '<tr data-request-id="' + esc(record.id) + '"><td class="strong">' + esc(record.vin) + '</td><td>' + esc(record.terminal) + '</td><td>' + esc(record.dealer) + '</td><td>' + esc(record.registered) + '</td><td class="c">' + requestStatusBadge(record) + '</td><td class="' + (record.processed ? '' : 'mute') + '">' + esc(record.processed || '-') + '</td><td class="c"><button class="btn btn--sm" type="button" data-request-detail="' + esc(record.id) + '">상세</button></td></tr>';
       }).join('');
-      if (!mine.length) myRequestBody.innerHTML = '<tr class="mm-empty"><td colspan="8">등록한 차량신청이 없습니다.</td></tr>';
+      if (!mine.length) myRequestBody.innerHTML = '<tr class="mm-empty"><td colspan="7">등록한 차량신청이 없습니다.</td></tr>';
       var pending = mine.filter(function (record) { return record.status === 'REQ'; }).length;
       var approved = mine.filter(function (record) { return record.status === 'APRV'; }).length;
       var rejected = mine.filter(function (record) { return record.status === 'RJCT'; }).length;
       var summary = document.getElementById('myRequestSummary');
       if (summary) summary.textContent = '대기 ' + pending + ' · 승인 ' + approved + ' · 반려 ' + rejected + ' · 총 ' + mine.length + '건';
-      var foot = document.getElementById('myReqFoot');
-      if (foot) foot.textContent = '총 ' + mine.length + '건 · 처리 완료 ' + (approved + rejected) + '건 · 신청 ' + pending + '건';
     }
     function renderRequestSummary() {
       var scoped = dealerRequests();
@@ -2294,7 +2208,7 @@
         ['신청', pending.length + '건', '처리가 필요한 신청', true],
         ['승인', approved.length + '건', '미배정 차량 연결 완료'],
         ['반려', rejected.length + '건', '사유 확인 가능'],
-        ['평균 처리시간', average ? average.toFixed(1) + '시간' : '-', '승인·반려 완료 기준'],
+        ['평균 처리시간', average ? window.MIQCommon.numbers.integer(average) + '시간' : '-', '승인·반려 완료 기준'],
         ['최장 대기', oldest ? waitingDays(oldest) + '일' : '-', oldest ? oldest.vin : '대기 없음']
       ].map(function (item) {
         return '<div class="mm-request-kpi"><span class="mm-request-kpi__label">' + item[0] + '</span><strong class="mm-request-kpi__value' + (item[3] ? ' is-pending' : '') + '">' + esc(item[1]) + '</strong><span class="mm-request-kpi__sub">' + esc(item[2]) + '</span></div>';
@@ -2346,11 +2260,11 @@
       var availableIds = {};
       pending.forEach(function (record) { availableIds[record.id] = true; });
       Object.keys(selectedRequests).forEach(function (id) { if (!availableIds[id]) delete selectedRequests[id]; });
-      requestAllBody.innerHTML = filtered.map(function (record) {
-        return '<tr data-request-id="' + esc(record.id) + '"><td class="c">' + requestCheckbox(record) + '</td><td class="strong">' + esc(record.vin) + '</td><td class="c">' + requestStatusBadge(record) + '</td><td>' + esc(record.terminal) + '</td><td>' + esc(record.company) + '</td><td>' + requestPerson(record.requesterName, record.requesterRole) + '</td><td>' + esc(record.registered) + '</td><td class="' + (record.processed ? '' : 'mute') + '">' + esc(record.processed || '-') + '</td><td>' + requestPerson(record.processorName, record.processorRole) + '</td><td>' + requestReason(record) + '</td><td class="c">' + requestAdminAction(record) + '</td></tr>';
+      requestAllBody.innerHTML = requestAllPager.slice(filtered).map(function (record) {
+        return '<tr data-request-id="' + esc(record.id) + '"><td class="c">' + requestCheckbox(record) + '</td><td class="strong">' + esc(record.vin) + '</td><td class="c">' + requestStatusBadge(record) + '</td><td>' + esc(record.terminal) + '</td><td>' + esc(record.company) + '</td><td>' + requestPerson(record.requesterName, record.requesterRole) + '</td><td>' + esc(record.registered) + '</td><td class="' + (record.processed ? '' : 'mute') + '">' + esc(record.processed || '-') + '</td><td>' + requestPerson(record.processorName, record.processorRole) + '</td><td class="c">' + requestAdminAction(record) + '</td></tr>';
       }).join('');
-      if (!filtered.length) requestAllBody.innerHTML = '<tr class="mm-empty"><td colspan="11">조회 조건에 해당하는 신청이 없습니다.</td></tr>';
-      requestPendingBody.innerHTML = pending.map(function (record) {
+      if (!filtered.length) requestAllBody.innerHTML = '<tr class="mm-empty"><td colspan="10">조회 조건에 해당하는 신청이 없습니다.</td></tr>';
+      requestPendingBody.innerHTML = requestPendingPager.slice(pending).map(function (record) {
         return '<tr data-request-id="' + esc(record.id) + '"><td class="c">' + requestCheckbox(record) + '</td><td class="strong">' + esc(record.vin) + '</td><td class="c">' + requestStatusBadge(record) + '</td><td>' + esc(record.terminal) + '</td><td>' + esc(record.company) + '</td><td>' + requestPerson(record.requesterName, record.requesterRole) + '</td><td>' + esc(record.registered) + '</td><td class="c mm-request-wait">' + waitingDays(record) + '일</td><td class="c">' + requestAdminAction(record) + '</td></tr>';
       }).join('');
       if (!pending.length) requestPendingBody.innerHTML = '<tr class="mm-empty"><td colspan="9">신청 중인 신청이 없습니다.</td></tr>';
@@ -2361,10 +2275,6 @@
       if (allCount) allCount.textContent = filtered.length;
       var pendingCount = document.getElementById('requestPendingCount');
       if (pendingCount) pendingCount.textContent = pending.length;
-      var foot = document.getElementById('requestAdminFoot');
-      if (foot) foot.textContent = activeRequestView === 'pending'
-        ? '신청 ' + pending.length + '건 · 신청일이 오래된 순으로 표시합니다.'
-        : '조회 결과 ' + filtered.length + '건 · 신청 ' + pending.length + '건';
       updateBatchState();
     }
     function clearDealerRequestViews() {
@@ -2378,8 +2288,6 @@
         var node = document.getElementById(id);
         if (node) node.textContent = '0';
       });
-      var foot = document.getElementById('requestAdminFoot');
-      if (foot) foot.textContent = '';
       var reference = document.getElementById('requestReferenceTime');
       if (reference) reference.textContent = '';
       updateBatchState();
@@ -2412,7 +2320,6 @@
       else if (myRequestBody) {
         myRequestBody.innerHTML = '';
         document.getElementById('myRequestSummary').textContent = '';
-        document.getElementById('myReqFoot').textContent = '';
       }
       if (role === 'dealer_owner') {
         renderRequestSummary();
@@ -2646,7 +2553,10 @@
       var button = event.target.closest('[data-request-view]');
       if (button) setRequestView(button.dataset.requestView);
     });
-    requestStatusSelect.addEventListener('change', applyRequestFilterInputs);
+    requestStatusSelect.addEventListener('change', function () {
+      appliedRequestFilters.status = this.value;
+      renderAdminRequests();
+    });
     document.getElementById('tabApproval').addEventListener('change', function (event) {
       var checkbox = event.target.closest('[data-request-select]');
       if (!checkbox) return;
@@ -2793,8 +2703,6 @@
       if (!button) return;
       window.setTimeout(function () {
         syncTabStops(document.querySelector('.mm-vehicle-tabs'), button);
-        var supporting = document.getElementById('vehicleListSupportingInfo');
-        if (supporting) supporting.classList.toggle('is-hidden', button.dataset.tab !== 'tabList');
         var controlContext = button.dataset.tab === 'tabList' ? 'list' : button.dataset.tab === 'tabApproval' ? 'approval' : 'none';
         if (managementHeader && typeof managementHeader.setControlContext === 'function') {
           managementHeader.setControlContext(controlContext);
@@ -2809,8 +2717,7 @@
     resetRequestCascade();
     renderRequests();
 
-    /* 총계와 실제 표 행을 처음부터 일치시킨다. 목록은 내부 스크롤 없이
-       문서 스크롤을 사용하며, 검색·필터도 전체 42대를 즉시 대상으로 삼는다. */
+    /* Complete the catalog before the single initial page render. */
     if (generated < 30) appendMore(30 - generated);
 
     var deepVin = query.get('veh') || query.get('vin');
@@ -2822,6 +2729,7 @@
     }, 0);
     markInitialDealerStaffScope();
     applyRole();
+    vehicleReady = true;
     if (query.get('q') || query.get('group') || query.get('type')) applyCompleteVehicleFilter();
     else applyFilter();
   }

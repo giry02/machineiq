@@ -79,7 +79,7 @@
   }
   function observeSize(host, redraw) {
     if (!host || host.__miqChartSizeObserver || !root.ResizeObserver) return;
-    var width = 0, frame = 0;
+    var width = Math.round(host.getBoundingClientRect().width), frame = 0;
     var observer = new root.ResizeObserver(function () {
       var next = Math.round(host.getBoundingClientRect().width);
       if (next <= 0 || next === width) return;

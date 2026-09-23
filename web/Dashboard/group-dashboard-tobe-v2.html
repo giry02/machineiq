@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
+<head><script src="../_shared/demo-clock.js?rev=34d9d133492b"></script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>대시보드 · MACHINE IQ</title>
+<title>대시보드 | MACHINE IQ</title>
 <link rel="icon" type="image/x-icon" href="../_shared/favicon.ico"/>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
+<link rel="stylesheet" href="../_shared/offline-fonts.css?rev=b405f97e6cf9"><script type="module" blocking="render">await document.fonts.load('400 14px "Noto Sans KR"');await document.fonts.ready;</script>
 <link rel="stylesheet" href="../_shared/gnb.css?rev=b9f0ddfcf14c"/>
 <style>
+/* The source markup supplies shared controllers; only the finished preview is painted. */
+body:not(.dc-ready) #dashboardContent{visibility:hidden!important}
 :root{--bobcat-red:#ff3600;--bobcat-red-hover:#d92e00;--bobcat-red-active:#cc2b00;--bobcat-black:#1e1e1e;--bobcat-dark:#333;--bobcat-muted:#777;--bobcat-gray:#ccc;--bobcat-steel:#d5dee3;--bobcat-light:#f1f1f1;--bobcat-positive:#158737;--bobcat-success:#0aa656;--bobcat-warning:#ff9f0a;--bobcat-danger:#992100;--bobcat-info:#17a2b8}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Noto Sans KR',sans-serif;font-size:14px;background:var(--bobcat-light);color:var(--bobcat-dark)}
@@ -103,7 +105,7 @@ body.miq-content-dashboard[data-gnb="dash"][data-sub="group"]>.miq-target-select
 .dashboard-period .btn-search{height:40px!important;min-height:40px!important;padding:0 18px!important;border:1px solid var(--bobcat-red-hover)!important;border-radius:4px;background:var(--bobcat-red-hover)!important;color:#fff;font-size:14px;font-weight:700}
 .dashboard-period .btn-search:hover{border-color:var(--bobcat-red-active)!important;background:var(--bobcat-red-active)!important}
 .dashboard-period .btn-search:active{border-color:#bf2900!important;background:#bf2900!important}
-.period-tabs button:focus-visible,.date-range input:focus-visible,.dashboard-period .btn-search:focus-visible{outline:2px solid var(--bobcat-red);outline-offset:2px}
+.period-tabs button:focus-visible,.dashboard-period .btn-search:focus-visible{outline:2px solid var(--bobcat-red);outline-offset:2px}
 
 /* 전체 기간 비교 */
 .usage-compare-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
@@ -211,366 +213,84 @@ body.miq-content-dashboard[data-gnb="dash"][data-sub="group"]>.miq-target-select
   .live-chip::before{animation:none}
   .motion-row{opacity:1;transform:none}
 }
+.live-chip[hidden],.dashboard-updated[hidden]{display:none}
 </style>
-<link rel="stylesheet" href="../_shared/content-system.css?v=20260902-readability&amp;rev=d8f94e7e5049"/>
-<link rel="stylesheet" href="../_shared/dashboard-deeplinks.css?v=20260902&amp;rev=b1960113c8ea"/>
+<link rel="stylesheet" href="../_shared/content-system.css?rev=d8f94e7e5049"/>
+<link rel="stylesheet" href="../_shared/dashboard-deeplinks.css?rev=b1960113c8ea"/>
 <link rel="stylesheet" href="../_shared/chart-common.css?rev=fc1c23dcf6af"/>
 <link rel="stylesheet" href="../_shared/dashboard-view-tabs.css?rev=4d0a789970d3"/>
-<link rel="stylesheet" href="../_shared/dashboard-company-browser.css?rev=651e7d41c059"/>
+<link rel="stylesheet" href="../_shared/dashboard-company-browser.css?rev=9dee15238703"/>
+<link rel="stylesheet" href="../_shared/form-controls.css?rev=6fda272acdcc"/>
+<link rel="stylesheet" href="../_shared/dashboard-canvas-preview.css?rev=37514fa526ff"/>
+<link rel="stylesheet" href="../_shared/dashboard-usage-variants-preview.css?rev=3388b490a09b"/>
+<link rel="stylesheet" href="../_shared/dashboard-work-idle-compact.css?rev=55ec63c18d2f"/>
+<link rel="stylesheet" href="../_shared/list-pagination.css?rev=0069e48c1009">
+<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?rev=bb6d53aabb78"/>
+<link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?rev=1cffa21a9777"/>
+<style>body.miq-current-shell>#gnb{min-height:64px}</style>
+<script defer blocking="render" src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script>
+<script defer blocking="render" src="../_shared/common-logic.js?rev=efb7e741cd7b"></script>
+<script defer blocking="render" src="../_shared/chart-common.js?rev=15c74452f805"></script>
+<script defer blocking="render" src="../_shared/list-pagination.js?rev=33207bf33d11"></script>
+<script defer blocking="render" src="../_mock-data/generated/fleet.generated.js?rev=309d68875499"></script>
+<script defer blocking="render" src="../_shared/nav.js?rev=049a18c69072"></script>
+<script defer blocking="render" src="../_shared/dashboard-company-model.js?rev=1600590975b7"></script>
+<script defer blocking="render" src="../_shared/service-demo-data.js?rev=dcd01d3f4b36"></script>
+<script defer blocking="render" src="../_shared/service-records.js?rev=4e2247047570"></script>
+<script defer blocking="render" src="../_shared/dashboard-report-series.js?rev=ec1291c0baf6"></script>
+<script defer blocking="render" src="../_shared/summary-row-model.js?rev=8ec5759511a3"></script>
+<script defer blocking="render" src="../_shared/dashboard-current-metrics.js?rev=834a6703ed94"></script>
+<script defer blocking="render" src="../_shared/dashboard-view-data.js?rev=540bb645737e"></script>
+<script defer blocking="render" src="../_shared/dashboard-work-idle-compact.js?rev=7fde31a738d7"></script>
+<script defer blocking="render" src="../_shared/dashboard-work-idle-compact-locale.js?rev=f2c2c6903246"></script>
 </head>
-<body data-period-presets="dwm" class="miq-content-system miq-content-dashboard" data-gnb="dash" data-sub="group" data-variant="tobe" data-base="../">
+<body data-current-bootstrap="ready" data-screen-id="LQ-DASH-001" data-period-presets="dwm" class="miq-current-shell miq-content-system miq-content-dashboard miq-dashboard-widgets-preview" data-gnb="dash" data-sub="group" data-variant="tobe" data-base="../">
 
 <div id="gnb"></div>
 
 <div class="layout">
   <main class="main dashboard-main">
     <div class="dashboard-content miq-content-frame is-ready" id="dashboardContent">
-      <header class="dashboard-titlebar">
+<header class="dashboard-titlebar">
         <h1 class="miq-page-title">대시보드</h1>
         <span class="live-chip">LIVE</span>
         <span class="dashboard-updated">2026-07-06 14:30 기준</span>
       </header>
-
-      <div class="tabs dashboard-view-tabs" role="tablist" aria-label="대시보드 보기" hidden>
-        <button type="button" id="dashboardLiveTab" role="tab" data-dashboard-view="live" aria-controls="dashboardLivePanel" aria-selected="true" tabindex="0" class="active">실시간</button>
-        <button type="button" id="dashboardPeriodTab" role="tab" data-dashboard-view="period" aria-controls="dashboardPeriodPanel" aria-selected="false" tabindex="-1">기간별 누적현황</button>
-      </div>
-
-      <div class="dashboard-stack">
-        <section class="dashboard-section dashboard-live" aria-labelledby="liveHeading">
-          <div class="section-heading">
-            <h2 id="liveHeading">금일 실시간 현황</h2>
-            <p>전체 보유 차량의 연결·가동·정비 상태</p>
-          </div>
-
-          <div class="dashboard-panel live-summary miq-overview-grid motion-row" style="--delay:.02s">
-            <div class="fleet-total miq-metric-group">
-              <span class="fleet-total__label">전체 보유 차량</span>
-              <div class="fleet-total__value"><strong class="miq-number">42</strong><span>대</span></div>
-              <span class="fleet-total__meta">3개 그룹 합계</span>
-            </div>
-
-            <div class="status-metric miq-metric-group">
-              <div class="status-metric__head">
-                <span class="status-metric__label">통신 연결</span>
-                <strong class="status-metric__rate miq-number">86%</strong>
-              </div>
-              <div class="status-metric__track" aria-label="42대 중 36대 연결"><i class="on" style="--value:.86"></i></div>
-              <div class="status-metric__details">
-                <span><b class="miq-number">36</b> 연결</span>
-                <span class="muted"><b class="miq-number">6</b> 미연결</span>
-              </div>
-            </div>
-
-            <div class="status-metric miq-metric-group">
-              <div class="status-metric__head">
-                <span class="status-metric__label">차량 가동</span>
-                <strong class="status-metric__rate miq-number">66%</strong>
-              </div>
-              <div class="status-metric__track" aria-label="36대 중 24대 정상 가동"><i class="run rate" style="--value:.66"></i></div>
-              <div class="status-metric__details">
-                <span><b class="miq-number">24</b> 정상 가동</span>
-                <span class="muted"><b class="miq-number">12</b> 유휴</span>
-              </div>
-            </div>
-
-            <div class="maintenance miq-metric-group">
-              <span class="maintenance__label">정비 현황</span>
-              <div class="maintenance__items">
-                <div class="maintenance-item fault">
-                  <div class="maintenance-item__value"><span class="maintenance-item__dot"></span><strong class="miq-number">2</strong></div>
-                  <span class="maintenance-item__name">고장 현황</span>
-                  <span class="maintenance-item__meta">즉시 확인</span>
-                </div>
-                <div class="maintenance-item need">
-                  <div class="maintenance-item__value"><span class="maintenance-item__dot"></span><strong class="miq-number">3</strong></div>
-                  <span class="maintenance-item__name">교체 필요</span>
-                  <span class="maintenance-item__meta">소모품</span>
-                </div>
-                <div class="maintenance-item soon">
-                  <div class="maintenance-item__value"><span class="maintenance-item__dot"></span><strong class="miq-number">5</strong></div>
-                  <span class="maintenance-item__name">교체 임박</span>
-                  <span class="maintenance-item__meta">소모품</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="dashboard-panel dashboard-panel--scroll motion-row" style="--delay:.06s">
-            <table class="group-matrix" aria-label="그룹별 실시간 차량 현황">
-              <colgroup>
-                <col/><col/><col/><col/><col/><col/><col/><col/><col/><col/>
-              </colgroup>
-              <thead>
-                <tr>
-                  <th rowspan="2" scope="col">그룹</th>
-                  <th colspan="3" scope="colgroup">통신</th>
-                  <th colspan="3" scope="colgroup">가동</th>
-                  <th colspan="3" scope="colgroup">정비</th>
-                </tr>
-                <tr>
-                  <th scope="col">보유</th>
-                  <th scope="col">연결</th>
-                  <th scope="col">미연결</th>
-                  <th scope="col">가동</th>
-                  <th scope="col">유휴</th>
-                  <th scope="col">가동율</th>
-                  <th scope="col">고장</th>
-                  <th scope="col">교체 필요</th>
-                  <th scope="col">교체 임박</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row"><span class="group-name">그룹1 <small>기본그룹</small></span></th>
-                  <td><span class="matrix-number miq-number">18</span></td>
-                  <td><span class="matrix-number on miq-number">16</span></td>
-                  <td><span class="matrix-number off miq-number">2</span></td>
-                  <td><span class="matrix-number run miq-number">11</span></td>
-                  <td><span class="matrix-number idle miq-number">5</span></td>
-                  <td><span class="matrix-rate rate"><b class="miq-number">69%</b><span class="matrix-rate__track"><i style="--value:.69"></i></span></span></td>
-                  <td><span class="matrix-number fault"><i class="matrix-signal"></i><b class="miq-number">1</b></span></td>
-                  <td><span class="matrix-number need"><i class="matrix-signal"></i><b class="miq-number">2</b></span></td>
-                  <td><span class="matrix-number soon"><i class="matrix-signal warning"></i><b class="miq-number">2</b></span></td>
-                </tr>
-                <tr>
-                  <th scope="row"><span class="group-name">그룹2 <small>테스트그룹</small></span></th>
-                  <td><span class="matrix-number miq-number">14</span></td>
-                  <td><span class="matrix-number on miq-number">12</span></td>
-                  <td><span class="matrix-number off miq-number">2</span></td>
-                  <td><span class="matrix-number run miq-number">8</span></td>
-                  <td><span class="matrix-number idle miq-number">4</span></td>
-                  <td><span class="matrix-rate rate"><b class="miq-number">67%</b><span class="matrix-rate__track"><i style="--value:.67"></i></span></span></td>
-                  <td><span class="matrix-number fault"><i class="matrix-signal"></i><b class="miq-number">1</b></span></td>
-                  <td><span class="matrix-number need"><i class="matrix-signal"></i><b class="miq-number">1</b></span></td>
-                  <td><span class="matrix-number soon"><i class="matrix-signal warning"></i><b class="miq-number">2</b></span></td>
-                </tr>
-                <tr>
-                  <th scope="row"><span class="group-name">그룹3 <small>물류1팀</small></span></th>
-                  <td><span class="matrix-number miq-number">10</span></td>
-                  <td><span class="matrix-number on miq-number">8</span></td>
-                  <td><span class="matrix-number off miq-number">2</span></td>
-                  <td><span class="matrix-number run miq-number">5</span></td>
-                  <td><span class="matrix-number idle miq-number">3</span></td>
-                  <td><span class="matrix-rate rate"><b class="miq-number">62%</b><span class="matrix-rate__track"><i style="--value:.62"></i></span></span></td>
-                  <td><span class="matrix-number fault"><b class="miq-number">0</b></span></td>
-                  <td><span class="matrix-number need"><b class="miq-number">0</b></span></td>
-                  <td><span class="matrix-number soon"><i class="matrix-signal warning"></i><b class="miq-number">1</b></span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section class="dashboard-section dashboard-period" aria-labelledby="periodHeading">
-          <div class="section-heading period-heading">
+<div class="dashboard-stack"><section class="dashboard-section dashboard-period" aria-labelledby="periodHeading"><div class="section-heading period-heading">
             <div>
               <h2 id="periodHeading">기간별 누적 현황</h2>
             </div>
             <div class="section-heading__actions filter-bar">
               <div class="period-tabs" role="group" aria-label="조회 기간 단위">
-                <button type="button">일</button>
-                <button type="button">주</button>
-                <button type="button" class="active">월</button>
+                <button type="button" data-period="d">일</button>
+                <button type="button" data-period="w">주</button>
+                <button type="button" data-period="m" class="active">월</button>
                 </div>
               <div class="date-range">2026-07-01 ~ 2026-07-06</div>
               <button type="button" class="btn-search miq-button miq-button--primary">조회</button>
             </div>
-          </div>
-
-          <div class="dashboard-panel motion-row" style="--delay:.08s">
-            <div class="panel-heading">
-              <h3>전체 보유 차량</h3>
-              <p>전월 대비 금월 누적값</p>
-              <span class="panel-heading__meta">단위별 절대값 비교</span>
-            </div>
-
-            <div class="usage-compare-grid">
-              <article class="compare-metric">
-                <div class="compare-metric__head">
-                  <span class="compare-metric__label">운행거리</span>
-                  <em class="compare-metric__delta up is-improved">+14.8%</em>
-                </div>
-                <div class="compare-metric__current miq-number">3,420<small>Km</small></div>
-                <div class="compare-track prev"><span>전월</span><span class="compare-track__rail"><i style="--value:.72"></i></span><b class="miq-number">2,980</b></div>
-                <div class="compare-track cur"><span>금월</span><span class="compare-track__rail"><i style="--value:.88"></i></span><b class="miq-number">3,420</b></div>
-              </article>
-              <article class="compare-metric">
-                <div class="compare-metric__head">
-                  <span class="compare-metric__label">운행시간</span>
-                  <em class="compare-metric__delta up is-improved">+3.3%</em>
-                </div>
-                <div class="compare-metric__current miq-number">2,170<small>H</small></div>
-                <div class="compare-track prev"><span>전월</span><span class="compare-track__rail"><i style="--value:.80"></i></span><b class="miq-number">2,100</b></div>
-                <div class="compare-track cur"><span>금월</span><span class="compare-track__rail"><i style="--value:.84"></i></span><b class="miq-number">2,170</b></div>
-              </article>
-              <article class="compare-metric">
-                <div class="compare-metric__head">
-                  <span class="compare-metric__label">연료소비량</span>
-                  <em class="compare-metric__delta down is-improved">−12.9%</em>
-                </div>
-                <div class="compare-metric__current miq-number">1,080<small>ℓ</small></div>
-                <div class="compare-track prev"><span>전월</span><span class="compare-track__rail"><i style="--value:.90"></i></span><b class="miq-number">1,240</b></div>
-                <div class="compare-track cur"><span>금월</span><span class="compare-track__rail"><i style="--value:.78"></i></span><b class="miq-number">1,080</b></div>
-              </article>
-              <article class="compare-metric">
-                <div class="compare-metric__head">
-                  <span class="compare-metric__label">배터리소비량</span>
-                  <em class="compare-metric__delta up is-worsened">+12.5%</em>
-                </div>
-                <div class="compare-metric__current miq-number">720<small>kWh</small></div>
-                <div class="compare-track prev"><span>전월</span><span class="compare-track__rail"><i style="--value:.60"></i></span><b class="miq-number">640</b></div>
-                <div class="compare-track cur"><span>금월</span><span class="compare-track__rail"><i style="--value:.68"></i></span><b class="miq-number">720</b></div>
-              </article>
-            </div>
-
-            <div class="efficiency-band">
-              <div class="efficiency-title">
-                <strong>대당 효율</strong>
-                <span>전월 → 금월</span>
-              </div>
-              <div class="efficiency-item">
-                <span class="efficiency-item__label">대당 이동거리</span>
-                <span class="efficiency-item__pair prev"><span>77</span><i>→</i><strong class="cur">81</strong><span>Km</span></span>
-                <em class="efficiency-item__delta up is-improved">▲ 5.2%</em>
-              </div>
-              <div class="efficiency-item">
-                <span class="efficiency-item__label">대당 가동시간</span>
-                <span class="efficiency-item__pair prev"><span>50</span><i>→</i><strong class="cur">51</strong><span>H</span></span>
-                <em class="efficiency-item__delta up is-improved">▲ 1.8%</em>
-              </div>
-              <div class="efficiency-item">
-                <span class="efficiency-item__label">대당 연료소비량</span>
-                <span class="efficiency-item__pair prev"><span>42</span><i>→</i><strong class="cur">41</strong><span>ℓ</span></span>
-                <em class="efficiency-item__delta down is-improved">▼ 3.1%</em>
-              </div>
-              <div class="efficiency-item">
-                <span class="efficiency-item__label">대당 배터리소비량</span>
-                <span class="efficiency-item__pair prev"><span>44</span><i>→</i><strong class="cur">45</strong><span>kWh</span></span>
-                <em class="efficiency-item__delta up is-worsened">▲ 2.4%</em>
-              </div>
-              <div class="efficiency-item hl">
-                <span class="efficiency-item__label">평균 운영효율</span>
-                <span class="efficiency-item__pair prev"><span>66</span><i>→</i><strong class="cur">67</strong><span>%</span></span>
-                <em class="efficiency-item__delta up is-improved">▲ 1.2%p</em>
-              </div>
-            </div>
-          </div>
-
-          <div class="dashboard-panel dashboard-panel--scroll motion-row" style="--delay:.12s">
-            <div class="performance-subsection">
-              <div class="performance-subhead"><h4>누적 사용량</h4><span>막대 위: 전월 · 아래: 금월</span></div>
-              <table class="performance-table" aria-label="그룹별 누적 사용량">
-                <colgroup><col/><col/><col/><col/><col/></colgroup>
-                <thead>
-                  <tr>
-                    <th scope="col">그룹</th>
-                    <th scope="col">운행거리</th>
-                    <th scope="col">운행시간</th>
-                    <th scope="col">연료소비량</th>
-                    <th scope="col">배터리소비량</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row"><span class="group-name">그룹1 <small>기본그룹</small></span></th>
-                    <td><div class="pair-value"><span>1,300</span><i>→</i><strong>1,480</strong><small>Km</small><em class="up is-improved">+13.8%</em></div><div class="micro-compare"><span class="prev"><i style="--value:.75"></i></span><span class="cur"><i style="--value:.86"></i></span></div></td>
-                    <td><div class="pair-value"><span>920</span><i>→</i><strong>960</strong><small>H</small><em class="up is-improved">+4.3%</em></div><div class="micro-compare"><span class="prev"><i style="--value:.82"></i></span><span class="cur"><i style="--value:.86"></i></span></div></td>
-                    <td><div class="pair-value"><span>560</span><i>→</i><strong>500</strong><small>ℓ</small><em class="down is-improved">−10.7%</em></div><div class="micro-compare"><span class="prev"><i style="--value:.88"></i></span><span class="cur"><i style="--value:.78"></i></span></div></td>
-                    <td><div class="pair-value"><span>280</span><i>→</i><strong>320</strong><small>kWh</small><em class="up is-worsened">+14.3%</em></div><div class="micro-compare"><span class="prev"><i style="--value:.62"></i></span><span class="cur"><i style="--value:.70"></i></span></div></td>
-                  </tr>
-                  <tr>
-                    <th scope="row"><span class="group-name">그룹2 <small>테스트그룹</small></span></th>
-                    <td><div class="pair-value"><span>980</span><i>→</i><strong>1,120</strong><small>Km</small><em class="up is-improved">+14.3%</em></div><div class="micro-compare"><span class="prev"><i style="--value:.70"></i></span><span class="cur"><i style="--value:.84"></i></span></div></td>
-                    <td><div class="pair-value"><span>720</span><i>→</i><strong>740</strong><small>H</small><em class="up is-improved">+2.8%</em></div><div class="micro-compare"><span class="prev"><i style="--value:.78"></i></span><span class="cur"><i style="--value:.82"></i></span></div></td>
-                    <td><div class="pair-value"><span>440</span><i>→</i><strong>400</strong><small>ℓ</small><em class="down is-improved">−9.1%</em></div><div class="micro-compare"><span class="prev"><i style="--value:.90"></i></span><span class="cur"><i style="--value:.80"></i></span></div></td>
-                    <td><div class="pair-value"><span>240</span><i>→</i><strong>280</strong><small>kWh</small><em class="up is-worsened">+16.7%</em></div><div class="micro-compare"><span class="prev"><i style="--value:.58"></i></span><span class="cur"><i style="--value:.66"></i></span></div></td>
-                  </tr>
-                  <tr>
-                    <th scope="row"><span class="group-name">그룹3 <small>물류1팀</small></span></th>
-                    <td><div class="pair-value"><span>700</span><i>→</i><strong>820</strong><small>Km</small><em class="up is-improved">+17.1%</em></div><div class="micro-compare"><span class="prev"><i style="--value:.74"></i></span><span class="cur"><i style="--value:.86"></i></span></div></td>
-                    <td><div class="pair-value"><span>460</span><i>→</i><strong>470</strong><small>H</small><em class="up is-improved">+2.2%</em></div><div class="micro-compare"><span class="prev"><i style="--value:.80"></i></span><span class="cur"><i style="--value:.82"></i></span></div></td>
-                    <td><div class="pair-value"><span>240</span><i>→</i><strong>180</strong><small>ℓ</small><em class="down is-improved">−25.0%</em></div><div class="micro-compare"><span class="prev"><i style="--value:.85"></i></span><span class="cur"><i style="--value:.64"></i></span></div></td>
-                    <td><div class="pair-value"><span>120</span><i>→</i><strong>120</strong><small>kWh</small><em class="flat is-flat">동일 0.0%</em></div><div class="micro-compare" role="img" aria-label="그룹3 배터리소비량은 전월과 금월 모두 120킬로와트시로 동일"><span class="prev"><i style="--value:.55"></i></span><span class="cur"><i style="--value:.55"></i></span></div></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div class="performance-subsection">
-              <div class="performance-subhead"><h4>대당 효율</h4><span>증감 방향은 원본 집계값 유지</span></div>
-              <table class="performance-table efficiency-table" aria-label="그룹별 대당 효율">
-                <colgroup><col/><col/><col/><col/><col/><col/></colgroup>
-                <thead>
-                  <tr>
-                    <th scope="col">그룹</th>
-                    <th scope="col">대당 이동거리</th>
-                    <th scope="col">대당 가동시간</th>
-                    <th scope="col">대당 연료소비량</th>
-                    <th scope="col">대당 배터리소비량</th>
-                    <th scope="col">평균 운영효율</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row"><span class="group-name">그룹1 <small>기본그룹</small></span></th>
-                    <td><div class="eff-pair"><span>77</span><i>→</i><strong>82</strong><small>Km</small></div><div class="eff-delta up is-improved">▲ 6.0%</div></td>
-                    <td><div class="eff-pair"><span>52</span><i>→</i><strong>53</strong><small>H</small></div><div class="eff-delta up is-improved">▲ 2.1%</div></td>
-                    <td><div class="eff-pair"><span>41</span><i>→</i><strong>39</strong><small>ℓ</small></div><div class="eff-delta down is-improved">▼ 4.0%</div></td>
-                    <td><div class="eff-pair"><span>43</span><i>→</i><strong>44</strong><small>kWh</small></div><div class="eff-delta up is-worsened">▲ 1.6%</div></td>
-                    <td class="hl"><div class="eff-pair"><span>67</span><i>→</i><strong>69</strong><small>%</small></div><div class="eff-delta up is-improved">▲ 2.0%p</div></td>
-                  </tr>
-                  <tr>
-                    <th scope="row"><span class="group-name">그룹2 <small>테스트그룹</small></span></th>
-                    <td><div class="eff-pair"><span>76</span><i>→</i><strong>80</strong><small>Km</small></div><div class="eff-delta up is-improved">▲ 4.5%</div></td>
-                    <td><div class="eff-pair"><span>52</span><i>→</i><strong>53</strong><small>H</small></div><div class="eff-delta up is-improved">▲ 1.2%</div></td>
-                    <td><div class="eff-pair"><span>44</span><i>→</i><strong>43</strong><small>ℓ</small></div><div class="eff-delta down is-improved">▼ 2.4%</div></td>
-                    <td><div class="eff-pair"><span>46</span><i>→</i><strong>47</strong><small>kWh</small></div><div class="eff-delta up is-worsened">▲ 3.0%</div></td>
-                    <td class="hl"><div class="eff-pair"><span>67.4</span><i>→</i><strong>66.9</strong><small>%</small></div><div class="eff-delta down is-worsened">▼ 0.5%p</div></td>
-                  </tr>
-                  <tr>
-                    <th scope="row"><span class="group-name">그룹3 <small>물류1팀</small></span></th>
-                    <td><div class="eff-pair"><span>76</span><i>→</i><strong>82</strong><small>Km</small></div><div class="eff-delta up is-improved">▲ 7.1%</div></td>
-                    <td><div class="eff-pair"><span>46.9</span><i>→</i><strong>47.3</strong><small>H</small></div><div class="eff-delta up is-improved">▲ 0.8%</div></td>
-                    <td><div class="eff-pair"><span>38</span><i>→</i><strong>36</strong><small>ℓ</small></div><div class="eff-delta down is-improved">▼ 5.0%</div></td>
-                    <td><div class="eff-pair"><span>40</span><i>→</i><strong>40</strong><small>kWh</small></div><div class="eff-delta flat is-flat">동일 0.0%</div></td>
-                    <td class="hl"><div class="eff-pair"><span>61</span><i>→</i><strong>62</strong><small>%</small></div><div class="eff-delta up is-improved">▲ 0.9%p</div></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-      </div>
-    </div>
+          </div></section></div>
+</div>
   </main>
 </div>
 
-<script src="../_mock-data/generated/fleet.generated.js?v=20260906-dashboard-role-company-r1&amp;rev=f69042cf6b57"></script>
-<script src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script>
-<script src="../_shared/common-logic.js?v=20260907-common-logic-r42&amp;rev=fe89537280cd"></script>
-<script src="../_shared/chart-common.js?rev=26b243959957"></script>
-<script src="../_shared/nav.js?v=20260907-common-logic-r42&amp;rev=10146ec619b0"></script>
-<script src="../_shared/dashboard-deeplinks.js?v=20260907-common-logic-r42&amp;rev=b5df4358ab48"></script>
-<script>
-(function(){
-  var content=document.getElementById('dashboardContent');
-  if(!content)return;
-  function play(){
-    content.classList.add('is-animating');
-    content.classList.remove('is-ready');
-    void content.offsetWidth;
-    setTimeout(function(){content.classList.add('is-ready')},24);
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',play,{once:true});
-  else play();
-  window.addEventListener('miq:period-change',play);
-})();
-</script>
-<script src="../_shared/dashboard-hourly.js?rev=bc3f26a03262"></script>
-<script src="../_shared/dashboard-chart-details.js?rev=2626bc4c2cf0"></script>
-<script src="../_shared/dashboard-view-tabs.js?rev=b2acd9df4e0a"></script>
-<script src="../_shared/dashboard-company-model.js?rev=1600590975b7"></script>
-<script src="../_shared/dashboard-company-browser.js?rev=5f98ce6c47ab"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </body>
 </html>
+
+

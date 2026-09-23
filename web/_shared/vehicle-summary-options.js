@@ -5,8 +5,8 @@
   var favoriteSummary=document.body.dataset.favoriteSummary==='true';
   var favoriteRole=document.body.dataset.managementRole;
   var favoriteReadError=false;
-  if(favoriteSummary&&!window.MIQCommon.roles.isDealer(favoriteRole)){
-    document.querySelector('.summary-content').textContent='딜러 전용 메뉴입니다.';
+  if(favoriteSummary&&!window.MIQCommon.roles.canUseFavorites(favoriteRole)){
+    document.querySelector('.summary-content').textContent='이 메뉴를 사용할 권한이 없습니다.';
     return;
   }
   var PERIOD={
@@ -32,7 +32,7 @@
   }
   if(favoriteSummary){
     try{
-      var favoriteIds=window.MIQFavorites.read(favoriteRole,VEHICLES);
+      var favoriteIds=window.MIQFavorites.read(favoriteRole,VEHICLES,new URLSearchParams(location.search).get('favoriteCategory'));
       VEHICLES=VEHICLES.filter(function(vehicle){return favoriteIds.indexOf(vehicle.vin)>-1});
     }catch(error){VEHICLES=[];favoriteReadError=true}
   }
@@ -72,6 +72,7 @@
   var vehicleList=document.getElementById('vehicleList');
   var live=document.getElementById('optionLive');
 
+  var pager=MIQ.createListPager(vehicleList,{pageSize:20,onChange:render});
   var tree=MIQ.lnbTree(document.getElementById('lnb'),{
     vehicles:VEHICLES,
     group:QUERY.get('group')||null,
@@ -83,7 +84,7 @@
 
   function num(value,decimal){
     var n=Number(value)||0;
-    return n.toFixed(decimal===undefined?0:decimal).replace(/\B(?=(\d{3})+(?!\d))/g,',')
+    return window.MIQCommon.numbers.integer(n).replace(/\B(?=(\d{3})+(?!\d))/g,',')
   }
   function hasNumber(value){return value!==null&&value!==undefined&&value!==''&&!isNaN(Number(value))}
   function hm(minutes){
@@ -310,14 +311,14 @@
     var labels={
       vin:'차량번호',group:'그룹',type:'분류',cumKm:'누적 이동거리',cumH:'누적 가동시간',
       km:'기간 이동거리',min:'기간 가동시간',workMin:'기간 작업시간',performance:'운영효율',electricEff:'운영효율',
-      shock:'충격 횟수',conn:'TMS 연결',soc:'배터리 SOC',fuel:'엔진 연료소비',battery:'전동 배터리소비'
+      shock:'충격 횟수',conn:'통신연결',soc:'배터리 SOC',fuel:'엔진 연료소비',battery:'전동 배터리소비'
     };
     return labels[key]||'기본 순서'
   }
 
   function connectionHtml(vehicle){
-    if(vehicle.conn===null||vehicle.conn===undefined)return'<span class="connection-badge unknown">수집 전</span>';
-    return '<span class="connection-badge '+(vehicle.conn?'on':'off')+'">'+(vehicle.conn?'연결됨':'연결 끊김')+'</span>'
+    var status=MIQSummaryRow.connection(vehicle.conn);
+    return '<span class="connection-badge '+status+'">'+(status==='on'?'연결':'미연결')+'</span>'
   }
   function socHtml(vehicle){
     if(!hasNumber(vehicle.soc)||Number(vehicle.soc)<0||Number(vehicle.soc)>100)return'<span class="na" title="배터리 잔량 미수집">-</span>';
@@ -325,22 +326,21 @@
   }
   function connectionDot(vehicle){
     var status=MIQSummaryRow.connection(vehicle.conn);
-    var label=status==='on'?'TMS 연결중':status==='off'?'TMS 연결안됨':'TMS 정보 미수집';
+    var label=status==='on'?'통신연결: 연결':'통신연결: 미연결';
     return '<i class="connection-dot '+status+'" role="img" aria-label="'+label+'" title="'+label+'"></i>'
   }
   function energyText(vehicle){
     return vehicle.soc===null?'정보 미제공':vehicle.soc+'%'
   }
   function performanceText(vehicle,value){
-    return {label:'운영효율',value:value.operatingEff==null?'-':value.operatingEff.toFixed(1)+'%'};
+    return {label:'운영효율',value:value.operatingEff==null?'-':window.MIQCommon.numbers.integer(value.operatingEff)+'%'};
   }
   function consumptionText(vehicle,value){
-    if(vehicle.type==='엔진')return value.fc===null?'-':value.fc.toFixed(1)+' ℓ/H';
-    return value.bc===null?'-':value.bc.toFixed(1)+' kWh/H'
+    if(vehicle.type==='엔진')return value.fc===null?'-':window.MIQCommon.numbers.integer(value.fc)+' ℓ/H';
+    return value.bc===null?'-':window.MIQCommon.numbers.integer(value.bc)+' kWh/H'
   }
   function health(vehicle,value){
-    if(vehicle.conn===false)return{cls:'danger',text:'통신 확인'};
-    if(vehicle.conn===null||vehicle.conn===undefined)return{cls:'unknown',text:'상태 수집 전'};
+    if(MIQSummaryRow.connection(vehicle.conn)==='off')return{cls:'danger',text:'통신 확인'};
     if(vehicle.soc!==null&&vehicle.soc<30)return{cls:'warning',text:'SOC 확인'};
     if(value.shock>=5)return{cls:'warning',text:'충격 확인'};
     return{cls:'normal',text:'정상'}
@@ -373,7 +373,7 @@
     if(!rows.length){
       var emptyMessage='조회 조건에 해당하는 차량이 없습니다.';
       if(favoriteSummary&&!VEHICLES.length){
-        emptyMessage=favoriteReadError?'관심차량을 불러오지 못했습니다. 새로고침 후 다시 확인해 주세요.':'등록된 관심차량이 없습니다. 관심차량 관리에서 차량을 담고 저장해 주세요.';
+        emptyMessage=favoriteReadError?'관심차량을 불러오지 못했습니다. 새로고침 후 다시 확인해 주세요.':(QUERY.get('favoriteCategory')?'선택한 구분에 등록된 관심차량이 없습니다.':'등록된 관심차량이 없습니다.')+' 관심차량 관리에서 차량을 담고 저장해 주세요.';
       }
       vehicleList.innerHTML='<div class="option-empty">'+emptyMessage+'</div>';
       return
@@ -393,7 +393,7 @@
         +'<td class="c"><strong class="row-time">'+(times.running===null?'—':hm(times.running))+'</strong></td>'
         +'<td class="c"><strong class="row-time">'+(times.working===null?'—':hm(times.working))+'</strong></td>'
         +'</tr>'
-        +'<tr class="detail-row" data-detail-vin="'+escapeAttr(vehicle.vin)+'" id="'+detailId+'"'+(expanded?'':' hidden')+'><td colspan="7">'+detailPanel(vehicle,value)+'</td></tr>'
+        +(expanded?'<tr class="detail-row" data-detail-vin="'+escapeAttr(vehicle.vin)+'" id="'+detailId+'"><td colspan="7">'+detailPanel(vehicle,value)+'</td></tr>':'')
     }).join('');
     vehicleList.innerHTML='<div class="expand-table-wrap"><table class="expand-table" aria-label="차량 운행 요약 상세 펼침형">'
       +'<colgroup><col><col><col><col><col><col><col></colgroup>'
@@ -473,22 +473,23 @@
       host.classList.add('miq-summary-scope-chip')
     }
   }
-  function renderToolbar(rows){
+  function renderToolbar(rows,visible){
+    visible=visible||rows;
     if(option==='expand'){
-      var allExpanded=rows.length>0&&rows.every(function(vehicle){return Boolean(state.expanded[vehicle.vin])});
+      var allExpanded=visible.length>0&&visible.every(function(vehicle){return Boolean(state.expanded[vehicle.vin])});
       optionToolbar.innerHTML='<span class="option-toolbar__count"></span>'
-        +'<span class="connection-legend" aria-label="TMS 연결 상태 범례"><span><i class="connection-dot on" aria-hidden="true"></i>TMS 연결중</span><span><i class="connection-dot off" aria-hidden="true"></i>TMS 연결안됨</span>'+(rows.some(function(vehicle){return MIQSummaryRow.connection(vehicle.conn)==='unknown'})?'<span><i class="connection-dot unknown" aria-hidden="true"></i>TMS 정보 미수집</span>':'')+'</span>'
+        +'<span class="connection-legend" aria-label="통신연결 범례"><span class="connection-legend__title">통신연결</span><span><i class="connection-dot on" aria-hidden="true"></i>연결</span><span><i class="connection-dot off" aria-hidden="true"></i>미연결</span></span>'
         +'<div class="option-toolbar__tools"><span class="option-toolbar__hint">+ 버튼으로 차량별 추가 정보를 확인합니다.</span><button type="button" class="option-toolbar__button" id="toggleAllDetails">'+(allExpanded?'모두 접기':'모두 펼치기')+'</button></div>';
       renderToolbarScope(rows);
       document.getElementById('toggleAllDetails').addEventListener('click',function(){
-        rows.forEach(function(vehicle){state.expanded[vehicle.vin]=!allExpanded});
+        visible.forEach(function(vehicle){state.expanded[vehicle.vin]=!allExpanded});
         render()
       })
     }else{
       var options=[
         ['vin','차량번호'],['group','그룹'],['type','분류'],['cumKm','누적 이동거리'],['cumH','누적 가동시간'],
         ['km','기간 이동거리'],['min','기간 가동시간'],['electricEff','운영효율'],['shock','충격 횟수'],
-        ['conn','TMS 연결'],['soc','배터리 SOC'],['fuel','엔진 연료소비'],['battery','전동 배터리소비']
+        ['conn','통신연결'],['soc','배터리 SOC'],['fuel','엔진 연료소비'],['battery','전동 배터리소비']
       ];
       optionToolbar.innerHTML='<span class="option-toolbar__count"></span>'
         +'<span class="sort-current">현재 '+sortLabel(state.sortKey)+' · '+(state.sortDir===1?'오름차순':'내림차순')+'</span>'
@@ -539,9 +540,10 @@
     var ordered=sortedRows(sourceRows);
     renderChrome();
     renderKpi(sourceRows);
-    renderToolbar(ordered);
-    if(option==='expand')renderExpandableTable(ordered);
-    else renderPriorityCards(ordered);
+    var visible=pager.slice(ordered,state.period+'|'+PERIOD[state.period].range.join('|'));
+    renderToolbar(ordered,visible);
+    if(option==='expand')renderExpandableTable(visible);
+    else renderPriorityCards(visible);
     syncUrl()
   }
 
@@ -560,6 +562,7 @@
     }
   });
   document.getElementById('runSearch').addEventListener('click',function(event){
+    if(sharedPeriodReady())return;
     if(!applyCustomRange()){
       event.stopImmediatePropagation();
       return

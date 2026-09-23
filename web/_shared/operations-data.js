@@ -6,11 +6,11 @@
   if (!O) return;
   var serial = 0;
   var KEYS = { terminals: 'data-terminals', equipment: 'equipment-codes', history: 'equipment-history', accounts: 'internal-accounts' };
-  var TYPES = [ ['working', '운행 데이터'], ['gps', 'GPS 데이터'], ['lithium', '리튬배터리 데이터'], ['hydrogen', '수소배터리 데이터'], ['error', '차량 에러 데이터'], ['lithiumError', '리튬배터리 에러 데이터'], ['hydrogenError', '수소배터리 에러 데이터'] ];
+  var TYPES = [ ['working', '운행 데이터'], ['gps', 'GPS 데이터'], ['lithium', '리튬배터리 데이터'], ['error', '차량 에러 데이터'], ['lithiumError', '리튬배터리 에러 데이터'] ];
   var COMPANIES = ['한빛물류', '대성산업', '중앙렌탈', '동우운수'];
   var GROUPS = ['기본그룹', '물류1팀', '물류2팀'];
-  var FUELS = ['LI', 'LA', 'LM', 'HI'];
-  var BASE_CODES = [ ['FBA32', 'B30S-7', 'MOTOR', 'LI'], ['FBA18', 'B18S-7', 'MOTOR', 'LA'], ['FDB30', 'D30S-9', 'ENGINE', 'LM'], ['FBH25', 'B25H-7', 'MOTOR', 'HI'] ];
+  var FUELS = ['LI', 'LA', 'LM'];
+  var BASE_CODES = [ ['FBA32', 'B30S-7', 'MOTOR', 'LI'], ['FBA18', 'B18S-7', 'MOTOR', 'LA'], ['FDB30', 'D30S-9', 'ENGINE', 'LM'] ];
   function e(value) { return O.esc(value == null ? '' : String(value)); }
   function pad(value) { return String(value).padStart(2, '0'); }
   function today() { return new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10); }
@@ -30,22 +30,24 @@
   function save(key, value) { return O.write(key, value) !== false; }
   function notifyError(form, name, message) { var control = form.elements.namedItem(name); if (control && control.setCustomValidity) { control.setCustomValidity(message); control.reportValidity(); control.addEventListener('input', function clear() { control.setCustomValidity(''); control.removeEventListener('input', clear); }); } else O.notify(message); }
   function codeSeeds() {
-    return Array.from({ length: 24 }, function (_, i) {
+    // Skip the retired fourth seed slot without renumbering the other records.
+    return Array.from({ length: 24 }, function (_, i) { return i; }).filter(function (i) { return i % 4 < BASE_CODES.length; }).map(function (i) {
       var basis = BASE_CODES[i % 4];
       return { id: 'EC-' + (i + 1), code: i < 4 ? basis[0] : basis[0] + '-' + pad(i + 1), name: i < 4 ? basis[1] : basis[1] + ' ' + (i + 1), type: basis[2], maker: i % 5 === 0 ? 'DOOSAN' : 'BOBCAT', fuel: basis[3], weight: 1800 + (i % 6) * 500, power: 20 + (i % 7) * 5, imageUrl: '', comment: i < 4 ? '표준 장비코드' : '', eaiYn: i % 7 === 6 ? 'N' : 'Y', useYn: i % 8 === 7 ? 'N' : 'Y', createdAt: '2026-08-01 09:00:00', updatedAt: '2026-09-01 10:00:00' };
     });
   }
   function terminalSeeds() {
     var basisDay = today();
-    return Array.from({ length: 36 }, function (_, i) {
+    return Array.from({ length: 36 }, function (_, i) { return i; }).filter(function (i) { return i % 4 < BASE_CODES.length; }).map(function (i) {
       var fuel = FUELS[i % 4], code = BASE_CODES[i % 4], registered = i < 28;
       var date = dayOffset(basisDay, i % 9 === 7 ? -3 : i % 9 === 8 ? -1 : 0);
       var at = date + ' ' + pad(8 + i % 6) + ':' + pad((i * 7) % 60) + ':00';
-      return { id: 'TM-' + (i + 1), terminalId: String(826110001 + i), vin: registered ? 'OPS_' + code[0] + '_' + (1001 + i) : '', company: registered ? COMPANIES[i % 4] : '', group: registered ? GROUPS[i % 3] : '', fuel: fuel, equipmentCode: code[0], model: code[1], registered: registered, mesReady: i % 6 !== 5, registeredAt: registered ? '2026-08-01 09:00:00' : '', last: { working: i % 11 === 10 ? null : at, gps: i % 7 === 6 ? null : at, lithium: fuel === 'LI' ? at : null, hydrogen: fuel === 'HI' ? at : null, error: i % 5 === 0 ? date + ' 08:15:00' : null, lithiumError: fuel === 'LI' && i % 8 === 0 ? date + ' 08:20:00' : null, hydrogenError: fuel === 'HI' && i % 7 === 0 ? date + ' 08:25:00' : null }, eaiAt: i % 6 !== 5 ? at : null };
+      return { id: 'TM-' + (i + 1), terminalId: String(826110001 + i), vin: registered ? 'OPS_' + code[0] + '_' + (1001 + i) : '', company: registered ? COMPANIES[i % 4] : '', group: registered ? GROUPS[i % 3] : '', fuel: fuel, equipmentCode: code[0], model: code[1], registered: registered, mesReady: i % 6 !== 5, registeredAt: registered ? '2026-08-01 09:00:00' : '', last: { working: i % 11 === 10 ? null : at, gps: i % 7 === 6 ? null : at, lithium: fuel === 'LI' ? at : null, error: i % 5 === 0 ? date + ' 08:15:00' : null, lithiumError: fuel === 'LI' && i % 8 === 0 ? date + ' 08:20:00' : null }, eaiAt: i % 6 !== 5 ? at : null };
     });
   }
-  function terminals() { return O.read(KEYS.terminals, terminalSeeds()); }
-  function equipment() { return O.read(KEYS.equipment, codeSeeds()); }
+  function supportedVehicle(row) { return !/^(HI|HY|hydrogen|수소)$/i.test(String(row.fuel || row.type || '').trim()); }
+  function terminals() { return O.read(KEYS.terminals, terminalSeeds()).filter(supportedVehicle); }
+  function equipment() { return O.read(KEYS.equipment, codeSeeds()).filter(supportedVehicle); }
   function ensureDateRange(form, from, to) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(from) || !/^\d{4}-\d{2}-\d{2}$/.test(to)) { notifyError(form, 'from', '조회 기간을 선택해 주세요.'); return false; }
     var days = (Date.parse(to + 'T00:00:00Z') - Date.parse(from + 'T00:00:00Z')) / 86400000 + 1;
@@ -56,7 +58,8 @@
   O.register('data', function (ctx) {
     var tab = 'latest', bulkIds = null;
     var filters = { company: '', group: '', fuel: '', state: '', q: '' };
-    var raw = { kind: 'working', terminal: terminals()[0].terminalId, from: dayOffset(today(), -6), to: today() };
+    var firstTerminal = terminals()[0];
+    var raw = { kind: 'working', terminal: firstTerminal ? firstTerminal.terminalId : '', from: dayOffset(today(), -6), to: today() };
     var tabs = [ ['latest', '최종 수집현황'], ['raw', '원시 데이터 조회'], ['terminal', '단말 등록·연동 점검'] ];
     function health(row) { if (!row.last.working) return '미수집'; return row.last.working.slice(0, 10) < dayOffset(today(), -1) ? '수집 지연' : '정상'; }
     function filtered() {
@@ -71,13 +74,12 @@
     }
     function renderTerminals() {
       var area = ctx.el.querySelector('[data-ops-filters]');
-      area.innerHTML = '<form class="ops-filters" aria-label="' + (tab === 'terminal' ? '단말' : '수집현황') + ' 조회">' + field('업체', select('company', COMPANIES, filters.company, '전체 업체')) + field('그룹', select('group', GROUPS, filters.group, '전체 그룹')) + field('연료', select('fuel', FUELS, filters.fuel, '전체 연료')) + field('상태', select('state', tab === 'terminal' ? ['등록', '미등록'] : ['정상', '수집 지연', '미수집'], filters.state, '전체 상태')) + field('검색', input('q', filters.q, 'type="search" maxlength="100" placeholder="단말 ID · 차량 ID"')) + '<button class="btn-search" type="submit">조회</button><button class="btn" type="button" data-ops-reset>초기화</button></form>' + (bulkIds ? '<div class="ops-inline-message" role="status">단말 ' + bulkIds.length + '개 일괄조회 적용 중 <button type="button" class="btn btn--sm" data-ops-bulk-clear>해제</button></div>' : '');
+      area.innerHTML = '<form class="ops-filters" aria-label="' + (tab === 'terminal' ? '단말' : '수집현황') + ' 조회">' + field('업체', select('company', COMPANIES, filters.company, '전체 업체')) + field('그룹', select('group', GROUPS, filters.group, '전체 그룹')) + field('연료', select('fuel', FUELS, filters.fuel, '전체 연료')) + field('상태', select('state', tab === 'terminal' ? ['등록', '미등록'] : ['정상', '수집 지연', '미수집'], filters.state, '전체 상태')) + field('검색', input('q', filters.q, 'type="search" maxlength="100" placeholder="단말 ID · 차량 ID"')) + '<button class="btn-search" type="submit">조회</button></form>' + (bulkIds ? '<div class="ops-inline-message" role="status">단말 ' + bulkIds.length + '개 일괄조회 적용 중 <button type="button" class="btn btn--sm" data-ops-bulk-clear>해제</button></div>' : '');
       area.querySelector('form').addEventListener('submit', function (event) { event.preventDefault(); var form = event.currentTarget; Object.keys(filters).forEach(function (key) { filters[key] = formValue(form, key); }); renderTerminals(); });
-      area.querySelector('[data-ops-reset]').addEventListener('click', function () { Object.keys(filters).forEach(function (key) { filters[key] = ''; }); bulkIds = null; renderTerminals(); });
       var clear = area.querySelector('[data-ops-bulk-clear]'); if (clear) clear.addEventListener('click', function () { bulkIds = null; renderTerminals(); });
-      var rows = filtered().map(function (row) { return Object.assign({}, row, { company: row.company || '미배정', group: row.group || '미배정', status: tab === 'terminal' ? (row.registered ? '등록' : '미등록') : health(row), working: row.last.working || '—', gps: row.last.gps || '—', lithium: row.last.lithium || '—', hydrogen: row.last.hydrogen || '—', lastError: row.last.error || '—', lithiumError: row.last.lithiumError || '—', hydrogenError: row.last.hydrogenError || '—', mesStatus: row.mesReady ? '정상' : '확인 필요' }); });
+      var rows = filtered().map(function (row) { return Object.assign({}, row, { company: row.company || '미배정', group: row.group || '미배정', status: tab === 'terminal' ? (row.registered ? '등록' : '미등록') : health(row), working: row.last.working || '—', gps: row.last.gps || '—', lithium: row.last.lithium || '—', lastError: row.last.error || '—', lithiumError: row.last.lithiumError || '—', mesStatus: row.mesReady ? '정상' : '확인 필요' }); });
       var columns = [ { key: 'company', label: '업체' }, { key: 'group', label: '그룹' }, { key: 'terminalId', label: '단말 ID', render: function (row) { return '<button type="button" class="mm-cell-link ops-text-button" data-action="detail">' + e(row.terminalId) + '</button>'; } }, { key: 'vin', label: '차량 ID', render: function (row) { return e(row.vin || '미등록'); } }, { key: 'fuel', label: '연료' } ];
-      if (tab === 'latest') columns = columns.concat([ { key: 'status', label: '운행 수집 상태' }, { key: 'working', label: '운행 수집일시' }, { key: 'gps', label: 'GPS 수집일시' }, { key: 'lithium', label: '리튬 수집일시' }, { key: 'hydrogen', label: '수소 수집일시' }, { key: 'lastError', label: '차량 에러 수집일시' }, { key: 'lithiumError', label: '리튬 에러 수집일시' }, { key: 'hydrogenError', label: '수소 에러 수집일시' }, { key: 'eaiAt', label: 'EAI 확인일시', render: function (row) { return e(row.eaiAt || '—'); } } ]);
+      if (tab === 'latest') columns = columns.concat([ { key: 'status', label: '운행 수집 상태' }, { key: 'working', label: '운행 수집일시' }, { key: 'gps', label: 'GPS 수집일시' }, { key: 'lithium', label: '리튬 수집일시' }, { key: 'lastError', label: '차량 에러 수집일시' }, { key: 'lithiumError', label: '리튬 에러 수집일시' }, { key: 'eaiAt', label: 'EAI 확인일시', render: function (row) { return e(row.eaiAt || '—'); } } ]);
       else columns = columns.concat([ { key: 'status', label: '등록 상태' }, { key: 'mesStatus', label: 'MES 상태' }, { key: 'eaiAt', label: 'EAI 확인일시', render: function (row) { return e(row.eaiAt || '—'); } }, { key: 'manage', label: '관리', className: 'c', sortable: false, export: false, render: function () { return button('detail', '상세 / MES 조회'); } } ]);
       var host = ctx.el.querySelector('[data-ops-table]');
       O.grid(host, { rows: rows, columns: columns, pageSize: 15, toolbar: '<button type="button" class="btn btn--sm" data-ops-bulk>단말 일괄조회</button>', emptyText: '조회 조건에 해당하는 단말이 없습니다.', defaultSort: { key: 'terminalId', dir: 'asc' }, onAction: function (action, row) { if (action === 'detail' && row) terminalModal(row.id); } });
@@ -130,7 +132,7 @@
     }
     function rawRows() {
       var result = [], days = Math.floor((Date.parse(raw.to) - Date.parse(raw.from)) / 86400000) + 1;
-      terminals().filter(function (row) { return row.last[raw.kind] && (!raw.terminal || row.terminalId === raw.terminal) && (!/^lithium/.test(raw.kind) || row.fuel === 'LI') && (!/^hydrogen/.test(raw.kind) || row.fuel === 'HI'); }).forEach(function (row) {
+      terminals().filter(function (row) { return row.last[raw.kind] && (!raw.terminal || row.terminalId === raw.terminal) && (!/^lithium/.test(raw.kind) || row.fuel === 'LI'); }).forEach(function (row) {
         for (var d = 0; d < days; d++) {
           var date = dayOffset(raw.from, d), error = /error/i.test(raw.kind), samples = error ? 1 : 4;
           for (var s = 0; s < samples; s++) {
@@ -141,7 +143,7 @@
             if (raw.kind === 'working') Object.assign(data, { runMinutes: 30 + seed % 25, workMinutes: 25 + seed % 25 - seed % 7, distance: Number((1.2 + seed % 18 / 10).toFixed(1)), shock: seed % 9 === 0 ? 1 : 0 });
             else if (raw.kind === 'gps') Object.assign(data, { latitude: (37.035 + seed % 20 / 10000).toFixed(6), longitude: (126.787 + seed % 13 / 10000).toFixed(6), speed: seed % 12, bearing: seed * 13 % 360 });
             else if (!error) Object.assign(data, { soc: 45 + seed % 50, soh: 90 + seed % 10, voltage: Number((48 + seed % 20 / 10).toFixed(1)), temperature: 23 + seed % 14, current: seed % 25 });
-            else Object.assign(data, { code: (raw.kind === 'error' ? 'ECU' : raw.kind === 'lithiumError' ? 'BMS-LI' : 'BMS-HI') + '-' + pad(1 + seed % 4), severity: seed % 2 ? '주의' : '경고', state: seed % 2 ? '해제' : '발생', message: seed % 2 ? '전압 신호 점검' : '온도 신호 점검' });
+            else Object.assign(data, { code: (raw.kind === 'error' ? 'ECU' : 'BMS-LI') + '-' + pad(1 + seed % 4), severity: seed % 2 ? '주의' : '경고', state: seed % 2 ? '해제' : '발생', message: seed % 2 ? '전압 신호 점검' : '온도 신호 점검' });
             result.push(data);
           }
         }
@@ -170,9 +172,8 @@
       var list = O.read(KEYS.history, []); list.unshift({ id: uid('EH'), codeId: row.id, code: row.code, action: action, at: stamp(), actor: '내부 사용자', before: before || null, after: after || null }); return save(KEYS.history, list);
     }
     function render() {
-      ctx.el.innerHTML = '<form class="ops-filters" aria-label="장비코드 조회">' + field('검색', input('q', filters.q, 'type="search" placeholder="장비코드 · 차종명 · 제조사" maxlength="100"')) + field('유형', select('type', [['MOTOR', '전동'], ['ENGINE', '엔진'], ['LPG', 'LPG']], filters.type, '전체 유형')) + field('연료', select('fuel', FUELS, filters.fuel, '전체 연료')) + field('사용여부', select('state', [['Y', '사용'], ['N', '미사용']], filters.state, '전체')) + '<button class="btn-search" type="submit">조회</button><button class="btn" type="button" data-ops-reset>초기화</button></form><div data-ops-table></div>';
+      ctx.el.innerHTML = '<form class="ops-filters" aria-label="장비코드 조회">' + field('검색', input('q', filters.q, 'type="search" placeholder="장비코드 · 차종명 · 제조사" maxlength="100"')) + field('유형', select('type', [['MOTOR', '전동'], ['ENGINE', '엔진'], ['LPG', 'LPG']], filters.type, '전체 유형')) + field('연료', select('fuel', FUELS, filters.fuel, '전체 연료')) + field('사용여부', select('state', [['Y', '사용'], ['N', '미사용']], filters.state, '전체')) + '<button class="btn-search" type="submit">조회</button></form><div data-ops-table></div>';
       ctx.el.querySelector('form').addEventListener('submit', function (event) { event.preventDefault(); Object.keys(filters).forEach(function (key) { filters[key] = formValue(event.currentTarget, key); }); render(); });
-      ctx.el.querySelector('[data-ops-reset]').addEventListener('click', function () { Object.keys(filters).forEach(function (key) { filters[key] = ''; }); render(); });
       var rows = equipment().filter(function (row) { return search(row, filters.q, ['code', 'name', 'maker']) && (!filters.type || row.type === filters.type) && (!filters.fuel || row.fuel === filters.fuel) && (!filters.state || row.useYn === filters.state); }).map(function (row) { return Object.assign({}, row, { count: used(row.code), typeName: { MOTOR: '전동', ENGINE: '엔진', LPG: 'LPG' }[row.type], status: row.useYn === 'Y' ? '사용' : '미사용' }); });
       var host = ctx.el.querySelector('[data-ops-table]');
       O.grid(host, { rows: rows, pageSize: 15, defaultSort: { key: 'code', dir: 'asc' }, toolbar: '<button type="button" class="btn btn--sm btn--pri" data-ops-code-add>장비코드 등록</button>', columns: [ { key: 'code', label: '장비코드' }, { key: 'name', label: '차종명' }, { key: 'count', label: '장비대수', className: 'r' }, { key: 'typeName', label: '유형' }, { key: 'maker', label: '제조사' }, { key: 'fuel', label: '연료' }, { key: 'status', label: '사용여부' }, { key: 'updatedAt', label: '수정일시' }, { key: 'manage', label: '관리', className: 'c', sortable: false, export: false, render: function () { return actions([button('edit', '수정'), button('history', '이력')]); } } ], emptyText: '조회 조건에 해당하는 장비코드가 없습니다.', onAction: function (action, row) { if (!row) return; if (action === 'edit') edit(row.id); if (action === 'history') history(row); } });
@@ -224,9 +225,8 @@
     var filters = { q: '', role: '', state: 'Y' };
     function accounts() { return O.read(KEYS.accounts, accountSeeds()); }
     function render() {
-      ctx.el.innerHTML = '<form class="ops-filters" aria-label="내부 계정 조회">' + field('검색', input('q', filters.q, 'type="search" maxlength="100" placeholder="사용자 ID · 이름 · 부서"')) + field('권한', select('role', [['ADMIN', 'Admin'], ['SERVICE', 'Service']], filters.role, '전체 권한')) + field('사용여부', select('state', [['Y', '사용'], ['N', '미사용']], filters.state, '전체')) + '<button class="btn-search" type="submit">조회</button><button type="button" class="btn" data-ops-reset>초기화</button></form><div data-ops-table></div>';
+      ctx.el.innerHTML = '<form class="ops-filters" aria-label="내부 계정 조회">' + field('검색', input('q', filters.q, 'type="search" maxlength="100" placeholder="사용자 ID · 이름 · 부서"')) + field('권한', select('role', [['ADMIN', 'Admin'], ['SERVICE', 'Service']], filters.role, '전체 권한')) + field('사용여부', select('state', [['Y', '사용'], ['N', '미사용']], filters.state, '전체')) + '<button class="btn-search" type="submit">조회</button></form><div data-ops-table></div>';
       ctx.el.querySelector('form').addEventListener('submit', function (event) { event.preventDefault(); Object.keys(filters).forEach(function (key) { filters[key] = formValue(event.currentTarget, key); }); render(); });
-      ctx.el.querySelector('[data-ops-reset]').addEventListener('click', function () { filters = { q: '', role: '', state: 'Y' }; render(); });
       var rows = accounts().filter(function (row) { return (!filters.role || row.role === filters.role) && (!filters.state || row.useYn === filters.state) && search(row, filters.q, ['userId', 'name', 'department']); }).map(function (row) { return Object.assign({}, row, { roleName: row.role === 'ADMIN' ? 'Admin' : 'Service', status: row.useYn === 'Y' ? '사용' : '미사용' }); });
       var host = ctx.el.querySelector('[data-ops-table]');
       O.grid(host, { rows: rows, pageSize: 15, defaultSort: { key: 'userId', dir: 'asc' }, toolbar: '<button type="button" class="btn btn--sm btn--pri" data-ops-account-add>내부 계정 등록</button>', emptyText: '조회 조건에 해당하는 내부 계정이 없습니다.', columns: [ { key: 'userId', label: '사용자 ID' }, { key: 'name', label: '이름' }, { key: 'roleName', label: '권한' }, { key: 'department', label: '부서' }, { key: 'phone', label: '연락처' }, { key: 'status', label: '사용여부' }, { key: 'createdAt', label: '등록일시' }, { key: 'deactivatedAt', label: '미사용 적용일', render: function (row) { return e(row.deactivatedAt || '—'); } }, { key: 'manage', label: '관리', className: 'c', sortable: false, export: false, render: function (row) { return actions([button('edit', '수정'), button('state', row.useYn === 'Y' ? '미사용' : '사용')]); } } ], onAction: function (action, row) { if (!row) return; if (action === 'edit') edit(row.id); if (action === 'state') changeState(row); } });

@@ -15,7 +15,15 @@
   if (!table || !tbody) return;
 
   var detailHref = '../Vehicle%20Detail/vehicle-detail-tobe.html';
-  var rows = [];
+  var seed = document.querySelector('template[data-service-seed]');
+  var rows = seed ? Array.prototype.slice.call(seed.content.querySelectorAll('tbody > tr')) : [];
+  if (seed) {
+    table.tHead.replaceWith(seed.content.querySelector('thead'));
+    seed.remove();
+  }
+  var initialized = false;
+  function allTableRows() { return Array.prototype.slice.call(table.tHead.rows).concat(rows); }
+  var pager=MIQ.createListPager(table.parentElement,{pageSize:20,onChange:function(){applyFilters()}});
   var nextOrder = 0;
   var sortState = { index: -1, direction: 1 };
   var scopeContext = window.MIQ_TARGET_CONTEXT || null;
@@ -114,6 +122,16 @@
     var fleet = window.MIQ && (MIQ.FLEET_CATALOG || MIQ.FLEET) || [];
     var day = MIQCommon.dates.format(MIQCommon.dates.yesterday());
     var demo = MIQServiceDemo.create(fleet, day);
+    // Only the separate dashboard's explicit sample link adds today's events.
+    // Freeze date/hour at the clicked card so list and card stay comparable.
+    var sampleQuery = new URLSearchParams(location.search);
+    if (MIQServiceDemo.createCurrent) {
+      var sampleWindow = sampleQuery.get('dashboardSample')==='current'
+        ? {date:sampleQuery.get('sampleDate'),to:sampleQuery.get('sampleTo')}
+        : MIQMeeting.hourlyWindow(new Date(),'Asia/Seoul');
+      demo.error=demo.error.concat(MIQServiceDemo.createCurrent(fleet,sampleWindow));
+      demo.maintenance=demo.maintenance.concat(MIQServiceDemo.create(fleet,sampleWindow.date).maintenance.filter(function(r){return r.dateTime<sampleWindow.date+' '+sampleWindow.to;}));
+    }
     MIQServiceRecords.records.push.apply(MIQServiceRecords.records, demo.maintenance.concat(demo.error));
     if (page === 'supply' || !rows.length) return;
     var template = rows[0];
@@ -126,7 +144,6 @@
       row.dataset.companyId = item.companyId;
       row.dataset.vehicleType = item.type;
       row.dataset.serviceDemo = 'true';
-      row.title = '시연용 더미 데이터';
       if (page === 'all' || page === 'maintenance') {
         [item.company, item.group, item.model, item.vin].forEach(function (value, index) { c[index].textContent = value; });
         if (page === 'all') {
@@ -140,37 +157,76 @@
         c[0].querySelector('span').textContent = item.group;
         c[1].querySelector('strong').textContent = item.vin;
         c[1].querySelector('span').textContent = item.model;
-        c[2].innerHTML = '<span class="state ' + (item.errorState === 'current' ? 'now' : 'past') + '">' + (item.errorState === 'current' ? '현재' : '과거') + '</span>';
-        c[3].innerHTML = '<span class="type' + (item.category === '배터리' ? ' battery' : '') + '">' + esc(item.category) + '</span>';
-        c[4].innerHTML = '<div class="errcode"><span class="errcode__main">' + esc(item.code) + ' <span class="level ' + esc(item.level) + '">' + esc(item.level.toUpperCase()) + '</span></span><span class="errcode__sub">' + esc(item.spn) + ' / ' + esc(item.fmi) + '</span></div>';
-        c[5].textContent = item.description;
-        c[6].querySelector('strong').textContent = item.dateTime;
-        c[6].querySelector('span').textContent = '완료 ' + (item.completedAt || '-');
+        MIQServiceErrors.cells(item).forEach(function(html,index){c[index+2].innerHTML=html;});
       }
-      tbody.appendChild(row);
+      rows.push(row);
       existing.push(normalize(item.vin));
     });
   }
 
   function collectRows() {
-    rows = Array.prototype.filter.call(tbody.rows, function (row) {
-      return !row.classList.contains('service-empty-row');
-    });
+    Array.prototype.forEach.call(tbody.rows, function(row){if(!row.classList.contains('service-empty-row')&&rows.indexOf(row)<0)rows.push(row)});
     rows.forEach(function (row) {
       if (typeof row._serviceOrder !== 'number') row._serviceOrder = nextOrder++;
     });
   }
 
-  function applyMaintenanceRole() {
+  function applyServiceRole() {
+    applyServiceTableColumns();
+    var customer = roleRules.isCustomer(accountRole);
+    var companyIndex = page === 'supply' ? 1 : 0;
+    var groupIndex = companyIndex + 1;
+    body.dataset.serviceRole = accountRole;
+    function labelHeading(index, label) {
+      var heading = table.tHead.rows[0].cells[index];
+      // Repeated calls after registration must preserve the sort button/listener.
+      if (heading && !heading.querySelector('.service-sort-button')) heading.textContent = label;
+    }
+    if (page === 'error') {
+      labelHeading(0, customer ? '그룹' : '업체');
+      rows.forEach(function (row) {
+        row.cells[0].querySelector('strong').hidden = customer;
+        row.cells[0].querySelector('span').hidden = !customer;
+      });
+    } else {
+      labelHeading(companyIndex, '업체');
+      labelHeading(groupIndex, '그룹');
+      allTableRows().forEach(function (row) {
+        if (row.cells.length < groupIndex + 2) return;
+        row.cells[companyIndex].hidden = customer;
+        row.cells[groupIndex].hidden = !customer;
+      });
+    }
     if (page !== 'maintenance') return;
     var hideDetail = roleRules.hideMaintenanceDetails(accountRole);
-    body.dataset.serviceRole = accountRole;
-    if (roleRules.isDealer(accountRole)) {
-      Array.prototype.forEach.call(tbody.closest('table').rows, function(row){if(row.cells[1])row.cells[1].hidden=true;});
-    }
-    Array.prototype.forEach.call(document.querySelectorAll('.detail-col'), function (cell) {
+    allTableRows().forEach(function (row) { Array.prototype.forEach.call(row.querySelectorAll('.detail-col'), function (cell) {
       cell.classList.toggle('is-hidden', hideDetail);
       cell.setAttribute('aria-hidden', hideDetail ? 'true' : 'false');
+    }); });
+  }
+
+  function fitServiceColumns() {
+    var minimums={company:210,group:140,model:100,vin:190,count:110,check:48,vehicle:210,date:174,part:165,symptom:180,description:250,status:96,supply:180,progress:260,category:88,code:180,action:76};
+    MIQTableLayout.fit(table,Array.prototype.map.call(table.tHead.rows[0].cells,function(header){var key=header.dataset.serviceColumn;return {min:minimums[key],compact:/^(check|status|category|action)$/.test(key)};}));
+  }
+
+  function applyServiceTableColumns() {
+    var columns = {
+      all: ['company', 'group', 'model', 'vin', 'count', 'count', 'count', 'count'],
+      maintenance: ['company', 'group', 'model', 'vin', 'date', 'part', 'symptom', 'description', 'status'],
+      supply: ['check', 'company', 'group', 'model', 'vin', 'supply', 'date', 'progress'],
+      error: ['company', 'vehicle', 'status', 'category', 'code', 'description', 'date', 'action']
+    }[page];
+    if (!columns) return;
+    table.classList.add('service-data-table');
+    var colgroup = table.querySelector('colgroup');
+    if (colgroup) colgroup.remove();
+    allTableRows().forEach(function (row) {
+      if (row.cells.length !== columns.length) return;
+      columns.forEach(function (column, index) {
+        row.cells[index].dataset.serviceColumn = column;
+        row.cells[index].style.removeProperty('width');
+      });
     });
   }
 
@@ -193,19 +249,37 @@
   }
 
   function vehicleDetailUrl(info) {
-    var catalogVehicle = catalogVehicleForVin(info && info.vin);
+    var catalogVehicle = catalogVehicleForVin(info && info.vin)
+      || MIQServiceRecords.vehicleIdentity(info && info.vin);
     if (!catalogVehicle) return '';
+    if (!roleRules.filterVehicles(accountRole, [catalogVehicle]).length) return '';
     var currentCompany = document.querySelector('[data-target-company]');
     var query = new URLSearchParams(location.search);
     var companyId = currentCompany ? currentCompany.value : (query.get('companyId') || '');
     var params = new URLSearchParams();
+    params.set('role', accountRole);
+    var returnQuery = new URLSearchParams();
+    returnQuery.set('role', accountRole);
+    [['companyId', filterState.companyId], ['group', filterState.group], ['type', filterState.type],
+      ['veh', filterState.vehicle], ['period', query.get('period') || 'm'],
+      ['from', filterState.from], ['to', filterState.to], ['lang', query.get('lang')],
+      ['dashboardSample', query.get('dashboardSample')], ['sampleDate', query.get('sampleDate')],
+      ['sampleTo', query.get('sampleTo')]].forEach(function (pair) {
+      if (pair[1]) returnQuery.set(pair[0], pair[1]);
+    });
+    if (filterState.supplyState) returnQuery.set('state', filterState.supplyState);
+    if (filterState.errorState) returnQuery.set('state', filterState.errorState);
+    params.set('returnTo', location.pathname + '?' + returnQuery.toString());
     params.set('veh', catalogVehicle.vin);
-    if (companyId) params.set('companyId', companyId);
+    if (query.get('lang')) params.set('lang', query.get('lang'));
+    if (catalogVehicle.companyId || companyId) params.set('companyId', catalogVehicle.companyId || companyId);
     if (info.model) params.set('model', info.model);
     if (info.group) params.set('group', info.group);
     var type = vehicleTypeFor(info);
     if (type) params.set('type', type);
     if (query.get('period')) params.set('period', query.get('period'));
+    if (filterState.from) params.set('from', filterState.from);
+    if (filterState.to) params.set('to', filterState.to);
     return detailHref + '?' + params.toString();
   }
 
@@ -311,12 +385,12 @@
       var info = rowInfo(row);
       if (!info.vin) return;
       if (page === 'all') {
-        row.cells[3].textContent = info.vin;
+        makeVinLink(row.cells[3], info);
         makeServiceItemLink(row.cells[4], info, 'maintenance', '수리이력');
         makeServiceItemLink(row.cells[5], info, 'supply', '소모품');
         makeServiceItemLink(row.cells[6], info, 'error', '에러');
       } else if (page === 'maintenance') {
-        row.cells[3].textContent = info.vin;
+        makeVinLink(row.cells[3], info);
       } else if (page === 'supply') {
         makeVinLink(row.cells[4], info);
       } else if (page === 'error') {
@@ -335,22 +409,49 @@
     var state = MIQServiceRecords.supplyStatus(cycle, used);
     var pct = state.percent === null ? 0 : state.percent;
     var capped = state.width;
-    var context = used > cycle ? '초과 ' + (used - cycle).toLocaleString('ko-KR') + 'H'
-      : '교체까지 ' + Math.max(0, cycle - used).toLocaleString('ko-KR') + 'H';
+    var context = used > cycle ? '초과 ' + window.MIQCommon.numbers.integer((used - cycle), true) + 'H'
+      : '교체까지 ' + window.MIQCommon.numbers.integer(Math.max(0, cycle - used), true) + 'H';
 
     progress.classList.toggle('is-danger', state.state === 'need');
     progress.classList.toggle('is-warning', state.state === 'soon');
     progress.classList.toggle('is-safe', state.state === 'ok');
     progress.innerHTML =
-      '<div class="progress__top"><span><b class="used">' + used.toLocaleString('ko-KR') + 'H</b> / '
-      + cycle.toLocaleString('ko-KR') + 'H</span><span class="progress__value"><b class="percent">'
-      + pct + '%</b></span></div><div class="progress__context">' + context
+      '<div class="progress__top"><span><b class="used">' + window.MIQCommon.numbers.integer(used, true) + 'H</b> / '
+      + window.MIQCommon.numbers.integer(cycle, true) + 'H</span><span class="progress__value"><b class="percent">'
+      + window.MIQCommon.numbers.integer(pct) + '%</b></span></div><div class="progress__context">' + context
       + '</div><div class="progress__bar"><span class="progress__fill" style="width:' + capped + '%"></span></div>';
     row.dataset.supplyState = state.state;
   }
 
   function initializeSupplyRows() {
     if (page !== 'supply') return;
+    var template = rows[0];
+    if (!template) return;
+    // Include every common-ledger item before the rendered list is synchronized.
+    // A VIN/name pair identifies an item; filtering must never remove source items.
+    MIQServiceRecords.records.filter(function (record) { return record.kind === 'supply'; }).forEach(function (item) {
+      var exists = rows.some(function (row) {
+        return normalize(row.dataset.vin) === normalize(item.vin) && row.dataset.name === item.supplyName;
+      });
+      if (exists) return;
+      var row = template.cloneNode(true);
+      row.hidden = false;
+      row.dataset.vin = item.vin;
+      row.dataset.name = item.supplyName;
+      row.dataset.companyId = item.companyId;
+      row.dataset.vehicleType = item.type;
+      row.dataset.cycle = item.supplyCycle;
+      row.dataset.used = item.supplyUsed;
+      delete row.dataset.lastDate;
+      delete row.dataset.lastCum;
+      [item.company, item.group, item.model, item.vin, item.supplyName, item.date].forEach(function (value, index) {
+        row.cells[index + 1].textContent = value;
+      });
+      var check = row.querySelector('.item-check');
+      check.checked = false;
+      check.setAttribute('aria-label', item.supplyName + ' 선택');
+      rows.push(row);
+    });
     rows.forEach(function (row) {
       var item = MIQServiceRecords.supplyItems(row.dataset.vin).filter(function (value) { return value.name === row.dataset.name; })[0];
       if (item) { row.dataset.cycle = item.cycle; row.dataset.used = item.used; }
@@ -385,6 +486,10 @@
   }
 
   function sortValue(row, index) {
+    if (page === 'error' && index === 0) {
+      var info = rowInfo(row);
+      return roleRules.isCustomer(accountRole) ? info.group : info.company;
+    }
     var text = row.cells[index] ? row.cells[index].textContent.replace(/\s+/g, ' ').trim() : '';
     var date = dateOnly(text);
     if (date) {
@@ -408,7 +513,7 @@
       else result = String(av).localeCompare(String(bv), 'ko', { numeric: true, sensitivity: 'base' });
       return result === 0 ? a._serviceOrder - b._serviceOrder : result * direction;
     });
-    rows.forEach(function (row) { tbody.appendChild(row); });
+
   }
 
   function enhanceSorting() {
@@ -501,30 +606,8 @@
     document.dispatchEvent(new CustomEvent('miq:query-change', { detail: { query: window.MIQ_SERVICE_QUERY } }));
   }
 
-  function resyncServiceLnbCounts() {
-    if (!document.querySelector('.miq-side-menu')) return;
-    collectRows();
-    updateServiceLnb(rows.filter(function (row) { return !row.hidden; }));
-  }
-
-  function scheduleServiceLnbCountResync() {
-    window.setTimeout(function () {
-      // Shared date controls are mounted after this script's initial pass.
-      if (!periodControlsReady) {
-        var inputs = document.querySelectorAll('.miq-period-filter input[type="date"]');
-        if (inputs.length) {
-          periodControlsReady = true;
-          filterState.from = inputs[0].value;
-          filterState.to = inputs[1] ? inputs[1].value : inputs[0].value;
-          enhanceVinLinks();
-          applyFilters();
-        }
-      }
-      resyncServiceLnbCounts();
-    }, 0);
-  }
-
   function applyFilters(message) {
+    if (!initialized) return;
     collectRows();
     if (page !== 'all') MIQServiceRecords.replace(page, rows.map(rowInfo));
     updateSummaryCounts();
@@ -535,12 +618,13 @@
       row.hidden = !show;
       if (show) visible.push(row);
     });
+    tbody.replaceChildren.apply(tbody,pager.slice(visible));
     var oldEmpty = tbody.querySelector('.service-empty-row');
     if (oldEmpty) oldEmpty.remove();
     if (!visible.length) {
       var empty = document.createElement('tr');
       empty.className = 'service-empty-row';
-      empty.innerHTML = '<td colspan="' + table.tHead.rows[0].cells.length
+      empty.innerHTML = '<td colspan="' + MIQTableLayout.columnCount(table)
         + '"><strong>조회 조건에 맞는 결과가 없습니다.</strong>차량·기간·상태 필터를 변경해 주세요.</td>';
       tbody.appendChild(empty);
     }
@@ -595,6 +679,8 @@
 
   function openDialog(config) {
     var dialog = ensureDialog();
+    if (config.screenId) dialog.dataset.screenId = config.screenId;
+    else delete dialog.dataset.screenId;
     dialog.className = 'service-dialog' + (config.dialogClass ? ' ' + config.dialogClass : '');
     dialog.innerHTML =
       '<form class="service-dialog__form" novalidate>'
@@ -636,139 +722,6 @@
     });
     document.body.appendChild(toast);
     window.setTimeout(function () { if (toast.isConnected) toast.remove(); }, 6000);
-  }
-
-  function uniqueVehicles() {
-    var seen = {};
-    return rows.map(rowInfo).filter(function (info) {
-      if (!info.vin || seen[normalize(info.vin)]) return false;
-      seen[normalize(info.vin)] = true;
-      return true;
-    });
-  }
-
-  function openMaintenanceRegistration() { return;
-    var fleet = window.MIQ && Array.isArray(MIQ.FLEET_CATALOG) && MIQ.FLEET_CATALOG.length
-      ? MIQ.FLEET_CATALOG.slice()
-      : uniqueVehicles();
-    if (filterState.companyId && filterState.companyId !== 'all') {
-      fleet = fleet.filter(function (item) { return String(item.companyId || '') === String(filterState.companyId); });
-    }
-    var groupMap = {};
-    fleet.forEach(function (item) {
-      var companyId = String(item.companyId || '');
-      var groupName = item.group || '미배정';
-      var key = companyId + '::' + groupName;
-      if (!groupMap[key]) {
-        groupMap[key] = {
-          key: key,
-          companyId: companyId,
-          companyName: item.companyName || item.company || '세종물류',
-          group: groupName
-        };
-      }
-    });
-    var groups = Object.keys(groupMap).map(function (key) { return groupMap[key]; });
-    var selectedVehicle = filterState.vehicle || (fleet[0] && fleet[0].vin) || '';
-    var selectedVehicleInfo = fleet.filter(function (item) { return normalize(item.vin) === normalize(selectedVehicle); })[0] || fleet[0] || null;
-    var selectedGroupKey = selectedVehicleInfo
-      ? String(selectedVehicleInfo.companyId || '') + '::' + (selectedVehicleInfo.group || '미배정')
-      : (groups[0] && groups[0].key) || '';
-    var groupOptions = groups.map(function (item) {
-      var label = item.group + (item.companyName ? ' - ' + item.companyName : '');
-      return '<option value="' + esc(item.key) + '"' + (item.key === selectedGroupKey ? ' selected' : '') + '>' + esc(label) + '</option>';
-    }).join('');
-    var hours = [];
-    for (var hour = 0; hour < 24; hour++) {
-      var label = (hour < 10 ? '0' : '') + hour;
-      hours.push('<option value="' + label + '"' + (hour === 9 ? ' selected' : '') + '>' + label + '</option>');
-    }
-    var baseDate = filterState.to || '2026-07-31';
-    var dialog = openDialog({
-      title: '등록',
-      confirmLabel: '장비점검 등록',
-      dialogClass: 'service-dialog--maintenance',
-      body: '<div class="service-dialog__grid">'
-        + '<label class="service-dialog__field full"><span>그룹명</span><select name="group" required>' + groupOptions + '</select></label>'
-        + '<label class="service-dialog__field full"><span>차량 ID</span><select name="vin"><option value="">차량없음</option></select></label>'
-        + '<label class="service-dialog__field"><span>고장부위</span><input name="part" required maxlength="40"></label>'
-        + '<label class="service-dialog__field"><span>현상</span><input name="symptom" required maxlength="60"></label>'
-        + '<label class="service-dialog__field"><span>접수일</span><span class="service-dialog__date-pair"><input name="receivedDate" type="date" value="' + esc(baseDate) + '" required><select name="receivedHour" aria-label="접수 시간">' + hours.join('') + '</select></span></label>'
-        + '<label class="service-dialog__field"><span>완료일</span><span class="service-dialog__date-pair"><input name="completedDate" type="date"><select name="completedHour" aria-label="완료 시간">' + hours.join('').replace(' value="09" selected', ' value="09"') + '</select></span></label>'
-        + '<label class="service-dialog__field full"><span>상세내용</span><textarea name="detail" required maxlength="300"></textarea></label>'
-        + '</div>',
-      onOpen: function (form) {
-        var groupSelect = form.elements.group;
-        var vehicleSelect = form.elements.vin;
-        function renderVehicleOptions() {
-          var selectedKey = groupSelect.value;
-          var currentValue = vehicleSelect.value || selectedVehicle;
-          var options = fleet.filter(function (item) {
-            return String(item.companyId || '') + '::' + (item.group || '미배정') === selectedKey;
-          }).map(function (item) {
-            var label = item.vin + ' · ' + item.model;
-            return '<option value="' + esc(item.vin) + '"' + (normalize(item.vin) === normalize(currentValue) ? ' selected' : '') + '>' + esc(label) + '</option>';
-          }).join('');
-          vehicleSelect.innerHTML = '<option value="">차량없음</option>' + options;
-        }
-        groupSelect.addEventListener('change', function () {
-          selectedVehicle = '';
-          renderVehicleOptions();
-        });
-        renderVehicleOptions();
-      },
-      onConfirm: function (form) {
-        var data = new FormData(form);
-        var vin = data.get('vin');
-        var vehicle = fleet.filter(function (item) { return normalize(item.vin) === normalize(vin); })[0] || null;
-        var selectedGroup = groupMap[data.get('group')] || { companyName: '세종물류', group: '미배정' };
-        var stamp = String(data.get('receivedDate')) + ' ' + String(data.get('receivedHour')) + ':00';
-        var completedDate = String(data.get('completedDate') || '');
-        var completedStamp = completedDate ? completedDate + ' ' + String(data.get('completedHour') || '00') + ':00' : '';
-        var done = completedDate ? 'y' : 'n';
-        var row = document.createElement('tr');
-        row.className = 'service-row-added';
-        row.dataset.completedAt = completedStamp;
-        row.innerHTML = '<td>' + esc((vehicle && (vehicle.companyName || vehicle.company)) || selectedGroup.companyName) + '</td><td>' + esc((vehicle && vehicle.group) || selectedGroup.group) + '</td><td>' + esc((vehicle && vehicle.model) || '-')
-          + '</td><td>' + esc(vin || '차량없음') + '</td><td>' + esc(stamp) + '</td><td>' + esc(data.get('part'))
-          + '</td><td>' + esc(data.get('symptom')) + '</td><td class="left detail-col">' + esc(data.get('detail'))
-          + '</td><td><span class="done ' + done + '">' + (done === 'y' ? '완료' : '진행중') + '</span></td>';
-        tbody.insertBefore(row, tbody.firstChild);
-        applyMaintenanceRole();
-        collectRows();
-        enhanceVinLinks();
-        applyFilters('수리이력 1건을 등록했습니다.');
-        showToast('수리이력 1건을 등록했습니다.');
-      }
-    });
-    return dialog;
-  }
-
-  function openSupplyEdit(button) { return;
-    var row = button.closest('tr');
-    var name = button.dataset.name || '소모품';
-    var cycle = Number(button.dataset.cycle || 0);
-    var used = Number(button.dataset.used || 0);
-    openDialog({
-      title: name + ' 교환 정보 수정',
-      body: '<div class="service-dialog__grid">'
-        + '<label class="service-dialog__field"><span>소모품</span><input value="' + esc(name) + '" readonly></label>'
-        + '<label class="service-dialog__field"><span>차량</span><input value="' + esc(button.dataset.vin || '') + '" readonly></label>'
-        + '<label class="service-dialog__field"><span>교환주기 (H)</span><input name="cycle" type="number" min="1" step="1" value="' + cycle + '" required></label>'
-        + '<label class="service-dialog__field"><span>현재 사용시간 (H)</span><input value="' + used + '" readonly></label>'
-        + '<label class="service-dialog__field"><span>마지막 교체일시</span><input name="lastDate" type="datetime-local" value="' + esc(String(button.dataset.lastDate || '').replace(' ', 'T')) + '" required></label>'
-        + '<label class="service-dialog__field"><span>마지막 교체 누적시간 (H)</span><input name="lastCum" type="number" min="0" step="1" value="' + esc(String(button.dataset.lastCum || '0').replace(/,/g, '')) + '" required></label>'
-        + '</div><p class="service-dialog__summary" style="margin-top:14px">저장하면 교환주기 대비 사용률과 교체필요·교체임박 상태가 즉시 다시 계산됩니다.</p>',
-      onConfirm: function (form) {
-        var data = new FormData(form);
-        button.dataset.cycle = String(Number(data.get('cycle')));
-        button.dataset.lastDate = String(data.get('lastDate')).replace('T', ' ');
-        button.dataset.lastCum = Number(data.get('lastCum')).toLocaleString('ko-KR');
-        supplyProgress(row);
-        applyFilters(name + ' 교환 정보를 저장했습니다.');
-        showToast(name + ' 교환 정보를 저장했습니다.');
-      }
-    });
   }
 
   function selectedSupplyRows() {
@@ -859,15 +812,11 @@
 
   function openErrorPrint(button) {
     var d = errorDetails(button);
-    openDialog({
+    var dialog = openDialog({
       title: '에러 조치 정보',
+      screenId: 'LQ-SVC-004-P01',
       confirmLabel: '인쇄 / PDF 저장',
-      body: '<div class="service-dialog__summary"><strong>' + esc(d.info.vin + ' · ' + d.info.model) + '</strong>'
-        + '<dl style="display:grid;grid-template-columns:120px 1fr;gap:8px 14px;margin-top:14px">'
-        + '<dt>구분</dt><dd>' + esc(d.type) + '</dd><dt>현재/과거</dt><dd>' + esc(d.state)
-        + '</dd><dt>에러코드</dt><dd>' + esc(d.code + ' · ' + (d.level && d.level !== '-' ? d.level + '등급' : '-')) + '</dd><dt>SPN / FMI</dt><dd>'
-        + esc(d.sub) + '</dd><dt>설명</dt><dd>' + esc(d.description) + '</dd><dt>발생 / 완료</dt><dd>' + esc(d.date)
-        + '</dd></dl></div>',
+      body: MIQServiceErrors.documentHtml(d),
       onConfirm: function (form, dialog) {
         body.classList.add('is-printing-error');
         window.print();
@@ -875,11 +824,16 @@
         return false;
       }
     });
+    var identity = dialog.querySelector('.service-dialog__summary > strong');
+    if (identity) {
+      makeVinLink(identity, d.info);
+      identity.appendChild(document.createTextNode(' · ' + d.info.model));
+    }
   }
 
   function enhanceErrorActions() {
     if (page !== 'error') return;
-    Array.prototype.forEach.call(tbody.querySelectorAll('span.pdf'), function (span) {
+    rows.forEach(function (row) { Array.prototype.forEach.call(row.querySelectorAll('span.pdf'), function (span) {
       var button = document.createElement('button');
       button.type = 'button';
       button.className = span.className;
@@ -887,7 +841,7 @@
       button.setAttribute('aria-label', rowInfo(span.closest('tr')).vin + ' 에러 조치 정보 열기');
       button.textContent = 'PDF';
       span.replaceWith(button);
-    });
+    }); });
   }
 
   function applyUrlState() {
@@ -992,13 +946,6 @@
     }
   });
   document.addEventListener('click', function (event) {
-    var edit = event.target.closest('[data-miq-modal="supply"], [data-service-edit="supply"]');
-    if (edit && page === 'supply') {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      openSupplyEdit(edit);
-      return;
-    }
     var reset = event.target.closest('#reset-selected');
     if (reset && page === 'supply') {
       event.preventDefault();
@@ -1010,27 +957,18 @@
   collectRows();
   initializeDemoRows();
   collectRows();
-  applyMaintenanceRole();
   initializeSupplyRows();
   collectRows();
+  applyServiceRole();
+  fitServiceColumns();
   enhanceVinLinks();
   enhanceSorting();
   enhanceErrorActions();
   applyUrlState();
   enhanceVinLinks();
   sortRows();
+  initialized = true;
   applyFilters();
   syncSupplySelection();
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', scheduleServiceLnbCountResync);
-  } else {
-    scheduleServiceLnbCountResync();
-  }
-  window.addEventListener('load', scheduleServiceLnbCountResync);
-
-  if (page === 'maintenance') {
-    var add = document.querySelector('.btn-add');
-    if (add) add.addEventListener('click', openMaintenanceRegistration);
-  }
 })();

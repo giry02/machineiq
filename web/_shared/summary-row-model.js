@@ -17,7 +17,8 @@
     }
     return {running: running, working: working, idle: idle};
   }
-  function connection(value) { return value === true ? 'on' : value === false ? 'off' : 'unknown'; }
+  // Communication has two UI states; only an explicit connection is shown as on.
+  function connection(value) { return value === true ? 'on' : 'off'; }
   function historyCounts(service, vehicle, range) {
     var unavailable = {repair: null, fault: null};
     if (!service || typeof service.count !== 'function' || !Array.isArray(service.records)

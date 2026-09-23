@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ko"><head><script src="../_shared/demo-clock.js?rev=34d9d133492b"></script><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>구분 관리 · MACHINE IQ</title>
+<link rel="icon" type="image/x-icon" href="../_shared/favicon.ico"/>
+<link rel="stylesheet" href="../_shared/mockup.css?rev=bed1f0069135"/>
+<link rel="stylesheet" href="../_shared/list-controls.css?rev=bbb25360b177"/>
+<link rel="stylesheet" href="../_shared/map-management-enhancements.css?rev=a999e938e96f"/>
+<link rel="stylesheet" href="../_shared/service-enhancements.css?rev=fb05756ae59b"/>
+<link rel="stylesheet" href="../_shared/favorite-categories.css?rev=0fc77bbb1b78"/>
+<link rel="stylesheet" href="../_shared/form-controls.css?rev=6fda272acdcc"/>
+<link rel="stylesheet" href="../_shared/list-pagination.css?rev=0069e48c1009">
+<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?rev=bb6d53aabb78"/>
+<link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?rev=1cffa21a9777"/>
+<style>body.miq-current-shell>#gnb{min-height:64px}</style>
+<script defer blocking="render" src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script>
+<script defer blocking="render" src="../_shared/common-logic.js?rev=efb7e741cd7b"></script>
+<script defer blocking="render" src="../_shared/list-pagination.js?rev=33207bf33d11"></script>
+<script defer blocking="render" src="../_mock-data/generated/fleet.generated.js?rev=309d68875499"></script>
+<script defer blocking="render" src="../_shared/fleet.js?rev=dfdf98be0a95"></script>
+<script defer blocking="render" src="../_shared/nav.js?rev=049a18c69072"></script>
+<script defer blocking="render" src="../_shared/favorite-store.js?rev=753f6857ed37"></script>
+<script defer blocking="render" src="../_shared/favorite-categories.js?rev=761ee6657669"></script>
+</head><body data-current-bootstrap="ready" class="miq-current-shell miq-section-mgmt" data-gnb="interest" data-sub="categories" data-variant="tobe" data-base="../" data-target-selector="none" data-screen-id="LQ-MGT-007">
+<div id="gnb"></div><div class="layout"><main class="main miq-mgmt-page">
+<div class="breadcrumb">관심차량 &gt; 구분 관리</div><div class="page-head"><h1 class="page-head__title">구분 관리</h1></div>
+<div class="list-head miq-mgmt-list-head"><div class="miq-list-summary-actions"><span class="list-head__count">총 <b id="categoryTotal">0</b>개 구분</span></div><div class="tools miq-mgmt-primary-actions"><button class="btn btn--pri" type="button" id="categoryAdd">구분 추가</button></div></div>
+<div class="tbl-wrap favorite-category-table-wrap"><table class="tbl favorite-category-table"><thead><tr><th scope="col">구분 이름</th><th scope="col" class="r">관심차량</th><th scope="col" class="c">관리</th></tr></thead><tbody id="favoriteCategoryRows"></tbody></table></div>
+<p class="favorite-category-note">구분을 삭제하면 등록된 차량은 기본 구분으로 이동합니다.</p>
+<p id="categoryStatus" class="favorite-category-feedback" role="status" aria-live="polite"></p>
+</main></div>
+<dialog id="favoriteCategoryEditor" class="service-dialog" aria-labelledby="favoriteCategoryEditorTitle" data-screen-id="LQ-MGT-007-P02"><form id="favoriteCategoryForm" class="service-dialog__form">
+<header class="service-dialog__head"><h2 id="favoriteCategoryEditorTitle">구분 추가</h2><button class="service-dialog__close" type="button" data-category-editor-close aria-label="닫기">×</button></header>
+<div class="service-dialog__body"><label class="service-dialog__field" for="favoriteCategoryName"><span>구분 이름</span><input class="inp" type="text" id="favoriteCategoryName" maxlength="30" placeholder="예: 중부지사" autocomplete="off" required/></label><p id="categoryFormStatus" class="favorite-category-feedback" role="status" aria-live="polite"></p></div>
+<footer class="service-dialog__foot"><button class="service-dialog__button" id="categoryCancel" type="button" data-category-editor-close>취소</button><button class="service-dialog__button primary" id="categorySubmit" type="submit">추가</button></footer>
+</form></dialog>
+<dialog id="favoriteCategoryDialog" class="service-dialog" aria-labelledby="favoriteCategoryDialogTitle" data-screen-id="LQ-MGT-007-P01"><div class="service-dialog__form">
+<header class="service-dialog__head"><h2 id="favoriteCategoryDialogTitle">구분 삭제</h2><button class="service-dialog__close" data-category-close aria-label="닫기">×</button></header>
+<div class="service-dialog__body"><p id="categoryDeleteMessage"></p><p id="categoryDeleteStatus" class="favorite-category-feedback" role="status"></p></div>
+<footer class="service-dialog__foot"><button class="service-dialog__button" data-category-close>취소</button><button class="service-dialog__button primary" id="categoryDeleteConfirm">삭제</button></footer>
+</div></dialog>
+
+
+
+
+</body></html>

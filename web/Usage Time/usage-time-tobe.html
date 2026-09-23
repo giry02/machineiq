@@ -1,18 +1,32 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
+<head><script src="../_shared/demo-clock.js?rev=34d9d133492b"></script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>운행시간 · MACHINE IQ</title>
 <link rel="icon" type="image/x-icon" href="../_shared/favicon.ico"/>
 <link rel="stylesheet" href="../_shared/chart-common.css?rev=fc1c23dcf6af"/>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
-<link rel="stylesheet" href="../_shared/mockup.css?rev=d24057a14011"/>
-<link rel="stylesheet" href="../_shared/content-system.css?v=20260902-readability&amp;rev=d8f94e7e5049"/>
-<link rel="stylesheet" href="../_shared/operation-metrics-enhancements.css?v=20260903-common-layout-r4&amp;rev=a369098bff2a"/>
-<link rel="stylesheet" href="../_shared/usage-time-enhancements.css?v=20260906-period-search-r1&amp;rev=2e6a0f678ee1"/>
+<link rel="stylesheet" href="../_shared/offline-fonts.css?rev=b405f97e6cf9"><script type="module" blocking="render">await document.fonts.load('400 14px "Noto Sans KR"');await document.fonts.ready;</script>
+<link rel="stylesheet" href="../_shared/mockup.css?rev=bed1f0069135"/>
+<link rel="stylesheet" href="../_shared/content-system.css?rev=d8f94e7e5049"/>
+<link rel="stylesheet" href="../_shared/operation-metrics-enhancements.css?rev=7382cce3b26e"/>
+<link rel="stylesheet" href="../_shared/usage-time-enhancements.css?rev=e8345b5b2b7a"/>
+<link rel="stylesheet" href="../_shared/form-controls.css?rev=6fda272acdcc"/>
+<link rel="stylesheet" href="../_shared/list-pagination.css?rev=0069e48c1009">
+<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?rev=bb6d53aabb78"/>
+<link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?rev=1cffa21a9777"/>
+<style>body.miq-current-shell>#gnb{min-height:64px}</style>
+<script defer blocking="render" src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script>
+<script defer blocking="render" src="../_shared/common-logic.js?rev=efb7e741cd7b"></script>
+<script defer blocking="render" src="../_shared/list-pagination.js?rev=33207bf33d11"></script>
+<script defer blocking="render" src="../_mock-data/generated/fleet.generated.js?rev=309d68875499"></script>
+<script defer blocking="render" src="../_shared/fleet.js?rev=dfdf98be0a95"></script>
+<script defer blocking="render" src="../_shared/nav.js?rev=049a18c69072"></script>
+<script defer blocking="render" src="../_shared/chart-common.js?rev=15c74452f805"></script>
+<script defer blocking="render" src="../_shared/usage-month-model.js?rev=9f1096290746"></script>
+<script defer blocking="render" src="../_shared/usage-time-enhancements.js?rev=0c797cefc2c9"></script>
 </head>
-<body data-period-presets="dwm" class="miq-content-system miq-operation-metrics miq-usage-time" data-gnb="anlz" data-sub="usage" data-variant="tobe" data-base="../">
+<body data-current-bootstrap="ready" class="miq-current-shell miq-content-system miq-operation-metrics miq-usage-time" data-gnb="anlz" data-sub="usage" data-variant="tobe" data-base="../">
 
 <div id="gnb"></div>
 
@@ -26,14 +40,11 @@
     </div>
 
     <div class="filter-bar miq-period-filter usage-month-filter" id="usageFilter" aria-label="운행시간 조회">
-      <div class="period-tabs" role="group" aria-label="조회 기간 단위">
-        <button type="button" data-period="d">일</button>
-        <button type="button" data-period="w">주</button>
-        <button type="button" class="active" data-period="m">월</button>
-        </div>
-      <input type="date" class="miq-date-input" id="usageFrom" value="2026-09-01" aria-label="조회 시작일"/>
-      <span class="miq-date-separator">~</span>
-      <input type="date" class="miq-date-input" id="usageTo" value="2026-09-05" aria-label="조회 종료일"/>
+      <div class="usage-month-nav" role="group" aria-label="조회 연월 선택">
+        <button class="btn usage-month-arrow" type="button" id="usagePrevMonth" aria-label="이전 달">‹</button>
+        <label class="usage-month-value"><span id="usageMonthLabel" aria-hidden="true"></span><input type="month" id="usageMonth" min="1000-01" max="9999-12" aria-label="조회 연월"/></label>
+        <button class="btn usage-month-arrow" type="button" id="usageNextMonth" aria-label="다음 달">›</button>
+      </div>
       <button class="btn-search" type="button" id="usageSearch">조회</button>
       <button class="btn" type="button" id="usageExport">내보내기</button>
     </div>
@@ -58,7 +69,7 @@
       </div>
       <div class="cal" id="usageCalendar" aria-label="월간 운행시간 캘린더"></div>
       <div class="cal__note">
-        <span>집계 전: 아직 데이터가 수집되지 않은 날짜</span>
+        <span>집계 전: 오늘의 일 집계 대기 · 미도래: 아직 오지 않은 날짜</span>
         <span class="grow"></span>
         <span>날짜 선택 시 차량별 상세를 확인할 수 있습니다.</span>
       </div>
@@ -86,17 +97,21 @@
     </div>
     <div class="modal__foot">
       <button class="btn" type="button" data-modal-close>닫기</button>
-      <a class="btn btn--pri" id="dayEfficiencyLink" data-context-link href="../Operational%20Efficiency/operational-efficiency-tobe.html">해당일 운영효율 화면으로</a>
+      <a class="btn btn--pri" id="dayEfficiencyLink" data-context-link href="../Operational%20Efficiency/operational-efficiency-tobe-option-b.html">해당일 운영효율 화면으로</a>
     </div>
   </div>
 </div>
 
-<script src="../_mock-data/generated/fleet.generated.js?v=20260906-json-r1&amp;rev=f69042cf6b57"></script>
-<script src="../_shared/fleet.js?v=20260906-json-r1&amp;rev=9bc7caf2ff93"></script>
-<script src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script>
-<script src="../_shared/common-logic.js?v=20260907-common-logic-r42&amp;rev=fe89537280cd"></script>
-<script src="../_shared/nav.js?v=20260907-common-logic-r42&amp;rev=10146ec619b0"></script>
-<script src="../_shared/chart-common.js?rev=26b243959957"></script>
-<script src="../_shared/usage-time-enhancements.js?v=20260906-period-search-r1&amp;rev=27abacb0e97b"></script>
+
+
+
+
+
+
+
+
+
+
+
 </body>
 </html>

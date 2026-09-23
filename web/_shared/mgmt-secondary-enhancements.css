@@ -193,9 +193,9 @@ body[data-sub="geofence"] .legend .sw[style*="#adb5bd"]{background:#c6cbd0!impor
 .dim.open .modal{animation:msModalIn .16s ease-out}
 @keyframes msModalIn{from{opacity:.6;transform:translateY(5px)}to{opacity:1;transform:none}}
 
-body[data-sub="acctreq"] :focus-visible,
-body[data-sub="equipreq"] :focus-visible,
-body[data-sub="geofence"] :focus-visible{outline:2px solid var(--ms-orange);outline-offset:2px}
+body[data-sub="acctreq"] :focus-visible:not(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),select,textarea),
+body[data-sub="equipreq"] :focus-visible:not(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),select,textarea),
+body[data-sub="geofence"] :focus-visible:not(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),select,textarea){outline:2px solid var(--ms-orange);outline-offset:2px}
 
 @media(max-width:1280px){
   body[data-sub="geofence"] .geo-layout{grid-template-columns:1fr}

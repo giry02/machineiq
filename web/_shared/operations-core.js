@@ -98,13 +98,26 @@
         close();
       }});
   }
+  function columnPresentation(col) {
+    // Presentation follows column meaning, including tables rebuilt by tabs or filters.
+    var compact = /^(actions|manage|detail|active|status|mesStatus|state|pinned|severity|result)$/.test(col.key);
+    var centered = compact || /^(order|count|runMinutes|workMinutes|distance|shock|latitude|longitude|speed|bearing|soc|soh|voltage|temperature|current)$/.test(col.key) || /^access_/.test(col.key) || col.className === 'c';
+    return ' data-ops-column="' + esc(col.key) + '" data-ops-cell="' + (compact ? 'compact' : centered ? 'center' : 'text') + '"';
+  }
   function grid(host, options) {
     var rows = (options.rows || []).slice(), columns = options.columns || [], page = 1;
     var pageSize = options.pageSize || 15, sort = options.defaultSort || {key:'',dir:'asc'};
     host.classList.add('ops-table-host');
     host.innerHTML = '<div class="list-head ops-list-head"><span class="list-head__count" role="status">총 <b>' + rows.length + '</b>건</span>' +
-      '<div class="ops-actions">' + (options.toolbar || '') + (options.export === false ? '' : '<button class="btn btn--sm" type="button" data-ops-export title="현재 조건에 맞는 모든 페이지의 조회 결과를 내보냅니다.">내보내기</button>') + '</div></div>' +
+      '<div class="ops-actions">' + (options.export === false ? '' : '<button class="btn" type="button" data-ops-export title="현재 조건에 맞는 모든 페이지의 조회 결과를 내보냅니다.">내보내기</button>') + (options.toolbar || '') + '</div></div>' +
       '<div class="tbl-wrap ops-grid-body"></div><div class="ops-grid-footer"></div>';
+    if (options.actionHeader) {
+      var context = options.actionHeader.querySelector('.list-head__count');
+      if (context) host.querySelector('.ops-list-head > .list-head__count').insertAdjacentHTML('beforeend', ' · ' + context.innerHTML);
+      // Move the whole header so its delegated action listeners remain intact.
+      options.actionHeader.classList.add('ops-merged-actions');
+      host.querySelector('.ops-list-head > .ops-actions').appendChild(options.actionHeader);
+    }
     function ordered() {
       var col = columns.find(function (item) { return item.key === sort.key; });
       if (!col) return rows.slice();
@@ -120,13 +133,22 @@
       page = Math.min(page, pages); currentRows = orderedRows.slice((page - 1) * pageSize, page * pageSize);
       host.querySelector('.ops-grid-body').innerHTML = '<table class="tbl ops-table"><caption class="ops-sr-only">' + esc(options.caption || '조회 결과') + '</caption><thead><tr>' + columns.map(function (col) {
         var sortable = col.sortable !== false && col.key && col.key !== 'actions';
-        return '<th scope="col" class="' + esc(col.className || '') + '"' + (sortable ? ' aria-sort="' + (sort.key === col.key ? (sort.dir === 'asc' ? 'ascending' : 'descending') : 'none') + '"' : '') + '>' +
+        return '<th scope="col" class="' + esc(col.className || '') + '"' + columnPresentation(col) + (sortable ? ' aria-sort="' + (sort.key === col.key ? (sort.dir === 'asc' ? 'ascending' : 'descending') : 'none') + '"' : '') + '>' +
           (sortable ? '<button class="ops-sort" type="button" data-ops-sort="' + esc(col.key) + '">' + esc(col.label) + ' <span aria-hidden="true">' + (sort.key === col.key ? (sort.dir === 'asc' ? '↑' : '↓') : '↕') + '</span></button>' : esc(col.label)) + '</th>';
       }).join('') + '</tr></thead><tbody>' + (currentRows.length ? currentRows.map(function (row, index) {
         return '<tr data-ops-row="' + index + '">' + columns.map(function (col) {
-          return '<td class="' + esc(col.className || '') + '">' + (col.render ? col.render(row) : esc(row[col.key] == null ? '—' : row[col.key])) + '</td>';
+          return '<td class="' + esc(col.className || '') + '"' + columnPresentation(col) + '>' + (col.render ? col.render(row) : esc(row[col.key] == null ? '—' : row[col.key])) + '</td>';
         }).join('') + '</tr>';
       }).join('') : '<tr><td class="ops-empty" colspan="' + columns.length + '">' + esc(options.emptyText || '조회 결과가 없습니다. 검색 조건을 확인해 주세요.') + '</td></tr>') + '</tbody></table>';
+      var table=host.querySelector('.ops-table');
+      MIQTableLayout.fit(table,columns.map(function(col,index){
+        var compact=table.tHead.rows[0].cells[index].dataset.opsCell==='compact';
+        var min=col.minWidth||MIQTableLayout.minimum(col.label);
+        if(document.body.dataset.opsPage==='data'&&/company|group/i.test(col.key))min=110;
+        if(/^(actions|manage)$/.test(col.key))min=({notices:176,languages:76,history:76,accounts:140,data:164})[document.body.dataset.opsPage]||126;
+        if(col.key==='detail')min=76;
+        return {min:min,compact:compact};
+      }));
       var start = Math.max(1, Math.min(page - 2, pages - 4)), end = Math.min(pages, start + 4), buttons = '';
       for (var i = start; i <= end; i++) buttons += '<button class="btn btn--sm' + (i === page ? ' btn--pri' : '') + '" type="button" data-ops-page="' + i + '" aria-label="' + i + '페이지"' + (i === page ? ' aria-current="page"' : '') + '>' + i + '</button>';
       host.querySelector('.ops-grid-footer').innerHTML = '<span>' + (rows.length ? ((page - 1) * pageSize + 1) + '–' + Math.min(page * pageSize, rows.length) : '0') + ' / ' + rows.length + '건</span><nav class="ops-pagination" aria-label="목록 페이지">' +
@@ -150,17 +172,97 @@
     draw();
     return {refresh:draw};
   }
-  function register(key, render) { registry[key] = render; }
+  function register(key, render) {
+    registry[key] = render;
+    if (typeof document !== 'undefined' && document.readyState !== 'loading' && document.body.dataset.opsPage === key) start();
+  }
+  var filterSequence = 0;
+  // Retain the original form and listeners. Native form ownership keeps moved
+  // controls in FormData and preserves Enter/submit without duplicate inputs.
+  function alignManagementControls(el) {
+    var head = document.querySelector('.ops-main > .page-head');
+    if (!head) return;
+    head.classList.add('ops-page-head');
+    document.querySelectorAll('.ops-query-controls,.ops-task-filters').forEach(function (group) {
+      if (group._opsForm && !group._opsForm.isConnected) group.remove();
+    });
+    var taskbar = el.querySelector('.ops-taskbar');
+    if (!taskbar) {
+      taskbar = document.createElement('div'); taskbar.className = 'ops-taskbar';
+      var tabs = Array.from(el.children).find(function (node) { return node.matches('.tabs'); });
+      el.insertBefore(taskbar, el.firstChild);
+      if (tabs) taskbar.appendChild(tabs);
+      else {
+        var subtitles = {equipment:'장비코드 목록',codes:'공통코드 목록',languages:'다국어 목록',notices:'공지사항 목록',accounts:'내부 계정 목록',history:'메뉴 접속이력 목록'};
+        var subtitle = document.createElement('span'); subtitle.className = 'ops-taskbar__label';
+        subtitle.textContent = subtitles[document.body.dataset.opsPage] || '목록'; taskbar.appendChild(subtitle);
+      }
+    }
+    el.querySelectorAll('.ops-filters').forEach(function (form) {
+      if (form.dataset.opsLayoutReady) return;
+      form.dataset.opsLayoutReady = 'true';
+      form.id = 'opsQueryForm' + (++filterSequence);
+      var search = form.querySelector('input[type="search"]');
+      var searchField = search && search.closest('.ops-field,.ops-form-field');
+      var buttons = Array.from(form.children).filter(function (node) { return node.matches('.btn,.btn-search'); });
+      var controls = document.createElement('div'), filters = document.createElement('div');
+      controls.className = 'ops-query-controls'; filters.className = 'ops-task-filters';
+      controls._opsForm = filters._opsForm = form;
+      form.querySelectorAll('input,select,button,textarea').forEach(function (control) { control.setAttribute('form', form.id); });
+      if (searchField) controls.appendChild(searchField);
+      var dates = Array.from(form.querySelectorAll('input[type="date"]'));
+      if (dates.length === 2) {
+        var range = document.createElement('div'); range.className = 'date-range';
+        range.setAttribute('role', 'group'); range.setAttribute('aria-label', '조회 기간');
+        dates.forEach(function (date, index) {
+          var field = date.closest('.ops-field,.ops-form-field');
+          date.setAttribute('aria-label', index === 0 ? '조회 시작일' : '조회 종료일');
+          if (index) { var separator = document.createElement('span'); separator.className = 'sep'; separator.textContent = '~'; range.appendChild(separator); }
+          range.appendChild(date); if (field) field.remove();
+        });
+        controls.appendChild(range);
+      }
+      buttons.forEach(function (button) { controls.appendChild(button); });
+      Array.from(form.children).forEach(function (field) {
+        var select = field.querySelector('select'), label = field.querySelector('span');
+        if (select && label) {
+          field.classList.add('ops-select-filter');
+          Array.from(select.options).forEach(function (option) {
+            if (option.textContent === '전체') option.textContent = label.textContent.trim() + ' 전체';
+          });
+        }
+        filters.appendChild(field);
+      });
+      form.classList.add('ops-form-owner');
+      head.appendChild(controls); taskbar.appendChild(filters);
+      var committed = Array.from(form.elements).filter(function (control) { return control.matches('input[type="search"],input[type="date"]'); }).map(function (control) { return {name:control.name,value:control.value}; });
+      filters.querySelectorAll('select').forEach(function (select) {
+        select.addEventListener('change', function () {
+          // Dropdowns apply immediately; unsubmitted keyword/date edits stay drafts.
+          var draft = committed.map(function (item) { var control = form.elements.namedItem(item.name); return {name:item.name,value:control.value}; });
+          committed.forEach(function (item) { form.elements.namedItem(item.name).value = item.value; });
+          form.requestSubmit();
+          alignManagementControls(el);
+          var nextForm = el.querySelector('.ops-filters');
+          draft.forEach(function (item) { var control = nextForm && nextForm.elements.namedItem(item.name); if (control) control.value = item.value; });
+        });
+      });
+    });
+    el.querySelectorAll('.ops-actions > .btn--sm').forEach(function (button) { button.classList.remove('btn--sm'); });
+  }
   function start() {
     var el = document.getElementById('opsContent');
     if (!el || document.body.dataset.gnb !== 'ops') return;
     if (!internal()) { el.innerHTML = ''; return; }
     var render = registry[document.body.dataset.opsPage];
-    if (render) { render({el:el}); el.removeAttribute('aria-busy'); }
+    if (render) {
+      render({el:el}); alignManagementControls(el); el.removeAttribute('aria-busy');
+      new MutationObserver(function () { alignManagementControls(el); }).observe(el, {childList:true,subtree:true});
+    }
   }
   root.MIQOps = {register:register,esc:esc,read:read,write:write,notify:notify,exportCsv:exportCsv,modal:modal,confirm:confirm,grid:grid};
   if (typeof module === 'object' && module.exports) module.exports = {esc:esc,csvText:csvText};
   if (typeof document !== 'undefined') {
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else setTimeout(start, 0);
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, {once:true});
   }
 }(typeof window !== 'undefined' ? window : globalThis));

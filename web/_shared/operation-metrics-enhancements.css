@@ -96,7 +96,6 @@ body.miq-operation-metrics .filter-bar input:not([readonly]) {
   cursor: pointer;
 }
 
-body.miq-operation-metrics .filter-bar input:focus,
 body.miq-operation-metrics button:focus-visible,
 body.miq-operation-metrics a:focus-visible,
 body.miq-operation-metrics summary:focus-visible,
@@ -109,14 +108,16 @@ body.miq-operation-metrics .bar-chart .col:focus {
 body.miq-operation-metrics .btn-search,
 body.miq-operation-metrics .btn--pri {
   color: #fff;
-  border-color: var(--metrics-orange-dark);
-  background: var(--metrics-orange-dark);
+  border-color: var(--metrics-orange);
+  background: var(--metrics-orange);
 }
 
-body.miq-operation-metrics .btn-search:hover,
-body.miq-operation-metrics .btn--pri:hover {
-  border-color: #c62b00;
-  background: #c62b00;
+body.miq-operation-metrics .btn-search:not(:disabled):hover,
+body.miq-operation-metrics .btn--pri:not(:disabled):hover,
+body.miq-operation-metrics .btn-search:not(:disabled):focus-visible,
+body.miq-operation-metrics .btn--pri:not(:disabled):focus-visible {
+  border-color: #cc2b00;
+  background: var(--metrics-orange-dark);
 }
 
 body.miq-operation-metrics .metrics-feedback {
@@ -815,3 +816,6 @@ body.miq-usage-time.hide-period-comparison .box.total .cell__d {
     transition-duration: .01ms !important;
   }
 }
+
+body.miq-operation-metrics .btn-search:not(:disabled):active,
+body.miq-operation-metrics .btn--pri:not(:disabled):active {border-color:#bf2900;background:#cc2b00}

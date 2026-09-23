@@ -5,6 +5,7 @@
   var fleet=model.allowed(MIQ.FLEET_CATALOG||MIQ.FLEET,role,policy);
   var state={companyId:policy.companyId||query.get('companyId')||'all',group:role==='customer_staff'?'물류1팀':query.get('group')||'',veh:query.get('veh')||query.get('equipmentId')||'',abnormal:query.get('abnormal')==='1',sort:model.sortKeys.indexOf(query.get('sort'))>=0?query.get('sort'):'',dir:query.get('dir')==='desc'?'desc':'asc'};
   var tbody=document.getElementById('lithiumListBody'),checkbox=document.getElementById('lithiumAbnormal');
+  var pager=MIQ.createListPager(tbody.closest('.tbl-wrap')||tbody.closest('table').parentElement,{pageSize:20,onChange:render});
   var scopeContext=window.MIQ_TARGET_CONTEXT||{};
   function esc(value){return MIQCharts.escape(value);}
   function hm(value){return value===null?'수집 전':Math.floor(value/60)+'시간 '+value%60+'분';}
@@ -50,6 +51,7 @@
     checkbox.checked=state.abnormal;
     renderScope(rows.length);
     renderSort();
+    rows=pager.slice(rows);
     tbody.innerHTML=rows.length?rows.map(function(vehicle){
       var info=model.snapshot(vehicle),color=info.soc>=60?'#37b24d':info.soc>=30?'#f59f00':'#e03131';
       var soc=info.soc===null?'<span class="li-list-unknown">수집 전</span>':'<div class="battery-graph mode-list" '+MIQCharts.tipAttrs(vehicle.vin+'\n배터리 잔량 (SOC) '+info.soc+'%')+'><div class="battery-graph__image"><div class="battery-graph__progress"><span class="battery-graph__bar" style="width:'+Math.max(0,Math.min(100,info.soc))+'%;background:'+color+'"></span></div></div><span class="battery-graph__text">'+info.soc+'%</span></div>';
@@ -61,6 +63,6 @@
   checkbox.addEventListener('change',function(){state.abnormal=checkbox.checked;render();});
   Array.prototype.forEach.call(document.querySelectorAll('.li-list-table .table-sort'),function(button){button.addEventListener('click',function(){var key=button.getAttribute('data-sort-key');state.dir=state.sort===key&&state.dir==='asc'?'desc':'asc';state.sort=key;render();});});
   document.addEventListener('miq:target-change',function(event){var target=event.detail||{};scopeContext=target;state.companyId=policy.companyId||target.companyId||'all';state.group=role==='customer_staff'?'물류1팀':target.group||'';state.veh=target.equipmentId||'';render();});
-  window.addEventListener('pageshow',render);
+  window.addEventListener('pageshow',function(event){if(event.persisted)render();});
   render();
 })();

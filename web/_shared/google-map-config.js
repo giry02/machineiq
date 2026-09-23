@@ -3,7 +3,7 @@
    routeEndpoint must point to the authenticated IMQ backend, not Google Directions.
    A host may inject loadRoute(query, {signal}) instead of routeEndpoint. */
 window.MIQMapConfig = Object.assign({
-  apiKey: '',
+  apiKey: "AIzaSyAF9XrtLKzXNNfyiWeOpzKf-JYUTV95a_Y",
   routeEndpoint: '',
   timeZone: 'Asia/Seoul'
 }, window.MIQMapConfig || {});

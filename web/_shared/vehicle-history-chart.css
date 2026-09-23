@@ -3,4 +3,4 @@
 #vehicleHistoryChart .history-point:hover .vline,#vehicleHistoryChart .history-point:focus .vline{display:block}
 #vehicleHistoryChart .history-point:focus{outline:none}
 #vehicleHistoryChart .history-point:focus .hit{stroke:#999;stroke-width:1;stroke-dasharray:3 3}
-#vehicleHistoryEmpty{height:330px;display:flex;align-items:center;justify-content:center;margin:0;color:#767676;font-size:13px;text-align:center}
+#vehicleHistoryEmpty{min-height:120px;display:flex;align-items:center;justify-content:center;margin:0;color:#767676;font-size:13px;text-align:center}

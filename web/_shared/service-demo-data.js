@@ -1,6 +1,6 @@
 /* Arbitrary demonstration records for the prototype only.
    These are not actual repairs, ECU/BMS codes, or collected vehicle telemetry.
-   The caller supplies yesterday's ISO date; no clock, random values, or catalog mutations are used. */
+   The caller supplies an ISO date/window; no clock, random values, or catalog mutations are used. */
 (function(root,factory){
   var api=factory();
   if(typeof module==='object'&&module.exports)module.exports=api;
@@ -53,14 +53,33 @@
       var metadata={companyId:text(vehicle.companyId),company:text(vehicle.companyName),group:text(vehicle.group),model:text(vehicle.model),vin:vin,type:type,date:referenceDay,demo:true};
       var minute=Math.floor(seed/7)%6*10,errorHour=7+seed%8;
       result.maintenance.push(Object.assign({},metadata,{kind:'maintenance',dateTime:stamp(referenceDay,9+seed%7,minute),
-        part:item[0],symptom:'시연 예시: '+item[1],detail:'시연용 점검 기록: '+item[2],completed:seed%2===0}));
+        part:item[0],symptom:item[1],detail:item[2],completed:seed%2===0}));
       var error=Object.assign({},metadata,{kind:'error',dateTime:stamp(referenceDay,errorHour,minute),errorState:seed%2===0?'current':'past',
         category:template.category,code:'DEMO-'+template.prefix+'-'+String(variant+1).padStart(2,'0'),level:['a','b','c'][seed%3],spn:'—',fmi:'—',
-        description:'시연 예시: '+item[2]});
+        description:item[2]});
       if(error.errorState==='past')error.completedAt=stamp(referenceDay,errorHour+2,minute);
       result.error.push(error);
     });
     return result;
   }
-  return {create:create};
+  // Explicit current-day review samples. Existing create() callers retain
+  // their historical data. Dashboard links pass this same frozen cutoff.
+  function createCurrent(fleet,window){
+    if(!window||!validDay(window.date)||!/^([01]\d|2[0-3]):00$/.test(window.to||''))return [];
+    var end=window.date+' '+window.to,rows=[];
+    create(fleet,window.date).error.forEach(function(item){
+      var seed=hash(item.vin.replace(/[-_]/g,'').toUpperCase());
+      if(seed%4===0)return;
+      [0].concat(seed%3===0?[30]:[]).forEach(function(offset,index){
+        var parts=item.dateTime.slice(11).split(':'),minute=Number(parts[0])*60+Number(parts[1])+offset;
+        var dateTime=stamp(window.date,Math.floor(minute/60),minute%60);
+        if(dateTime>=end)return;
+        var row=Object.assign({},item,{dateTime:dateTime,currentSample:true,sampleId:window.date+':'+item.vin+':'+index});
+        if(row.completedAt&&row.completedAt>=end){row.errorState='current';delete row.completedAt;}
+        rows.push(row);
+      });
+    });
+    return rows;
+  }
+  return {create:create,createCurrent:createCurrent};
 });

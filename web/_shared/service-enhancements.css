@@ -15,9 +15,6 @@ body.miq-service-enhanced {
   font-variant-numeric: tabular-nums;
 }
 
-/* Count values are retained in the DOM for the current LNB badges. */
-body.miq-service-enhanced .count-row { display: none !important; }
-body.miq-service-enhanced .breadcrumb { display: none !important; }
 body.miq-service-enhanced .page-title {
   color: var(--service-ink);
   font-size: 24px !important;
@@ -62,6 +59,54 @@ body.miq-service-enhanced .meta-stack strong,
 body.miq-service-enhanced .errcode__main { font-size: 14px; line-height: 20px; }
 body.miq-service-enhanced .meta-stack span,
 body.miq-service-enhanced .errcode__sub { color: var(--service-muted); font-size: 12px; line-height: 18px; }
+
+/* All service lists share 16px inline padding. Text columns use content-led
+   widths; compact controls and statuses do not absorb the remaining space. */
+body.miq-service-enhanced[data-gnb="srvc"] .main .table-wrap {
+  overflow-x: auto !important;
+}
+body.miq-service-enhanced[data-gnb="srvc"] .main .service-data-table {
+  width: 100% !important;
+  min-width: 850px !important;
+  table-layout: auto;
+}
+body.miq-service-enhanced[data-gnb="srvc"][data-sub="maintenance"] .main .service-data-table {
+  min-width: 1260px !important;
+}
+body.miq-service-enhanced[data-gnb="srvc"][data-sub="maintenance"][data-service-role^="customer_"] .main .service-data-table {
+  min-width: 1080px !important;
+}
+body.miq-service-enhanced[data-gnb="srvc"][data-sub="supply"] .main .service-data-table {
+  min-width: 1140px !important;
+}
+body.miq-service-enhanced[data-gnb="srvc"][data-sub="error"] .main .service-data-table {
+  min-width: 1180px !important;
+}
+body.miq-service-enhanced[data-gnb="srvc"] .main .service-data-table :is(th,td)[data-service-column] {
+  width: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+  text-align: left;
+  line-height: 20px;
+  vertical-align: middle;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+body.miq-service-enhanced[data-gnb="srvc"] .main .service-data-table td {
+  padding-top: 11px;
+  padding-bottom: 11px;
+}
+body.miq-service-enhanced[data-gnb="srvc"] .main .service-data-table th {
+  width: auto;
+  height: 44px;
+}
+body.miq-service-enhanced[data-gnb="srvc"] .main .service-data-table :is(th,td):is([data-service-column="check"],[data-service-column="status"],[data-service-column="category"],[data-service-column="action"]) { width: 1%; text-align: center; white-space: nowrap; }
+body.miq-service-enhanced[data-gnb="srvc"] .main .service-data-table :is(th,td)[data-service-column="count"] { text-align: center; }
+body.miq-service-enhanced[data-gnb="srvc"] .main .service-data-table :is([data-service-column="model"],[data-service-column="vin"],[data-service-column="vehicle"],[data-service-column="date"],[data-service-column="code"]) { white-space: nowrap; }
+body.miq-service-enhanced[data-gnb="srvc"] .main .service-data-table .service-sort-button { justify-content: flex-start; }
+body.miq-service-enhanced[data-gnb="srvc"] .main .service-data-table :is([data-service-column="check"],[data-service-column="count"],[data-service-column="status"],[data-service-column="category"],[data-service-column="action"]) .service-sort-button { justify-content: center; }
+body.miq-service-enhanced[data-gnb="srvc"] .main .service-data-table .service-vin-link { white-space: nowrap; }
+body.miq-service-enhanced[data-gnb="srvc"] .main .service-data-table :is(.meta-stack,.errcode) { align-items: flex-start; text-align: left; }
 
 .service-list-meta {
   display: flex;
@@ -251,7 +296,7 @@ body.miq-service-enhanced .pdf:hover { border-color: var(--service-brand); backg
 .service-dialog__button.primary { border-color: var(--service-brand); background: var(--service-brand); color: #fff; }
 .service-dialog__button.primary:hover { border-color: var(--service-brand-dark); background: var(--service-brand-dark); }
 
-body.miq-service-enhanced :is(button,a,input,select,textarea):focus-visible {
+body.miq-service-enhanced :is(button,a,input,select,textarea):focus-visible:not(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),select,textarea) {
   outline: 2px solid var(--service-brand);
   outline-offset: 2px;
 }

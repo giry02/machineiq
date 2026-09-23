@@ -4,8 +4,8 @@
   if (!host || !canvas) return;
   var frame = document.createElement('iframe');
   frame.title = 'Google 지도'; frame.allowFullscreen = true; frame.referrerPolicy = 'no-referrer-when-downgrade';
-  frame.setAttribute('loading', 'eager'); canvas.appendChild(frame);
-  host.dataset.mapProvider = 'google-embed';
+  frame.setAttribute('loading', 'eager');
+  host.dataset.mapProvider = 'loading';
   var status = document.createElement('div'); status.className = 'miq-map-status'; status.setAttribute('role', 'status');
   host.appendChild(status);
   var current = {}, scopeKey = '', selected = '', center = { lat: 36.5, lng: 127.5 }, point = null, zoom = 7, type = 'map', lastSrc = '';
@@ -13,6 +13,7 @@
   var route = {key: '', state: 'idle', points: [], controller: null, message: ''};
   function message(text) { status.textContent = text || ''; status.hidden = !text; }
   function view() {
+    if (window.MIQMapRoutePreview) MIQMapRoutePreview.draw(canvas, window.MIQMapConfig.demoRoute && current.routeMode && route.state === 'ready' ? route.points : [], selected);
     var url = new URL('https://maps.google.com/maps');
     url.search = new URLSearchParams({ output: 'embed', hl: 'ko', ll: center.lat + ',' + center.lng, z: String(zoom), t: type === 'sat' ? 'k' : 'm' }).toString();
     if (point && !current.routeMode) url.searchParams.set('q', point.lat + ',' + point.lng);
@@ -47,12 +48,12 @@
     message(!visible.size ? '조회 조건에 해당하는 장비가 없습니다.'
       : selectedRow && !selectedRow.hasPosition ? '선택 차량의 위치 정보가 수집되지 않았습니다.'
       : !rows.length ? '조회 차량의 위치 정보가 수집되지 않았습니다.' : '');
-    if (current.routeMode) message(selected ? '선택한 운행일의 이동 경로 기록이 없습니다.' : '장비목록에서 차량 1대를 선택해 주세요.');
+    if (current.routeMode) message(selected ? '선택한 운행일의 이동 경로 기록이 없습니다.' : '아래 장비목록의 차대번호를 눌러 차량을 선택해 주세요.');
     updateRoute();
     if (renderer) paintInteractive();
     else {
-      view();
-      if (current.routeMode && selected) message(routeMessage() || '이동 경로는 지도 연결 설정 후 표시할 수 있습니다.');
+      if(host.dataset.mapProvider==='google-embed')view();
+      if (current.routeMode && selected) message(routeMessage() || (window.MIQMapConfig.demoRoute && route.points.length ? '' : '이동 경로는 지도 연결 설정 후 표시할 수 있습니다.'));
     }
   }
   function visibleRows() {
@@ -61,7 +62,7 @@
   }
   function routeMessage() {
     if (!current.routeMode) return '';
-    if (!selected) return '장비목록에서 차량 1대를 선택해 주세요.';
+    if (!selected) return '아래 장비목록의 차대번호를 눌러 차량을 선택해 주세요.';
     if (route.state === 'loading') return '이동 경로를 불러오는 중입니다.';
     if (route.message) return route.message;
     if (route.state === 'empty') return '선택 기간의 이동 경로 기록이 없습니다.';
@@ -90,7 +91,12 @@
     window.MIQMapRouteSource.load({vin:selected,from:from,to:to}, {signal:request.controller.signal}).then(function(points) {
       if (disposed || route !== request) return;
       route.points = points; route.state = points.length ? 'ready' : 'empty';
-      if (renderer) paintInteractive(); else message(points.length ? '이동 경로는 지도 연결 설정 후 표시할 수 있습니다.' : routeMessage());
+      if (renderer) paintInteractive(); else {
+        canvas.dataset.routeState = route.state; canvas.dataset.routePoints = String(points.length);
+        if (window.MIQMapConfig.demoRoute && window.MIQMapRoutePreview) {
+          MIQMapRoutePreview.draw(canvas, points, selected); message(routeMessage());
+        } else message(points.length ? '이동 경로는 지도 연결 설정 후 표시할 수 있습니다.' : routeMessage());
+      }
     }).catch(function(error) {
       if (disposed || route !== request || error.name === 'AbortError') return;
       route.state = error.code === 'ROUTE_NOT_CONFIGURED' ? 'unconfigured' : 'error';
@@ -133,7 +139,8 @@
       window.removeEventListener('miq:map-config-ready', upgrade); status.remove(); frame.remove();
     }
   };
-  message('지도를 불러오는 중입니다.'); view();
+  message('지도를 불러오는 중입니다.');
+  if(!(window.MIQMapConfig&&MIQMapConfig.apiKey)){canvas.appendChild(frame);host.dataset.mapProvider='google-embed';view();}
   window.addEventListener('miq:map-config-ready', upgrade);
   upgrade();
 })();

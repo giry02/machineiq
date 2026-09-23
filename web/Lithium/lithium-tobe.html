@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
+<head><script src="../_shared/demo-clock.js?rev=34d9d133492b"></script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>리튬배터리 상세보기 · MACHINE IQ</title>
 <link rel="icon" type="image/x-icon" href="../_shared/favicon.ico"/>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
-<link rel="stylesheet" href="../_shared/mockup.css?rev=d24057a14011"/>
+<link rel="stylesheet" href="../_shared/offline-fonts.css?rev=b405f97e6cf9"><script type="module" blocking="render">await document.fonts.load('400 14px "Noto Sans KR"');await document.fonts.ready;</script>
+<link rel="stylesheet" href="../_shared/mockup.css?rev=bed1f0069135"/>
 <style>
 /* ── 페이지 전용 : 차량 1대 상세 레이아웃 (차량 상세 → 에너지 상세 정보에서 진입) ── */
 .veh-pick{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px;color:#888}
@@ -78,202 +78,23 @@
 .line-chart .thr-max{stroke:#e03131;stroke-width:1;stroke-dasharray:4 3}
 .empty-cell{color:#e03131;font-weight:700}
 </style>
-<link rel="stylesheet" href="../_shared/smart-charge.css?rev=5fac8b9b8ffe"/>
+<link rel="stylesheet" href="../_shared/smart-charge.css?rev=9cb9c65ed2fc"/>
 <link rel="stylesheet" href="../_shared/chart-common.css?rev=fc1c23dcf6af"/>
-</head>
-<body data-period-presets="dwm" data-gnb="anlz" data-sub="lithium" data-variant="tobe" data-base="../">
-
-<div id="gnb"></div>
-
-<div class="layout">
-  <!-- ═══════ LNB : 요약정보와 동일한 공용 컴포넌트(_shared/lnb-tree.js) ═══════ -->
-  <aside class="lnb" id="lnb"></aside>
-
-  <!-- ═══════ MAIN : 차량 1대 상세 ═══════ -->
-  <main class="main">
-    <div class="page-head">
-      <div class="page-head__bc">
-        <a href="../Vehicle%20Summary/vehicle-summary-tobe-3.html">운행이력</a> &gt;
-        <a href="../Vehicle%20Summary/vehicle-summary-tobe-3.html">요약정보</a> &gt; 리튬배터리 상세보기
-      </div>
-    </div>
-    <div class="page-head">
-      <div class="page-head__title">리튬배터리 상세보기 <span class="sub" data-lnb-label hidden>- B30S-7 · FBA32_224250271</span></div>
-      <div class="veh-pick">
-        <span>차량별</span>
-        <select class="inp inp--sm" id="vehSel" aria-label="차량 선택"></select>
-      </div>
-    </div>
-
-    <!-- ═══════ ① 상태 요약 (실시간) ═══════ -->
-    <div class="box">
-      <div class="box__head">
-        <span class="box__name">배터리 상태</span>
-        <span class="live"><span class="dot"></span>실시간 조회 14:30:12</span>
-      </div>
-
-      <div class="li-head">
-        <div class="li-head__main">
-          <div class="li-status">
-            <span class="soc-big">
-              <span class="soc-big__cell"><span class="soc-big__fill" id="socFill" style="width:67%"></span></span>
-              <span class="soc-big__val" id="socVal">67%</span>
-            </span>
-            <span class="st-grid">
-              <span class="st-item">
-                <span class="st-item__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 14.5V5a3 3 0 0 1 6 0v9.5a5 5 0 1 1-6 0Z"/><path d="M12 7v9"/></svg></span>
-                <span class="st-item__text"><span class="st-item__k">온도</span><span class="st-item__v" id="stTemp">정상</span></span>
-              </span>
-              <span class="st-item">
-                <span class="st-item__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m13 2-7 11h6l-1 9 7-12h-6z"/></svg></span>
-                <span class="st-item__text"><span class="st-item__k">충전</span><span class="st-item__v" id="stChg">정상</span></span>
-              </span>
-              <span class="st-item">
-                <span class="st-item__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="17" height="12" rx="2"/><path d="M20 10h2v4h-2M7 10h6M10 7v6"/></svg></span>
-                <span class="st-item__text"><span class="st-item__k">배터리</span><span class="st-item__v" id="stBatt">정상</span></span>
-              </span>
-            </span>
-          </div>
-
-          <div class="li-est">
-            <div class="est">
-              <div class="est__t">작업 가능 예상 시간은 <b id="estWork">3시간 50분</b></div>
-              <div class="est__kv">
-                <span>시간당 전력 사용량 <b id="useKwh">5.565kWh</b></span>
-                <span>마지막충전 이후 전력 사용량 <b id="sinceKwh">2.182kWh</b></span>
-              </div>
-            </div>
-            <div class="est">
-              <div class="est__t">충전 완료 예상 시간은 <b id="estChg">0시간 40분</b></div>
-              <div class="est__kv"><span>시간당 전력 충전량 <b id="chgKwh">15.635kWh</b></span></div>
-            </div>
-          </div>
-
-          <div class="li-foot">ⓘ 최초 1~2회 완전 충전 이후 정상적으로 계산됩니다. SOC · SOH · 예상시간 · 정상여부는 단말 EAI 직접 조회 값이며 DB에 저장되지 않습니다.</div>
-        </div>
-
-        <div class="soh-side">
-          <div class="soh-side__t">성능<br/>최대치</div>
-          <div class="soh-cell"><div class="soh-cell__fill" id="sohFill" style="height:98%"><span class="soh-cell__pct" id="sohPct">98%</span></div></div>
-          <div class="soh-side__k">성능상태 SOH</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══════ ② 스마트 충전 ═══════ -->
-    <div class="box">
-      <div class="smart-row">
-        <span class="smart-row__t">스마트 충전</span>
-        <button class="sw-toggle on" id="smartSw" type="button" aria-pressed="true" aria-label="스마트 충전 사용"></button>
-        <span class="divider"></span>
-        <select class="inp inp--sm" id="smartFrom" aria-label="충전 시작 시간">
-          <option>선택</option><option selected>22시</option><option>23시</option><option>00시</option>
-        </select>
-        <span>~</span>
-        <select class="inp inp--sm" id="smartTo" aria-label="충전 종료 시간">
-          <option>선택</option><option selected>06시</option><option>07시</option><option>08시</option>
-        </select>
-        <button class="btn btn--sm btn--dark" type="button" id="smartSave">저장</button>
-        <div id="smartSchedule" class="smart-schedule"></div><div id="smartFeedback" role="status" aria-live="polite"></div>
-      </div>
-    </div>
-
-    <!-- ═══════ ③ 배터리 충전 · 방전량 (일=꺾은선 / 주·월=충전량/소비량 세로 막대) ═══════ -->
-    <div class="box" data-chart="soc">
-      <div class="chart-head">
-        <span class="chart-head__name">배터리 충전, 방전량</span>
-        <span class="badge gray">집계</span>
-        <span class="chart-hint" data-legend></span>
-        <span class="chart-head__tools">
-          <span class="period-tabs">
-            <button class="active" type="button" data-period="d">일</button>
-            <button type="button" data-period="w">주</button>
-            <button type="button" data-period="m">월</button>
-          </span>
-          <input class="inp inp--sm" data-from readonly value="2026-08-12"/>
-          <span>~</span>
-          <input class="inp inp--sm" data-to readonly value="2026-08-12"/>
-          <button class="btn btn--sm btn--dark" type="button" data-search>조회</button>
-        </span>
-      </div>
-      <svg class="line-chart" viewBox="0 0 960 280" role="img"
-           aria-label="배터리 충전 · 방전량 추이" data-svg></svg>
-    </div>
-
-    <!-- ═══════ ④ 온도정보 (일=꺾은선 / 주·월=최저/최고 온도 세로 막대) ═══════ -->
-    <div class="box" data-chart="temp">
-      <div class="chart-head">
-        <span class="chart-head__name">온도정보</span>
-        <span class="thr-chip min">최저온도 <span data-tmin>32 ℃</span></span>
-        <span class="thr-chip max">최고온도 <span data-tmax>42 ℃</span></span>
-        <span class="chart-hint" data-legend></span>
-        <span class="chart-head__tools">
-          <span class="period-tabs">
-            <button class="active" type="button" data-period="d">일</button>
-            <button type="button" data-period="w">주</button>
-            <button type="button" data-period="m">월</button>
-          </span>
-          <input class="inp inp--sm" data-from readonly value="2026-08-12"/>
-          <span>~</span>
-          <input class="inp inp--sm" data-to readonly value="2026-08-12"/>
-          <button class="btn btn--sm btn--dark" type="button" data-search>조회</button>
-        </span>
-      </div>
-      <svg class="line-chart" viewBox="0 0 960 280" role="img"
-           aria-label="셀 온도 추이" data-svg></svg>
-    </div>
-
-    <!-- ═══════ ⑤ 에러 정보 ═══════ -->
-    <div class="box" data-chart="err">
-      <div class="chart-head">
-        <span class="chart-head__name">에러 정보</span>
-        <span class="badge gray">집계</span>
-        <span class="chart-head__tools">
-          <span class="period-tabs">
-            <button class="active" type="button" data-period="d">일</button>
-            <button type="button" data-period="w">주</button>
-            <button type="button" data-period="m">월</button>
-          </span>
-          <input class="inp inp--sm" data-from readonly value="2026-08-12"/>
-          <span>~</span>
-          <input class="inp inp--sm" data-to readonly value="2026-08-12"/>
-          <button class="btn btn--sm btn--dark" type="button" data-search>조회</button>
-        </span>
-      </div>
-      <div class="tbl-wrap">
-        <table class="tbl">
-          <thead><tr>
-            <th class="c">현재/과거</th><th>그룹</th><th>차량</th><th>에러코드</th><th>내용</th>
-            <th class="c">중요도</th><th>발생일시</th><th>완료일시</th><th>조치방법</th>
-          </tr></thead>
-          <tbody data-errbody></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="note">
-      <b>TO-BE 개선 사항</b>
-      <ul>
-        <li><span class="tag-new">신규</span> <b>차량 1대 상세 화면으로 재구성</b> — 이 화면은 <b>차량 상세 &gt; 에너지 상세 정보</b> 클릭으로만 진입하므로, 전체 차량 목록 대신 선택 차량의 상태·추이·에러만 보여줍니다. 다른 차량은 상단 <b>차량별</b> 선택 또는 좌측 차량 리스트로 전환합니다.</li>
-        <li><span class="tag-new">신규</span> <b>좌측 내비게이션을 요약정보와 동일한 공용 컴포넌트</b>(그룹별 · 분류별 · 차량 리스트 expand/collapse)로 통일했습니다. 리튬 화면이므로 <b>리튬 차량만</b> 대상입니다.</li>
-        <li><span class="tag-new">신규</span> <b>기간별 표현 분리</b> — <b>일</b>은 시간당 값의 <b>꺾은선</b>(충전 중 시각은 채워진 점), <b>주 · 월</b>은 일자별 <b>캔들차트</b>(시가·종가 몸통 / 최저·최고 꼬리)로 변동 폭까지 함께 읽습니다.</li>
-        <li><span class="tag-new">신규</span> 온도 차트에 <b>최저 · 최대 온도 기준선</b>을 표시하고 헤더 배지의 값과 연동합니다.</li>
-        <li><span class="tag-keep">유지</span> SOC · 상태 3종(온도/충전/배터리) · 작업/충전 예상시간 · 성능 최대치(SOH) · 스마트 충전 설정 · 에러 정보(현재/과거) 구성.</li>
-        <li><span class="tag-keep">유지</span> <span class="badge pri">실시간</span> / <span class="badge gray">집계</span> 데이터 출처 배지 — DB 미저장 값과 적재 값을 화면에서 구분합니다.</li>
-      </ul>
-    </div>
-  </main>
-</div>
-
-<script src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script>
-<script src="../_shared/common-logic.js?v=20260907-common-logic-r42&amp;rev=fe89537280cd"></script>
-<script src="../_shared/chart-common.js?rev=26b243959957"></script>
-<script src="../_shared/nav.js?v=20260907-common-logic-r42&amp;rev=10146ec619b0"></script>
-<script src="../_mock-data/generated/fleet.generated.js?v=20260906-json-r1&amp;rev=f69042cf6b57"></script>
-<script src="../_shared/fleet.js?v=20260906-json-r1&amp;rev=9bc7caf2ff93"></script>
-<script src="../_shared/lnb-tree.js?v=20260905-company-group-r3&amp;rev=11a580f70bf0"></script>
-<script src="../_shared/lithium-list-model.js?rev=8cef0f7e4b96"></script>
-<script>
+<link rel="stylesheet" href="../_shared/form-controls.css?rev=6fda272acdcc"/>
+<link rel="stylesheet" href="../_shared/list-pagination.css?rev=0069e48c1009">
+<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?rev=bb6d53aabb78"/>
+<link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?rev=1cffa21a9777"/>
+<style>body.miq-current-shell>#gnb{min-height:64px}</style>
+<script defer blocking="render" src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script>
+<script defer blocking="render" src="../_shared/common-logic.js?rev=efb7e741cd7b"></script>
+<script defer blocking="render" src="../_shared/chart-common.js?rev=15c74452f805"></script>
+<script defer blocking="render" src="../_shared/list-pagination.js?rev=33207bf33d11"></script>
+<script defer blocking="render" src="../_mock-data/generated/fleet.generated.js?rev=309d68875499"></script>
+<script defer blocking="render" src="../_shared/fleet.js?rev=dfdf98be0a95"></script>
+<script defer blocking="render" src="../_shared/nav.js?rev=049a18c69072"></script>
+<script defer blocking="render" src="../_shared/lnb-tree.js?rev=fb81b76cb736"></script>
+<script defer blocking="render" src="../_shared/lithium-list-model.js?rev=ad33389c02d5"></script>
+<script type="module" blocking="render">
 /* ══════════════════════════════════════════════════════════════
    리튬배터리 상세보기 (차량 1대) Mock-up 인터랙션
      1) LNB = 요약정보와 같은 공용 컴포넌트. 리튬(LI) 차량만 대상
@@ -284,7 +105,7 @@
 (function () {
   'use strict';
 
-  var QUERY = new URLSearchParams(location.search);
+  var QUERY = new URLSearchParams(window.MIQ_ENTRY_QUERY === undefined ? location.search : window.MIQ_ENTRY_QUERY);
   var role = MIQCommon.roles.resolve(QUERY.get('role'));
   var policy = MIQCommon.roles.targetPolicy(role);
   var LI = MIQLithiumListModel.allowed(MIQ.FLEET_CATALOG || MIQ.FLEET, role, policy);
@@ -468,7 +289,7 @@
       s.el.querySelector('[data-legend]').innerHTML='ⓘ 충전 중엔 채워진 점으로 표기됩니다.';
     }else{
       svgEl.innerHTML=pairedBars(dailyEnergy(cur),{lowKey:'chargeKwh',highKey:'consumeKwh',lowLabel:'충전량',highLabel:'소비량',lowColor:'#ff3600',highColor:'#767676',unit:'kWh',step:10,attribute:'data-energy'});
-      s.el.querySelector('[data-legend]').innerHTML='<i class="battery-energy-legend" style="background:#ff3600"></i>충전량 &nbsp; <i class="battery-energy-legend" style="background:#767676"></i>소비량 · 일자별 합계 (kWh) · 목업 데이터';
+      s.el.querySelector('[data-legend]').innerHTML='<i class="battery-energy-legend" style="background:#ff3600"></i>충전량 &nbsp; <i class="battery-energy-legend" style="background:#767676"></i>소비량 · 일자별 합계 (kWh)';
     }
 
   }
@@ -683,8 +504,208 @@
   setPeriod(period);
 })();
 </script>
-<script src="../_shared/vehicle-child-context.js?v=20260905-scope-r2&amp;rev=e5e65ce40303"></script>
-<script src="../_shared/smart-charge.js?rev=0911d4e4b50f"></script>
-<script src="../_shared/battery-chart-tooltip.js?rev=48966f675eff"></script>
+<script defer blocking="render" src="../_shared/vehicle-child-context.js?rev=f943fa9b37d3"></script>
+<script defer blocking="render" src="../_shared/smart-charge.js?rev=31d3cd865915"></script>
+<script defer blocking="render" src="../_shared/battery-chart-tooltip.js?rev=48966f675eff"></script>
+</head>
+<body class="miq-current-shell" data-current-bootstrap="ready" data-period-presets="dwm" data-gnb="anlz" data-sub="lithium" data-variant="tobe" data-base="../">
+
+<div id="gnb"></div>
+
+<div class="layout">
+  <!-- ═══════ LNB : 요약정보와 동일한 공용 컴포넌트(_shared/lnb-tree.js) ═══════ -->
+  <aside class="lnb" id="lnb"></aside>
+
+  <!-- ═══════ MAIN : 차량 1대 상세 ═══════ -->
+  <main class="main">
+    <div class="page-head">
+      <div class="page-head__bc">
+        <a href="../Vehicle%20Summary/vehicle-summary-tobe-3.html">운행이력</a> &gt;
+        <a href="../Vehicle%20Summary/vehicle-summary-tobe-3.html">요약정보</a> &gt; 리튬배터리 상세보기
+      </div>
+    </div>
+    <div class="page-head">
+      <div class="page-head__title">리튬배터리 상세보기 <span class="sub" data-lnb-label hidden>- B30S-7 · FBA32_224250271</span></div>
+      <div class="veh-pick">
+        <span>차량별</span>
+        <select class="inp inp--sm" id="vehSel" aria-label="차량 선택"></select>
+      </div>
+    </div>
+
+    <!-- ═══════ ① 상태 요약 (실시간) ═══════ -->
+    <div class="box">
+      <div class="box__head">
+        <span class="box__name">배터리 상태</span>
+        <span class="live"><span class="dot"></span>실시간 조회 14:30:12</span>
+      </div>
+
+      <div class="li-head">
+        <div class="li-head__main">
+          <div class="li-status">
+            <span class="soc-big">
+              <span class="soc-big__cell"><span class="soc-big__fill" id="socFill" style="width:67%"></span></span>
+              <span class="soc-big__val" id="socVal">67%</span>
+            </span>
+            <span class="st-grid">
+              <span class="st-item">
+                <span class="st-item__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 14.5V5a3 3 0 0 1 6 0v9.5a5 5 0 1 1-6 0Z"/><path d="M12 7v9"/></svg></span>
+                <span class="st-item__text"><span class="st-item__k">온도</span><span class="st-item__v" id="stTemp">정상</span></span>
+              </span>
+              <span class="st-item">
+                <span class="st-item__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m13 2-7 11h6l-1 9 7-12h-6z"/></svg></span>
+                <span class="st-item__text"><span class="st-item__k">충전</span><span class="st-item__v" id="stChg">정상</span></span>
+              </span>
+              <span class="st-item">
+                <span class="st-item__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="17" height="12" rx="2"/><path d="M20 10h2v4h-2M7 10h6M10 7v6"/></svg></span>
+                <span class="st-item__text"><span class="st-item__k">배터리</span><span class="st-item__v" id="stBatt">정상</span></span>
+              </span>
+            </span>
+          </div>
+
+          <div class="li-est">
+            <div class="est">
+              <div class="est__t">작업 가능 예상 시간은 <b id="estWork">3시간 50분</b></div>
+              <div class="est__kv">
+                <span>시간당 전력 사용량 <b id="useKwh">5.565kWh</b></span>
+                <span>마지막충전 이후 전력 사용량 <b id="sinceKwh">2.182kWh</b></span>
+              </div>
+            </div>
+            <div class="est">
+              <div class="est__t">충전 완료 예상 시간은 <b id="estChg">0시간 40분</b></div>
+              <div class="est__kv"><span>시간당 전력 충전량 <b id="chgKwh">15.635kWh</b></span></div>
+            </div>
+          </div>
+
+          <div class="li-foot">ⓘ 최초 1~2회 완전 충전 이후 정상적으로 계산됩니다. SOC · SOH · 예상시간 · 정상여부는 단말 EAI 직접 조회 값이며 DB에 저장되지 않습니다.</div>
+        </div>
+
+        <div class="soh-side">
+          <div class="soh-side__t">성능<br/>최대치</div>
+          <div class="soh-cell"><div class="soh-cell__fill" id="sohFill" style="height:98%"><span class="soh-cell__pct" id="sohPct">98%</span></div></div>
+          <div class="soh-side__k">성능상태 SOH</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ ② 스마트 충전 ═══════ -->
+    <div class="box">
+      <div class="smart-row">
+        <span class="smart-row__t">스마트 충전</span>
+        <button class="sw-toggle on" id="smartSw" type="button" aria-pressed="true" aria-label="스마트 충전 사용"></button>
+        <span class="divider"></span>
+        <select class="inp inp--sm" id="smartFrom" aria-label="충전 시작 시간">
+          <option>선택</option><option selected>22시</option><option>23시</option><option>00시</option>
+        </select>
+        <span>~</span>
+        <select class="inp inp--sm" id="smartTo" aria-label="충전 종료 시간">
+          <option>선택</option><option selected>06시</option><option>07시</option><option>08시</option>
+        </select>
+        <button class="btn btn--sm btn--dark" type="button" id="smartSave">저장</button>
+        <div id="smartSchedule" class="smart-schedule"></div><div id="smartFeedback" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <!-- ═══════ ③ 배터리 충전 · 방전량 (일=꺾은선 / 주·월=충전량/소비량 세로 막대) ═══════ -->
+    <div class="box" data-chart="soc">
+      <div class="chart-head">
+        <span class="chart-head__name">배터리 충전, 방전량</span>
+        <span class="badge gray">집계</span>
+        <span class="chart-hint" data-legend></span>
+        <span class="chart-head__tools">
+          <span class="period-tabs">
+            <button class="active" type="button" data-period="d">일</button>
+            <button type="button" data-period="w">주</button>
+            <button type="button" data-period="m">월</button>
+          </span>
+          <input class="inp inp--sm" data-from readonly value="2026-08-12"/>
+          <span>~</span>
+          <input class="inp inp--sm" data-to readonly value="2026-08-12"/>
+          <button class="btn btn--sm btn--dark" type="button" data-search>조회</button>
+        </span>
+      </div>
+      <svg class="line-chart" viewBox="0 0 960 280" role="img"
+           aria-label="배터리 충전 · 방전량 추이" data-svg></svg>
+    </div>
+
+    <!-- ═══════ ④ 온도정보 (일=꺾은선 / 주·월=최저/최고 온도 세로 막대) ═══════ -->
+    <div class="box" data-chart="temp">
+      <div class="chart-head">
+        <span class="chart-head__name">온도정보</span>
+        <span class="thr-chip min">최저온도 <span data-tmin>32 ℃</span></span>
+        <span class="thr-chip max">최고온도 <span data-tmax>42 ℃</span></span>
+        <span class="chart-hint" data-legend></span>
+        <span class="chart-head__tools">
+          <span class="period-tabs">
+            <button class="active" type="button" data-period="d">일</button>
+            <button type="button" data-period="w">주</button>
+            <button type="button" data-period="m">월</button>
+          </span>
+          <input class="inp inp--sm" data-from readonly value="2026-08-12"/>
+          <span>~</span>
+          <input class="inp inp--sm" data-to readonly value="2026-08-12"/>
+          <button class="btn btn--sm btn--dark" type="button" data-search>조회</button>
+        </span>
+      </div>
+      <svg class="line-chart" viewBox="0 0 960 280" role="img"
+           aria-label="셀 온도 추이" data-svg></svg>
+    </div>
+
+    <!-- ═══════ ⑤ 에러 정보 ═══════ -->
+    <div class="box" data-chart="err">
+      <div class="chart-head">
+        <span class="chart-head__name">에러 정보</span>
+        <span class="badge gray">집계</span>
+        <span class="chart-head__tools">
+          <span class="period-tabs">
+            <button class="active" type="button" data-period="d">일</button>
+            <button type="button" data-period="w">주</button>
+            <button type="button" data-period="m">월</button>
+          </span>
+          <input class="inp inp--sm" data-from readonly value="2026-08-12"/>
+          <span>~</span>
+          <input class="inp inp--sm" data-to readonly value="2026-08-12"/>
+          <button class="btn btn--sm btn--dark" type="button" data-search>조회</button>
+        </span>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr>
+            <th class="c">현재/과거</th><th>그룹</th><th>차량</th><th>에러코드</th><th>내용</th>
+            <th class="c">중요도</th><th>발생일시</th><th>완료일시</th><th>조치방법</th>
+          </tr></thead>
+          <tbody data-errbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="note">
+      <b>TO-BE 개선 사항</b>
+      <ul>
+        <li><span class="tag-new">신규</span> <b>차량 1대 상세 화면으로 재구성</b> — 이 화면은 <b>차량 상세 &gt; 에너지 상세 정보</b> 클릭으로만 진입하므로, 전체 차량 목록 대신 선택 차량의 상태·추이·에러만 보여줍니다. 다른 차량은 상단 <b>차량별</b> 선택 또는 좌측 차량 리스트로 전환합니다.</li>
+        <li><span class="tag-new">신규</span> <b>좌측 내비게이션을 요약정보와 동일한 공용 컴포넌트</b>(그룹별 · 분류별 · 차량 리스트 expand/collapse)로 통일했습니다. 리튬 화면이므로 <b>리튬 차량만</b> 대상입니다.</li>
+        <li><span class="tag-new">신규</span> <b>기간별 표현 분리</b> — <b>일</b>은 시간당 값의 <b>꺾은선</b>(충전 중 시각은 채워진 점), <b>주 · 월</b>은 일자별 <b>캔들차트</b>(시가·종가 몸통 / 최저·최고 꼬리)로 변동 폭까지 함께 읽습니다.</li>
+        <li><span class="tag-new">신규</span> 온도 차트에 <b>최저 · 최대 온도 기준선</b>을 표시하고 헤더 배지의 값과 연동합니다.</li>
+        <li><span class="tag-keep">유지</span> SOC · 상태 3종(온도/충전/배터리) · 작업/충전 예상시간 · 성능 최대치(SOH) · 스마트 충전 설정 · 에러 정보(현재/과거) 구성.</li>
+        <li><span class="tag-keep">유지</span> <span class="badge pri">실시간</span> / <span class="badge gray">집계</span> 데이터 출처 배지 — DB 미저장 값과 적재 값을 화면에서 구분합니다.</li>
+      </ul>
+    </div>
+  </main>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </body>
 </html>

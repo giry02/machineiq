@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
+<head><script src="../_shared/demo-clock.js?rev=34d9d133492b"></script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>차량신청관리 | MACHINE IQ</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
-<link rel="stylesheet" href="../_shared/mockup.css?rev=d24057a14011"/>
+<link rel="stylesheet" href="../_shared/offline-fonts.css?rev=b405f97e6cf9"><script type="module" blocking="render">await document.fonts.load('400 14px "Noto Sans KR"');await document.fonts.ready;</script>
+<link rel="stylesheet" href="../_shared/mockup.css?rev=bed1f0069135"/>
 <style>
 .grid-scroll{max-height:none;overflow-x:auto;overflow-y:hidden}
 .step{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
@@ -29,29 +29,25 @@
 .policy-callout:before{content:"";position:absolute;left:18px;top:-6px;width:10px;height:10px;background:#f8fafc;border-left:1px dashed #9aa4b2;border-top:1px dashed #9aa4b2;transform:rotate(45deg)}
 .permission-row{display:flex;justify-content:flex-end;margin:10px 0 16px}
 </style>
-<link rel="stylesheet" href="../_shared/mgmt-secondary-enhancements.css?rev=8a2682948c00"/>
+<link rel="stylesheet" href="../_shared/mgmt-secondary-enhancements.css?rev=3bde1ff22c5d"/>
+<link rel="stylesheet" href="../_shared/form-controls.css?rev=6fda272acdcc"/>
+<link rel="stylesheet" href="../_shared/list-pagination.css?rev=0069e48c1009">
+<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?rev=bb6d53aabb78"/>
+<link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?rev=1cffa21a9777"/>
+<style>body.miq-current-shell>#gnb{min-height:64px}</style>
+<script defer blocking="render" src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script>
+<script defer blocking="render" src="../_shared/common-logic.js?rev=efb7e741cd7b"></script>
+<script defer blocking="render" src="../_shared/list-pagination.js?rev=33207bf33d11"></script>
+<script defer blocking="render" src="../_shared/nav.js?rev=049a18c69072"></script>
+<script defer blocking="render" src="../_shared/mgmt-secondary-enhancements.js?rev=aecc53f8567f"></script>
 </head>
-<body data-gnb="mgmt" data-sub="equipreq" data-variant="tobe" data-base="../">
+<body class="miq-current-shell" data-current-bootstrap="ready" data-gnb="mgmt" data-sub="equipreq" data-variant="tobe" data-base="../">
 
 <div id="gnb"></div>
 
 <div class="layout">
   <!-- ═══════ LNB : 관리기능 메뉴 ═══════ -->
-  <aside class="lnb">
-    <div class="lnb__company">(주)세종물류중부지점</div>
-    <div class="lnb__search">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-      <input placeholder="관리 메뉴 검색"/>
-    </div>
-    <div class="lnb__group-title">관리기능 <span>▲</span></div>
-    <a data-label="사용자" class="lnb__item" href="../Mgmt%20User/mgmt-user-tobe.html">사용자 <span class="cnt">10</span></a>
-    <a data-label="업체" class="lnb__item" href="../Mgmt%20Company/mgmt-company-tobe.html">업체 <span class="cnt">5</span></a>
-    <a data-label="그룹" class="lnb__item" href="../Mgmt%20Group/mgmt-group-tobe.html">그룹 <span class="cnt">4</span></a>
-    <a data-label="차량" class="lnb__item" href="../Mgmt%20Vehicle/mgmt-vehicle-tobe.html">차량 <span class="cnt">42</span></a>
-    <a data-label="계정신청관리" class="lnb__item" href="../Mgmt%20Account%20Request/mgmt-account-request-tobe.html">계정신청관리 <span class="cnt">4</span></a>
-    <a data-label="차량신청관리" class="lnb__item active" href="mgmt-vehicle-request-tobe.html">차량신청관리 <span class="cnt">3</span></a>
-    <div class="lnb__hint">승인 시 해당 장비의 <b>소속 업체·권한</b>이 신청 업체로 연결되어 모니터링이 시작됩니다.</div>
-  </aside>
+  <aside class="lnb"></aside>
 
   <!-- ═══════ MAIN ═══════ -->
   <main class="main">
@@ -119,11 +115,11 @@
         <table class="tbl">
           <thead><tr><th>차대번호</th><th>단말기ID</th><th>업체명</th><th>등록자ID</th><th>등록일시</th><th>처리일시</th><th class="c">처리상태</th><th>처리자</th><th class="c">관리</th></tr></thead>
           <tbody>
-            <tr class="sel"><td class="strong">FBH28_331470041</td><td>TERM-HI-0041</td><td>(주)세종물류중부지점</td><td>customer02@sejong.co.kr</td><td>2026-07-06 10:05</td><td class="mute">-</td><td class="c"><span class="badge warn">REQ 신청</span></td><td class="mute">-</td><td class="c"><button class="btn btn--sm btn--pri" data-modal-open="procModal">승인처리</button></td></tr>
+            <tr class="sel"><td class="strong">FBH28_331470041</td><td>331470041</td><td>(주)세종물류중부지점</td><td>customer02@sejong.co.kr</td><td>2026-07-06 10:05</td><td class="mute">-</td><td class="c"><span class="badge warn">REQ 신청</span></td><td class="mute">-</td><td class="c"><button class="btn btn--sm btn--pri" data-modal-open="procModal">승인처리</button></td></tr>
             <tr><td class="strong">FBD22_113920233</td><td>TERM-LM-0233</td><td>(주)세종물류중부지점</td><td>customer01@sejong.co.kr</td><td>2026-07-04 14:26</td><td class="mute">-</td><td class="c"><span class="badge warn">REQ 신청</span></td><td class="mute">-</td><td class="c"><button class="btn btn--sm btn--pri" data-modal-open="procModal">승인처리</button></td></tr>
             <tr><td class="strong">FBA28_224250512</td><td>TERM-LI-0512</td><td>(주)세종물류중부지점</td><td>customer01@sejong.co.kr</td><td>2026-07-03 09:12</td><td class="mute">-</td><td class="c"><span class="badge warn">REQ 신청</span></td><td class="mute">-</td><td class="c"><button class="btn btn--sm btn--pri" data-modal-open="procModal">승인처리</button></td></tr>
             <tr><td class="strong">FBA35_224250427</td><td>TERM-LI-0427</td><td>(주)세종물류중부지점</td><td>customer01@sejong.co.kr</td><td>2026-06-16 11:40</td><td>2026-06-18 09:22</td><td class="c"><span class="badge ok">APRV 승인</span></td><td>internal01@mhmiq.co.kr</td><td class="c"><button class="btn btn--sm" disabled>처리완료</button></td></tr>
-            <tr><td class="strong">FBH30_331470028</td><td>TERM-HI-0028</td><td>(주)세종물류중부지점</td><td>customer01@sejong.co.kr</td><td>2026-06-10 09:30</td><td>2026-06-11 15:08</td><td class="c"><span class="badge ok">APRV 승인</span></td><td>internal01@mhmiq.co.kr</td><td class="c"><button class="btn btn--sm" disabled>처리완료</button></td></tr>
+            <tr><td class="strong">FBH30_331470028</td><td>331470028</td><td>(주)세종물류중부지점</td><td>customer01@sejong.co.kr</td><td>2026-06-10 09:30</td><td>2026-06-11 15:08</td><td class="c"><span class="badge ok">APRV 승인</span></td><td>internal01@mhmiq.co.kr</td><td class="c"><button class="btn btn--sm" disabled>처리완료</button></td></tr>
             <tr><td class="strong">FBA22_224250388</td><td>TERM-LA-0388</td><td>(주)세종물류중부지점</td><td>customer02@sejong.co.kr</td><td>2026-05-27 13:12</td><td>2026-05-28 10:44</td><td class="c"><span class="badge ok">APRV 승인</span></td><td>internal01@mhmiq.co.kr</td><td class="c"><button class="btn btn--sm" disabled>처리완료</button></td></tr>
             <tr><td class="strong">FBA20_224250203</td><td>TERM-LI-0203</td><td>(주)세종물류중부지점</td><td>customer01@sejong.co.kr</td><td>2026-05-13 10:05</td><td>2026-05-14 16:30</td><td class="c"><span class="badge ok">APRV 승인</span></td><td>internal01@mhmiq.co.kr</td><td class="c"><button class="btn btn--sm" disabled>처리완료</button></td></tr>
             <tr><td class="strong">FBD18_113920156</td><td>TERM-LM-0156</td><td>(주)세종물류중부지점</td><td>customer01@sejong.co.kr</td><td>2026-04-28 15:40</td><td>2026-04-29 09:18</td><td class="c"><span class="badge ok">APRV 승인</span></td><td>internal01@mhmiq.co.kr</td><td class="c"><button class="btn btn--sm" disabled>처리완료</button></td></tr>
@@ -155,7 +151,7 @@
               <td>대영중기(주)</td><td class="mute">-</td><td>2026-07-04 14:26</td>
               <td class="r strong">2일</td>
               <td class="c"><button class="btn btn--sm btn--pri" data-modal-open="procModal">승인처리</button></td></tr>
-            <tr><td class="c"><input type="checkbox" checked/></td><td class="strong">EQ-10423</td><td>FBH28_331470041</td><td>TERM-HI-0041</td>
+            <tr><td class="c"><input type="checkbox" checked/></td><td class="strong">EQ-10423</td><td>FBH28_331470041</td><td>331470041</td>
               <td>밥캣코리아 중부딜러</td><td>(주)한신렌탈</td><td>2026-07-06 10:05</td>
               <td class="r strong">0일</td>
               <td class="c"><button class="btn btn--sm btn--pri" data-modal-open="procModal">승인처리</button></td></tr>
@@ -208,7 +204,7 @@
       <div class="sub-head">신청 정보</div>
       <div class="form-grid" id="requestDetail">
         <div class="fld"><span class="fld__k">차대번호</span><input class="inp" data-request-field="vin" value="FBH28_331470041" readonly/></div>
-        <div class="fld"><span class="fld__k">단말기 ID</span><input class="inp" data-request-field="terminal" value="TERM-HI-0041" readonly/></div>
+        <div class="fld"><span class="fld__k">단말기 ID</span><input class="inp" data-request-field="terminal" value="331470041" readonly/></div>
         <div class="fld col-2"><span class="fld__k">신청 업체</span><input class="inp" data-request-field="company" value="(주)세종물류중부지점" readonly/></div>
         <div class="fld"><span class="fld__k">등록자 ID</span><input class="inp" data-request-field="registrar" value="customer02@sejong.co.kr" readonly/></div>
         <div class="fld"><span class="fld__k">등록일시</span><input class="inp" data-request-field="registered" value="2026-07-06 10:05" readonly/></div>
@@ -265,7 +261,7 @@
       <div class="prev-box" style="margin-top:14px">
         3건 승인 시 각 장비의 <b>TB_EQUIPMENT.COMPANY_ID</b>가 <b>(주)세종물류중부지점</b>으로 연결되고
         렌탈 신청 건은 <b>RENTAL_COMPANY_ID</b>까지 함께 설정됩니다.<br/>
-        보유 차량 <b>42대 → 45대</b> · 분류 변화 : 리튬 16→17 · 엔진 11→12 · 수소 4→5
+        승인한 차량의 조회 권한이 연결됩니다.
       </div>
     </div>
     <div class="modal__foot">
@@ -275,9 +271,10 @@
   </div>
 </div>
 
-<script src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script>
-<script src="../_shared/common-logic.js?v=20260907-common-logic-r42&amp;rev=fe89537280cd"></script>
-<script src="../_shared/nav.js?v=20260907-common-logic-r42&amp;rev=10146ec619b0"></script>
-<script src="../_shared/mgmt-secondary-enhancements.js?rev=aecc53f8567f"></script>
+
+
+
+
+
 </body>
 </html>

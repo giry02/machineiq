@@ -21,7 +21,7 @@
       filters: [
         { key: 'userGroup', label: '사용자 그룹', fieldKo: '그룹명', fieldEn: 'groupName', width: 140,
           roles: ['internal', 'customer_owner'],
-          options: [['', '그룹 전체'], ['전체', '전체'], ['기본그룹', '기본그룹'], ['테스트그룹', '테스트그룹'], ['물류1팀', '물류1팀']] }
+          options: [['', '그룹 전체'], ['전체', '전체'], ['기본그룹', '기본그룹'], ['테스트그룹', '테스트그룹'], ['물류1팀', '물류1팀'], ['물류2팀', '물류2팀']] }
       ]
     },
     company: {
@@ -42,13 +42,14 @@
       title: '차량', titleEn: 'Vehicle',
       searchPlaceholder: '차대번호 · 닉네임 · 그룹명 검색', searchFieldKo: '통합 검색어', searchFieldEn: 'query',
       searchPlaceholderByRole: {
+        internal: '차대번호 · 기종 · 분류 검색',
         dealer_owner: '차대번호 · 기종 · 분류 검색',
         dealer_staff: '차대번호 · 기종 · 분류 검색'
       },
       filters: [
         { key: 'vehicleGroup', label: '그룹', fieldKo: '그룹명', fieldEn: 'groupName', width: 150,
-          roles: ['internal', 'customer_owner'],
-          options: [['', '그룹 전체'], ['미배정', '미배정 (2)'], ['기본그룹', '기본그룹 (18)'], ['테스트그룹', '테스트그룹 (12)'], ['물류1팀', '물류1팀 (10)']] },
+          roles: ['customer_owner'],
+          options: [['', '그룹 전체'], ['미배정', '미배정 (2)'], ['기본그룹', '기본그룹 (18)'], ['테스트그룹', '테스트그룹 (12)'], ['물류1팀', '물류1팀 (3)'], ['물류2팀', '물류2팀 (2)']] },
         { key: 'powerType', label: '분류', fieldKo: '동력 유형', fieldEn: 'powerType', width: 130,
           options: [['', '분류 전체'], ['엔진', '엔진 (32)'], ['납산', '납산 (3)'], ['리튬', '리튬 (7)']] }
       ]

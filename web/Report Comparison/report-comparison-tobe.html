@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
+<head><script src="../_shared/demo-clock.js?rev=34d9d133492b"></script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>업체별 비교 · MACHINE IQ</title>
 <link rel="icon" type="image/x-icon" href="../_shared/favicon.ico"/>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
-<link rel="stylesheet" href="../_shared/mockup.css?rev=d24057a14011"/>
+<link rel="stylesheet" href="../_shared/offline-fonts.css?rev=b405f97e6cf9"><script type="module" blocking="render">await document.fonts.load('400 14px "Noto Sans KR"');await document.fonts.ready;</script>
+<link rel="stylesheet" href="../_shared/mockup.css?rev=bed1f0069135"/>
 <style>
 /* ── 페이지 전용 : 업체 선택(최대 3) · 비교 표 · 지표 전환 · 라인차트(hover) ── */
 .filter-bar .inp--sm{width:116px;flex:0 0 auto;text-align:center}
@@ -50,6 +50,8 @@
 
 /* 라인차트 : 너비에 맞춤 · 라벨 대신 hover */
 .chart-wrap{position:relative}
+.cmp-tbl td.empty,#comparisonEmpty{border:0;border-radius:0;text-align:center}
+#chart[hidden],#comparisonEmpty[hidden]{display:none}
 .line-chart{width:100%;height:340px;display:block}
 .line-chart .grid{stroke:#f1f3f5;stroke-width:1;stroke-dasharray:3 3}
 .line-chart .axis{stroke:#e9ecef;stroke-width:1}
@@ -65,89 +67,23 @@
 .tip-box .r i{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
 .tip-box .r span{margin-left:auto;font-weight:700}
 </style>
-<link rel="stylesheet" href="../_shared/content-system.css?v=20260902-readability&amp;rev=d8f94e7e5049"/>
-<link rel="stylesheet" href="../_shared/report-enhancements.css?v=20260905-common-header-r4&amp;rev=2636fe8efa69"/>
+<link rel="stylesheet" href="../_shared/content-system.css?rev=d8f94e7e5049"/>
+<link rel="stylesheet" href="../_shared/report-enhancements.css?rev=dceeccfe9513"/>
 <link rel="stylesheet" href="../_shared/chart-common.css?rev=fc1c23dcf6af"/>
-</head>
-<body data-period-presets="dwm" class="miq-content-system miq-report-enhanced" data-gnb="rpt" data-sub="rptcompare" data-variant="tobe" data-base="../">
-
-<div id="gnb"></div>
-
-<div class="layout">
-  <aside class="lnb" aria-label="리포트 메뉴"></aside>
-  <main class="main">
-    <div class="page-head">
-      <div class="page-head__title">업체별 비교</div>
-      <div class="page-head__bc">
-        리포트 &gt; <a href="../Report%20Status/report-status-tobe.html">업체별 현황</a> ·
-        업체별 비교 · <a href="../Report%20Heatmap/report-heatmap-tobe.html">업체별 히트맵</a>
-      </div>
-    </div>
-
-    <!-- 업체 선택(최대 3) + 기간 필터 -->
-    <div class="filter-bar">
-      <span class="co-k">업체</span>
-      <button class="btn-ic" type="button" id="btnAdd" title="업체 추가 (최대 3)">＋</button>
-      <button class="btn-ic" type="button" id="btnDel" title="업체 제거">－</button>
-      <span class="co-wrap" id="coWrap"></span>
-      <span class="co-hint" id="coHint"></span>
-      <div class="grow"></div>
-      <span class="period-tabs" id="periodTabs">
-        <button type="button" data-period="d">일</button>
-        <button type="button" data-period="w">주</button>
-        <button class="active" type="button" data-period="m">월</button>
-        </span>
-      <input class="inp inp--sm" id="dFrom" type="date" value="2026-08-01" aria-label="조회 시작일"/>
-      <span class="sep">~</span>
-      <input class="inp inp--sm" id="dTo" type="date" value="2026-08-31" aria-label="조회 종료일"/>
-      <button class="btn btn--sm btn--dark" type="button" id="btnSearch">조회</button>
-    </div>
-
-    <!-- ═══════ ① 지표 비교 표 ═══════ -->
-    <div class="tbl-wrap" style="margin-bottom:14px">
-      <table class="cmp-tbl">
-        <thead><tr id="cmpHead"></tr></thead>
-        <tbody id="cmpBody"></tbody>
-      </table>
-      <div class="tbl-note">지표별로 가장 좋은 값을 <b>최적 배지와 옅은 브랜드 강조</b>로 표시합니다. 충격횟수 · 연료소비량은 낮을수록 좋은 지표입니다.</div>
-    </div>
-
-    <!-- ═══════ ② 지표별 추이 비교 ═══════ -->
-    <div class="metric-tabs" id="metricTabs"></div>
-    <div class="chart-box">
-      <div class="chart-head">
-        <span class="chart-head__name" id="chartName">운영효율</span>
-        <span class="lg" id="chartLg"></span>
-        <span class="chart-hint" id="chartHint"></span>
-      </div>
-      <div class="chart-wrap" id="chartWrap">
-        <svg class="line-chart" viewBox="0 0 960 340" role="img" aria-label="업체별 지표 추이 비교" id="chart"></svg>
-        <div class="tip-box" id="tip"></div>
-      </div>
-    </div>
-
-    <div class="note">
-      <b>TO-BE 개선 사항</b>
-      <ul>
-        <li><span class="tag-asis">삭제</span> <b>좌측 내비게이션 제거</b> — 리포트는 업체 단위 화면이므로 상단에서 업체를 고르고 화면 전체 폭을 데이터에 사용합니다.</li>
-        <li><span class="tag-new">신규</span> <b>비교 업체는 최대 3개</b> — ＋ / － 로 추가 · 제거하며, 이미 고른 업체는 다른 칸에서 선택할 수 없습니다. 업체마다 색을 부여해 표 · 범례 · 그래프가 같은 색으로 연결됩니다.</li>
-        <li><span class="tag-new">신규</span> <b>지표를 6종으로 확정</b> — 운영효율 · 충격횟수 · 연료소비량 · 배터리 충전량 · 운행거리 · 운행시간. 근로시간 기반 <b>운영률 · 토/일요일 근무 · 배터리 충전 횟수는 제거</b>했습니다.</li>
-        <li><span class="tag-new">신규</span> <b>지표별 최우수 업체 강조</b> — 표에서 가장 좋은 값을 색으로 구분하고, 낮을수록 좋은 지표(충격 · 연비)는 기준을 반대로 적용합니다.</li>
-        <li><span class="tag-new">신규</span> <b>월 조회에서 가로 스크롤 제거</b> + <b>hover 툴팁</b> — 한 시점의 모든 업체 값을 한 번에 비교합니다. 집계 전 구간은 선을 잇지 않습니다.</li>
-        <li><span class="tag-keep">유지</span> 업체 추가 · 제거 방식, 우측 상단 <b>일 / 주 / 월</b> 기간 조회, 지표 탭 전환, 업체별 라인 비교.</li>
-      </ul>
-    </div>
-  </main>
-</div>
-
-<script src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script>
-<script src="../_shared/common-logic.js?v=20260907-common-logic-r42&amp;rev=fe89537280cd"></script>
-<script src="../_shared/chart-common.js?rev=26b243959957"></script>
-<script src="../_shared/nav.js?v=20260907-common-logic-r42&amp;rev=10146ec619b0"></script>
-<script src="../_mock-data/generated/fleet.generated.js?v=20260906-json-r1&amp;rev=f69042cf6b57"></script>
-<script src="../_shared/fleet.js?v=20260906-json-r1&amp;rev=9bc7caf2ff93"></script>
-<script src="../_shared/report-scope.js?rev=544a25c316d3"></script>
-<script>
+<link rel="stylesheet" href="../_shared/form-controls.css?rev=6fda272acdcc"/>
+<link rel="stylesheet" href="../_shared/list-pagination.css?rev=0069e48c1009">
+<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?rev=bb6d53aabb78"/>
+<link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?rev=1cffa21a9777"/>
+<style>body.miq-current-shell>#gnb{min-height:64px}</style>
+<script defer blocking="render" src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script>
+<script defer blocking="render" src="../_shared/common-logic.js?rev=efb7e741cd7b"></script>
+<script defer blocking="render" src="../_shared/chart-common.js?rev=15c74452f805"></script>
+<script defer blocking="render" src="../_shared/list-pagination.js?rev=33207bf33d11"></script>
+<script defer blocking="render" src="../_mock-data/generated/fleet.generated.js?rev=309d68875499"></script>
+<script defer blocking="render" src="../_shared/fleet.js?rev=dfdf98be0a95"></script>
+<script defer blocking="render" src="../_shared/nav.js?rev=049a18c69072"></script>
+<script defer blocking="render" src="../_shared/report-scope.js?rev=544a25c316d3"></script>
+<script type="module" blocking="render">
 /* ══════════════════════════════════════════════════════════════
    업체별 비교 Mock-up 인터랙션 (리포트 · LNB 없음)
      1) 업체를 최대 3개까지 추가 · 제거 (중복 선택 불가 · 업체별 색상 고정)
@@ -159,6 +95,7 @@
   'use strict';
 
   var SCOPE = window.MIQReportScope;
+  var emptyText = SCOPE.customer ? '조회할 그룹이 없습니다.' : '조회할 업체가 없습니다.';
   var COMPANIES = SCOPE.items;
   var COLORS = ['#ff3600', '#333333', '#8a8f98'];
   var MAX = SCOPE.readOnly ? 1 : Math.min(3, COMPANIES.length);
@@ -201,7 +138,7 @@
   }
   function rd(n, d) { var p = Math.pow(10, d); return Math.round(n * p) / p; }
   function fmt(n, m) {
-    return rd(n, m.dec).toLocaleString('ko-KR', { minimumFractionDigits: m.dec, maximumFractionDigits: m.dec }) + m.unit;
+    return window.MIQCommon.numbers.integer(n, true) + m.unit;
   }
   function metric(key) { return METRICS.filter(function (m) { return m.key === key; })[0]; }
 
@@ -248,6 +185,10 @@
       METRICS.forEach(function (m) { row.v[m.key] = build(co, m.key).total; });
       return row;
     });
+    if (!data.length) {
+      document.getElementById('cmpBody').innerHTML = "<tr><td class='empty' colspan='" + (METRICS.length + 1) + "'>" + emptyText + "</td></tr>";
+      return;
+    }
     var best = {};
     METRICS.forEach(function (m) {
       var vs = data.map(function (r) { return r.v[m.key]; });
@@ -290,6 +231,10 @@
     var sets = state.cos.map(function (co) { return build(co, state.metric); });
     var labels = sets.length ? sets[0].labels : [];
     var el = document.getElementById('chart');
+    el.toggleAttribute('hidden', !sets.length);
+    document.getElementById('comparisonEmpty').textContent = emptyText;
+    document.getElementById('comparisonEmpty').hidden = sets.length > 0;
+    if (!sets.length) { el.innerHTML = ''; return; }
     useWidth(el);
 
     var vals = [];
@@ -306,7 +251,7 @@
     var gridTicks = countAxis ? countAxis.ticks : Array.from({length:9}, function(_, index){return max * index / 8;});
     gridTicks.forEach(function (t) {
       svg += "<line class='grid' x1='" + L + "' y1='" + r2(y(t), 1) + "' x2='" + R + "' y2='" + r2(y(t), 1) + "'/>"
-        + "<text x='" + (L - 8) + "' y='" + r2(y(t) + 3, 1) + "' text-anchor='end'>" + rd(t, m.dec) + "</text>";
+        + "<text x='" + (L - 8) + "' y='" + r2(y(t) + 3, 1) + "' text-anchor='end'>" + window.MIQCommon.numbers.integer(t) + "</text>";
     });
     svg += "<line class='axis' x1='" + L + "' y1='" + B + "' x2='" + R + "' y2='" + B + "'/>"
       + "<line class='axis' x1='" + L + "' y1='" + T + "' x2='" + L + "' y2='" + B + "'/>";
@@ -368,7 +313,9 @@
     });
   }
 
+  var reportReady = false;
   function render() {
+    if (!reportReady) { renderCos(); return; }
     renderCos();
     renderTable();
     renderTabs();
@@ -402,6 +349,7 @@
     render();
   });
   document.getElementById('periodTabs').addEventListener('click', function (e) {
+    if (this.closest('.finder, .filter-bar').__miqPeriodController) return;
     var b = e.target.closest('button[data-period]');
     if (!b) return;
     state.period = b.getAttribute('data-period');
@@ -423,6 +371,7 @@
     render();
   });
   document.getElementById('btnSearch').addEventListener('click', function () {
+    if (this.closest('.finder, .filter-bar').__miqPeriodController) return;
     if (state.period === 'c') {
       var from = document.getElementById('dFrom').value;
       var to = document.getElementById('dTo').value;
@@ -433,13 +382,99 @@
     render();
   });
 
-  var rz;
-  window.addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(render, 150); });
-
+  renderCos();
+  window.MIQReportInit = function () {
+    reportReady = true;
+    render();
   MIQCharts.observeSize(document.getElementById('chart'), renderChart);
-  render();
+  };
 })();
 </script>
-<script src="../_shared/report-enhancements.js?v=20260903-report-targets&amp;rev=a003bd77559b"></script>
+<script defer blocking="render" src="../_shared/report-enhancements.js?rev=62600e5241f4"></script>
+</head>
+<body data-current-bootstrap="ready" data-period-presets="dwm" class="miq-current-shell miq-content-system miq-report-enhanced" data-gnb="rpt" data-sub="rptcompare" data-variant="tobe" data-base="../">
+
+<div id="gnb"></div>
+
+<div class="layout">
+  <aside class="lnb" aria-label="리포트 메뉴"></aside>
+  <main class="main">
+    <div class="page-head">
+      <div class="page-head__title">업체별 비교</div>
+      <div class="page-head__bc">
+        리포트 &gt; <a href="../Report%20Status/report-status-tobe.html">업체별 현황</a> ·
+        업체별 비교 · <a href="../Report%20Heatmap/report-heatmap-tobe.html">업체별 히트맵</a>
+      </div>
+    </div>
+
+    <!-- 업체 선택(최대 3) + 기간 필터 -->
+    <div class="filter-bar">
+      <span class="co-k">업체</span>
+      <button class="btn-ic" type="button" id="btnAdd" title="업체 추가 (최대 3)">＋</button>
+      <button class="btn-ic" type="button" id="btnDel" title="업체 제거">－</button>
+      <span class="co-wrap" id="coWrap"></span>
+      <span class="co-hint" id="coHint"></span>
+      <div class="grow"></div>
+      <span class="period-tabs" id="periodTabs">
+        <button type="button" data-period="d">일</button>
+        <button type="button" data-period="w">주</button>
+        <button class="active" type="button" data-period="m">월</button>
+        </span>
+      <input class="inp inp--sm" id="dFrom" type="date" value="2026-08-01" aria-label="조회 시작일"/>
+      <span class="sep">~</span>
+      <input class="inp inp--sm" id="dTo" type="date" value="2026-08-31" aria-label="조회 종료일"/>
+      <button class="btn btn--sm btn--dark" type="button" id="btnSearch">조회</button>
+    </div>
+
+    <!-- ═══════ ① 지표 비교 표 ═══════ -->
+    <div class="tbl-wrap" style="margin-bottom:14px">
+      <table class="cmp-tbl">
+        <thead><tr id="cmpHead"></tr></thead>
+        <tbody id="cmpBody"></tbody>
+      </table>
+      <div class="tbl-note">지표별로 가장 좋은 값을 <b>최적 배지와 옅은 브랜드 강조</b>로 표시합니다. 충격횟수 · 연료소비량은 낮을수록 좋은 지표입니다.</div>
+    </div>
+
+    <!-- ═══════ ② 지표별 추이 비교 ═══════ -->
+    <div class="metric-tabs" id="metricTabs"></div>
+    <div class="chart-box">
+      <div class="chart-head">
+        <span class="chart-head__name" id="chartName">운영효율</span>
+        <span class="lg" id="chartLg"></span>
+        <span class="chart-hint" id="chartHint"></span>
+      </div>
+      <div class="chart-wrap" id="chartWrap">
+        <div class="empty" id="comparisonEmpty" role="status" hidden></div>
+        <svg class="line-chart" viewBox="0 0 960 340" role="img" aria-label="업체별 지표 추이 비교" id="chart"></svg>
+        <div class="tip-box" id="tip"></div>
+      </div>
+    </div>
+
+    <div class="note">
+      <b>TO-BE 개선 사항</b>
+      <ul>
+        <li><span class="tag-asis">삭제</span> <b>좌측 내비게이션 제거</b> — 리포트는 업체 단위 화면이므로 상단에서 업체를 고르고 화면 전체 폭을 데이터에 사용합니다.</li>
+        <li><span class="tag-new">신규</span> <b>비교 업체는 최대 3개</b> — ＋ / － 로 추가 · 제거하며, 이미 고른 업체는 다른 칸에서 선택할 수 없습니다. 업체마다 색을 부여해 표 · 범례 · 그래프가 같은 색으로 연결됩니다.</li>
+        <li><span class="tag-new">신규</span> <b>지표를 6종으로 확정</b> — 운영효율 · 충격횟수 · 연료소비량 · 배터리 충전량 · 운행거리 · 운행시간. 근로시간 기반 <b>운영률 · 토/일요일 근무 · 배터리 충전 횟수는 제거</b>했습니다.</li>
+        <li><span class="tag-new">신규</span> <b>지표별 최우수 업체 강조</b> — 표에서 가장 좋은 값을 색으로 구분하고, 낮을수록 좋은 지표(충격 · 연비)는 기준을 반대로 적용합니다.</li>
+        <li><span class="tag-new">신규</span> <b>월 조회에서 가로 스크롤 제거</b> + <b>hover 툴팁</b> — 한 시점의 모든 업체 값을 한 번에 비교합니다. 집계 전 구간은 선을 잇지 않습니다.</li>
+        <li><span class="tag-keep">유지</span> 업체 추가 · 제거 방식, 우측 상단 <b>일 / 주 / 월</b> 기간 조회, 지표 탭 전환, 업체별 라인 비교.</li>
+      </ul>
+    </div>
+  </main>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
 </body>
 </html>

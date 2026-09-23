@@ -1,13 +1,14 @@
 (function (root) {
   'use strict';
-  /* Service의 기존 세 상세 HTML에 있는 목업 이력 18건을 집계용으로 공유한다.
+  /* Service 공용 이력과 소모품 목록. 목록과 배지는 같은 품목·상태를 사용한다.
      날짜·호기를 변경하지 않으며 실제 서버 데이터나 차량 카탈로그를 만들지 않는다. */
   var kinds = ['maintenance', 'supply', 'error'];
   var sourceVehicles = {
     FBA32_224250271: { model: 'B30S-7', group: '기본그룹', type: '리튬' },
     FBA32_224250383: { model: 'B30S-7', group: '기본그룹', type: '리튬' },
     FBA32_032068: { model: 'B30S-7', group: '기본그룹', type: '리튬' },
-    FBA32_032042: { model: 'B18S-7', group: '테스트그룹', type: '납산' }
+    FBA32_032042: { model: 'B18S-7', group: '테스트그룹', type: '납산' },
+    FBA32_DEMO_CS01: { model: 'B30S-7', group: '물류1팀', type: '리튬' }
   };
   /* Existing Service HTML fixtures; full consumable values are shared with vehicle detail. */
   var supplies = [
@@ -16,7 +17,10 @@
     { vin: 'FBA32_224250383', name: '트랜스미션 오일 필터', cycle: 100, used: 105 },
     { vin: 'FBA32_032068', name: '엔진오일', cycle: 500, used: 231 },
     { vin: 'FBA32_032068', name: '엔진오일 필터', cycle: 250, used: 231 },
-    { vin: 'FBA32_032068', name: '에어클리너', cycle: 300, used: 251 }
+    { vin: 'FBA32_032068', name: '에어클리너', cycle: 300, used: 251 },
+    { vin: 'FBA32_224250271', name: '감속기 오일', cycle: 500, used: 425 },
+    { vin: 'FBA32_DEMO_CS01', name: '작동유 필터', cycle: 250, used: 240 },
+    { vin: 'FBA32_DEMO_CS01', name: '감속기 오일', cycle: 500, used: 425 }
   ];
   function supplyStatus(cycle, used) {
     cycle = Number(cycle); used = Number(used);
@@ -52,7 +56,10 @@
     ['error', 'FBA32_224250271', '2026-07-24', 'current'],
     ['error', 'FBA32_032042', '2026-07-15', 'past'],
     ['error', 'FBA32_032068', '2026-07-12', 'past'],
-    ['error', 'FBA32_224250383', '2026-07-26', 'current']
+    ['error', 'FBA32_224250383', '2026-07-26', 'current'],
+    ['supply', 'FBA32_224250271', '2026-06-01'],
+    ['supply', 'FBA32_DEMO_CS01', '2026-06-01'],
+    ['supply', 'FBA32_DEMO_CS01', '2026-06-01']
   ];
   var supplyIndex = 0;
   var records = sourceRows.map(function (row) {
@@ -61,6 +68,9 @@
     return {
       kind: row[0], companyId: '1933', company: '세종물류', group: vehicle.group,
       model: vehicle.model, vin: row[1], type: vehicle.type, date: row[2],
+      supplyName: supply ? supply.name : '',
+      supplyCycle: supply ? supply.cycle : undefined,
+      supplyUsed: supply ? supply.used : undefined,
       supplyState: supply ? supplyStatus(supply.cycle, supply.used).state : '',
       errorState: row[0] === 'error' ? row[3] : ''
     };
@@ -108,6 +118,9 @@
         companyId: text(info.companyId) || (normalize(company).indexOf('세종물류') > -1 ? '1933' : ''),
         company: company, group: text(info.group), model: text(info.model), vin: text(info.vin),
         type: text(info.type), date: date ? date[0] : '',
+        supplyName: kind === 'supply' ? text(info.supplyName) : '',
+        supplyCycle: kind === 'supply' ? info.supplyCycle : undefined,
+        supplyUsed: kind === 'supply' ? info.supplyUsed : undefined,
         supplyState: kind === 'supply' ? (info.supplyCycle !== undefined && info.supplyUsed !== undefined ? supplyStatus(info.supplyCycle, info.supplyUsed).state : text(info.supplyState)) : '',
         errorState: kind === 'error' ? text(info.errorState) : ''
       };
@@ -116,7 +129,16 @@
     records.splice.apply(records, [0, records.length].concat(retained, updated));
     return updated.length;
   }
-  var api = { records: records, count: count, totals: totals, replace: replace, supplyStatus: supplyStatus, supplyPreview: supplyPreview, supplyItems: supplyItems };
+  // Service-only identities can open detail without creating collected telemetry
+  // or adding vehicles to the fleet/summary population.
+  function vehicleIdentity(vin) {
+    var key = Object.keys(sourceVehicles).find(function (value) { return normalize(value) === normalize(vin); });
+    if (!key) return null;
+    return Object.assign({ vin: key, companyId: '1933', companyName: '세종물류',
+      serviceOnly: true, catalogOnly: true, conn: null, km: null, min: null, shock: null,
+      cumKm: null, cumH: null, soc: null }, sourceVehicles[key]);
+  }
+  var api = { records: records, count: count, totals: totals, replace: replace, supplyStatus: supplyStatus, supplyPreview: supplyPreview, supplyItems: supplyItems, vehicleIdentity: vehicleIdentity };
   root.MIQServiceRecords = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);

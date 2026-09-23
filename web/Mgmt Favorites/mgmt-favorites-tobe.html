@@ -1,9 +1,10 @@
 <!doctype html>
-<html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<html lang="ko"><head><script src="../_shared/demo-clock.js?rev=34d9d133492b"></script><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>관심차량 관리 · MACHINE IQ</title>
 <link rel="icon" type="image/x-icon" href="../_shared/favicon.ico"/>
-<link rel="stylesheet" href="../_shared/mockup.css?rev=d24057a14011"/>
-<link rel="stylesheet" href="../_shared/map-management-enhancements.css?rev=bc8382d9a34b"/>
+<link rel="stylesheet" href="../_shared/mockup.css?rev=bed1f0069135"/>
+<link rel="stylesheet" href="../_shared/map-management-enhancements.css?rev=a999e938e96f"/>
+<link rel="stylesheet" href="../_shared/favorite-categories.css?rev=0fc77bbb1b78"/>
 <style>.xfer{display:grid;grid-template-columns:minmax(0,1fr) 96px minmax(0,1fr);gap:12px;align-items:stretch}
 .xfer__col{border:1px solid #e5e7eb;border-radius:8px;background:#fff;display:flex;flex-direction:column}
 .xfer__hd{padding:10px 12px;border-bottom:1px solid #f0f0f0;font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px}
@@ -19,17 +20,36 @@
 .xfer__it{cursor:pointer}.xfer__it small{display:block;color:#888;margin-top:4px}.favorite-search{display:flex;gap:8px;padding:10px 12px;border-bottom:1px solid #eee;flex-wrap:wrap}.favorite-search .inp{min-width:100px;flex:1}.favorite-empty{padding:28px 12px;color:#888;font-size:12px;text-align:center}.favorite-overview{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}#favoriteStatus{min-height:20px;font-size:12px;color:#666;margin-top:12px}.xfer__list{min-height:290px;max-height:400px}@media(max-width:900px){.xfer{grid-template-columns:minmax(0,1fr)}.xfer__mid{flex-direction:row;flex-wrap:wrap}}
 /* Keep this desktop page's two interest menus available within the existing shell. */
 body.miq-current-shell[data-gnb="interest"][data-sub="favorites"] .layout:not(.miq-side-collapsed)>aside.lnb:not([hidden]){display:block}
-</style></head><body class="miq-section-mgmt" data-gnb="interest" data-sub="favorites" data-variant="tobe" data-base="../">
+</style><link rel="stylesheet" href="../_shared/form-controls.css?rev=6fda272acdcc"/>
+<link rel="stylesheet" href="../_shared/vehicle-transfer.css?rev=0ab37216acea"/>
+<link rel="stylesheet" href="../_shared/list-pagination.css?rev=0069e48c1009">
+<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?rev=bb6d53aabb78"/>
+<link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?rev=1cffa21a9777"/>
+<style>body.miq-current-shell>#gnb{min-height:64px}</style>
+<script defer blocking="render" src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script>
+<script defer blocking="render" src="../_shared/common-logic.js?rev=efb7e741cd7b"></script>
+<script defer blocking="render" src="../_shared/list-pagination.js?rev=33207bf33d11"></script>
+<script defer blocking="render" src="../_mock-data/generated/fleet.generated.js?rev=309d68875499"></script>
+<script defer blocking="render" src="../_shared/fleet.js?rev=dfdf98be0a95"></script>
+<script defer blocking="render" src="../_shared/nav.js?rev=049a18c69072"></script>
+<script defer blocking="render" src="../_shared/favorite-store.js?rev=753f6857ed37"></script>
+<script defer blocking="render" src="../_shared/favorite-categories.js?rev=761ee6657669"></script>
+<script defer blocking="render" src="../_shared/vehicle-transfer.js?rev=82c05b005f9e"></script>
+<script defer blocking="render" src="../_shared/favorites.js?rev=a098cf20721e"></script>
+</head><body data-current-bootstrap="ready" class="miq-current-shell miq-section-mgmt" data-gnb="interest" data-sub="favorites" data-variant="tobe" data-base="../">
 <div id="gnb"></div><div class="layout"><main class="main miq-mgmt-page">
 <div class="breadcrumb">관심차량 &gt; 관심차량 관리</div><div class="page-head"><div class="page-head__title">관심차량 관리</div></div>
-<div class="favorite-overview"><span>관심차량 <strong id="favoriteTotal">0</strong>대</span></div>
-<div class="box mm-transfer-workspace" id="favoriteTransfer"><div class="xfer">
-<section class="xfer__col" aria-label="고객 차량"><div class="xfer__hd">고객 차량 <span class="badge gray" id="favoriteSourceCount">0대</span></div>
+<div class="favorite-category-bar"><span>총 <strong id="favoriteTotal">0</strong>대</span><label for="favoriteCategory">구분 <select class="inp" id="favoriteCategory"></select></label><a class="btn" id="favoriteCategoryManage" href="favorite-categories-tobe.html">구분 관리</a></div>
+<div class="box mm-transfer-workspace miq-vehicle-transfer" id="favoriteTransfer"><div class="xfer">
+<section class="xfer__col" aria-label="고객 차량"><div class="xfer__hd"><span id="favoriteSourceLabel">고객 차량</span> <span class="badge gray" id="favoriteSourceCount">0대</span></div>
 <div class="favorite-search"><input class="inp inp--sm" id="favoriteSearchSource" aria-label="고객 차량 검색" placeholder="업체 · 기종 · 차대번호"/><select class="inp inp--sm" id="favoriteCompany" aria-label="업체"></select></div><div class="xfer__list" id="favoriteSource"></div></section>
 <div class="xfer__mid"><button class="btn btn--pri" data-favorite-action="add">담기 ▶</button><button class="btn" data-favorite-action="remove">◀ 빼기</button><button class="btn btn--sm" data-favorite-action="add-all">표시 전체 ▶</button><button class="btn btn--sm" data-favorite-action="remove-all">◀ 표시 전체</button></div>
-<section class="xfer__col" aria-label="관심차량"><div class="xfer__hd">관심차량 <span class="badge pri" id="favoriteTargetCount">0대</span></div>
-<div class="favorite-search"><input class="inp inp--sm" id="favoriteSearchTarget" aria-label="관심차량 검색" placeholder="업체 · 기종 · 차대번호"/></div><div class="xfer__list" id="favoriteTarget"></div></section>
+<section class="xfer__col" aria-label="관심차량"><div class="xfer__hd">관심차량 <span class="badge pri" id="favoriteTargetCount">0대</span><span id="favoriteCategoryLabel" class="favorite-category-name"></span></div>
+<div class="favorite-search"><input class="inp inp--sm" id="favoriteSearchTarget" type="search" aria-label="관심차량 검색" placeholder="업체 · 기종 · 차대번호"/></div><div class="xfer__list" id="favoriteTarget"></div><div class="favorite-move"><select class="inp" id="favoriteMoveCategory" aria-label="이동할 구분"></select><button class="btn" type="button" id="favoriteMove">선택 차량 이동</button></div></section>
 </div><div class="mm-transfer-review"><div class="mm-transfer-review__body"><strong>변경 내역</strong><div class="mm-transfer-change-list" id="favoriteChanges" role="status">변경 없음</div></div><div class="mm-transfer-actions"><button class="btn" id="favoriteCancel" disabled>변경 취소</button><button class="btn btn--pri" id="favoriteSave" disabled>변경 저장</button></div></div>
 <div id="favoriteStatus" role="status" aria-live="polite"></div></div></main></div>
-<script src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script><script src="../_shared/common-logic.js?rev=fe89537280cd"></script><script src="../_shared/nav.js?rev=10146ec619b0"></script><script src="../_mock-data/generated/fleet.generated.js?rev=f69042cf6b57"></script><script src="../_shared/fleet.js?rev=9bc7caf2ff93"></script><script src="../_shared/favorite-store.js?rev=e6415c616870"></script><script src="../_shared/favorites.js?rev=fb70dab4388a"></script>
+
+
+
+
 </body></html>

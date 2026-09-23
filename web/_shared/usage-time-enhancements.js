@@ -7,9 +7,9 @@
   var QUERY = new URLSearchParams(location.search);
   var FLEET = window.MIQ && Array.isArray(MIQ.FLEET_CATALOG) && MIQ.FLEET_CATALOG.length ? MIQ.FLEET_CATALOG : window.MIQ && MIQ.FLEET ? MIQ.FLEET : [];
   var MIN_OPERATING_MINUTES = 30;
-  var LATEST_DATE = new Date();
-  LATEST_DATE.setHours(12, 0, 0, 0);
-  LATEST_DATE.setDate(LATEST_DATE.getDate() - 1);
+  var monthRules = window.MIQUsageMonth;
+  var TODAY = monthRules.today(new Date());
+  var monthInput = document.getElementById('usageMonth');
   var WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
   var feedback = document.getElementById('metricsFeedback');
   var scopeContext = window.MIQ_TARGET_CONTEXT || null;
@@ -22,17 +22,13 @@
   function inSelectedCompany(vehicle) {
     return !context.companyId || context.companyId === 'all' || String(vehicle.companyId || '1933') === String(context.companyId);
   }
-  var defaultFrom = new Date(LATEST_DATE.getFullYear(), LATEST_DATE.getMonth(), 1, 12, 0, 0, 0);
-  var requestedFrom = parseDate(QUERY.get('from'));
-  var requestedTo = parseDate(QUERY.get('to'));
-  var initialTo = requestedTo && requestedTo <= LATEST_DATE ? requestedTo : new Date(LATEST_DATE.getTime());
-  var initialFrom = requestedFrom && requestedFrom <= initialTo ? requestedFrom : defaultFrom;
+  var initialRange = monthRules.range(monthRules.initial(QUERY, TODAY));
   var state = {
-    year: initialTo.getFullYear(),
-    month: initialTo.getMonth() + 1,
-    period: normalizePeriod(QUERY.get('period')) || 'm',
-    from: formatDateValue(initialFrom),
-    to: formatDateValue(initialTo),
+    year: initialRange.year,
+    month: initialRange.month,
+    period: 'm',
+    from: initialRange.from,
+    to: initialRange.to,
     rows: FLEET,
     label: '전체차량',
     selection: null
@@ -54,10 +50,6 @@
     return isoDate(date.getFullYear(), date.getMonth() + 1, date.getDate());
   }
 
-  function normalizePeriod(value) {
-    return { d: 'd', day: 'd', w: 'w', week: 'w', m: 'm', month: 'm', c: 'c', custom: 'c' }[String(value || '').toLowerCase()] || '';
-  }
-
   function parseDate(value) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return null;
     var parts = value.split('-').map(Number);
@@ -72,11 +64,6 @@
     var value = new Date(date.getTime());
     value.setDate(value.getDate() + amount);
     return value;
-  }
-
-  function inSelectedRange(year, month, day) {
-    var value = isoDate(year, month, day);
-    return value >= state.from && value <= state.to;
   }
 
   function setFeedback(message, isError) {
@@ -142,7 +129,7 @@
   }
 
   function isUncollected(year, month, day) {
-    return new Date(year, month - 1, day, 12, 0, 0, 0) > LATEST_DATE;
+    return monthRules.status(isoDate(year, month, day), TODAY) !== 'collected';
   }
 
   function vehicleDay(vehicle, year, month, day) {
@@ -229,17 +216,17 @@
 
     for (var day = 1; day <= lastDay; day++) {
       var weekdayIndex = new Date(state.year, state.month - 1, day).getDay();
-      var selected = inSelectedRange(state.year, state.month, day);
-      var aggregate = selected ? dayAggregate(state.year, state.month, day) : null;
+      var date = isoDate(state.year, state.month, day);
+      var status = monthRules.status(date, TODAY);
+      var aggregate = dayAggregate(state.year, state.month, day);
       var dayClass = weekdayIndex === 0 ? ' sun' : weekdayIndex === 6 ? ' sat' : '';
       var cellClass = 'cal__day';
-      if (!selected) cellClass += ' is-outside-range';
-      if (selected && !aggregate) cellClass += ' void';
-      if (state.year === LATEST_DATE.getFullYear() && state.month === LATEST_DATE.getMonth() + 1 && day === LATEST_DATE.getDate()) cellClass += ' today';
-      html += '<div class="' + cellClass + '"' + (aggregate ? ' data-day="' + day + '" role="button" tabindex="0"' : '') + '>';
+      if (status !== 'collected') cellClass += ' is-' + status;
+      if (date === TODAY) cellClass += ' today';
+      html += '<div class="' + cellClass + '" data-date="' + date + '" data-status="' + status + '"' + (aggregate ? ' data-day="' + day + '" role="button" tabindex="0"' : '') + '>';
       html += '<div class="cal__d' + dayClass + '">' + day + '</div>';
       if (!aggregate) {
-        html += '<div class="empty">' + (selected ? '집계 전' : '선택 범위 밖') + '</div>';
+        html += '<div class="empty">' + monthRules.label(status) + '</div>';
       } else {
         html += '<div class="ct' + (aggregate.work === 0 ? ' zero' : '') + '">';
         html += '<div class="ct__row work"><span class="ct__k">작업시간</span><span class="ct__v">' + formatMinutesHtml(aggregate.work) + '</span></div>';
@@ -279,19 +266,17 @@
   function renderSummary(totals) {
     var from = parseDate(state.from);
     var to = parseDate(state.to);
-    var isSameMonth = from.getFullYear() === to.getFullYear() && from.getMonth() === to.getMonth();
-    var title = state.from === state.to
-      ? from.getFullYear() + '년 ' + (from.getMonth() + 1) + '월 ' + from.getDate() + '일 요약'
-      : (state.period === 'm' && isSameMonth)
-        ? to.getFullYear() + '년 ' + (to.getMonth() + 1) + '월 요약'
-        : state.from.replace(/-/g, '.') + ' ~ ' + state.to.replace(/-/g, '.') + ' 요약';
-    document.getElementById('usageSummaryTitle').textContent = title;
-    document.getElementById('usageSumWork').innerHTML = formatMinutesHtml(totals.work);
-    document.getElementById('usageSumDistance').innerHTML = formatDistanceHtml(totals.distance);
+    document.getElementById('usageSummaryTitle').textContent = state.year + '년 ' + state.month + '월 요약';
+    document.getElementById('usageSumWork').innerHTML = totals.collectedDays ? formatMinutesHtml(totals.work) : '-';
+    document.getElementById('usageSumDistance').innerHTML = totals.collectedDays ? formatDistanceHtml(totals.distance) : '-';
     var averageOperating = totals.operatingDays ? Math.round(totals.operating / totals.operatingDays * 10) / 10 : 0;
-    document.getElementById('usageSumOperating').innerHTML = averageOperating.toLocaleString() + '<small>대</small>';
+    document.getElementById('usageSumOperating').innerHTML = totals.collectedDays ? window.MIQCommon.numbers.integer(averageOperating, true) + '<small>대</small>' : '-';
     var selectedDays = Math.round((to - from) / 86400000) + 1;
-    var meta = '조회 기간 ' + selectedDays + '일 · 집계 완료 ' + totals.collectedDays + '일';
+    var pendingDays = TODAY >= state.from && TODAY <= state.to ? 1 : 0;
+    var futureDays = selectedDays - totals.collectedDays - pendingDays;
+    var meta = '조회 월 ' + selectedDays + '일 · 집계 완료 ' + totals.collectedDays + '일';
+    if (pendingDays) meta += ' · 집계 전 ' + pendingDays + '일';
+    if (futureDays) meta += ' · 미도래 ' + futureDays + '일';
     document.getElementById('usageSummaryMeta').textContent = meta;
   }
 
@@ -306,7 +291,10 @@
     });
   }
 
+  var activeDay,activeDayAggregate;
+  var dayPager=MIQ.createListPager(document.getElementById('usageDayRows').closest('.tbl-wrap'),{pageSize:20,onChange:function(){openDay(activeDay,activeDayAggregate)}});
   function openDay(day, aggregate) {
+    activeDay=day;activeDayAggregate=aggregate;
     var weekday = WEEKDAYS[new Date(state.year, state.month - 1, day).getDay()];
     document.getElementById('dayModalTitle').textContent = isoDate(state.year, state.month, day) + ' (' + weekday + ') 운행시간 상세';
     document.getElementById('usageDaySummary').innerHTML =
@@ -314,14 +302,14 @@
       + '<div class="cell"><div class="cell__v">' + formatDistanceHtml(aggregate.distance) + '</div><div class="cell__k">총 이동거리</div></div>'
       + '<div class="cell hl"><div class="cell__v">' + aggregate.operating + '<small>대</small></div><div class="cell__k">운영 장비 수 (30분 이상)</div></div>';
     document.getElementById('usageDayMeta').textContent = state.rows.length + '대 중 운영 ' + aggregate.operating + '대 · 작업시간 내림차순';
-    document.getElementById('usageDayRows').innerHTML = aggregate.rows.slice().sort(function (left, right) { return right.work - left.work; }).map(function (row) {
+    document.getElementById('usageDayRows').innerHTML = dayPager.slice(aggregate.rows.slice().sort(function (left, right) { return right.work - left.work; }),String(day)).map(function (row) {
       var operating = row.work >= MIN_OPERATING_MINUTES;
-      return '<tr><td class="strong"><a class="metrics-vehicle-link" href="' + escapeHtml(vehicleDetailHref(row.vehicle, day)) + '">' + escapeHtml(row.vehicle.model)
-        + ' <span class="mute">' + escapeHtml(row.vehicle.vin) + '</span></a></td><td>' + escapeHtml(row.vehicle.type) + '</td><td class="mute">' + escapeHtml(row.vehicle.group) + '</td>'
+      return '<tr><td class="strong"><a class="metrics-vehicle-link" href="' + escapeHtml(vehicleDetailHref(row.vehicle, day)) + '">' + escapeHtml(row.vehicle.vin)
+        + ' <span class="mute">' + escapeHtml(row.vehicle.model) + '</span></a></td><td>' + escapeHtml(row.vehicle.type) + '</td><td class="mute">' + escapeHtml(row.vehicle.group) + '</td>'
         + '<td class="r ' + (operating ? 'strong' : 'mute') + '">' + formatMinutesText(row.work) + '</td><td class="r ' + (operating ? '' : 'mute') + '">' + formatDistanceText(row.distance) + '</td>'
         + '<td class="c"><span class="usage-status' + (operating ? ' is-operating' : '') + '">' + (operating ? '운영' : '미운영') + '</span></td></tr>';
     }).join('');
-    document.getElementById('dayEfficiencyLink').href = contextualHref('../Operational%20Efficiency/operational-efficiency-tobe.html', {
+    document.getElementById('dayEfficiencyLink').href = contextualHref('../Operational%20Efficiency/operational-efficiency-tobe-option-b.html', {
       period: 'd',
       from: isoDate(state.year, state.month, day),
       to: isoDate(state.year, state.month, day)
@@ -336,6 +324,7 @@
       type: context.type,
       veh: context.veh,
       period: state.period,
+      month: state.from.slice(0, 7),
       from: state.from,
       to: state.to
     });
@@ -343,7 +332,7 @@
   }
 
   function render() {
-    var rangeEnd = parseDate(state.to) || LATEST_DATE;
+    var rangeEnd = parseDate(state.to);
     state.year = rangeEnd.getFullYear();
     state.month = rangeEnd.getMonth() + 1;
     var totals = aggregateRange();
@@ -386,7 +375,7 @@
       var day = cursor.getDate();
       var aggregate = dayAggregate(year, month, day);
       if (!aggregate) {
-        rows.push([isoDate(year, month, day), '', '', '', '집계 전'].join(','));
+        rows.push([isoDate(year, month, day), '', '', '', monthRules.label(monthRules.status(isoDate(year, month, day), TODAY))].join(','));
       } else {
         rows.push([isoDate(year, month, day), formatMinutesText(aggregate.work), Math.round(aggregate.distance) + 'km', aggregate.operating, '집계 완료'].join(','));
       }
@@ -404,16 +393,46 @@
     setFeedback(state.from + '부터 ' + state.to + '까지의 운행시간 집계 결과를 CSV로 내보냈습니다.', false);
   }
 
-  document.getElementById('usageFilter').addEventListener('miq:period-change', function (event) {
-    var detail = event.detail || {};
-    var from = parseDate(detail.startDate);
-    var to = parseDate(detail.endDate);
-    if (!from || !to || from > to) return;
-    state.period = normalizePeriod(detail.period) || 'c';
-    state.from = formatDateValue(from);
-    state.to = formatDateValue(to > LATEST_DATE ? LATEST_DATE : to);
+  var lastValidDraftMonth = state.from.slice(0, 7);
+  function syncDraftMonth() {
+    var currentDate = monthRules.today(new Date());
+    monthInput.max = currentDate.slice(0, 7);
+    if (monthRules.parse(monthInput.value) && !monthRules.selectable(monthInput.value, currentDate)) {
+      monthInput.value = lastValidDraftMonth;
+      setFeedback('이번 달까지만 선택할 수 있습니다.', true);
+    }
+    if (monthRules.selectable(monthInput.value, currentDate)) lastValidDraftMonth = monthInput.value;
+    document.getElementById('usageMonthLabel').textContent = monthInput.value || '연월 선택';
+    var draft = monthRules.range(monthInput.value);
+    document.getElementById('usagePrevMonth').disabled = !draft || !monthRules.shift(monthInput.value, -1);
+    document.getElementById('usageNextMonth').disabled = !draft || !monthRules.selectable(monthRules.shift(monthInput.value, 1), currentDate);
+  }
+  function shiftDraftMonth(amount) {
+    var next = monthRules.shift(monthInput.value, amount);
+    if (!monthRules.selectable(next, monthRules.today(new Date()))) return;
+    monthInput.value = next;
+    syncDraftMonth();
+  }
+  monthInput.value = state.from.slice(0, 7);
+  syncDraftMonth();
+  monthInput.addEventListener('input', syncDraftMonth);
+  monthInput.addEventListener('change', syncDraftMonth);
+  monthInput.addEventListener('click', function () { if (typeof monthInput.showPicker === 'function') monthInput.showPicker(); });
+  document.getElementById('usagePrevMonth').addEventListener('click', function () { shiftDraftMonth(-1); });
+  document.getElementById('usageNextMonth').addEventListener('click', function () { shiftDraftMonth(1); });
+  document.getElementById('usageSearch').addEventListener('click', function () {
+    var currentDate = monthRules.today(new Date());
+    if (monthRules.parse(monthInput.value) && !monthRules.selectable(monthInput.value, currentDate)) {
+      syncDraftMonth();
+      return;
+    }
+    var range = monthRules.range(monthInput.value);
+    if (!range) { setFeedback('조회할 연도와 월을 선택해 주세요.', true); monthInput.focus(); return; }
+    TODAY = currentDate;
+    state.from = range.from;
+    state.to = range.to;
     render();
-    setFeedback(state.from + '부터 ' + state.to + '까지 조회가 완료되었습니다.', false);
+    setFeedback(state.year + '년 ' + state.month + '월 조회가 완료되었습니다.', false);
   });
   document.getElementById('usageExport').addEventListener('click', exportCsv);
 

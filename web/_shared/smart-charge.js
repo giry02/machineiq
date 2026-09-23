@@ -24,11 +24,17 @@
     var available=!sw.disabled,on=available&&sw.classList.contains('on'),w=MIQMeeting.chargeWindow(from.value,to.value);
     from.disabled=to.disabled=!on;save.disabled=!available;sw.setAttribute('aria-pressed',String(on));
     if(!available)status.textContent='선택 차량의 스마트 충전 설정은 수집 전입니다.';
-    var lastDay=w.overnight?'금일 ':'익일 ';
-    host.innerHTML='<div class="smart-schedule__label"><strong>'+(on?w.startLabel+' → '+w.endLabel+' · '+w.duration+'시간':'스마트 충전 꺼짐')+'</strong><span>차량 시간 · Asia/Seoul</span></div>'
-      +'<div class="smart-schedule__track" role="img" aria-label="24시간 중 '+(on?w.duration:0)+'시간 충전 설정"><span style="width:'+(on?w.fill:0)+'%"></span>'
-      +(w.midnight!==null&&w.midnight<100?'<i style="left:'+w.midnight+'%" title="금일 00:00"><b>금일 00:00</b></i>':'')+'</div>'
-      +'<div class="smart-schedule__axis"><span>'+w.startLabel+'</span><span>24시간 · '+lastDay+String(w.start).padStart(2,'0')+':00</span></div>';
+    var summary=!available?'충전 설정 수집 전':on?w.startLabel+' → '+w.endLabel+' · '+w.duration+'시간':'스마트 충전 꺼짐';
+    var hours=Array.from({length:24},function(_,hour){
+      var charging=on&&(hour-w.start+24)%24<w.duration;
+      var label=String(hour).padStart(2,'0'),end=String(hour+1).padStart(2,'0');
+      var detail=label+':00 ~ '+end+':00 · '+(!available?'수집 전':charging?'충전':'비충전');
+      return '<div class="smart-schedule__hour'+(charging?' is-charging':'')+'" role="listitem" aria-label="'+detail+'" title="'+detail+'">'
+        +'<span class="smart-schedule__cell" aria-hidden="true"></span><span class="smart-schedule__time" aria-hidden="true">'+label+'</span></div>';
+    }).join('');
+    host.innerHTML='<div class="smart-schedule__label"><strong>'+summary+'</strong><span>차량 시간 · Asia/Seoul</span></div>'
+      +'<div class="smart-schedule__hours" role="list" aria-label="00시부터 23시까지, 한 칸은 1시간. '+summary+'">'+hours+'</div>'
+      +'<div class="smart-schedule__key"><span class="smart-schedule__legend"><span><i class="is-charging" aria-hidden="true"></i>충전</span><span><i aria-hidden="true"></i>'+(!available?'수집 전':'비충전')+'</span></span><span>00~23시 · 1칸 = 1시간</span></div>';
   }
   from.addEventListener('change',function(){clearSaveFeedback();status.textContent='변경 후 저장해 주세요.';paint();});
   to.addEventListener('change',function(){clearSaveFeedback();status.textContent='변경 후 저장해 주세요.';paint();});

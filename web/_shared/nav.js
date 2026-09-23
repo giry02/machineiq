@@ -24,57 +24,56 @@
   /* ── 사이트맵: 한 곳에서만 관리 ── */
   var MENU = [
     { key: 'dash', label: '대시보드', dir: 'Dashboard',
-      subs: [{ key: 'group', label: '그룹별 대시보드', asis: 'group-dashboard-asis.html', tobe: 'group-dashboard-tobe-v2.html' }] },
+      subs: [{ key: 'group', label: '그룹별 대시보드', tobe: 'group-dashboard-tobe-v2.html' }] },
 
     /* 차량관리 = 현행 전용. 차량정보 리스트는 운행이력>요약정보로 병합됨 */
     { key: 'equip', label: '차량관리', dir: 'Vehicle Detail', asisOnly: true,
-      subs: [{ key: 'detail', label: '차량 정보', asis: 'vehicle-detail-asis.html', tobe: 'vehicle-detail-tobe.html' }] },
+      subs: [{ key: 'detail', label: '차량 정보', tobe: 'vehicle-detail-tobe.html' }] },
 
     { key: 'anlz', label: '운행이력',
       subs: [
-        { key: 'summary', label: '요약정보', dir: 'Vehicle Summary', asis: 'vehicle-summary-asis.html', tobe: 'vehicle-summary-tobe-3.html' },
+        { key: 'summary', label: '요약정보', dir: 'Vehicle Summary', tobe: 'vehicle-summary-tobe-3.html' },
         /* 차량 상세 = 숨은 화면. 요약정보에서만 진입 */
-        { key: 'detail', label: '차량 상세', dir: 'Vehicle Detail', asis: 'vehicle-detail-asis.html', tobe: 'vehicle-detail-tobe.html', hidden: true, from: '요약정보' },
-        { key: 'usage', label: '운행시간', dir: 'Usage Time', asis: 'usage-time-asis.html', tobe: 'usage-time-tobe.html' },
-        { key: 'oper', label: '운영효율', dir: 'Operational Efficiency', asis: 'operational-efficiency-asis.html', tobe: 'operational-efficiency-tobe.html' },
-        /* 운영효율 B안은 TO-BE 좌측 메뉴에서만 비교하는 별도 시안이다. */
-        { key: 'operb', label: '운영효율 B안', dir: 'Operational Efficiency', tobe: 'operational-efficiency-tobe-option-b.html', hidden: true },
+        { key: 'detail', label: '차량 상세', dir: 'Vehicle Detail', tobe: 'vehicle-detail-tobe.html', hidden: true, from: '요약정보' },
+        { key: 'usage', label: '운행시간', dir: 'Usage Time', tobe: 'usage-time-tobe.html' },
+        { key: 'oper', label: '운영효율', dir: 'Operational Efficiency', tobe: 'operational-efficiency-tobe-option-b.html' },
+        { key: 'vehicleeff', label: '차량별 효율', dir: 'Operational Efficiency', tobe: 'vehicle-efficiency-tobe.html', tobeOnly: true },
         /* 충격 · 엔진 · 리튬 = TO-BE 에서는 GNB 에서 감추고 차량 상세에서만 진입
            (충격 = 충격 횟수 지표 클릭 / 리튬 = 에너지 상세 정보 클릭 / 엔진 = 엔진 상세 정보 클릭) */
-        { key: 'shock', label: '충격', dir: 'Shock', asis: 'shock-asis.html', tobe: 'shock-tobe.html' },
-        { key: 'engine', label: '엔진', dir: 'Engine', asis: 'engine-asis.html', tobe: 'engine-tobe.html', hiddenTobe: true, from: '차량 상세' },
-        { key: 'lithium', label: '리튬배터리', dir: 'Lithium', asis: 'lithium-asis.html', tobe: 'lithium-list-tobe.html' }
+        { key: 'shock', label: '충격', dir: 'Shock', tobe: 'shock-tobe.html' },
+        { key: 'engine', label: '엔진', dir: 'Engine', tobe: 'engine-tobe.html', hiddenTobe: true, from: '차량 상세' },
+        { key: 'lithium', label: '리튬배터리', dir: 'Lithium', tobe: 'lithium-list-tobe.html' }
       ] },
 
     { key: 'srvc', label: '서비스', dir: 'Service',
       subs: [
-        { key: 'all', label: '전체', asis: 'service-asis.html', tobe: 'service-tobe-v2.html' },
-        { key: 'maintenance', label: '수리이력', asis: 'service-asis.html', tobe: 'service-maintenance-tobe.html' },
-        { key: 'supply', label: '소모품관리', asis: 'service-asis.html', tobe: 'service-supply-tobe.html' },
-        { key: 'error', label: '차량 에러', asis: 'service-asis.html', tobe: 'service-error-tobe.html' }
+        { key: 'all', label: '전체', tobe: 'service-tobe-v2.html' },
+        { key: 'maintenance', label: '수리이력', tobe: 'service-maintenance-tobe.html' },
+        { key: 'supply', label: '소모품관리', tobe: 'service-supply-tobe.html' },
+        { key: 'error', label: '차량 에러', tobe: 'service-error-tobe.html' }
       ] },
 
     { key: 'rpt', label: '리포트',
       subs: [
-        { key: 'rptstatus', label: '업체별 현황', dir: 'Report Status', asis: 'report-status-asis.html', tobe: 'report-status-tobe.html' },
-        { key: 'rptcompare', label: '업체별 비교', dir: 'Report Comparison', asis: 'report-comparison-asis.html', tobe: 'report-comparison-tobe.html' },
-        { key: 'rptheat', label: '업체별 히트맵', dir: 'Report Heatmap', asis: 'report-heatmap-asis.html', tobe: 'report-heatmap-tobe.html' },
+        { key: 'rptstatus', label: '업체별 현황', dir: 'Report Status', tobe: 'report-status-tobe.html' },
+        { key: 'rptcompare', label: '업체별 비교', dir: 'Report Comparison', tobe: 'report-comparison-tobe.html' },
+        { key: 'rptheat', label: '업체별 히트맵', dir: 'Report Heatmap', tobe: 'report-heatmap-tobe.html' },
         /* 3화면 통합 시도판 — 반려됨. 참조용으로만 보존 */
-        { key: 'report', label: '(구) 통합 리포트', dir: 'Report', asis: 'report-asis.html', tobe: 'report-tobe.html', hidden: true }
+        { key: 'report', label: '(구) 통합 리포트', dir: 'Report', asisOnly: true, hidden: true }
       ] },
 
     { key: 'map', label: '지도', dir: 'Map',
-      subs: [{ key: 'map', label: '지도 · 이동경로', asis: 'map-asis.html', tobe: 'map-tobe.html' }] },
+      subs: [{ key: 'map', label: '지도 · 이동경로', tobe: 'map-tobe.html' }] },
 
     { key: 'mgmt', label: '관리기능',
       subs: [
-        { key: 'user', label: '사용자', dir: 'Mgmt User', asis: 'mgmt-user-asis.html', tobe: 'mgmt-user-tobe.html' },
-        { key: 'company', label: '업체', dir: 'Mgmt Company', asis: 'mgmt-company-asis.html', tobe: 'mgmt-company-tobe.html' },
-        { key: 'group', label: '그룹', dir: 'Mgmt Group', asis: 'mgmt-group-asis.html', tobe: 'mgmt-group-tobe.html' },
-        { key: 'geofence', label: 'Geofence', dir: 'Mgmt Geofence', asis: 'mgmt-geofence-asis.html', tobe: 'mgmt-geofence-tobe.html', hiddenTobe: true },
-        { key: 'vehicle', label: '차량', dir: 'Mgmt Vehicle', asis: 'mgmt-vehicle-asis.html', tobe: 'mgmt-vehicle-tobe.html' },
-        { key: 'acctreq', label: '계정신청관리', dir: 'Mgmt Account Request', asis: 'mgmt-account-request-asis.html', tobe: 'mgmt-account-request-tobe.html', hiddenTobe: true },
-        { key: 'equipreq', label: '차량신청관리', dir: 'Mgmt Vehicle Request', asis: 'mgmt-vehicle-request-asis.html', tobe: 'mgmt-vehicle-request-tobe.html', hiddenTobe: true }
+        { key: 'user', label: '사용자', dir: 'Mgmt User', tobe: 'mgmt-user-tobe.html' },
+        { key: 'company', label: '업체', dir: 'Mgmt Company', tobe: 'mgmt-company-tobe.html' },
+        { key: 'group', label: '그룹', dir: 'Mgmt Group', tobe: 'mgmt-group-tobe.html' },
+        { key: 'geofence', label: 'Geofence', dir: 'Mgmt Geofence', tobe: 'mgmt-geofence-tobe.html', hiddenTobe: true },
+        { key: 'vehicle', label: '차량', dir: 'Mgmt Vehicle', tobe: 'mgmt-vehicle-tobe.html' },
+        { key: 'acctreq', label: '계정신청관리', dir: 'Mgmt Account Request', tobe: 'mgmt-account-request-tobe.html', hiddenTobe: true },
+        { key: 'equipreq', label: '차량신청관리', dir: 'Mgmt Vehicle Request', tobe: 'mgmt-vehicle-request-tobe.html', hiddenTobe: true }
       ] },
 
     { key: 'ops', label: '운영관리', dir: 'Operations',
@@ -92,25 +91,26 @@
     { key: 'interest', label: '관심차량',
       subs: [
         { key: 'summary', label: '관심차량 현황', dir: 'Interest Vehicles', tobe: 'interest-vehicles-status-tobe.html' },
-        { key: 'favorites', label: '관심차량 관리', dir: 'Mgmt Favorites', tobe: 'mgmt-favorites-tobe.html' }
+        { key: 'favorites', label: '관심차량 관리', dir: 'Mgmt Favorites', tobe: 'mgmt-favorites-tobe.html' },
+        { key: 'categories', label: '구분 관리', dir: 'Mgmt Favorites', tobe: 'favorite-categories-tobe.html' }
       ] },
 
     /* GNB 우측 사용자 영역에서 진입 — 상단 메뉴 줄에는 노출하지 않는다 */
     { key: 'myacct', label: '마이페이지', dir: 'My Account', userMenu: true,
-      subs: [{ key: 'account', label: '내 계정', asis: 'my-account-asis.html', tobe: 'my-account-tobe.html' }] },
+      subs: [{ key: 'account', label: '내 계정', tobe: 'my-account-tobe.html' }] },
 
     /* 로그인 이전 화면 — GNB 없음. 사이트맵/검증 용도로만 등록 */
     { key: 'login', label: '로그인', dir: 'Login', preLogin: true,
-      subs: [{ key: 'login', label: '로그인', asis: 'login-asis.html', tobe: 'login-tobe.html' }] },
+      subs: [{ key: 'login', label: '로그인', tobe: 'login-tobe.html' }] },
     { key: 'findpw', label: '비밀번호 찾기', dir: 'Find Password', preLogin: true,
-      subs: [{ key: 'findpw', label: '비밀번호 찾기', asis: 'find-password-asis.html', tobe: 'find-password-tobe.html' }] }
+      subs: [{ key: 'findpw', label: '비밀번호 찾기', tobe: 'find-password-tobe.html' }] }
   ];
 
   /* ── MVP 진행상태 (index.html 상태판과 동일 기준 · 2026-08-13 현행화) ──
      done = MVP 확정 · nd(not done) = 미진행 · dl(delete) = MVP 제외 */
   var STATUS = {
     'dash/group': 'done',
-    'anlz/summary': 'done', 'anlz/detail': 'done', 'anlz/oper': 'done',
+    'anlz/summary': 'done', 'anlz/detail': 'done', 'anlz/oper': 'done', 'anlz/vehicleeff': 'done',
     'anlz/shock': 'done', 'anlz/engine': 'done', 'anlz/lithium': 'done',
     'srvc/all': 'done', 'srvc/maintenance': 'done', 'srvc/supply': 'done', 'srvc/error': 'done',
     'rpt/rptstatus': 'done', 'rpt/rptcompare': 'done', 'rpt/rptheat': 'done',
@@ -131,6 +131,7 @@
   var d = body.dataset;
   /* 화면별 스크립트가 초기 렌더 중 URL을 바꾸기 전, 실제 진입 조건을 보존한다. */
   var INITIAL_QUERY = new URLSearchParams(location.search);
+  window.MIQ_ENTRY_QUERY = INITIAL_QUERY.toString();
   var BASE = d.base || '../';
   var VARIANT = d.variant === 'asis' ? 'asis' : 'tobe';
   var ACT = d.gnb || '';
@@ -168,6 +169,7 @@
 
   body.dataset.managementRole = MANAGEMENT_ROLE;
   function isDealerManagementRole(role) { return roleRules.isDealer(role); }
+  function canUseInterest(role) { return roleRules.canUseFavorites(role); }
   function managementRoleLabel(role) {
     return roleRules.label(role);
   }
@@ -239,7 +241,7 @@
       if (host.getAttribute('data-miq-scope-placement') !== 'title') return;
       container = document.querySelector('.main .miq-title-period-row, .main .miq-service-header-row');
       title = container && container.querySelector('.page-head__title, .page-title');
-      if ((!container || !title) && ACT === 'map') {
+      if ((!container || !title) && (ACT === 'map' || (ACTSUB === 'lithium' && body.getAttribute('data-lithium-list') !== 'true'))) {
         title = document.querySelector('.main .page-head .page-head__title');
         container = title && title.closest('.page-head');
       }
@@ -335,16 +337,18 @@
     if (!document.querySelector('link[data-current-shell]')) {
       var shellCss = document.createElement('link');
       shellCss.rel = 'stylesheet';
-      shellCss.href = BASE + '_shared/current-shell.css?v=20260910-content-search-r3';
+      shellCss.href = BASE + '_shared/current-shell.css?v=20260915-ops-date-r1';
       shellCss.setAttribute('data-current-shell', '');
       document.head.appendChild(shellCss);
     }
     if (VARIANT === 'tobe' && MANAGEMENT_ROLE === 'internal') {
       body.classList.add('miq-has-operations');
+      if (!document.querySelector('link[data-operations-navigation]')) {
       var opsNavCss = document.createElement('link');
       opsNavCss.rel = 'stylesheet';
       opsNavCss.href = BASE + '_shared/operations-navigation.css?rev=20260911-2';
       document.head.appendChild(opsNavCss);
+      }
     }
   }
 
@@ -352,12 +356,12 @@
   function menuVisible(m) {
     if (m.preLogin || m.userMenu) return false;          // 상단 메뉴 줄에는 노출하지 않음
     if (m.key === 'ops') return VARIANT === 'tobe' && MANAGEMENT_ROLE === 'internal';
-    if (m.key === 'interest') return VARIANT === 'tobe' && isDealerManagementRole(MANAGEMENT_ROLE);
+    if (m.key === 'interest') return VARIANT === 'tobe' && canUseInterest(MANAGEMENT_ROLE);
     if (m.key === 'equip') return VARIANT === 'asis';    // TO-BE는 요약정보로 통합되어 상단 차량관리 제거
     return !(m.asisOnly && VARIANT !== 'asis');
   }
-  function subVisible(s) { return !(s.asisOnly && VARIANT !== 'asis'); }
-  function subHidden(s) { return (s.key === 'favorites' && !isDealerManagementRole(MANAGEMENT_ROLE)) || !!s.hidden || (s.hiddenTobe && VARIANT !== 'asis'); }
+  function subVisible(s) { return !(s.asisOnly && VARIANT !== 'asis') && !(s.tobeOnly && VARIANT !== 'tobe'); }
+  function subHidden(s) { return (s.key === 'favorites' && !canUseInterest(MANAGEMENT_ROLE)) || !!s.hidden || (s.hiddenTobe && VARIANT !== 'asis'); }
   function subInDropdown(s) { return subVisible(s) && !subHidden(s); }
 
   function enc(s) { return s.replace(/ /g, '%20'); }
@@ -420,9 +424,9 @@
     }, true);
   });
 
-  /* 고객 운영 그룹은 고객사 내부의 현장·작업조 관리 기능이다. 딜러 계정은
+  /* 고객 운영 그룹은 고객사 내부의 현장·작업조 관리 기능이다. 내부·딜러 계정은
      메뉴뿐 아니라 직접 주소로도 진입하지 못하도록 관리 사용자 화면으로 돌린다. */
-  if (VARIANT === 'tobe' && ACT === 'mgmt' && ACTSUB === 'group' && isDealerManagementRole(MANAGEMENT_ROLE)) {
+  if (VARIANT === 'tobe' && ACT === 'mgmt' && ACTSUB === 'group' && !roleRules.isCustomer(MANAGEMENT_ROLE)) {
     var blockedGroupTarget = new URL(BASE + enc('Mgmt User') + '/mgmt-user-tobe.html', location.href);
     blockedGroupTarget.searchParams.set('role', MANAGEMENT_ROLE);
     location.replace(blockedGroupTarget.href);
@@ -529,11 +533,11 @@
           nextUrl = new URL(BASE + 'Dashboard/group-dashboard-tobe-v2.html', location.href);
           nextUrl.searchParams.set('role', nextRole);
         }
-        if (ACT === 'interest' && !isDealerManagementRole(nextRole)) {
+        if (ACT === 'interest' && !canUseInterest(nextRole)) {
           nextUrl = new URL(BASE + enc('Vehicle Summary') + '/vehicle-summary-tobe-3.html', location.href);
           nextUrl.searchParams.set('role', nextRole);
         }
-        if (ACT === 'mgmt' && ACTSUB === 'group' && isDealerManagementRole(nextRole)) {
+        if (ACT === 'mgmt' && ACTSUB === 'group' && !roleRules.isCustomer(nextRole)) {
           nextUrl = new URL(BASE + enc('Mgmt User') + '/mgmt-user-tobe.html', location.href);
           nextUrl.searchParams.set('role', nextRole);
         }
@@ -543,7 +547,7 @@
     if (VARIANT === 'tobe') {
       /* 대부분의 화면은 nav.js 뒤에서 fleet.js를 불러온다. 공통 차량 명부가 준비된
          뒤 한 번만 그려야 조회 건수와 본문 데이터가 어긋나지 않는다. */
-      if (document.readyState === 'loading') {
+      if (document.readyState === 'loading' && body.dataset.currentBootstrap !== 'ready') {
         document.addEventListener('DOMContentLoaded', renderTargetSelector, { once: true });
       } else {
         renderTargetSelector();
@@ -575,13 +579,13 @@
       ['7690', '팔팔지게차서비스'], ['8246', '한일중기(주)']
     ];
     var vehicles = [
-      ['FBA32_224250271', 'FBA32_224250271 · B30S-7'], ['FBA32_224250383', 'FBA32_224250383 · B30S-7'],
+      ['FBA32_224250271', 'FBA32_224250271 · B30S-7'], ['FBA20_224250312', 'FBA20_224250312 · B30S-7'],
       ['FBD25_113920044', 'FBD25_113920044 · D25S-9'],
       ['FBA18_224250094', 'FBA18_224250094 · B18S-7'], ['FBA20_224250312', 'FBA20_224250312 · B20S-7'],
       ['FBA25_224250188', 'FBA25_224250188 · B25S-7'], ['FBD30_113920117', 'FBD30_113920117 · D30S-9'],
       ['FBA16_224250045', 'FBA16_224250045 · B16S-7'], ['FBA35_224250403', 'FBA35_224250403 · B35S-7'],
       ['FBD18_113920062', 'FBD18_113920062 · D18S-9'], ['FBA22_224250226', 'FBA22_224250226 · B22S-7'],
-      ['FBA32_032068', 'FBA32_032068 · B30S-7'], ['FBA32_032042', 'FBA32_032042 · B30S-7'],
+      ['FBD25_113920044', 'FBD25_113920044 · B30S-7'], ['FBA18_224250094', 'FBA18_224250094 · B30S-7'],
       ['FBA32-002038', 'FBA32-002038 · B30S-7'], ['FBA32-002039', 'FBA32-002039 · B30S-7'],
       ['FBA32-002040', 'FBA32-002040 · B30S-7'], ['FBA32-002043', 'FBA32-002043 · B30S-7'],
       ['FBA32-002044', 'FBA32-002044 · B30S-7'], ['FBA32-002045', 'FBA32-002045 · B30S-7'],
@@ -749,7 +753,7 @@
     if (!document.querySelector('.gnb')) return;
     if (body.getAttribute('data-target-selector') === 'none') return;
     if (ACT === 'dash' || ACT === 'mgmt' || ACT === 'rpt') return;
-    if (ACT === 'interest' && (ACTSUB === 'favorites' || !isDealerManagementRole(MANAGEMENT_ROLE))) return;
+    if (ACT === 'interest' && (ACTSUB !== 'summary' || !canUseInterest(MANAGEMENT_ROLE))) return;
     if (document.querySelector('.miq-target-selector')) return;
 
     var explicitProfile = body.getAttribute('data-target-profile');
@@ -774,11 +778,11 @@
       { id: '20120', name: '최재민' }, { id: '3703', name: '태형금속공업(주)' },
       { id: '7690', name: '팔팔지게차서비스' }, { id: '8246', name: '한일중기(주)' }
     ];
-    /* Internal dashboard preview companies can have no detailed vehicle records.
+    /* Permitted dashboard preview companies can have no detailed vehicle records.
        Retain a permitted company scope instead of silently opening all vehicles. */
     var previewCompanyIds = [];
     var dashboardSource = window.MIQ_MOCK_DATA && window.MIQ_MOCK_DATA.fleet;
-    if (MANAGEMENT_ROLE === 'internal' && profile !== 'vehicle' && dashboardSource && Array.isArray(dashboardSource.dashboardCompanies)) {
+    if (['internal', 'dealer_owner', 'dealer_staff'].indexOf(MANAGEMENT_ROLE) > -1 && profile !== 'vehicle' && dashboardSource && Array.isArray(dashboardSource.dashboardCompanies)) {
       dashboardSource.dashboardCompanies.forEach(function (item) {
         if (!item.demo || !item.companyId || !item.companyName || !Array.isArray(item.dashboardRoles)
           || item.dashboardRoles.indexOf(MANAGEMENT_ROLE) < 0
@@ -801,7 +805,7 @@
         ? window.MIQ.FLEET : fallbackFleet;
     if (body.dataset.favoriteSummary === 'true') {
       try {
-        var favoriteIds = window.MIQFavorites.read(MANAGEMENT_ROLE, sourceFleet);
+        var favoriteIds = window.MIQFavorites.read(MANAGEMENT_ROLE, sourceFleet, query.get('favoriteCategory'));
         sourceFleet = sourceFleet.filter(function (item) { return favoriteIds.indexOf(item.vin) > -1; });
       } catch (error) { sourceFleet = []; }
     }
@@ -909,6 +913,11 @@
           '<div class="miq-target-selector__results" data-target-results><p class="miq-target-selector__result-guide">차량번호를 입력하고 조회해 주세요.</p></div>' +
         '</div>' +
       '</div>';
+    var leadingControl = document.querySelector('[data-target-leading-control]');
+    if (leadingControl) {
+      wrap.querySelector('.miq-target-selector__row').prepend(leadingControl);
+      leadingControl.hidden = false;
+    }
     document.querySelector('.gnb').insertAdjacentElement('afterend', wrap);
 
     if (body.getAttribute('data-summary-layout') === 'content-search') {
@@ -1582,7 +1591,24 @@
         setDateVisibility(mode);
       }
 
+      // Inputs are draft conditions. Results, URLs and exports use this snapshot.
+      var applied = null;
+      function snapshot() { return { period: state.mode, from: state.from, to: state.to }; }
+      function validateDraft() {
+        startInput.setCustomValidity(''); endInput.setCustomValidity('');
+        var from = dateRules.parse(startInput.value), to = dateRules.parse(endInput.value);
+        var invalid = !from ? startInput : !to ? endInput : from > to ? startInput : null;
+        var message = !from || !to ? '조회 시작일과 종료일을 모두 입력해 주세요.' : '조회 시작일은 종료일보다 늦을 수 없습니다.';
+        if (!invalid && state.mode === 'c' && dateRules.dayCount(from, to) > 366) {
+          invalid = endInput; message = '사용자설정 기간은 최대 366일까지 조회할 수 있습니다.';
+        }
+        if (invalid) { invalid.setCustomValidity(message); invalid.reportValidity(); return false; }
+        state.from = startInput.value; state.to = state.mode === 'd' ? state.from : endInput.value;
+        return true;
+      }
       function emitPeriodChange() {
+        applied = snapshot();
+        if (ACTSUB === 'lithium') controllers.forEach(function (other) { other.setApplied(applied); });
         var nextUrl = new URL(location.href);
         nextUrl.searchParams.set('period', state.mode);
         nextUrl.searchParams.set('from', state.from);
@@ -1629,7 +1655,7 @@
         selectMode(mode);
         syncLinkedControls();
         window.setTimeout(function () {
-          restoreState(true);
+          restoreState(false);
           syncLinkedControls();
         }, 0);
         if (mode === 'c') {
@@ -1641,8 +1667,15 @@
       });
 
       Array.prototype.forEach.call([startInput, endInput], function (input) {
+        input.addEventListener('input', function () { startInput.setCustomValidity(''); endInput.setCustomValidity(''); });
         input.addEventListener('change', function () {
+          startInput.setCustomValidity(''); endInput.setCustomValidity('');
           var mode = state.mode;
+          if (!dateRules.parse(input.value)) {
+            state.from = startInput.value; state.to = endInput.value;
+            syncLinkedControls();
+            return;
+          }
           if (mode === 'd') {
             state.from = input.value;
             state.to = input.value;
@@ -1675,14 +1708,22 @@
 
       if (searchButton) {
         searchButton.addEventListener('click', function () {
-          window.setTimeout(function () {
-            restoreState(true);
-            syncLinkedControls();
-          }, 0);
+          if (!validateDraft()) return;
+          restoreState(true);
+          syncLinkedControls();
+        });
+        [startInput, endInput].forEach(function (input) {
+          input.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') { event.preventDefault(); searchButton.click(); }
+          });
         });
       }
 
-      var controller = { bar: bar, writeRange: writeRange, restore: restoreState };
+      var controller = {
+        bar: bar, writeRange: writeRange, restore: restoreState,
+        readApplied: function () { return applied && Object.assign({}, applied); },
+        setApplied: function (value) { applied = Object.assign({}, value); }
+      };
       controllers.push(controller);
       bar.__miqPeriodController = controller;
 
@@ -1705,6 +1746,7 @@
       } else {
         selectMode(initialMode);
       }
+      applied = snapshot();
     });
   }
 
@@ -1820,9 +1862,10 @@
     if (VARIANT !== 'tobe' || ACT !== 'anlz' || !analysisChild[ACTSUB]) return;
     var main = document.querySelector('.main');
     if (!main || main.querySelector('.miq-analysis-return')) return;
-    var fromVehicleDetail = ACTSUB === 'shock' && INITIAL_QUERY.get('origin') === 'vehicle-detail';
+    var fromVehicleDetail = (ACTSUB === 'shock' || ACTSUB === 'lithium') && INITIAL_QUERY.get('origin') === 'vehicle-detail';
+    var lithiumDetail = ACTSUB === 'lithium' && body.getAttribute('data-lithium-list') !== 'true';
     /* 목록과 제목 옆 범위 표시가 있는 집계 화면에는 빈 상세 복귀 행을 만들지 않는다. */
-    if (body.getAttribute('data-lithium-list') === 'true' || (!fromVehicleDetail && main.querySelector('[data-miq-scope-placement="title"]'))) return;
+    if (body.getAttribute('data-lithium-list') === 'true' || (!fromVehicleDetail && !lithiumDetail && main.querySelector('[data-miq-scope-placement="title"]'))) return;
 
     var row = document.createElement('div');
     row.className = 'miq-analysis-return';
@@ -1834,7 +1877,7 @@
 
     var link = row.querySelector('a');
     var scope = row.querySelector('[data-analysis-return-scope]');
-    var fromLithiumList = ACTSUB === 'lithium' && INITIAL_QUERY.get('origin') === 'lithium-list';
+    var fromLithiumList = lithiumDetail && !fromVehicleDetail;
     if (fromLithiumList) {
       link.setAttribute('data-lithium-list-return', 'true');
       link.textContent = '‹ 이전 목록';
@@ -1848,6 +1891,10 @@
     if (scope && main.querySelector('[data-miq-scope-placement="title"]')) {
       scope.remove();
       scope = null;
+    }
+    if (scope && lithiumDetail) {
+      scope.setAttribute('data-miq-scope-placement', 'title');
+      scope.setAttribute('aria-label', '현재 조회 범위');
     }
     function update(target) {
       target = target || window.MIQ_TARGET_CONTEXT || {};
@@ -1872,7 +1919,7 @@
           countLabel: '차량',
           count: target.selectedCount,
           countUnit: '대',
-          pathFirst: true,
+          pathFirst: !lithiumDetail,
           includeVehicle: true,
           resettable: false
         });
@@ -1929,19 +1976,19 @@
     filter.insertAdjacentElement('afterend', description);
   }
 
-  function enhanceCurrentShell() {
+  function renderCurrentSideMenu() {
     var serviceCounts = readServiceCounts();
-    removeMockupAnnotations();
-    document.body.classList.add('miq-section-' + ACT, 'miq-page-' + ACTSUB);
-    var vehicleScopedPages = { detail: true, engine: true, lithium: true };
-    var lithiumList = body.getAttribute('data-lithium-list') === 'true';
-    if (vehicleScopedPages[ACTSUB] && !lithiumList) document.body.classList.add('miq-vehicle-scoped');
-    if (ACTSUB === 'lithium' && !lithiumList) document.body.classList.add('miq-lithium-detail');
-
     var layout = document.querySelector('.layout');
-    if (!layout) return;
+    if (!layout) return {};
 
     var aside = layout.querySelector('aside.lnb');
+    if (aside && aside.getAttribute('data-miq-side-menu') === 'true') {
+      aside.querySelectorAll('[data-miq-side-sub]').forEach(function(link){
+        var count=link.querySelector('.miq-side-count'),key=link.dataset.miqSideSub;
+        if(count && Object.prototype.hasOwnProperty.call(serviceCounts,key))count.textContent=serviceCounts[key];
+      });
+      return {layout:layout,aside:aside};
+    }
     var sideMenus = {
       anlz: {
         title: '운행이력',
@@ -1949,7 +1996,7 @@
           ['summary', '요약정보']
         ].concat([
           ['usage', VARIANT === 'tobe' ? '운행시간' : '사용시간'], ['oper', '운영효율']
-        ]).concat(VARIANT === 'tobe' ? [['operb', '운영효율 B안'], ['shock', '충격'], ['lithium', '리튬배터리']] : [])
+        ]).concat(VARIANT === 'tobe' ? [['vehicleeff', '차량별 효율'], ['shock', '충격'], ['lithium', '리튬배터리']] : [])
       },
       srvc: {
         title: '서비스',
@@ -1970,7 +2017,7 @@
       },
       interest: {
         title: '관심차량',
-        items: isDealerManagementRole(MANAGEMENT_ROLE) ? [['summary', '관심차량 현황'], ['favorites', '관심차량 관리']] : []
+        items: canUseInterest(MANAGEMENT_ROLE) ? [['summary', '관심차량 현황'], ['favorites', '관심차량 관리'], ['categories', '구분 관리']] : []
       },
       rpt: {
         title: '리포트',
@@ -2000,8 +2047,8 @@
       aside.hidden = false;
       layout.classList.remove('miq-no-side');
       var config = sideMenus[ACT];
-      var roleAwareItems = config.items.filter(function(item){return item[0]!=='favorites' || isDealerManagementRole(MANAGEMENT_ROLE);});
-      if (ACT === 'mgmt' && isDealerManagementRole(MANAGEMENT_ROLE)) {
+      var roleAwareItems = config.items.filter(function(item){return item[0]!=='favorites' || canUseInterest(MANAGEMENT_ROLE);});
+      if (ACT === 'mgmt' && !roleRules.isCustomer(MANAGEMENT_ROLE)) {
         roleAwareItems = roleAwareItems.filter(function (item) { return item[0] !== 'group'; });
       }
       /* 차량 상세·충격·엔진·배터리는 요약정보에서만 진입하는 숨은 화면이다.
@@ -2024,6 +2071,22 @@
       aside.removeAttribute('data-lnb-tree');
       aside.innerHTML = '<h2 class="miq-side-title">' + config.title + '</h2><nav class="miq-side-menu">' + links + '</nav>';
     }
+
+    return {layout:layout,aside:aside};
+  }
+
+  function enhanceCurrentShell() {
+    var serviceCounts = readServiceCounts();
+    removeMockupAnnotations();
+    document.body.classList.add('miq-section-' + ACT, 'miq-page-' + ACTSUB);
+    var vehicleScopedPages = { detail: true, engine: true, lithium: true };
+    var lithiumList = body.getAttribute('data-lithium-list') === 'true';
+    if (vehicleScopedPages[ACTSUB] && !lithiumList) document.body.classList.add('miq-vehicle-scoped');
+    if (ACTSUB === 'lithium' && !lithiumList) document.body.classList.add('miq-lithium-detail');
+
+    var shell = renderCurrentSideMenu();
+    var layout = shell.layout, aside = shell.aside;
+    if (!layout) return;
 
     removeServiceKpiRows();
     enhanceServiceHeader();
@@ -2086,16 +2149,13 @@
     });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', enhanceCurrentShell);
+  renderCurrentSideMenu();
+  if (document.readyState === 'loading' && body.dataset.currentBootstrap !== 'ready') {
+    document.addEventListener('DOMContentLoaded', enhanceCurrentShell, {once:true});
   } else {
     enhanceCurrentShell();
   }
-
-  window.addEventListener('load', function () {
-    /* 화면별 LNB 초기화가 끝난 뒤 공통 현재 화면 셸을 적용한다. */
-    window.setTimeout(enhanceCurrentShell, 0);
-  });
+
 
   /* ── 공통 인터랙션 ── */
   document.addEventListener('click', function (e) {
@@ -2179,4 +2239,8 @@
   window.MIQ.managementRoleLabel = managementRoleLabel;
   window.MIQ.isDealerManagementRole = isDealerManagementRole;
   window.MIQ.enhanceCurrentShell = enhanceCurrentShell;
+  window.MIQ.getAppliedPeriod = function (bar) {
+    bar = bar || document.querySelector('.miq-period-filter');
+    return bar && bar.__miqPeriodController ? bar.__miqPeriodController.readApplied() : null;
+  };
 })();

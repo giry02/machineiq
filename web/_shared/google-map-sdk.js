@@ -73,7 +73,7 @@
       center: { lat: 36.5, lng: 127.5 }, zoom: 7,
       disableDefaultUI: true, zoomControl: false, mapTypeControl: false,
       streetViewControl: false, fullscreenControl: false, rotateControl: false,
-      scaleControl: true, gestureHandling: 'greedy', clickableIcons: false,
+      scaleControl: true, gestureHandling: 'greedy', scrollwheel: true, clickableIcons: false,
       keyboardShortcuts: true, mapTypeId: 'roadmap'
     }); } catch (error) { surface.remove(); throw failure('MAP_INIT_FAILED', 'Google 지도를 시작하지 못했습니다.'); }
     canvas.dataset.mapState = 'ready';
@@ -142,10 +142,10 @@
       clearPopup();
       var content = node('div', 'map-pop');
       applyStyles(content, { position: 'relative', fontFamily: "'Noto Sans KR', sans-serif", fontWeight: '400', lineHeight: 'normal' });
-      var close = node('button', 'map-pop__x', '✕'); close.type = 'button'; close.setAttribute('aria-label', '같은 위치 차량 목록 닫기');
+      var close = node('button', 'map-pop__x', '✕'); close.type = 'button'; close.setAttribute('aria-label', '묶음 차량 목록 닫기');
       applyStyles(close, { border: '0', background: 'transparent', padding: '0', cursor: 'pointer' });
       close.addEventListener('click', clearPopup); content.appendChild(close);
-      content.appendChild(node('div', 'map-pop__t', '같은 위치 차량 ' + group.length + '대'));
+      content.appendChild(node('div', 'map-pop__t', '차량 ' + group.length + '대'));
       var list = node('div'); applyStyles(list, { maxHeight: '200px', overflowY: 'auto' });
       group.forEach(function (row) {
         var item = node('button', 'map-pop__r', present(row.model) + ' · ' + present(row.vin)); item.type = 'button';
@@ -157,22 +157,31 @@
     }
     function buildVehicles() {
       clearVehicles();
-      var groups = new Map();
-      rows.forEach(function (row) {
+      var groups = [], projection = map.getProjection && map.getProjection(), scale = Math.pow(2, map.getZoom() || 7);
+      rows.slice().sort(function(a,b){return String(a.vin).localeCompare(String(b.vin));}).forEach(function (row) {
         var position = coordinate(row); if (!position || row.hasPosition === false) return;
-        var key = position.lat.toFixed(6) + ',' + position.lng.toFixed(6);
-        if (!groups.has(key)) groups.set(key, []); groups.get(key).push(row);
+        var pixel = projection && projection.fromLatLngToPoint(new maps.LatLng(position.lat,position.lng));
+        var group = groups.find(function(g){
+          var p=coordinate(g[0]);
+          if(pixel&&g.pixel)return Math.hypot(pixel.x-g.pixel.x,pixel.y-g.pixel.y)*scale<48;
+          return p.lat.toFixed(6)===position.lat.toFixed(6)&&p.lng.toFixed(6)===position.lng.toFixed(6);
+        });
+        if(group)group.push(row);else{group=[row];group.pixel=pixel;groups.push(group);}
       });
       groups.forEach(function (group) {
-        var position = coordinate(group[0]), marker;
+        var position = {lat:group.reduce(function(n,r){return n+Number(r.lat);},0)/group.length,lng:group.reduce(function(n,r){return n+Number(r.lng);},0)/group.length}, marker;
         if (group.length === 1) {
           marker = root.MIQMapPopup.createMarker(group[0], { onSelect: function (row) { if (typeof options.onSelect === 'function') options.onSelect(row.vin); } });
           marker.classList.toggle('on', group[0].vin === selectedVin);
         } else {
           marker = node('button', 'cluster', String(group.length)); marker.type = 'button';
-          marker.setAttribute('aria-label', '같은 위치 차량 ' + group.length + '대 선택');
-          marker.title = group.length + '대 · 클릭하여 차량 선택';
-          marker.addEventListener('click', function () { clusterPopup(group); });
+          marker.setAttribute('aria-label', '주변 차량 ' + group.length + '대 확대');
+          marker.title = group.length + '대 · 클릭하여 확대';
+          marker.addEventListener('click', function () {
+            var same=group.every(function(r){return Math.abs(r.lat-group[0].lat)<.000001&&Math.abs(r.lng-group[0].lng)<.000001;});
+            if(same||(map.getZoom()||0)>=20)clusterPopup(group);
+            else{var previous=map.getZoom()||7;fit(group.map(coordinate));if((map.getZoom()||0)<=previous)map.setZoom(Math.min(21,previous+2));}
+          });
           if (group.some(function (row) { return row.vin === selectedVin; })) marker.style.outline = '3px solid rgba(255,54,0,.35)';
         }
         marker.style.left = '0'; marker.style.top = '0';
@@ -213,7 +222,7 @@
       positions = positions.filter(function (position) { var key = position.lat.toFixed(6) + ',' + position.lng.toFixed(6); if (known.has(key)) return false; known.add(key); return true; });
       if (positions.length === 1) { map.setCenter(positions[0]); map.setZoom(16); return; }
       var bounds = new maps.LatLngBounds(); positions.forEach(function (position) { bounds.extend(position); });
-      map.fitBounds(bounds, 48);
+      map.fitBounds(bounds, {top:55,left:50,right:280,bottom:45});
     }
     function sync(value) {
       if (destroyed) return;
@@ -241,6 +250,7 @@
     }
     function updateZoom() { canvas.dataset.mapZoom = String(map.getZoom() || 0); var label = host.querySelector('.mm-zoom-level'); if (label) label.textContent = String(map.getZoom() || 0); }
     listeners.push(map.addListener('zoom_changed', updateZoom));
+    listeners.push(map.addListener('idle', function(){if(!destroyed&&!routeMode)buildVehicles();}));
     listeners.push(map.addListener('click', function () { clearPointTip(); }));
     var resize = root.ResizeObserver ? new root.ResizeObserver(function () {
       if (destroyed) return; maps.event.trigger(map, 'resize'); if (popup) popup.draw(); if (pointTip) pointTip.draw();

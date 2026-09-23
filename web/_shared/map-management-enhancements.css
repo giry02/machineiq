@@ -54,6 +54,22 @@ body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .gnb__role option{c
 .mm-toast.is-danger{border-left-color:#e03131}
 
 /* Map */
+/* Match the existing WEB list guide: 13px heading / 14px value, 48px / 60px rows. */
+.eq-table-wrap{border-color:var(--bobcat-steel,#d5dee3);border-radius:7px}
+.eq-tbl{width:100%;border-collapse:collapse;background:#fff;color:var(--bobcat-dark,#333);font-size:14px;line-height:20px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.eq-tbl th{height:48px;padding:0 12px;border-bottom:1px solid var(--bobcat-steel,#d5dee3);background:var(--bobcat-light,#f1f1f1);color:var(--bobcat-dark,#333);font-size:13px;font-weight:700;text-align:center;vertical-align:middle;cursor:pointer;user-select:none}
+.eq-tbl td{height:60px;padding:9px 12px;border-bottom:1px solid var(--bobcat-steel,#d5dee3);color:var(--bobcat-dark,#333);text-align:center;vertical-align:middle}
+.eq-tbl th:last-child,.eq-tbl td:last-child{padding-right:24px}
+.eq-tbl td.addr{text-align:left;white-space:normal}
+.eq-tbl td:nth-child(3),.eq-tbl td:nth-child(9){white-space:normal}
+.eq-tbl tr:last-child td{border-bottom:0}
+.eq-tbl tbody tr{cursor:pointer}
+.eq-tbl tbody tr:hover{background:var(--bobcat-light,#f1f1f1)}
+.eq-tbl tbody tr.sel{background:var(--c-primary-lt,#fff5f3)}
+.eq-tbl th .ind{display:inline-block;width:9px;margin-left:4px;color:var(--bobcat-gray,#ccc);font-size:11px}
+.eq-tbl th:hover,.eq-tbl th.sorted{color:var(--mm-accent-dark)}
+.eq-tbl th.sorted .ind{color:var(--mm-accent)}
+.eq-tbl .zero{color:var(--bobcat-muted,#777)}
 .mm-map-toolbar{display:flex;align-items:center;gap:8px;margin:-4px 0 10px;min-height:34px}
 .mm-map-toolbar__modes{display:inline-flex;border:1px solid var(--mm-line);border-radius:4px;overflow:hidden;background:#fff}
 .mm-map-toolbar__modes button{min-height:32px;padding:0 13px;border:0;border-right:1px solid var(--mm-line);background:#fff;color:#555;font:600 12px/1 'Noto Sans KR',sans-serif;cursor:pointer}
@@ -70,6 +86,8 @@ body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .gnb__role option{c
 .mm-route-message{position:absolute;left:50%;top:50%;z-index:6;transform:translate(-50%,-50%);padding:10px 14px;border:1px solid var(--mm-line);border-radius:5px;background:rgba(255,255,255,.94);color:#555;font-size:12px;box-shadow:0 5px 16px rgba(0,0,0,.1)}
 .eq-tbl td.vin a{color:var(--mm-ink);font-weight:700;text-decoration:none}
 .eq-tbl td.vin a:hover,.eq-tbl td.vin a:focus-visible{color:var(--mm-accent);text-decoration:underline;text-underline-offset:3px}
+.eq-tbl td.vin .mm-map-select{padding:0;border:0;background:transparent;color:var(--mm-ink);font:inherit;font-weight:700;cursor:pointer}
+.eq-tbl td.vin .mm-map-select:hover,.eq-tbl td.vin .mm-map-select:focus-visible{color:var(--mm-accent);text-decoration:underline;text-underline-offset:3px}
 .eq-tbl tbody tr:focus-visible{outline:2px solid var(--mm-accent);outline-offset:-2px}
 .map-mock .marker:focus-visible .marker__pin{outline:3px solid rgba(255,54,0,.45)}
 .map-ctl .mm-zoom-level{display:grid;place-items:center;width:34px;height:23px;background:#fff;color:#555;font-size:10px;border-top:1px solid #eee;border-bottom:1px solid #eee}
@@ -80,7 +98,6 @@ body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .gnb__role option{c
 .mm-user-vehicle-link{display:block;margin-top:4px;padding:0;border:0;background:transparent;color:#667085;font:600 11px/1.35 'Noto Sans KR',sans-serif;cursor:pointer}
 .mm-user-vehicle-link:disabled{color:#98a0aa;text-decoration:none;cursor:default}
 .mm-inline-actions{display:inline-flex;align-items:center;justify-content:center;gap:5px;flex-wrap:nowrap}
-.mm-a11y-status{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 .mm-list-summary__secondary{margin-left:6px;color:#7b8490;font-weight:400}
 .mm-context-banner{display:flex;align-items:center;gap:8px;margin:0 0 12px;padding:9px 12px;border:1px solid var(--mm-line);border-radius:6px;background:var(--mm-soft);color:#555;font-size:12px}
 .mm-context-banner strong{color:var(--mm-ink)}
@@ -92,13 +109,8 @@ body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .gnb__role option{c
 .xfer__it:focus-visible{box-shadow:inset 0 0 0 2px var(--mm-accent)}
 .xfer__it.mm-dragging{opacity:.45}
 .xfer__list.mm-drop-target{background:var(--mm-tint);box-shadow:inset 0 0 0 2px rgba(255,54,0,.35)}
-.mm-column-popover{position:absolute;right:0;top:34px;z-index:30;min-width:190px;padding:10px;border:1px solid var(--mm-line);border-radius:6px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.14)}
-.mm-column-popover label{display:flex;align-items:center;gap:7px;padding:5px;color:#444;font-size:12px;cursor:pointer}
 .list-head .tools{position:relative}
 
-.mm-auto-load-status{display:block;width:100%;box-sizing:border-box;padding:11px;border-top:1px solid #eee;background:#fafafa;color:#667085;font:600 12px 'Noto Sans KR',sans-serif;text-align:center}
-.mm-auto-load-status.is-loading{color:var(--mm-accent)}
-.mm-auto-load-status.is-complete{color:#6f7782;font-weight:500}
 .mm-cascade-error{margin-top:8px;color:#c92a2a;font-size:12px;font-weight:600}
 
 /* Management list common rules
@@ -113,7 +125,7 @@ body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-mgmt-page-head
   display:flex;align-items:center;gap:10px;flex:0 0 auto;white-space:nowrap
 }
 body.miq-current-shell .miq-list-search,
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-mgmt-filter-bar{
+body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-mgmt-filter-bar:where(:not(.miq-mgmt-taskbar>.miq-mgmt-filter-bar)){
   flex:1 1 auto;justify-content:flex-end;flex-wrap:nowrap;min-width:0;margin:0 0 0 auto
 }
 body.miq-current-shell .miq-list-search > .inp,
@@ -146,7 +158,7 @@ body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-mgmt-page-head
 .mm-request-period button.active{background:var(--c-ink);color:#fff;font-weight:600}
 @media(max-width:1360px){
   body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .layout > .main > .page-head.miq-mgmt-page-head{
-    flex-wrap:wrap
+    flex-wrap:wrap;align-content:flex-start;min-height:100px
   }
   body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-mgmt-page-head .page-head__title{
     flex:1 0 100%;min-height:40px
@@ -164,21 +176,14 @@ body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-mgmt-list-head
 body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-mgmt-list-head > .btn{
   flex:0 0 auto;margin-left:auto
 }
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-mgmt-taskbar{
-  display:flex;align-items:flex-end;gap:12px;margin-bottom:18px;border-bottom:1px solid var(--c-line)
-}
 body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-mgmt-taskbar > .tabs{
-  flex:1 1 auto;flex-wrap:nowrap;min-width:0;margin:0;border-bottom:0
-}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-mgmt-taskbar > .tabs > button{
-  flex:0 0 auto;white-space:nowrap
+  flex:1 1 auto;min-width:0
 }
 body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-mgmt-taskbar > .miq-mgmt-filter-bar{
-  display:flex;align-items:center;gap:6px;flex:0 1 auto;justify-content:flex-end;min-width:0;margin:0 0 7px auto
+  flex:0 1 auto;justify-content:flex-end
 }
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-mgmt-taskbar__label{
-  display:flex;align-items:flex-end;flex:0 0 auto;height:43px;box-sizing:border-box;padding:0 14px 7px;
-  border-bottom:2px solid var(--mm-accent);color:var(--mm-accent);font-size:13px;font-weight:700;white-space:nowrap
+body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-mgmt-taskbar > .miq-mgmt-filter-bar > .inp{
+  height:40px;min-height:40px;box-sizing:border-box
 }
 body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-mgmt-primary-actions{
   display:flex;flex:0 0 auto;align-items:center;gap:8px;margin:0 0 7px auto
@@ -286,82 +291,13 @@ body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .mm-transfer-confir
   body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .mm-transfer-target{margin-left:0}
   body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .mm-transfer-actions{margin-left:0}
 }
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-mgmt-help{
-  display:flex;align-items:baseline;gap:12px;margin-top:14px;padding:10px 0 0;
-  border:0;border-top:1px solid #e7e9ed;border-radius:0;background:transparent;box-shadow:none;
-  color:#68717d;font-size:11px;line-height:1.55
-}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-mgmt-help.is-hidden{display:none!important}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-mgmt-help strong{
-  flex:0 0 auto;color:#20242a;font-size:12px
-}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] #userTable{min-width:1180px}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="group"] #tabList > .tbl-wrap > .tbl{min-width:1120px}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList > .tbl-wrap > .tbl{
-  width:100%;min-width:0;table-layout:fixed
-}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList .tbl th,
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList .tbl td{
-  box-sizing:border-box;overflow:hidden;padding-left:8px;padding-right:8px;text-overflow:ellipsis
-}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList .tbl th:nth-child(1){width:12%}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList .tbl th:nth-child(2){width:13%}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList .tbl th:nth-child(3){width:8%}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList .tbl th:nth-child(4){width:10%}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList .tbl th:nth-child(5){width:6%}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList .tbl th:nth-child(6){width:5%}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList .tbl th:nth-child(7){width:5%}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList .tbl th:nth-child(8){width:12%}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList .tbl th:nth-child(9){width:9%}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList .tbl th:nth-child(10){width:7%}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList .tbl th:nth-child(11){width:8%}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList .tbl th:nth-child(12){width:5%}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="user"][data-management-role="dealer_owner"] #userTable,
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="user"][data-management-role="dealer_staff"] #userTable{min-width:900px}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="user"][data-management-role="customer_staff"] #userTable{min-width:1000px}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="user"] #reqPanel .tbl{min-width:1120px}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #reqPanel .tbl{min-width:1200px}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabReq .tbl{min-width:1050px}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] #userTable th,
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] #userTable td,
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="group"] #tabList .tbl th,
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="group"] #tabList .tbl td,
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList .tbl th,
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList .tbl td{white-space:nowrap;word-break:keep-all;overflow-wrap:normal}
 body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] #userTable .group-select,
 body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] #userTable .btn--sm,
 body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="group"] #tabList .btn--sm,
 body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList .btn--sm{
   height:30px;min-height:30px;padding-top:0;padding-bottom:0;box-sizing:border-box
 }
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] #userTable th:last-child,
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] #userTable td:last-child,
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] #reqPanel .tbl th:last-child,
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] #reqPanel .tbl td:last-child,
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="group"] #tabList .tbl th:last-child,
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="group"] #tabList .tbl td:last-child,
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList .tbl th:last-child,
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList .tbl td:last-child{
-  position:sticky;right:0;z-index:1;background:#fff;box-shadow:-1px 0 0 #eceff2
-}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] #userTable th:last-child,
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] #reqPanel .tbl th:last-child,
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="group"] #tabList .tbl th:last-child,
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList .tbl th:last-child{z-index:3;background:#fafafa}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] #userTable tbody tr:hover td:last-child,
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] #reqPanel .tbl tbody tr:hover td:last-child,
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="group"] #tabList .tbl tbody tr:hover td:last-child,
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList .tbl tbody tr:hover td:last-child{background:#fcfcfd}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] #userTable tbody tr.sel td:last-child,
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="group"] #tabList .tbl tbody tr.sel td:last-child,
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList .tbl tbody tr.sel td:last-child{background:var(--c-primary-lt)}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList > .grid-scroll{
-  max-height:none;overflow:hidden
-}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList .tbl th:last-child,
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList .tbl td:last-child{
-  position:static;right:auto;box-shadow:none
-}
+body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] #tabList > .grid-scroll{max-height:none;overflow:auto}
 
 /* User list / account-request workflow follows the same task hierarchy as the
    vehicle workflow while keeping user-specific approval fields and scopes. */
@@ -384,7 +320,6 @@ body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="user"] #u
 body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="user"] #userRequestListHead{margin-bottom:10px}
 body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="user"] .mm-user-request-filters{margin-top:0}
 body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="user"] .mm-user-request-filters > #userRequestStatus{width:140px}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="user"] .mm-user-request-table{min-width:1320px}
 .mm-user-request-group,.mm-user-request-reason{margin-top:14px;padding:12px;border:1px solid var(--mm-line);border-radius:6px;background:var(--mm-soft)}
 .mm-user-request-group label,.mm-user-request-reason label{display:block;margin-bottom:7px;color:var(--mm-ink);font-size:12px;font-weight:700}
 .mm-user-request-group .inp{width:100%}
@@ -439,21 +374,12 @@ body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"]
 .mm-request-view-tabs button{min-height:36px;padding:0 16px;border:0;border-bottom:2px solid transparent;background:#fff;color:#68717d;font:500 12px 'Noto Sans KR',sans-serif;cursor:pointer}
 .mm-request-view-tabs button.active{border-bottom-color:var(--mm-accent);color:var(--mm-accent);font-weight:700}
 .mm-request-view-tabs button span{margin-left:3px}
-.mm-request-batch{display:flex;align-items:center;gap:6px;margin-left:auto;padding-bottom:6px;color:#68717d;font-size:11px}
+.mm-request-batch{padding-bottom:6px;color:#68717d;font-size:11px}
 .mm-request-batch .btn:disabled{opacity:.45;cursor:not-allowed}
 .mm-request-view{display:none}
 .mm-request-view.active{display:block}
 .mm-request-sort-note{margin:-2px 0 8px;color:#737b86;font-size:11px;text-align:right}
 .mm-request-table-wrap{max-height:none;overflow:auto;scrollbar-gutter:auto}
-.mm-request-table th,.mm-request-table td{white-space:nowrap;word-break:keep-all}
-.mm-request-table{min-width:1040px}
-.mm-request-admin-table{min-width:1320px}
-.mm-request-pending-table{min-width:1040px}
-.mm-request-table .mm-request-reason{max-width:230px;overflow:hidden;text-overflow:ellipsis}
-.mm-request-table thead th{position:sticky;top:0;z-index:2;background:#fafafa}
-.mm-request-table th:last-child,.mm-request-table td:last-child{position:sticky;right:0;z-index:1;background:#fff;box-shadow:-1px 0 0 #eceff2}
-.mm-request-table th:last-child{z-index:4;background:#fafafa}
-.mm-request-table tbody tr:hover td:last-child{background:#fcfcfd}
 .mm-request-table .mm-request-person{line-height:1.35}
 .mm-request-table .mm-request-person small{display:block;color:#8a929d;font-size:10px}
 .mm-request-table .mm-request-wait{color:var(--mm-accent);font-weight:700}
@@ -466,18 +392,12 @@ body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"]
   body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-mgmt-list-head .list-head__count{
     flex:1 1 520px;white-space:normal
   }
-  body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-mgmt-help{
-    align-items:flex-start;flex-direction:column;gap:3px
-  }
 }
 body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-list-summary-actions{
   display:inline-flex;align-items:center;gap:10px;flex:0 0 auto;flex-wrap:nowrap;min-width:0
 }
 body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-list-summary-actions .list-head__count{
   display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;white-space:nowrap
-}
-body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-list-column-tools{
-  position:relative;display:inline-flex;flex:0 0 auto
 }
 .mm-modal-guide{margin:0 0 14px;padding:0;border:0;background:transparent;color:#68717d;font-size:12px;line-height:1.55}
 .mm-modal-notice{margin:14px 0 0;padding:10px 12px;border:1px solid var(--mm-line);border-left:3px solid var(--mm-accent);border-radius:4px;background:#fff;color:#59616c;font-size:12px;line-height:1.55}
@@ -501,7 +421,7 @@ body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .policy-callout::af
 .mm-approval-grid > div:nth-child(odd){border-right:1px solid #eceff2}
 .mm-approval-grid > div:nth-last-child(-n+2){border-bottom:0}
 .mm-approval-grid dt{color:#737b86;font-size:11px}
-.mm-approval-grid dd{overflow:hidden;margin:0;color:var(--mm-ink);font-size:12px;font-weight:600;text-overflow:ellipsis;white-space:nowrap}
+.mm-approval-grid dd{margin:0;min-width:0;color:var(--mm-ink);font-size:12px;font-weight:600;white-space:normal;overflow-wrap:anywhere}
 .mm-validation-list{display:flex;flex-wrap:wrap;gap:6px 14px;margin:10px 0 0;padding:0;list-style:none;color:#606975;font-size:11px}
 .mm-validation-list li{display:flex;align-items:center;gap:4px}
 .mm-validation-list li span{font-weight:800}
@@ -520,7 +440,6 @@ body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .policy-callout::af
 .mm-bulk-targets li:last-child{border-bottom:0}
 .mm-bulk-targets b{color:var(--mm-ink);font-size:12px}
 .mm-bulk-impact{margin:10px 0 14px;padding:9px 10px;border-left:3px solid var(--mm-accent);background:var(--mm-soft);color:#59616c;font-size:11px;line-height:1.5}
-.mm-vehicle-list-only.is-hidden{display:none!important}
 body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"] .miq-mgmt-filter-bar.is-hidden{display:none!important}
 @media (max-width:1200px){
   .mm-map-toolbar{align-items:flex-start;flex-wrap:wrap}
@@ -534,4 +453,36 @@ body.miq-current-shell.miq-section-mgmt[data-variant="tobe"][data-sub="vehicle"]
   body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .gnb__right{flex-basis:440px;min-width:430px}
   body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .gnb__right .home{padding-left:9px;padding-right:9px}
 }
+@media (max-width:1350px){
+  body.miq-current-shell.miq-section-mgmt .gnb{gap:12px}
+  body.miq-current-shell.miq-section-mgmt .gnb__menu{min-width:0}
+  body.miq-current-shell.miq-section-mgmt .gnb__item{min-width:76px}
+  body.miq-current-shell.miq-section-mgmt .gnb__item>a{padding-inline:6px;white-space:nowrap}
+  body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .gnb__right{flex-basis:390px;min-width:390px}
+}
 @media (prefers-reduced-motion:reduce){.mm-toast,.mm-just-saved td{transition:none;animation:none}}
+
+/* Management lists share the service/operations spacing contract. The class is
+   limited to list tables; assignment panels and modal layouts keep their styles. */
+body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-management-table{
+  table-layout:fixed;min-width:0;font-variant-numeric:tabular-nums
+}
+body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-management-table :is(th,td){
+  padding:11px 16px;vertical-align:middle;white-space:normal;word-break:keep-all;overflow-wrap:anywhere
+}
+body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-management-table th,
+body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-management-table td:not([colspan]){
+  text-align:left
+}
+body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-management-table :is(th,td)[data-mgmt-compact]{
+  text-align:center
+}
+body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-management-table th[data-mgmt-compact]{
+  width:1%;white-space:nowrap
+}
+body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-management-table td.c:not([colspan]){
+  white-space:normal
+}
+
+body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .miq-management-table .inp{min-width:0;max-width:100%;box-sizing:border-box}
+body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] #userTable .group-select{width:100%}

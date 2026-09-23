@@ -1,6 +1,9 @@
 (function(root){
   'use strict';
   var errors = {
+    FBA32_DEMO_CS01: [
+      { st: 'cur', code: 'BM-0x0104', msg: '충전 전류 이상', lv: '주의', days: 0, done: null, act: '충전기 커넥터 접점 및 충전 케이블 단선 점검' }
+    ],
     FBA32_224250271: [
       { st: 'cur',  code: 'BM-0x0210', msg: '셀 과열 (43℃)',      lv: '주의', days: 0,  done: null,                 act: '차량 정지 후 30분 냉각, 배터리 팩 통풍구 이물 점검' },
       { st: 'past', code: 'BM-0x0308', msg: '셀 전압 편차 초과',   lv: '주의', days: 3,  done: '2026-08-09 15:22',   act: '밸런싱 모드로 완충 1회 실시 후 편차 재확인' },
@@ -42,7 +45,7 @@
     return (!selection.companyId||selection.companyId==='all'||String(vehicle.companyId||'1933')===String(selection.companyId))
       &&(!selection.group||vehicle.group===selection.group)&&(!selection.veh||vehicle.vin===selection.veh)&&(!selection.abnormal||snapshot(vehicle).abnormal);
   });}
-  var sortKeys=['vin','soc','soh','workMinutes','chargeMinutes','smartCharge','status'];
+  var sortKeys=['vin','soc','soh','workMinutes','chargeMinutes','smartCharge'];
   function sort(rows,key,direction,readSmartCharge){
     if(sortKeys.indexOf(key)<0)return rows.slice();
     var factor=direction==='desc'?-1:1;
@@ -53,11 +56,6 @@
         if(!info.known)return null;
         var charge=readSmartCharge?readSmartCharge(vehicle,info.known):'켜짐';
         return charge==='켜짐'?1:charge==='꺼짐'?0:null;
-      }
-      if(key==='status'){
-        if(!info.known)return null;
-        var severity={'정상':0,'주의':1,'경고':2,'이상':2};
-        return Math.max(severity[info.temperature],severity[info.charge],severity[info.battery]);
       }
       return info[key];
     }

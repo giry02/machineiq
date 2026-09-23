@@ -171,9 +171,14 @@
     else params.delete('veh');
     if (body.dataset.sub !== 'rptstatus' && selectedCompanies.length) params.set('companies', selectedCompanies.join('|'));
     else params.delete('companies');
-    if (activePeriod && activePeriod.dataset.period) params.set('period', activePeriod.dataset.period);
-    if (from && from.value) params.set('from', from.value);
-    if (to && to.value) params.set('to', to.value);
+    var applied = MIQ.getAppliedPeriod();
+    if (applied) {
+      params.set('period', applied.period); params.set('from', applied.from); params.set('to', applied.to);
+    } else {
+      if (activePeriod && activePeriod.dataset.period) params.set('period', activePeriod.dataset.period);
+      if (from && from.value) params.set('from', from.value);
+      if (to && to.value) params.set('to', to.value);
+    }
     params.delete('company');
     if (reportPolicy.group) {
       params.set('companyId', reportPolicy.companyId);
@@ -326,7 +331,11 @@
     queued = true;
     window.requestAnimationFrame(function () {
       queued = false;
+      // Decoration changes classes too. Do not observe our own writes and
+      // schedule another frame forever while the report is otherwise idle.
+      observer.disconnect();
       enhanceAll();
+      observer.observe(main, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
     });
   });
   observer.observe(main, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
@@ -358,12 +367,13 @@
   document.addEventListener('change', function (event) {
     if (event.target.matches('#dFrom, #dTo')) setFeedback('', false);
     if (event.target.matches('#coSel, #coWrap select[data-ci="0"]')) syncTargetFromReportPrimary();
-    if (event.target.matches('#coSel, #coWrap select, #dFrom, #dTo')) {
+    if (event.target.matches('#coSel, #coWrap select')) {
       window.setTimeout(function () { syncContext(true); }, 0);
     }
   });
   document.addEventListener('click', function (event) {
-    if (event.target.closest('.period-tabs button, .metric-tabs button, #btnAdd, #btnDel')) {
+    if (event.target.closest('.period-tabs button')) { window.setTimeout(syncTabs, 0); return; }
+    if (event.target.closest('.metric-tabs button, #btnAdd, #btnDel')) {
       window.setTimeout(syncTabs, 0);
       window.setTimeout(function () { syncContext(true); }, 0);
     }
@@ -452,16 +462,7 @@
   enhanceAll();
   applyQuery();
   syncReportFromTarget(window.MIQ_TARGET_CONTEXT || {});
+  if (window.MIQReportInit) window.MIQReportInit();
   enhanceAll();
   syncContext(true);
-  document.addEventListener('DOMContentLoaded', function () {
-    relocateCompanyControls();
-    syncContext(true);
-  }, { once: true });
-  window.addEventListener('load', function () {
-    window.setTimeout(function () {
-      relocateCompanyControls();
-      syncContext(true);
-    }, 0);
-  });
 })();

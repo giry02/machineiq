@@ -17,26 +17,29 @@
   function normalize(value) { return String(value || '').replace(/[-_]/g, '').toLowerCase(); }
   var defaultVehicle = fleet.filter(function (item) { return normalize(item.vin) === normalize('FBA32_224250271'); })[0] || metricFleet[0] || fleet[0] || null;
   var matchedVehicle = fleet.filter(function (item) { return normalize(item.vin) === normalize(requested); })[0] || (!requested ? defaultVehicle : null);
-  if (requested && !matchedVehicle) {
+  var serviceVehicle = !matchedVehicle && window.MIQServiceRecords && MIQServiceRecords.vehicleIdentity
+    ? MIQServiceRecords.vehicleIdentity(requested) : null;
+  if (serviceVehicle && !MIQCommon.roles.filterVehicles(role, [serviceVehicle]).length) serviceVehicle = null;
+  if (requested && !matchedVehicle && !serviceVehicle) {
     var unmatchedSummaryQuery = new URLSearchParams(query.toString());
     unmatchedSummaryQuery.delete('veh');
     unmatchedSummaryQuery.delete('equipmentId');
     location.replace('../Vehicle%20Summary/vehicle-summary-tobe-3.html?' + unmatchedSummaryQuery.toString());
     return;
   }
-  var vehicle = matchedVehicle || {
+  var vehicle = matchedVehicle || serviceVehicle || {
     vin: requested || '정보 미제공',
     model: query.get('model') || '모델 정보 미제공',
     group: query.get('group') || '소속 정보 미제공',
     type: query.get('type') || '동력 정보 미제공',
     cumKm: null, cumH: null, conn: null, soc: null, km: null, min: null, shock: null
   };
-  if (matchedVehicle) {
-    query.set('veh', matchedVehicle.vin);
+  if (matchedVehicle || serviceVehicle) {
+    query.set('veh', vehicle.vin);
     query.delete('equipmentId');
-    query.set('companyId', matchedVehicle.companyId || '1933');
-    if (matchedVehicle.group) query.set('group', matchedVehicle.group); else query.delete('group');
-    if (matchedVehicle.type) query.set('type', matchedVehicle.type); else query.delete('type');
+    query.set('companyId', vehicle.companyId || '1933');
+    if (vehicle.group) query.set('group', vehicle.group); else query.delete('group');
+    if (vehicle.type) query.set('type', vehicle.type); else query.delete('type');
     history.replaceState(null, '', location.pathname + '?' + query.toString() + location.hash);
   }
   if (matchedVehicle && window.MIQServiceRecords && window.MIQServiceDemo) {
@@ -87,7 +90,7 @@
   }
 
   function number(value, digits) {
-    return Number(value || 0).toFixed(digits === undefined ? 0 : digits).replace(/\.0+$/, '').replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return window.MIQCommon.numbers.integer(Number(value || 0)).replace(/\.0+$/, '').replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
   function hasNumber(value) { return value !== null && value !== undefined && value !== '' && !isNaN(Number(value)); }
   function hours(minutes) {
@@ -129,9 +132,14 @@
 
     var conn = document.querySelector('.conn');
     if (conn) {
-      conn.classList.toggle('on', vehicle.conn === true);
-      conn.classList.toggle('off', vehicle.conn !== true);
-      conn.innerHTML = '<span class="dot"></span>' + (vehicle.conn === null ? '통신 정보 미제공' : vehicle.conn ? '연결됨' : '연결 끊김');
+      var connected = MIQSummaryRow.connection(vehicle.conn) === 'on';
+      conn.classList.toggle('on', connected);
+      conn.classList.toggle('off', !connected);
+      conn.innerHTML = '<span class="dot"></span>' + (connected ? '연결됨' : '연결 끊김');
+      if (serviceVehicle) {
+        conn.classList.remove('on', 'off');
+        conn.textContent = '수집 전';
+      }
     }
     var energy = document.querySelector('.batt-mini');
     if (energy) {
@@ -182,6 +190,7 @@
 
   function renderPeriod() {
     var info = periodInfo[period];
+    if (window.MIQVehicleErrors) MIQVehicleErrors.render(vehicle, info);
     var labels = { '일': 'd', '주': 'w', '월': 'm', '사용자설정': 'c' };
     Array.prototype.forEach.call(document.querySelectorAll('.period-tabs button'), function (button) {
       var key = labels[button.textContent.trim()];
@@ -221,7 +230,7 @@
     var energyTitle = document.getElementById('energyTitle');
     if (energyTitle) {
       if (detailTarget) {
-        setLink(energyTitle, detailTarget);
+        setLink(energyTitle, detailTarget, { origin: 'vehicle-detail', vehicleDetailQuery: queryString() });
         energyTitle.textContent = '에너지 상세 정보 ›';
         energyTitle.title = (vehicle.type === '엔진' ? '운행이력 > 엔진' : '운행이력 > 리튬') + ' — 이 차량으로 필터되어 열립니다';
         energyTitle.classList.remove('na');
@@ -234,6 +243,12 @@
     }
     Array.prototype.forEach.call(document.querySelectorAll('.supply-status a,.sec-more'), function (anchor) {
       var state = anchor.classList.contains('need') ? 'need' : anchor.classList.contains('soon') ? 'soon' : anchor.classList.contains('ok') ? 'ok' : '';
+      // The service queue contains only items requiring attention; normal items are shown here.
+      if (state === 'ok') {
+        anchor.removeAttribute('href');
+        anchor.title = '정상 소모품은 아래 소모품 정보에서 확인할 수 있습니다.';
+        return;
+      }
       setLink(anchor, '../Service/service-supply-tobe.html', state ? { state: state } : {});
     });
     Array.prototype.forEach.call(document.querySelectorAll('[data-miq-modal="supply"]'), function (button) { button.dataset.vin = vehicle.vin; });
@@ -265,8 +280,8 @@
       + '<div class="batt-info"><div class="bi"><span class="bi__k">작업 가능 예상 시간</span><span class="bi__v">3<small>H</small> 20<small>M</small></span></div>'
       + '<div class="bi"><span class="bi__k">충전 완료 예상 시간</span><span class="bi__v">1<small>H</small> 10<small>M</small></span></div>'
       + '<div class="bi"><span class="bi__k">시간당 전력 사용량</span><span class="bi__v">' + consumption + '<small>kWh</small></span></div>'
-      + '<div class="bi"><span class="bi__k">시간당 전력 충전량</span><span class="bi__v">3.1<small>kWh</small></span></div>'
-      + '<div class="bi"><span class="bi__k">마지막 충전 이후 사용량</span><span class="bi__v">5.6<small>kWh</small></span></div>'
+      + '<div class="bi"><span class="bi__k">시간당 전력 충전량</span><span class="bi__v">3<small>kWh</small></span></div>'
+      + '<div class="bi"><span class="bi__k">마지막 충전 이후 사용량</span><span class="bi__v">6<small>kWh</small></span></div>'
       + '<div class="bi"><span class="bi__k">스마트 충전</span><span class="bi__v">08 ~ 18</span></div></div>'
       + '<div class="batt-soh"><div class="batt-soh__title">성능 최대치(SOH)</div><div class="batt-soh__circle"><div class="batt-soh__inner"><span class="batt-soh__pct">87%</span><span class="batt-soh__lbl">SOH</span></div></div></div>';
   }
@@ -339,8 +354,8 @@
     var supplyStatus = document.querySelector('.supply-status');
     var supplyGrid = document.querySelector('.supply-grid');
     if (!supplyGrid || !window.MIQServiceRecords) return;
-    var items = MIQServiceRecords.supplyItems(vehicle.vin), counts = { need: 0, soon: 0, ok: 0 };
-    items.forEach(function (item) { if (counts[item.state] !== undefined) counts[item.state]++; });
+    var items = MIQVehicleDetailSupplies.items(vehicle, MIQServiceRecords);
+    var supplySummary = MIQVehicleDetailSupplies.summary(items), counts = supplySummary.counts;
     if (supplyStatus) ['need', 'soon', 'ok'].forEach(function (state) {
       var badge = supplyStatus.querySelector('.' + state + ' .badge');
       if (badge) badge.textContent = counts[state];
@@ -352,7 +367,7 @@
       supplyGrid.innerHTML = '<p class="energy-empty" style="grid-column:1/-1;margin:0;padding:18px 0">선택 차량의 소모품 교체주기·사용시간 데이터가 수집되지 않았습니다.</p>';
       return;
     }
-    items.slice(0, 4).forEach(function (item) {
+    supplySummary.preview.forEach(function (item) {
       var node = template.cloneNode(true), values = node.querySelectorAll('.supply-item__row b'), fill = node.querySelector('.bar__fill');
       node.dataset.supplyState = item.state;
       node.querySelector('.supply-item__name').textContent = item.name;

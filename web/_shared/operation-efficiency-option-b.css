@@ -220,18 +220,14 @@ body.miq-operation-efficiency-b .efficiency-daily-row {
   padding: 4px 10px;
   border-bottom: 1px solid #e7eaed;
   box-sizing: border-box;
-  transition: background-color .16s ease;
 }
 
 body.miq-operation-efficiency-b .efficiency-daily-row:last-child {
   border-bottom: 0;
 }
 
-body.miq-operation-efficiency-b .efficiency-daily-row:hover,
-body.miq-operation-efficiency-b .efficiency-daily-row:focus,
-body.miq-operation-efficiency-b .efficiency-daily-row.on {
+body.miq-operation-efficiency-b .efficiency-daily-row:focus {
   outline: 0;
-  background: #fff6f3;
 }
 
 body.miq-operation-efficiency-b .efficiency-daily-row:focus-visible {
@@ -287,7 +283,7 @@ body.miq-operation-efficiency-b .efficiency-daily-row__metrics {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   color: var(--metrics-muted);
-  font-size: 11px;
+  font-size: 13px;
   text-align: right;
 }
 

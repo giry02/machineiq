@@ -2,9 +2,9 @@
    요구사항 본문 컴포넌트에는 관여하지 않고 GNB·조회 대상·LNB·푸터만 정렬한다. */
 body.miq-current-shell {
   --miq-orange: #ff3600;
-  --miq-action: #d92e00;
-  --miq-action-hover: #cc2b00;
-  --miq-action-active: #bf2900;
+  --miq-action: #ff3600;
+  --miq-action-hover: #d92e00;
+  --miq-action-active: #cc2b00;
   --miq-line: #dedede;
   --miq-side: 240px;
   margin: 0;
@@ -317,7 +317,8 @@ body.miq-current-shell .miq-period-filter .period-tabs button.active {
   border-color: #111;
   background: #111;
 }
-body.miq-current-shell .miq-period-filter .date-range {
+body.miq-current-shell .miq-period-filter .date-range,
+body.miq-current-shell .ops-query-controls .date-range {
   display: inline-flex;
   align-items: center;
   min-width: 0;
@@ -339,11 +340,11 @@ body.miq-current-shell .miq-period-filter .btn-search {
 }
 body.miq-current-shell .miq-period-filter .btn-search:hover,
 body.miq-current-shell .miq-period-filter .btn-search:focus-visible {
-  border-color: var(--miq-action-hover) !important;
+  border-color: #cc2b00 !important;
   background: var(--miq-action-hover) !important;
 }
 body.miq-current-shell .miq-period-filter .btn-search:active {
-  border-color: var(--miq-action-active) !important;
+  border-color: #bf2900 !important;
   background: var(--miq-action-active) !important;
 }
 body.miq-current-shell .miq-period-filter .miq-date-input {
@@ -445,6 +446,8 @@ body.miq-current-shell .section-top.miq-empty-section-top { display: none !impor
 body.miq-current-shell .miq-list-search > .inp,
 body.miq-current-shell .miq-list-search > button,
 body.miq-current-shell .miq-list-actions > .btn,
+body.miq-current-shell.miq-section-ops .ops-query-controls > .btn,
+body.miq-current-shell.miq-section-ops .ops-query-controls > .btn-search,
 body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .filter-bar > .inp,
 body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .filter-bar > .btn,
 body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .filter-bar > .btn-search {
@@ -660,24 +663,28 @@ body.miq-current-shell .miq-analysis-return {
   margin: 0 0 10px;
   gap: 12px;
 }
-body.miq-current-shell .miq-analysis-return__link {
+body.miq-current-shell .miq-analysis-return__link,
+body.miq-current-shell .main .back-link {
   display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
-  min-height: 30px;
-  padding: 0 11px;
-  color: #e52d0a;
-  border: 1px solid #ffc7b9;
+  min-height: 31px;
+  gap: 5px;
+  padding: 5px 12px;
+  line-height: normal;
+  color: #ff3600;
+  border: 1px solid #ffd0c4;
   border-radius: 4px;
-  background: #fff7f4;
-  font-size: 12px;
-  font-weight: 700;
+  background: #fff5f3;
+  font-size: 13px;
+  font-weight: 600;
   text-decoration: none;
 }
 body.miq-current-shell .miq-analysis-return__link:hover,
-body.miq-current-shell .miq-analysis-return__link:focus-visible {
-  border-color: var(--miq-orange);
-  background: #fff0eb;
+body.miq-current-shell .miq-analysis-return__link:focus-visible,
+body.miq-current-shell .main .back-link:hover,
+body.miq-current-shell .main .back-link:focus-visible {
+  background: #ffe9e3;
 }
 body.miq-current-shell .miq-analysis-return__scope {
   min-width: 0;
@@ -1280,5 +1287,5 @@ body.miq-current-shell.miq-vehicle-scoped .miq-target-selector{display:none!impo
 body.miq-current-shell.miq-page-detail .veh-pick,body.miq-current-shell.miq-page-shock .veh-pick{display:none!important}
 body.miq-current-shell.miq-page-detail .section[hidden]{display:none!important}
 body.miq-current-shell.miq-page-summary .kpi-strip-a{grid-template-columns:repeat(5,minmax(0,1fr))}
-body.miq-current-shell.miq-vehicle-scoped .miq-analysis-return__link:not([data-lithium-list-return]){display:none!important}
+body.miq-current-shell.miq-vehicle-scoped .miq-analysis-return__link:not([data-lithium-list-return]):not([data-vehicle-detail-return]){display:none!important}
 body.miq-current-shell.miq-page-detail .card[hidden]{display:none!important}

@@ -269,7 +269,7 @@
       one('#recoveryResend').disabled = false;
       one('#recoverySend').disabled = true;
       startTimer();
-      setAlert(one('#recoveryMailStatus'), (isResend ? '인증 코드를 다시 발송했습니다.' : '인증 코드를 발송했습니다.') + ' 프로토타입 확인 코드는 123456입니다.', 'info');
+      setAlert(one('#recoveryMailStatus'), (isResend ? '인증 코드를 다시 발송했습니다.' : '인증 코드를 발송했습니다.'), 'info');
       one('#recoveryCode').focus();
     }
     one('#recoverySend').addEventListener('click', function () { sendCode(false); });
@@ -580,7 +580,7 @@
           setAlert(emailStatus, '인증 시간이 만료되었습니다. 재발송해 주세요.', 'danger');
         }
       }, 1000);
-      setAlert(emailStatus, (resend ? '인증 코드를 다시 발송했습니다.' : '인증 코드를 발송했습니다.') + ' 프로토타입 확인 코드는 123456입니다.', 'info');
+      setAlert(emailStatus, (resend ? '인증 코드를 다시 발송했습니다.' : '인증 코드를 발송했습니다.'), 'info');
       emailCode.focus();
     }
     sendEmail.addEventListener('click', function () { beginEmailVerification(false); });
