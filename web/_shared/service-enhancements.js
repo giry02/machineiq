@@ -28,6 +28,25 @@
   var sortState = { index: -1, direction: 1 };
   var scopeContext = window.MIQ_TARGET_CONTEXT || null;
   var initialQuery = new URLSearchParams(location.search);
+  // A map count refers to exact current items, not unrelated service-only identities.
+  var mapSupplyItems = null;
+  if (page === 'supply' && initialQuery.get('source') === 'map' && initialQuery.has('supplyItems')) {
+    mapSupplyItems = new Set();
+    try {
+      var requestedItems = JSON.parse(initialQuery.get('supplyItems'));
+      if (Array.isArray(requestedItems)) requestedItems.forEach(function (item) {
+        if (Array.isArray(item) && item.length === 2 && item.every(function (part) { return typeof part === 'string'; })) {
+          mapSupplyItems.add(JSON.stringify([normalize(item[0]), item[1]]));
+        }
+      });
+    } catch (error) { /* Invalid or empty item selection must not broaden the result. */ }
+  }
+  function clearMapSupplyItems() {
+    mapSupplyItems = null;
+    var url = new URL(location.href);
+    url.searchParams.delete('supplyItems');
+    history.replaceState({}, '', url.href);
+  }
   var defaultPeriod = MIQCommon.dates.operatingRange(initialQuery.get('period') || 'm');
   var periodControlsReady = false;
   var filterState = {
@@ -122,9 +141,9 @@
     var fleet = window.MIQ && (MIQ.FLEET_CATALOG || MIQ.FLEET) || [];
     var day = MIQCommon.dates.format(MIQCommon.dates.yesterday());
     var demo = MIQServiceDemo.create(fleet, day);
-    // Only the separate dashboard's explicit sample link adds today's events.
-    // Freeze date/hour at the clicked card so list and card stay comparable.
-    var sampleQuery = new URLSearchParams(location.search);
+    // Only the separate dashboard's explicit sample link adds today's events.
+    // Freeze date/hour at the clicked card so list and card stay comparable.
+    var sampleQuery = new URLSearchParams(location.search);
     if (MIQServiceDemo.createCurrent) {
       var sampleWindow = sampleQuery.get('dashboardSample')==='current'
         ? {date:sampleQuery.get('sampleDate'),to:sampleQuery.get('sampleTo')}
@@ -268,6 +287,10 @@
       if (pair[1]) returnQuery.set(pair[0], pair[1]);
     });
     if (filterState.supplyState) returnQuery.set('state', filterState.supplyState);
+    if (mapSupplyItems !== null) {
+      returnQuery.set('source', 'map');
+      returnQuery.set('supplyItems', new URLSearchParams(location.search).get('supplyItems') || '[]');
+    }
     if (filterState.errorState) returnQuery.set('state', filterState.errorState);
     params.set('returnTo', location.pathname + '?' + returnQuery.toString());
     params.set('veh', catalogVehicle.vin);
@@ -474,6 +497,7 @@
 
   function isVisible(info) {
     if (!matchesCompany(info)) return false;
+    if (mapSupplyItems !== null && !mapSupplyItems.has(JSON.stringify([normalize(info.vin), info.supplyName]))) return false;
     if (page === 'supply' && info.supplyState !== 'need' && info.supplyState !== 'soon') return false;
     if (filterState.vehicle && normalize(info.vin) !== normalize(filterState.vehicle)) return false;
     if (filterState.group && normalize(info.group).indexOf(normalize(filterState.group)) < 0) return false;
@@ -554,6 +578,7 @@
 
   function chipsHtml() {
     var chips = [];
+    if (mapSupplyItems !== null) chips.push('지도 집계 항목');
     if (filterState.supplyState) {
       chips.push({ need: '교체필요', soon: '교체임박', ok: '정상' }[filterState.supplyState] || filterState.supplyState);
     }
@@ -647,7 +672,7 @@
       scopeHost.textContent = '';
     }
     meta.querySelector('[data-service-filter-chips]').innerHTML = chipsHtml();
-    var hasExtraFilter = !!(filterState.supplyState || filterState.errorState);
+    var hasExtraFilter = !!(filterState.supplyState || filterState.errorState || mapSupplyItems !== null);
     meta.querySelector('[data-service-filter-reset]').hidden = !hasExtraFilter;
     meta.classList.toggle('is-empty', !hasExtraFilter);
     updateServiceLnb(visible);
@@ -655,6 +680,7 @@
   }
 
   meta.querySelector('[data-service-filter-reset]').addEventListener('click', function () {
+    if (mapSupplyItems !== null) clearMapSupplyItems();
     filterState.supplyState = '';
     filterState.errorState = '';
     applyFilters('추가 필터를 초기화했습니다.');
@@ -899,6 +925,7 @@
   }
 
   document.addEventListener('miq:target-change', function (event) {
+    if (initialized && mapSupplyItems !== null) clearMapSupplyItems();
     scopeContext = event.detail || scopeContext;
     filterState.companyId = (accountPolicy.group && accountPolicy.companyId) || event.detail && event.detail.companyId || '';
     filterState.vehicle = event.detail && event.detail.equipmentId || '';

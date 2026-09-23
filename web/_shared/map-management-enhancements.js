@@ -429,6 +429,11 @@
           }).forEach(function (pair) { url.searchParams.set(pair[0], pair[1]); });
         } else if (kind === 'supply') {
           url.searchParams.set('state', 'need');
+          var visibleVins = new Set(MIQMapData.getVisibleRows().map(function (row) { return row.vin; }));
+          var items = MIQServiceRecords.records.filter(function (record) {
+            return record.kind === 'supply' && record.supplyState === 'need' && visibleVins.has(record.vin);
+          }).map(function (record) { return [record.vin, record.supplyName]; });
+          url.searchParams.set('supplyItems', JSON.stringify(items));
         }
         link.href = url.href;
       });
