@@ -402,6 +402,36 @@
         countUnit: '대',
         includeVehicle: true
       });
+      updateSummaryLinks();
+    }
+    function updateSummaryLinks() {
+      var target = currentScopeTarget();
+      var windowNow = MIQMeeting.hourlyWindow();
+      var paths = {
+        owned: '../Vehicle%20Summary/vehicle-summary-tobe-3.html',
+        fault: '../Service/service-error-tobe.html',
+        shock: '../Shock/shock-tobe.html',
+        supply: '../Service/service-supply-tobe.html'
+      };
+      map.querySelectorAll('[data-map-summary-link]').forEach(function (link) {
+        var kind = link.dataset.mapSummaryLink;
+        var url = new URL(paths[kind], location.href);
+        url.searchParams.set('role', managementRole());
+        url.searchParams.set('source', 'map');
+        [['companyId', target.companyId], ['group', target.group], ['type', target.type],
+          ['veh', target.equipmentId], ['lang', query.get('lang')]].forEach(function (pair) {
+          if (pair[1]) url.searchParams.set(pair[0], pair[1]);
+        });
+        if (kind === 'fault') {
+          // Use the same frozen hourly sample as the count, including its date boundary.
+          Object.entries({period:'d', from:windowNow.date, to:windowNow.date,
+            dashboardSample:'current', sampleDate:windowNow.date, sampleTo:windowNow.to
+          }).forEach(function (pair) { url.searchParams.set(pair[0], pair[1]); });
+        } else if (kind === 'supply') {
+          url.searchParams.set('state', 'need');
+        }
+        link.href = url.href;
+      });
     }
     function updateScopeLabel() {
       var label = '전체차량';

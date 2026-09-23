@@ -29,11 +29,16 @@
 #map .marker.on .miq-energy-pin{filter:drop-shadow(0 0 3px #ff3600)}
 .st-lg .miq-energy-pin{width:19px;height:24px}
 .miq-map-summary{position:absolute;right:50px;bottom:100px;z-index:4;display:grid;grid-template-columns:repeat(2,110px);gap:8px;pointer-events:none}
-.miq-map-count{height:120px;overflow:hidden;display:flex;flex-direction:column;border:1px solid #333;border-radius:8px;background:#fff;text-align:center}
+.miq-map-count{height:120px;overflow:hidden;display:flex;flex-direction:column;border:1px solid #dfdfdf;border-radius:8px;background:#fff;color:#333;text-align:center;text-decoration:none;pointer-events:auto;cursor:pointer}
 .miq-map-count:first-child,.miq-map-count:last-child{grid-column:2}
-.miq-map-count>span{display:flex;align-items:center;justify-content:center;height:45px;background:#ff9f0a;color:#fff;font-size:14px;font-weight:600}
-.miq-map-count.is-supply>span{background:#158737}
-.miq-map-count>strong{display:flex;align-items:center;justify-content:center;flex:1;gap:3px;color:#111;font-size:28px}
+.miq-map-count>span{display:flex;align-items:center;justify-content:center;gap:6px;height:45px;background:#f1f1f1;color:#333;font-size:14px;font-weight:600}
+.miq-map-count>span>i{font-size:18px;font-style:normal;font-weight:400;color:#777}
+.miq-map-count:hover{border-color:#ff3600;text-decoration:none}
+.miq-map-count:hover>span,.miq-map-count:hover>span>i{color:#d92e00}
+.miq-map-count:active{border-color:#cc2b00}
+.miq-map-count:active>span,.miq-map-count:active>span>i{color:#cc2b00}
+.miq-map-count:focus-visible{outline:2px solid #ff3600;outline-offset:3px}
+.miq-map-count>strong{display:flex;align-items:center;justify-content:center;flex:1;gap:3px;color:#333;font-size:28px}
 .miq-map-count b{font-weight:700}.miq-map-count small{font-size:12px;font-weight:400;color:#777}
 .miq-map-fullscreen{position:absolute;right:85px;bottom:20px;z-index:5;background:#111;color:#fff;border:0;border-radius:3px;min-height:40px;padding:0 14px;font:600 14px 'Noto Sans KR',sans-serif;cursor:pointer}
 #map>.map-type{top:10px;left:10px;z-index:5}
