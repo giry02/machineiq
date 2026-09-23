@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="../_shared/offline-fonts.css?rev=b405f97e6cf9"><script type="module" blocking="render">await document.fonts.load('400 14px "Noto Sans KR"');await document.fonts.ready;</script>
 <link rel="stylesheet" href="../_shared/mockup.css?rev=bed1f0069135"/>
 <link rel="stylesheet" href="../_shared/map-management-enhancements.css?rev=a999e938e96f"/>
-<link rel="stylesheet" href="../_shared/google-map.css?rev=839dcb90b8c7"/>
+<link rel="stylesheet" href="../_shared/google-map.css?rev=39dd71c17a83"/>
 <style>
 /* ── 페이지 전용 : 상태 범례 · 지도 · 장비목록 ── */
 .st-lg{margin-left:auto;display:flex;gap:14px;font-size:12px;color:#555;align-items:center}
@@ -199,8 +199,17 @@
 
   Array.prototype.forEach.call(document.querySelectorAll('.st-lg .pin'),function(el){var st=['off','unknown','bad','ok'].find(function(s){return el.classList.contains(s);});el.replaceChildren(MIQMapPopup.createIcon('엔진',st));});
   var fullButton=document.querySelector('.miq-map-fullscreen'),mapHost=document.getElementById('map');
-  fullButton.addEventListener('click',function(){if(document.fullscreenElement===mapHost)document.exitFullscreen();else mapHost.requestFullscreen().catch(function(){fullButton.textContent='전체화면을 열 수 없습니다';});});
-  document.addEventListener('fullscreenchange',function(){var full=document.fullscreenElement===mapHost;fullButton.textContent=full?'⛶ 전체화면 닫기':'⛶ 전체화면';fullButton.setAttribute('aria-label',full?'지도 전체화면 닫기':'지도 전체화면');});
+  var previousOverflow='';
+  function updateFullscreenButton(){var full=document.fullscreenElement===mapHost||mapHost.classList.contains('is-expanded');fullButton.textContent=full?'⛶ 전체화면 닫기':'⛶ 전체화면';fullButton.setAttribute('aria-label',full?'지도 전체화면 닫기':'지도 전체화면');}
+  function expandInWindow(expand){if(expand){previousOverflow=document.body.style.overflow;document.body.style.overflow='hidden';}else document.body.style.overflow=previousOverflow;mapHost.classList.toggle('is-expanded',expand);updateFullscreenButton();}
+  fullButton.addEventListener('click',function(){
+    if(document.fullscreenElement===mapHost){document.exitFullscreen();return;}
+    if(mapHost.classList.contains('is-expanded')){expandInWindow(false);return;}
+    if(mapHost.requestFullscreen)mapHost.requestFullscreen().catch(function(){expandInWindow(true);});
+    else expandInWindow(true);
+  });
+  document.addEventListener('fullscreenchange',updateFullscreenButton);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&mapHost.classList.contains('is-expanded'))expandInWindow(false);});
   /* ── 이벤트 ── */
   document.getElementById('eqHead').addEventListener('click', function (e) {
     var th = e.target.closest('th[data-key]');
