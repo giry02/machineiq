@@ -217,6 +217,7 @@
       vehicle: hasInitialTarget ? (initialTarget.equipmentId || '') : (query.get('veh') || '')
     };
     var routeMode = query.get('route') === '1';
+    var restoreRouteVin = query.get('routeVin');
     var routeToday = window.MIQMeeting ? MIQMeeting.hourlyWindow().date : common.dates.format(new Date());
     var routePeriod = /^[dwm]$/.test(query.get('routePeriod') || '') ? query.get('routePeriod') : 'd';
     var routeFrom = common.dates.parse(query.get('routeFrom')) ? query.get('routeFrom') : routeToday;
@@ -230,14 +231,15 @@
     toolbar.innerHTML =
       '<div class="mm-map-toolbar__modes" role="group" aria-label="지도 표시 모드">' +
         '<button type="button" data-mm-map-mode="position" class="' + (routeMode ? '' : 'is-active') + '">현재 위치</button>' +
-        '<button type="button" data-mm-map-mode="route" class="' + (routeMode ? 'is-active' : '') + '">이동 경로</button>' +
+        '<button type="button" data-mm-map-mode="route" class="' + (routeMode ? 'is-active' : '') + '">차량 경로 조회</button>' +
       '</div>' +
       '<div class="mm-map-toolbar__date" role="group" aria-label="이동 경로 조회 기간">' +
+        '<label class="mm-route-vehicle">차량 <select data-mm-route-vehicle aria-label="경로 조회 차량"><option value="">차량 선택</option></select></label>' +
         '<div class="mm-map-toolbar__modes" aria-label="경로 기간 단위">' +
           '<button type="button" data-mm-route-period="d">일</button><button type="button" data-mm-route-period="w">주</button><button type="button" data-mm-route-period="m">월</button>' +
         '</div><input type="date" aria-label="경로 시작일" data-mm-route-from value="' + routeFrom + '"> ~ ' +
         '<input type="date" aria-label="경로 종료일" data-mm-route-to value="' + routeTo + '">' +
-        '<button type="button" class="btn-search" data-mm-route-search>조회</button>' +
+        '<button type="button" class="btn-search" data-mm-route-search>경로 조회</button>' +
         '<span class="mm-route-legend"><i class="start"></i>시작 <i class="end"></i>종료</span>' +
       '</div>' +
       '<div class="mm-map-toolbar__filters" data-mm-map-filters></div>' +
@@ -325,20 +327,34 @@
     }
     function updatePopupLink() {
       var link = document.querySelector('.map-pop__go');
-      var selected = tbody.querySelector('tr.sel[data-vin]');
-      if (link && selected) link.href = detailUrl(selected.getAttribute('data-vin'), 'map-popup');
+      var vin = selectedVin();
+      if (link && vin) link.href = detailUrl(vin, 'map-popup');
     }
     function selectedVin() {
-      var row = tbody.querySelector('tr.sel[data-vin]');
-      return row ? row.getAttribute('data-vin') : (filters.vehicle || '');
+      var visible=MIQMapData.getVisibleRows(),vin=MIQMapData.getSelectedVin()||filters.vehicle||'';
+      return visible.some(function(row){return row.vin===vin;})?vin:'';
+    }
+    var routeVehicleKey='';
+    function syncRouteVehicles(rows,vin){
+      var select=toolbar.querySelector('[data-mm-route-vehicle]');
+      var key=rows.map(function(row){return row.vin;}).join('|');
+      if(key!==routeVehicleKey){
+        routeVehicleKey=key;select.replaceChildren();
+        var placeholder=document.createElement('option');placeholder.value='';placeholder.textContent='차량 선택';select.appendChild(placeholder);
+        rows.forEach(function(row){var option=document.createElement('option');option.value=row.vin;option.textContent=row.vin+' · '+row.model;select.appendChild(option);});
+      }
+      select.value=vin;
     }
     function renderRoute() {
       var vin = selectedVin();
-      var visible = Array.prototype.map.call(tbody.querySelectorAll('tr[data-vin]:not(.mm-filter-hidden)'), function (row) { return row.getAttribute('data-vin'); });
+      var rows=MIQMapData.getVisibleRows();
+      var visible = rows.map(function(row){return row.vin;});
+      syncRouteVehicles(rows,vin);
+      if(routeMode&&(query.get('routeVin')||'')!==vin)setQuery({routeVin:vin||null});
       if (window.MIQGoogleMap) MIQGoogleMap.sync({ visibleVins: visible, selectedVin: vin, routeMode: routeMode, from: routeFrom, to: routeTo, requestId: routeRequestId });
       toolbar.querySelector('[data-mm-map-hint]').textContent = routeMode && vin
         ? vin + ' · ' + routeFrom + (routeFrom === routeTo ? '' : ' ~ ' + routeTo) + ' 이동 경로'
-        : '아래 장비목록의 차대번호를 누르면 지도에서 차량이 선택됩니다.';
+        : routeMode?'차량과 기간을 선택한 뒤 경로를 조회하세요.':'아래 장비목록의 차대번호를 누르면 지도에서 차량이 선택됩니다.';
     }    function paintFilterChips() {
       var box = toolbar.querySelector('[data-mm-map-filters]');
       var items = [];
@@ -427,7 +443,7 @@
       applyFilters();
     }
     applyMapSearch();
-    tbody.addEventListener('click', function () { window.setTimeout(function () { updatePopupLink(); renderRoute(); }, 0); });
+    toolbar.querySelector('[data-mm-route-vehicle]').addEventListener('change',function(event){MIQMapData.setSelectedVin(event.target.value);});
     toolbar.addEventListener('click', function (event) {
       var button = event.target.closest('[data-mm-map-mode]');
       if (!button) return;
@@ -458,14 +474,15 @@
       if (!event.target.closest('[data-mm-route-search]')) return;
       var from = toolbar.querySelector('[data-mm-route-from]').value, to = toolbar.querySelector('[data-mm-route-to]').value;
       if (!common.dates.parse(from) || !common.dates.parse(to) || from > to) { toast('조회 시작일과 종료일을 확인해 주세요.', 'error'); return; }
-      if (!selectedVin()) { toast('아래 장비목록의 차대번호를 눌러 차량을 선택해 주세요.', 'error'); return; }
+      if (!selectedVin()) { toast('경로를 조회할 차량을 선택해 주세요.', 'error'); return; }
       routeFrom = from; routeTo = to; routeRequestId++;
       setQuery({routeFrom:routeFrom,routeTo:routeTo,routePeriod:routePeriod,routeVin:selectedVin()}); renderRoute();
     });
+    toolbar.querySelector('.mm-map-toolbar__date').addEventListener('keydown',function(event){if(event.key==='Enter'&&event.target.matches('input[type="date"]')){event.preventDefault();toolbar.querySelector('[data-mm-route-search]').click();}});
     paintRoutePeriod();
     document.addEventListener('miq:map-route', function(event) {
       var vin = event.detail && event.detail.vin;
-      if (vin && selectedVin() !== vin) MIQMapData.select(vin);
+      if (vin && selectedVin() !== vin) MIQMapData.setSelectedVin(vin);
       toolbar.querySelector('[data-mm-map-mode="route"]').click();
     });
 
@@ -509,13 +526,11 @@
     });
 
     // Restore the current scope and zoom before refreshed hourly rows are painted.
-    document.addEventListener('miq:map-rendered', function () { if(!applying){decorateRows();renderMapScope(MIQMapData.getVisibleRows().length);} applyZoom(); });
+    document.addEventListener('miq:map-rendered', function () { if(!applying){decorateRows();renderMapScope(MIQMapData.getVisibleRows().length);updatePopupLink();renderRoute();} applyZoom(); });
 
     applyFilters();
-    var restoreRouteVin = query.get('routeVin');
     if (routeMode && restoreRouteVin) {
-      var restoreRow = Array.prototype.find.call(tbody.querySelectorAll('tr[data-vin]'), function(row) { return row.getAttribute('data-vin') === restoreRouteVin && !row.classList.contains('mm-filter-hidden'); });
-      if (restoreRow) MIQMapData.select(restoreRouteVin);
+      MIQMapData.setSelectedVin(restoreRouteVin);
     }
   }
 

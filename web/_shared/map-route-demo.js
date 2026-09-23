@@ -22,7 +22,7 @@
   }
   root.MIQMapRouteDemo = { response: response };
   var config = root.MIQMapConfig;
-  if (!config || config.loadRoute || config.routeEndpoint) return;
+  if (!config || config.loadRoute || config.routeEndpoint || config.routeApiBaseUrl) return;
   config.demoRoute = true;
   config.loadRoute = function (query) {
     return response(query, root.MIQMapData ? root.MIQMapData.rows : [], new Date());

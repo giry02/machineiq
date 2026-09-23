@@ -13,7 +13,7 @@
     if (old) old.remove();
     if (!points.length) return;
     var panel = document.createElement('div'); panel.className = 'miq-route-preview';
-    var title = document.createElement('strong'); title.textContent = vin + ' · 이동 경로'; panel.appendChild(title);
+    var title = document.createElement('strong'); title.textContent = vin + ' · 이동 경로'+(root.MIQMapConfig&&root.MIQMapConfig.demoRoute?' · 시연 데이터':''); panel.appendChild(title);
     var info = document.createElement('div'); info.className = 'miq-route-preview__info';
     info.textContent = '시작 ' + points[0].gpsDatetime + ' · 종료 ' + points[points.length - 1].gpsDatetime + ' · 위치 기록 ' + points.length + '개'; panel.appendChild(info);
     var svg = element('svg', { viewBox: '0 0 1000 340', role: 'img', 'aria-label': vin + ' 이동 경로 · 위치 좌표 기준' });
@@ -31,8 +31,9 @@
     svg.appendChild(element('polyline', { points:points.map(function(p){return xy(p).join(',');}).join(' '),fill:'none',stroke:'#ff3600','stroke-width':2 }));
     var unique = points.filter(function(p,i){return i===0||i===points.length-1||points.findIndex(function(v){return v.lat===p.lat&&v.lng===p.lng;})===i;});
     unique.forEach(function(p,i){var pos=xy(p),start=i===0,end=i===unique.length-1;var dot=element('circle',{cx:pos[0],cy:pos[1],r:start||end?7:4,fill:start?'#158737':end?'#ff3600':'#8aaabe',stroke:'#fff','stroke-width':2,tabindex:0,role:'button','aria-label':p.gpsDatetime+' · '+p.lat.toFixed(5)+', '+p.lng.toFixed(5)});
-      dot.appendChild(element('title',{},p.gpsDatetime+' · 속도 '+p.speed+' km/h'));
-      function show(){info.textContent=p.gpsDatetime+' · 위도 '+p.lat.toFixed(5)+' · 경도 '+p.lng.toFixed(5)+' · 속도 '+p.speed+' km/h';}
+      var detail=p.gpsDatetime+' · 위도 '+p.lat.toFixed(5)+' · 경도 '+p.lng.toFixed(5)+' · 속도 '+(p.speed==null?'-':p.speed+' km/h')+' · 충격 '+(p.shock==null?'-':p.shock+'건');
+      dot.appendChild(element('title',{},detail));
+      function show(){info.textContent=detail;}
       dot.addEventListener('click',show);dot.addEventListener('focus',show);svg.appendChild(dot);
     });
     panel.appendChild(svg);canvas.appendChild(panel);

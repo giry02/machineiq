@@ -7,7 +7,7 @@
 <link rel="icon" type="image/x-icon" href="../_shared/favicon.ico"/>
 <link rel="stylesheet" href="../_shared/offline-fonts.css?rev=b405f97e6cf9"><script type="module" blocking="render">await document.fonts.load('400 14px "Noto Sans KR"');await document.fonts.ready;</script>
 <link rel="stylesheet" href="../_shared/mockup.css?rev=bed1f0069135"/>
-<link rel="stylesheet" href="../_shared/map-management-enhancements.css?rev=a999e938e96f"/>
+<link rel="stylesheet" href="../_shared/map-management-enhancements.css?rev=710a55c4231f"/>
 <link rel="stylesheet" href="../_shared/google-map.css?rev=39dd71c17a83"/>
 <style>
 /* ── 페이지 전용 : 상태 범례 · 지도 · 장비목록 ── */
@@ -190,6 +190,7 @@
 
   function render() {
     var rows = sortRows(scoped());
+    if(state.sel&&!rows.some(function(row){return row.vin===state.sel;}))state.sel=null;
     renderCounts(rows);
     renderTable(rows);
     renderHead();
@@ -236,7 +237,7 @@
     if(window.MIQGoogleMap)MIQGoogleMap.setType(b.getAttribute('data-view'));
   });
 
-  window.MIQMapData={rows:DATA,select:select,setFilter:function(fn){rowFilter=fn;},refresh:render,getVisibleRows:function(){return sortRows(scoped());},setSearch:function(value){state.q=value;render();}};
+  window.MIQMapData={rows:DATA,select:select,getSelectedVin:function(){return state.sel||'';},setSelectedVin:function(vin){state.sel=scoped().some(function(row){return row.vin===vin;})?vin:null;render();},setFilter:function(fn){rowFilter=fn;},refresh:render,getVisibleRows:function(){return sortRows(scoped());},setSearch:function(value){state.q=value;render();}};
   var hourlyClock=MIQMeeting.watchHourly(function(w){
     var fleet=scopedFleet;
     DATA.forEach(function(row,i){
@@ -256,14 +257,14 @@
   document.addEventListener('visibilitychange',function(){if(!document.hidden)hourlyClock.refresh();});
 })();
 </script>
-<script defer blocking="render" src="../_shared/google-map-config.js?rev=2f2336f51875"></script>
+<script defer blocking="render" src="../_shared/google-map-config.js?rev=f83a0509b051"></script>
 <script defer blocking="render" src="../_shared/map-route-model.js?rev=4f7bb7f08c3b"></script>
-<script defer blocking="render" src="../_shared/map-route-source.js?rev=07244b2649ed"></script>
-<script defer blocking="render" src="../_shared/map-route-demo.js?rev=53066e3d101f"></script>
-<script defer blocking="render" src="../_shared/map-route-preview.js?rev=c530a96cb587"></script>
+<script defer blocking="render" src="../_shared/map-route-source.js?rev=31f1b9cd9e3c"></script>
+<script defer blocking="render" src="../_shared/map-route-demo.js?rev=5d148d9a372e"></script>
+<script defer blocking="render" src="../_shared/map-route-preview.js?rev=8ccf4dbd2f1c"></script>
 <script defer blocking="render" src="../_shared/google-map-sdk.js?rev=499504c73f84"></script>
-<script defer blocking="render" src="../_shared/google-map.js?rev=6d488192cd47"></script>
-<script defer blocking="render" src="../_shared/map-management-enhancements.js?rev=a118a9724af8"></script>
+<script defer blocking="render" src="../_shared/google-map.js?rev=4cedaef0bb15"></script>
+<script defer blocking="render" src="../_shared/map-management-enhancements.js?rev=e7bfc9286f92"></script>
 </head>
 <body class="miq-current-shell" data-current-bootstrap="ready" data-gnb="map" data-sub="map" data-variant="tobe" data-base="../">
 

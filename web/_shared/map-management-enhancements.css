@@ -78,6 +78,8 @@ body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .gnb__role option{c
 .mm-map-toolbar__date{display:none;align-items:center;gap:6px;color:#666;font-size:12px}
 .mm-map-toolbar.is-route .mm-map-toolbar__date{display:flex}
 .mm-map-toolbar__date input{height:32px;padding:0 8px;border:1px solid var(--mm-line);border-radius:4px;font:500 12px 'Noto Sans KR',sans-serif}
+.mm-route-vehicle{display:inline-flex;align-items:center;gap:6px}
+.mm-route-vehicle select{height:32px;max-width:260px;padding:0 24px 0 8px;border:1px solid var(--mm-line);border-radius:4px;background:#fff;color:inherit;font:500 12px 'Noto Sans KR',sans-serif}
 .mm-map-toolbar__hint{margin-left:auto;color:#6f7782;font-size:12px}
 .mm-map-toolbar__filters{display:flex;gap:6px;flex-wrap:wrap}
 .mm-route-layer{position:absolute;inset:0;z-index:2;width:100%;height:100%;pointer-events:none}

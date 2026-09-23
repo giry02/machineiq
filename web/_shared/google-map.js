@@ -13,13 +13,14 @@
   var route = {key: '', state: 'idle', points: [], controller: null, message: ''};
   function message(text) { status.textContent = text || ''; status.hidden = !text; }
   function view() {
-    if (window.MIQMapRoutePreview) MIQMapRoutePreview.draw(canvas, window.MIQMapConfig.demoRoute && current.routeMode && route.state === 'ready' ? route.points : [], selected);
+    if (window.MIQMapRoutePreview) MIQMapRoutePreview.draw(canvas, current.routeMode && route.state === 'ready' ? route.points : [], selected);
     var url = new URL('https://maps.google.com/maps');
     url.search = new URLSearchParams({ output: 'embed', hl: 'ko', ll: center.lat + ',' + center.lng, z: String(zoom), t: type === 'sat' ? 'k' : 'm' }).toString();
     if (point && !current.routeMode) url.searchParams.set('q', point.lat + ',' + point.lng);
     if (url.href !== lastSrc) { lastSrc = url.href; frame.src = lastSrc; canvas.dataset.mapState = 'loading'; }
     canvas.dataset.mapType = type === 'sat' ? 'satellite' : 'roadmap'; canvas.dataset.mapZoom = String(zoom);
     canvas.dataset.selectedVin = selected; canvas.dataset.positionCount = String(current.positionCount || 0);
+    canvas.dataset.routeState=route.state;canvas.dataset.routePoints=String(route.points.length);
     var label = host.querySelector('.mm-zoom-level'); if (label) label.textContent = String(zoom);
   }
   function sync(value) {
@@ -48,12 +49,12 @@
     message(!visible.size ? '조회 조건에 해당하는 장비가 없습니다.'
       : selectedRow && !selectedRow.hasPosition ? '선택 차량의 위치 정보가 수집되지 않았습니다.'
       : !rows.length ? '조회 차량의 위치 정보가 수집되지 않았습니다.' : '');
-    if (current.routeMode) message(selected ? '선택한 운행일의 이동 경로 기록이 없습니다.' : '아래 장비목록의 차대번호를 눌러 차량을 선택해 주세요.');
+    if (current.routeMode) message(selected ? '선택한 운행일의 이동 경로 기록이 없습니다.' : '경로를 조회할 차량을 선택해 주세요.');
     updateRoute();
     if (renderer) paintInteractive();
     else {
       if(host.dataset.mapProvider==='google-embed')view();
-      if (current.routeMode && selected) message(routeMessage() || (window.MIQMapConfig.demoRoute && route.points.length ? '' : '이동 경로는 지도 연결 설정 후 표시할 수 있습니다.'));
+      if (current.routeMode && selected) message(routeMessage());
     }
   }
   function visibleRows() {
@@ -62,7 +63,7 @@
   }
   function routeMessage() {
     if (!current.routeMode) return '';
-    if (!selected) return '아래 장비목록의 차대번호를 눌러 차량을 선택해 주세요.';
+    if (!selected) return '경로를 조회할 차량을 선택해 주세요.';
     if (route.state === 'loading') return '이동 경로를 불러오는 중입니다.';
     if (route.message) return route.message;
     if (route.state === 'empty') return '선택 기간의 이동 경로 기록이 없습니다.';
@@ -93,14 +94,14 @@
       route.points = points; route.state = points.length ? 'ready' : 'empty';
       if (renderer) paintInteractive(); else {
         canvas.dataset.routeState = route.state; canvas.dataset.routePoints = String(points.length);
-        if (window.MIQMapConfig.demoRoute && window.MIQMapRoutePreview) {
+        if (window.MIQMapRoutePreview) {
           MIQMapRoutePreview.draw(canvas, points, selected); message(routeMessage());
         } else message(points.length ? '이동 경로는 지도 연결 설정 후 표시할 수 있습니다.' : routeMessage());
       }
     }).catch(function(error) {
       if (disposed || route !== request || error.name === 'AbortError') return;
       route.state = error.code === 'ROUTE_NOT_CONFIGURED' ? 'unconfigured' : 'error';
-      route.message = error.code === 'ROUTE_NOT_CONFIGURED' ? '이동 경로 조회 연결이 설정되지 않았습니다.' : '이동 경로를 불러오지 못했습니다. 다시 조회해 주세요.';
+      route.message = error.code === 'ROUTE_NOT_CONFIGURED' ? '이동 경로 조회 연결이 설정되지 않았습니다.' : error.code==='ROUTE_AUTH_REQUIRED'?'차량 경로 조회 권한 또는 서버 로그인 상태를 확인해 주세요.':'이동 경로를 불러오지 못했습니다. 다시 조회해 주세요.';
       if (renderer) paintInteractive(); else message(routeMessage());
     });
   }
@@ -112,7 +113,7 @@
     if (renderer) renderer.destroy();
     renderer = null; host.dataset.mapProvider = 'google-embed';
     canvas.replaceChildren(frame); view();
-    message('기본 지도를 표시합니다. 차량 아이콘·경로는 지도 연결 설정이 필요합니다.');
+    message(current.routeMode?routeMessage():'기본 지도를 표시합니다. 차량 아이콘·경로는 지도 연결 설정이 필요합니다.');
   }
   async function upgrade() {
     if (renderer || upgrading || disposed || !(window.MIQMapConfig && MIQMapConfig.apiKey)) return;
