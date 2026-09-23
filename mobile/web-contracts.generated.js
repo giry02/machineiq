@@ -28,13 +28,14 @@
   var targetPolicies = {
     internal:       { hideCompany: false, hideGroup: true,  companyId: '', companyIds: null },
     dealer_owner:   { hideCompany: false, hideGroup: true,  companyId: '', companyIds: null },
-    dealer_staff:   { hideCompany: false, hideGroup: true,  companyId: '', companyIds: ['1933', '3703'] },
+    dealer_staff:   { hideCompany: false, hideGroup: true,  companyId: '', companyIds: null },
     customer_owner: { hideCompany: true,  hideGroup: false, companyId: '1933', companyIds: ['1933'] },
     customer_staff: { hideCompany: true,  hideGroup: true,  companyId: '1933', companyIds: ['1933'] }
   };
   function resolveRole(value) { return codes.indexOf(value) > -1 ? value : 'customer_owner'; }
   function isDealer(role) { return role === 'dealer_owner' || role === 'dealer_staff'; }
   function isCustomer(role) { return role === 'customer_owner' || role === 'customer_staff'; }
+  function canUseFavorites(role) { return isDealer(role) || isCustomer(role); }
   function roleLabel(role) { return roles[codes.indexOf(resolveRole(role))].label; }
   function targetPolicy(role) {
     var policy = targetPolicies[resolveRole(role)];
@@ -127,8 +128,12 @@
       '../Vehicle%20Summary/vehicle-summary-tobe-3.html',
       '../Vehicle%20Summary/vehicle-summary-tobe-v2.html',
       '../Vehicle%20Summary/vehicle-summary-tobe-option-b-sort.html',
-      '../Vehicle%20Summary/vehicle-summary-tobe-option-c-reference-sort.html'];
-    if (isDealer(role)) paths.push('../Interest%20Vehicles/interest-vehicles-status-tobe.html');
+      '../Vehicle%20Summary/vehicle-summary-tobe-option-c-reference-sort.html',
+      '../Service/service-tobe-v2.html',
+      '../Service/service-maintenance-tobe.html',
+      '../Service/service-supply-tobe.html',
+      '../Service/service-error-tobe.html'];
+    if (canUseFavorites(role)) paths.push('../Interest%20Vehicles/interest-vehicles-status-tobe.html');
     try {
       var candidate = new URL(saved || '', base);
       if (saved && candidate.origin === destination.origin && paths.some(function (path) {
@@ -176,10 +181,21 @@
     return state;
   }
 
+  // Display only. Never feed rounded labels back into metrics, thresholds or coordinates.
+  function integer(value, grouped) {
+    if (value === null || value === undefined || value === '' || typeof value === 'boolean') return '-';
+    var numeric = Number(value);
+    if (!Number.isFinite(numeric)) return '-';
+    var rounded = Math.round(numeric);
+    if (Object.is(rounded, -0)) rounded = 0;
+    return grouped ? rounded.toLocaleString('ko-KR', { maximumFractionDigits: 0 }) : String(rounded);
+  }
+
   return {
+    numbers: { integer: integer },
     roles: {
       list: function () { return roles.map(function (role) { return { code: role.code, label: role.label }; }); },
-      resolve: resolveRole, label: roleLabel, isDealer: isDealer, isCustomer: isCustomer,
+      resolve: resolveRole, label: roleLabel, isDealer: isDealer, isCustomer: isCustomer, canUseFavorites: canUseFavorites,
       hasCapability: function (role, capability) { return codes.indexOf(role) > -1 && (!capability || capabilities[role].indexOf(capability) > -1); },
       targetPolicy: targetPolicy,
       filterVehicles: filterVehicles,
@@ -373,7 +389,7 @@
   }
   function observeSize(host, redraw) {
     if (!host || host.__miqChartSizeObserver || !root.ResizeObserver) return;
-    var width = 0, frame = 0;
+    var width = Math.round(host.getBoundingClientRect().width), frame = 0;
     var observer = new root.ResizeObserver(function () {
       var next = Math.round(host.getBoundingClientRect().width);
       if (next <= 0 || next === width) return;
@@ -394,7 +410,7 @@
 
 (function (root) {
   'use strict';
-  /* Service의 기존 세 상세 HTML에 있는 목업 이력 18건을 집계용으로 공유한다.
+  /* Service 공용 이력과 소모품 목록. 목록과 배지는 같은 품목·상태를 사용한다.
      날짜·호기를 변경하지 않으며 실제 서버 데이터나 차량 카탈로그를 만들지 않는다. */
   var kinds = ['maintenance', 'supply', 'error'];
   var sourceVehicles = {
@@ -462,6 +478,9 @@
     return {
       kind: row[0], companyId: '1933', company: '세종물류', group: vehicle.group,
       model: vehicle.model, vin: row[1], type: vehicle.type, date: row[2],
+      supplyName: supply ? supply.name : '',
+      supplyCycle: supply ? supply.cycle : undefined,
+      supplyUsed: supply ? supply.used : undefined,
       supplyState: supply ? supplyStatus(supply.cycle, supply.used).state : '',
       errorState: row[0] === 'error' ? row[3] : ''
     };
@@ -509,6 +528,9 @@
         companyId: text(info.companyId) || (normalize(company).indexOf('세종물류') > -1 ? '1933' : ''),
         company: company, group: text(info.group), model: text(info.model), vin: text(info.vin),
         type: text(info.type), date: date ? date[0] : '',
+        supplyName: kind === 'supply' ? text(info.supplyName) : '',
+        supplyCycle: kind === 'supply' ? info.supplyCycle : undefined,
+        supplyUsed: kind === 'supply' ? info.supplyUsed : undefined,
         supplyState: kind === 'supply' ? (info.supplyCycle !== undefined && info.supplyUsed !== undefined ? supplyStatus(info.supplyCycle, info.supplyUsed).state : text(info.supplyState)) : '',
         errorState: kind === 'error' ? text(info.errorState) : ''
       };
@@ -517,14 +539,23 @@
     records.splice.apply(records, [0, records.length].concat(retained, updated));
     return updated.length;
   }
-  var api = { records: records, count: count, totals: totals, replace: replace, supplyStatus: supplyStatus, supplyPreview: supplyPreview, supplyItems: supplyItems };
+  // Service-only identities can open detail without creating collected telemetry
+  // or adding vehicles to the fleet/summary population.
+  function vehicleIdentity(vin) {
+    var key = Object.keys(sourceVehicles).find(function (value) { return normalize(value) === normalize(vin); });
+    if (!key) return null;
+    return Object.assign({ vin: key, companyId: '1933', companyName: '세종물류',
+      serviceOnly: true, catalogOnly: true, conn: null, km: null, min: null, shock: null,
+      cumKm: null, cumH: null, soc: null }, sourceVehicles[key]);
+  }
+  var api = { records: records, count: count, totals: totals, replace: replace, supplyStatus: supplyStatus, supplyPreview: supplyPreview, supplyItems: supplyItems, vehicleIdentity: vehicleIdentity };
   root.MIQServiceRecords = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);
 
 /* Arbitrary demonstration records for the prototype only.
    These are not actual repairs, ECU/BMS codes, or collected vehicle telemetry.
-   The caller supplies yesterday's ISO date; no clock, random values, or catalog mutations are used. */
+   The caller supplies an ISO date/window; no clock, random values, or catalog mutations are used. */
 (function(root,factory){
   var api=factory();
   if(typeof module==='object'&&module.exports)module.exports=api;
@@ -577,16 +608,35 @@
       var metadata={companyId:text(vehicle.companyId),company:text(vehicle.companyName),group:text(vehicle.group),model:text(vehicle.model),vin:vin,type:type,date:referenceDay,demo:true};
       var minute=Math.floor(seed/7)%6*10,errorHour=7+seed%8;
       result.maintenance.push(Object.assign({},metadata,{kind:'maintenance',dateTime:stamp(referenceDay,9+seed%7,minute),
-        part:item[0],symptom:'시연 예시: '+item[1],detail:'시연용 점검 기록: '+item[2],completed:seed%2===0}));
+        part:item[0],symptom:item[1],detail:item[2],completed:seed%2===0}));
       var error=Object.assign({},metadata,{kind:'error',dateTime:stamp(referenceDay,errorHour,minute),errorState:seed%2===0?'current':'past',
         category:template.category,code:'DEMO-'+template.prefix+'-'+String(variant+1).padStart(2,'0'),level:['a','b','c'][seed%3],spn:'—',fmi:'—',
-        description:'시연 예시: '+item[2]});
+        description:item[2]});
       if(error.errorState==='past')error.completedAt=stamp(referenceDay,errorHour+2,minute);
       result.error.push(error);
     });
     return result;
   }
-  return {create:create};
+  // Explicit current-day review samples. Existing create() callers retain
+  // their historical data. Dashboard links pass this same frozen cutoff.
+  function createCurrent(fleet,window){
+    if(!window||!validDay(window.date)||!/^([01]\d|2[0-3]):00$/.test(window.to||''))return [];
+    var end=window.date+' '+window.to,rows=[];
+    create(fleet,window.date).error.forEach(function(item){
+      var seed=hash(item.vin.replace(/[-_]/g,'').toUpperCase());
+      if(seed%4===0)return;
+      [0].concat(seed%3===0?[30]:[]).forEach(function(offset,index){
+        var parts=item.dateTime.slice(11).split(':'),minute=Number(parts[0])*60+Number(parts[1])+offset;
+        var dateTime=stamp(window.date,Math.floor(minute/60),minute%60);
+        if(dateTime>=end)return;
+        var row=Object.assign({},item,{dateTime:dateTime,currentSample:true,sampleId:window.date+':'+item.vin+':'+index});
+        if(row.completedAt&&row.completedAt>=end){row.errorState='current';delete row.completedAt;}
+        rows.push(row);
+      });
+    });
+    return rows;
+  }
+  return {create:create,createCurrent:createCurrent};
 });
 
 /* Shared summary row values. Dates are committed query dates; no DOM state is read. */
@@ -608,7 +658,8 @@
     }
     return {running: running, working: working, idle: idle};
   }
-  function connection(value) { return value === true ? 'on' : value === false ? 'off' : 'unknown'; }
+  // Communication has two UI states; only an explicit connection is shown as on.
+  function connection(value) { return value === true ? 'on' : 'off'; }
   function historyCounts(service, vehicle, range) {
     var unavailable = {repair: null, fault: null};
     if (!service || typeof service.count !== 'function' || !Array.isArray(service.records)
@@ -669,7 +720,7 @@
     return (!selection.companyId||selection.companyId==='all'||String(vehicle.companyId||'1933')===String(selection.companyId))
       &&(!selection.group||vehicle.group===selection.group)&&(!selection.veh||vehicle.vin===selection.veh)&&(!selection.abnormal||snapshot(vehicle).abnormal);
   });}
-  var sortKeys=['vin','soc','soh','workMinutes','chargeMinutes','smartCharge','status'];
+  var sortKeys=['vin','soc','soh','workMinutes','chargeMinutes','smartCharge'];
   function sort(rows,key,direction,readSmartCharge){
     if(sortKeys.indexOf(key)<0)return rows.slice();
     var factor=direction==='desc'?-1:1;
@@ -680,11 +731,6 @@
         if(!info.known)return null;
         var charge=readSmartCharge?readSmartCharge(vehicle,info.known):'켜짐';
         return charge==='켜짐'?1:charge==='꺼짐'?0:null;
-      }
-      if(key==='status'){
-        if(!info.known)return null;
-        var severity={'정상':0,'주의':1,'경고':2,'이상':2};
-        return Math.max(severity[info.temperature],severity[info.charge],severity[info.battery]);
       }
       return info[key];
     }
@@ -941,7 +987,7 @@ window.MIQMapPositions = [
     "vin": "FBA32_DEMO_CS01",
     "lat": 37.035646,
     "lng": 126.787038,
-    "address": "경기도 화성시 우정읍 이화리 (시연 위치 1)",
+    "address": "경기도 화성시 우정읍 이화리",
     "lastDatetime": "2026-09-10 14:00:00",
     "demo": true
   },
@@ -949,7 +995,7 @@ window.MIQMapPositions = [
     "vin": "FBA18_DEMO_CS02",
     "lat": 37.035246,
     "lng": 126.787238,
-    "address": "경기도 화성시 우정읍 이화리 (시연 위치 2)",
+    "address": "경기도 화성시 우정읍 이화리",
     "lastDatetime": "2026-09-10 14:00:00",
     "demo": true
   },
@@ -957,7 +1003,7 @@ window.MIQMapPositions = [
     "vin": "FBD30_DEMO_CS03",
     "lat": 37.035446,
     "lng": 126.787538,
-    "address": "경기도 화성시 우정읍 이화리 (시연 위치 3)",
+    "address": "경기도 화성시 우정읍 이화리",
     "lastDatetime": "2026-09-10 14:00:00",
     "demo": true
   }
@@ -984,7 +1030,7 @@ function build() {
 
       state.rows.forEach(function (vehicle) {
         var random = seeded(vehicle.vin + state.period + PERIOD[state.period].from + PERIOD[state.period].to);
-        byVehicle[vehicle.vin] = { vehicle: vehicle, work: 0 };
+        byVehicle[vehicle.vin] = { vehicle: vehicle, work: 0, idle: 0, capacity: 0 };
         for (var columnIndex = 0; columnIndex < filled; columnIndex++) {
           var work = 0;
           var idle = 0;
@@ -999,6 +1045,8 @@ function build() {
           columns[columnIndex].work += work;
           columns[columnIndex].idle += idle;
           byVehicle[vehicle.vin].work += work;
+          byVehicle[vehicle.vin].idle += idle;
+          byVehicle[vehicle.vin].capacity += Math.max(state.period === 'd' ? 1 : 10 * bucket, work + idle);
           totalWork += work;
           totalIdle += idle;
         }
@@ -1017,6 +1065,7 @@ function build() {
         detailLabels: axis.detailLabels,
         columns: columns,
         top: top,
+        vehicles: Object.keys(byVehicle).map(function (vin) { return byVehicle[vin]; }),
         filled: filled,
         bucket: bucket,
         average: {
@@ -1097,7 +1146,7 @@ function seeded(key) {
   }
   function rd(n, d) { var p = Math.pow(10, d); return Math.round(n * p) / p; }
   function fmt(n, m) {
-    return rd(n, m.dec).toLocaleString('ko-KR', { minimumFractionDigits: m.dec, maximumFractionDigits: m.dec }) + m.unit;
+    return window.MIQCommon.numbers.integer(n, true) + m.unit;
   }
   function metric(key) { return METRICS.filter(function (m) { return m.key === key; })[0]; }
 
@@ -1126,6 +1175,7 @@ function seeded(key) {
     return { m: m, labels: b.labels, detailLabels: b.detailLabels, cols: cols, filled: b.filled, cur: agg(curA), prev: agg(prevA) };
   }
 return build(key);}
+const common=root.MIQCommon;
 var principals = {
       dealer_owner: 'dealer.park@sejonglog.co.kr', dealer_staff: 'staff.jung@sejonglog.co.kr',
       customer_owner: 'leader.yoon@customer.co.kr', customer_staff: 'user.oh@customer.co.kr'
@@ -1141,6 +1191,24 @@ function seedUserRequests() {
         { id:'UR-20260530-01', email:'dealer.temp@sejonglog.co.kr', name:'강도윤', role:'딜러 직원', company:'세종모터스', phone:'010-****-7732', registered:'2026-05-30 16:12', processed:'2026-06-01 09:21', status:'RJCT', processor:'박민아', processorRole:'딜러 대표', reason:'재직 확인 서류가 첨부되지 않았습니다.', approverId:principals.dealer_owner, group:'전체' }
       ];
     }
-root.CustomerWebContracts={common:root.MIQCommon,meeting:root.MIQMeeting,charts:MIQCharts,service:root.MIQServiceRecords,demo:root.MIQServiceDemo,times:root.MIQSummaryRow.times,lithium:root.MIQLithiumListModel,positions:root.MIQMapPositions,efficiency,shocks,summaryValue,reportValue,approvalSeed:seedUserRequests,existingUsers:["admin@sejonglog.co.kr","cs.lee@sejonglog.co.kr","dealer.park@sejonglog.co.kr","dealer.choi@sejonglog.co.kr","staff.jung@sejonglog.co.kr","staff.kang@sejonglog.co.kr","leader.yoon@customer.co.kr","leader.shin@customer.co.kr","user.oh@customer.co.kr","user.lim@customer.co.kr"],principals,approvalReference:"2026-07-06 14:30",legacy:[{"kind":"error","vin":"FBA32_224250271","companyId":"1933","code":"P0003","description":"연료량 조절 밸브 회로 이상","category":"차량","level":"a","spn":"523","fmi":"3","date":"2026-07-25","dateTime":"2026-07-25 08:12","completedAt":null,"errorState":"current","pdfKey":"p0003"},{"kind":"error","vin":"FBA32_032068","companyId":"1933","code":"P0191","description":"연료 레일 압력 센서 범위 이상","category":"차량","level":"b","spn":"157","fmi":"2","date":"2026-07-20","dateTime":"2026-07-20 13:40","completedAt":"2026-07-21 13:40","errorState":"past","pdfKey":null},{"kind":"error","vin":"FBA32_224250271","companyId":"1933","code":"A7","description":"주행 제어 시스템 경고","category":"차량","level":"b","spn":"-","fmi":"-","date":"2026-07-24","dateTime":"2026-07-24 10:30","completedAt":null,"errorState":"current","pdfKey":null},{"kind":"error","vin":"FBA32_032042","companyId":"1933","code":"51","description":"유압 온도 경고","category":"차량","level":"c","spn":"-","fmi":"-","date":"2026-07-15","dateTime":"2026-07-15 10:05","completedAt":"2026-07-16 10:05","errorState":"past","pdfKey":null},{"kind":"error","vin":"FBA32_032068","companyId":"1933","code":"A","description":"시트 안전벨트 미착용","category":"차량","level":"c","spn":"-","fmi":"-","date":"2026-07-12","dateTime":"2026-07-12 09:15","completedAt":"2026-07-13 09:15","errorState":"past","pdfKey":null},{"kind":"error","vin":"FBA32_224250383","companyId":"1933","code":"16","description":"셀 밸런싱 이상","category":"배터리","level":"a","spn":"-","fmi":"-","date":"2026-07-26","dateTime":"2026-07-26 09:30","completedAt":null,"errorState":"current","pdfKey":null},{"kind":"maintenance","vin":"FBA32_224250271","companyId":"1933","date":"2026-07-03","dateTime":"2026-07-03 09:20","part":"트랜스미션","symptom":"오일누유","detail":"변속기 오일 누유 발생, 실링 교체","completed":true},{"kind":"maintenance","vin":"FBA32_224250271","companyId":"1933","date":"2026-07-08","dateTime":"2026-07-08 13:45","part":"조향장치","symptom":"유격발생","detail":"스티어링 링크 조정 및 체결 토크 확인","completed":true},{"kind":"maintenance","vin":"FBA32_224250271","companyId":"1933","date":"2026-07-11","dateTime":"2026-07-11 16:10","part":"전장","symptom":"경고등","detail":"배선 커넥터 접촉 상태 점검","completed":false},{"kind":"maintenance","vin":"FBA32_224250383","companyId":"1933","date":"2026-07-14","dateTime":"2026-07-14 10:00","part":"냉각계통","symptom":"과열","detail":"냉각수 보충 및 호스 누수 점검","completed":true},{"kind":"maintenance","vin":"FBA32_032042","companyId":"1933","date":"2026-07-18","dateTime":"2026-07-18 14:30","part":"유압","symptom":"작동지연","detail":"유압 실린더 점검 및 작동유 보충","completed":false},{"kind":"maintenance","vin":"FBA32_032042","companyId":"1933","date":"2026-07-22","dateTime":"2026-07-22 11:20","part":"브레이크","symptom":"제동불량","detail":"브레이크 패드 마모 상태 확인 후 교체","completed":true}],sourceHashes:{"_shared/common-logic.js":"fe89537280cd276fb099d41c876889bcf6567e9cb0fb924b7a7d592b431e4a59","_shared/meeting-model.js":"b9aef6dedaba7abbd5118fa9b90d903bb7149b000794b6250fbc0963010eaae5","_shared/chart-common.js":"26b243959957147629094742d37b7891b1fad4081915456866eae6b53ffc0ca2","_shared/service-records.js":"b118dac99b6762f3ae3f9a752b3454a058ca51b71da962b4f66b7d63f8adf86c","_shared/service-demo-data.js":"695aeb6410b96c9ec68c994cb64c9036e023fabaf093fa05cd801a632bb62aa0","_shared/summary-row-model.js":"765d8e3e94afcbb24f997baff7c4a38e5afe7e9da0a9d950dde0e83eb3234955","_shared/lithium-list-model.js":"f9eff23d5fdeb13b1383d8ebf149e3b0a4c4cee638b161a7dcd0b0b3302d2fb7","_shared/map-positions.js":"9ee532d97810d053e9f4f8dee1b8c2d0d6af885584763b8a8222e11c987e51bf","_shared/operation-metrics-enhancements.js":"b7edf131ca3675f7eab796c15baa5a0a8cc9abb694482a8a71851b827a6010d4","Shock/shock-tobe.html":"a9b759527fb5eaa848941c4adb124282c41aafffe8b90038c03743d1c9fb8335","_shared/vehicle-summary-option-c.js":"efa3b2a99d94461602da775608cf8243df26bb5324914db3989b982cb83416f8","Report Status/report-status-tobe.html":"a7392de74f774d47463a39d3ac29378b19586b47c3a272f296c77809ea79cd65","_shared/map-management-enhancements.js":"ede5235bc19459fbdb02e57f3eb57afcd7dd57f1fe43bda47e94c8956353f0d6","Mgmt User/mgmt-user-tobe.html":"762aae1c53befad92e7d400c582ec00e4ec0a0e88987a5e6e887d6b1b3c48fad","Service/service-error-tobe.html":"cc9e813af608a782f672e84911d858a2e37941f8ac876d2f74a0f9a4d11a8446","Service/service-maintenance-tobe.html":"538ca5a06b189625c618e91a991f4928d2a7ee412c903334630c5d5eec0ca3a2"}};
+function currentDemoRequests(legacy, ageDays) {
+    return legacy.map(function (record, index) {
+      var date = common.dates.addDays(common.dates.today(), -ageDays[index]);
+      var registered = common.dates.format(date) + record.registered.slice(10);
+      var processed = '';
+      if (record.processed) {
+        var elapsed = Date.parse(record.processed.replace(' ', 'T')) - Date.parse(record.registered.replace(' ', 'T'));
+        var completed = new Date(Date.parse(registered.replace(' ', 'T')) + elapsed);
+        processed = common.dates.format(completed) + ' ' + String(completed.getHours()).padStart(2, '0') + ':' + String(completed.getMinutes()).padStart(2, '0');
+      }
+      return Object.assign({}, record, { registered: registered, processed: processed, demoDateRevision: '20260915-current' });
+    });
+  }
+function nowText() {
+    var d = new Date();
+    function p(n) { return String(n).padStart(2, '0'); }
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+root.CustomerWebContracts={common:root.MIQCommon,meeting:root.MIQMeeting,charts:MIQCharts,service:root.MIQServiceRecords,demo:root.MIQServiceDemo,times:root.MIQSummaryRow.times,lithium:root.MIQLithiumListModel,positions:root.MIQMapPositions,efficiency,shocks,summaryValue,reportValue,approvalSeed:function(){return currentDemoRequests(seedUserRequests(),[1,2,3,4,10,16,22]);},existingUsers:["admin@sejonglog.co.kr","cs.lee@sejonglog.co.kr","dealer.park@sejonglog.co.kr","dealer.choi@sejonglog.co.kr","staff.jung@sejonglog.co.kr","staff.kang@sejonglog.co.kr","leader.yoon@customer.co.kr","leader.shin@customer.co.kr","user.oh@customer.co.kr","user.lim@customer.co.kr"],principals,get approvalReference(){return nowText();},legacy:[{"kind":"error","vin":"FBA32_224250271","companyId":"1933","code":"P0003","description":"연료량 조절 밸브 회로 이상","category":"차량","level":"a","spn":"523","fmi":"3","date":"2026-07-25","dateTime":"2026-07-25 08:12","completedAt":null,"errorState":"current","pdfKey":"p0003"},{"kind":"error","vin":"FBA32_032068","companyId":"1933","code":"P0191","description":"연료 레일 압력 센서 범위 이상","category":"차량","level":"b","spn":"157","fmi":"2","date":"2026-07-20","dateTime":"2026-07-20 13:40","completedAt":"2026-07-21 13:40","errorState":"past","pdfKey":null},{"kind":"error","vin":"FBA32_224250271","companyId":"1933","code":"A7","description":"주행 제어 시스템 경고","category":"차량","level":"b","spn":"-","fmi":"-","date":"2026-07-24","dateTime":"2026-07-24 10:30","completedAt":null,"errorState":"current","pdfKey":null},{"kind":"error","vin":"FBA32_032042","companyId":"1933","code":"51","description":"유압 온도 경고","category":"차량","level":"c","spn":"-","fmi":"-","date":"2026-07-15","dateTime":"2026-07-15 10:05","completedAt":"2026-07-16 10:05","errorState":"past","pdfKey":null},{"kind":"error","vin":"FBA32_032068","companyId":"1933","code":"A","description":"시트 안전벨트 미착용","category":"차량","level":"c","spn":"-","fmi":"-","date":"2026-07-12","dateTime":"2026-07-12 09:15","completedAt":"2026-07-13 09:15","errorState":"past","pdfKey":null},{"kind":"error","vin":"FBA32_224250383","companyId":"1933","code":"16","description":"셀 밸런싱 이상","category":"배터리","level":"a","spn":"-","fmi":"-","date":"2026-07-26","dateTime":"2026-07-26 09:30","completedAt":null,"errorState":"current","pdfKey":null},{"kind":"maintenance","vin":"FBA32_224250271","companyId":"1933","date":"2026-07-03","dateTime":"2026-07-03 09:20","part":"트랜스미션","symptom":"오일누유","detail":"변속기 오일 누유 발생, 실링 교체","completed":true},{"kind":"maintenance","vin":"FBA32_224250271","companyId":"1933","date":"2026-07-08","dateTime":"2026-07-08 13:45","part":"조향장치","symptom":"유격발생","detail":"스티어링 링크 조정 및 체결 토크 확인","completed":true},{"kind":"maintenance","vin":"FBA32_224250271","companyId":"1933","date":"2026-07-11","dateTime":"2026-07-11 16:10","part":"전장","symptom":"경고등","detail":"배선 커넥터 접촉 상태 점검","completed":false},{"kind":"maintenance","vin":"FBA32_224250383","companyId":"1933","date":"2026-07-14","dateTime":"2026-07-14 10:00","part":"냉각계통","symptom":"과열","detail":"냉각수 보충 및 호스 누수 점검","completed":true},{"kind":"maintenance","vin":"FBA32_032042","companyId":"1933","date":"2026-07-18","dateTime":"2026-07-18 14:30","part":"유압","symptom":"작동지연","detail":"유압 실린더 점검 및 작동유 보충","completed":false},{"kind":"maintenance","vin":"FBA32_032042","companyId":"1933","date":"2026-07-22","dateTime":"2026-07-22 11:20","part":"브레이크","symptom":"제동불량","detail":"브레이크 패드 마모 상태 확인 후 교체","completed":true}],sourceHashes:{"_shared/common-logic.js":"a6f64c8db74a20689cf109a5893881e42d48886fda80ea756e35db6373a41d52","_shared/meeting-model.js":"b9aef6dedaba7abbd5118fa9b90d903bb7149b000794b6250fbc0963010eaae5","_shared/chart-common.js":"15c74452f8053e50beb87992240eac4fef8547a4fab8fdb80282c43fc6e0bb1d","_shared/service-records.js":"4e2247047570df87d702fea2e11164e500e379592e60006858a849f3ce98372f","_shared/service-demo-data.js":"dcd01d3f4b3632d03a3fd4ff741a319008137185f5421a42b12885b693f2ed4d","_shared/summary-row-model.js":"8ec5759511a3cf6bc23319c79b3a71e76fbcaa3cd08819c1cae7b5fe089c5500","_shared/lithium-list-model.js":"7303031cad80131e220e3172e7e3d3f1ba0770a2923cc80fd92db1555545376a","_shared/map-positions.js":"f0538ed3d6b1d0ce5dd0ae424da3b0ca3ac2f9d446ca1e5fd614194110433d20","_shared/operation-metrics-enhancements.js":"c07771cadbf82364fe1297f04c09618a239a7df0e84420f0ab3e704e856aab4b","Shock/shock-tobe.html":"9a93d92c7ee0df8aff9541c64d6d6c9a57c54f5945f34b9ed339b85ee9ba9f31","_shared/vehicle-summary-option-c.js":"7b6e44d91c1d8ca108ce68b17a9de74199a0428601ad162a9882ce392e2d5cba","Report Status/report-status-tobe.html":"5b392d4b1601e1f14f5e059e4ec61ba0fa7b97f388e5e24a1161edf294e9212a","_shared/map-management-enhancements.js":"8f22d7c42f0cac9865907b624ae71f6599ecd52a652f78f3a63ee04ca15339ce","Mgmt User/mgmt-user-tobe.html":"42430c1e7d5b618b4c067ce397de90ca6c852b05971541bd467ef0a33c2efa6b","Service/service-error-tobe.html":"d80b254c3ad5f6c0f18fc3fe6289e34de01b28d19d39d20b70cf7fc53c4a1eeb","Service/service-maintenance-tobe.html":"14b3b440b76239c7df8799989d6f0edbf9b40e1687e11cb9c459ed63b75f8230"}};
 })(typeof window==='undefined'?globalThis:window);
 if(typeof module==='object'&&module.exports)module.exports=globalThis.CustomerWebContracts;

@@ -2,9 +2,8 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const app=path.resolve(__dirname,'..'),shared=path.resolve(app,'../../final-implementation/fleet-customer-requested-260813');
 const packaged=fs.existsSync(path.join(app,'data/fleet.generated.js'));
 const fleetSource=fs.readFileSync(packaged?path.join(app,'data/fleet.generated.js'):path.join(shared,'_mock-data/generated/fleet.generated.js'),'utf8');
-const lithiumSource=fs.readFileSync(path.join(app,'lithium-status-model.js'),'utf8');
-if(!packaged)assert.equal(lithiumSource.replace(/\r/g,'').trim(),fs.readFileSync(path.join(shared,'_shared/lithium-list-model.js'),'utf8').replace(/\r/g,'').trim(),'Reuse web status model verbatim');
-const ctx=vm.createContext({window:{},Date});vm.runInContext(fleetSource,ctx);vm.runInContext(fs.readFileSync(path.join(app,'web-contracts.generated.js'),'utf8'),ctx);vm.runInContext(fs.readFileSync(path.join(app,'model.js'),'utf8'),ctx);vm.runInContext(lithiumSource,ctx);
+const ctx=vm.createContext({window:{},Date});vm.runInContext(fleetSource,ctx);vm.runInContext(fs.readFileSync(path.join(app,'web-contracts.generated.js'),'utf8'),ctx);vm.runInContext(fs.readFileSync(path.join(app,'model.js'),'utf8'),ctx);
+assert.equal(ctx.window.CustomerWebContracts.lithium,ctx.window.MIQLithiumListModel,'One shared battery model, no stale second copy');
 const M=ctx.window.CustomerPrototype,fleet=ctx.window.MIQ_MOCK_DATA.fleet,rows=M.buildVehicles(fleet);
 for(const [g,key] of [[1.19,null],[1.2,'s3'],[1.79,'s3'],[1.8,'s4'],[2.49,'s4'],[2.5,'s5'],[8,'s5'],[null,null],[NaN,null]])assert.equal(M.shockLevel(g),key);
 for(const [from,to,hours] of [[22,6,8],[8,18,10],[0,0,24],[23,23,24],[23,22,23]])assert.equal(M.chargeWindow(from,to).duration,hours);
@@ -21,7 +20,7 @@ for(const v of rows){
 }
 const harnessSource=fs.readFileSync(path.join(__dirname,fs.existsSync(path.join(__dirname,'harness.js'))?'harness.js':'customer-mobile-prototype.cjs'),'utf8');
 const start=harnessSource.indexOf('function harness('),end=harnessSource.indexOf('\nconst h=harness()',start);
-const read=f=>(f==='customer.js'?lithiumSource+'\n':'')+fs.readFileSync(path.join(app,f),'utf8');
+const read=f=>fs.readFileSync(path.join(app,f),'utf8');
 const harness=vm.runInNewContext('('+harnessSource.slice(start,end<0?undefined:end)+')',{vm,URL,URLSearchParams,M,fleet,read});
 const h=harness('#detail?equipmentId=demo-equipment-01');
 assert.match(h.html(),/<dt class="metric-label-with-help"><span>충격<\/span><button[^>]*shock-level-help-trigger/);

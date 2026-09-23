@@ -1,6 +1,5 @@
-/* Web style guide 2026-09-13, pp. 2/6/8/12. Colors only; customer HTML only.
-   Component-specific battery/shock colors already match web mockup.css and
-   lithium-list.css. Do not replace those with the summary status palette. */
+/* Customer HTML color tokens. 2026-09-23: error/danger red is unified;
+   other battery/shock levels and the brand/action palette stay unchanged. */
 :root, body {
   --linq-color-brand:#ff3600;
   --linq-color-primary-fill:#d92e00;
@@ -60,7 +59,7 @@ body.customer-prototype {
   color:var(--customer-communication-offline-text);
 }
 /* Dashboard emphasis matches the vehicle shortcut brand; error icons match PUSH. */
-.customer-prototype { --customer-error-icon:#e03131; }
+.customer-prototype { --customer-error-icon:var(--linq-color-danger); }
 .customer-prototype .health-kpis :is([data-service-focus="error"],[data-service-focus="due"]) > strong,
 .customer-prototype .health-kpis :is([data-service-focus="error"],[data-service-focus="due"]) .dashboard-kpi__label svg {
   color:var(--linq-color-brand);

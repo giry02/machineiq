@@ -36,3 +36,5 @@
 ## 반영 상태
 
 로컬 고객 모바일 HTML만 적용했다. GitHub 배포, APK/ZIP 재생성, iOS 및 실제 서버 연동은 이번 요청에서 수행하지 않았다. QR는 기존 APK 테스트 전용 정책 유지. Figma/FigJam은 원격 변경 없이 로컬 등록부와 반영 대기 기록만 갱신했다.
+
+후속 요청 ‘깃에 올려줘’에 따라 2026-09-21 `fa4297a`로 GitHub/Pages 게시를 완료했다. APK/ZIP은 재생성하지 않았다. [게시·검증](CUSTOMER_MOBILE_R88_GITHUB_20260921.md).

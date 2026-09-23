@@ -1,4 +1,18 @@
 {
+  "r90Revision": {
+    "revision": "2026-09-21-r90",
+    "screenIdsChanged": false,
+    "changes": "LQ-REF-003 상세의 날짜 업무 리포트 보조 이동 제거. 기존 상단/하단 메뉴와 다른 화면 이동 유지.",
+    "report": "docs/handoff/CUSTOMER_MOBILE_REMOVE_DAILY_REPORT_LINK_20260921.md",
+    "figjam": "원격 미변경. 사용자 요청 시 보조 연결선 삭제를 누적 반영."
+  },
+  "r89Revision": {
+    "revision": "2026-09-21-r89",
+    "screenIdsChanged": false,
+    "changes": "모바일 실행 소스 정리. 메인/직원 홈·기존 링크·메뉴·권한 유지, 비교안/백업 기본 배포 제외. 새 메뉴 없음.",
+    "report": "docs/handoff/CUSTOMER_MOBILE_SOURCE_CLEANUP_20260921.md",
+    "figjam": "원격 미변경. 사용자 요청 시 누적 반영."
+  },
   "schemaVersion": 1,
   "updatedAt": "2026-09-13",
   "r65Revision": {

@@ -19,6 +19,6 @@ assert.equal(lead.type,'납산');assert.equal(lead.soc,46);assert.equal(level(le
 assert(source.includes('${batteryIcon(v)}<strong>${value}</strong>'),'Plain numeric text in summary');
 assert(!source.includes('socAttributes')&&!source.includes('battery-soc-value'));
 const css=fs.readFileSync(path.join(app,'customer.css'),'utf8');
-for(const [band,color] of [['high','#37b24d'],['medium','#f59f00'],['low','#e03131']])assert(css.includes('.battery-soc-icon[data-soc-level="'+band+'"] .battery-soc-fill { fill:'+color+'; }'));
+for(const [band,color] of [['high','#37b24d'],['medium','#f59f00'],['low','var(--linq-color-danger)']])assert(css.includes('.battery-soc-icon[data-soc-level="'+band+'"] .battery-soc-fill { fill:'+color+'; }'));
 assert(!css.includes('battery-soc-value'));
 console.log('PASS: lithium and lead-acid fixed interior color bands; FBA18_DEMO_CS02 46% medium; neutral numbers; invalid values unchanged.');

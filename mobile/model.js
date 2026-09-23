@@ -32,7 +32,7 @@
   const SHOCK_LEVELS=[
     {key:'s3',label:'민감',level:'Lv3',min:1.2,max:1.8,color:'#2b8a3e',description:'노면이 고르지 않거나 과속 방지턱을 넘을 때 발생할 수 있는 정도'},
     {key:'s4',label:'주의',level:'Lv4',min:1.8,max:2.5,color:'#f59f00',description:'충분히 감속하지 않은 상태에서 화물을 들 때 발생할 수 있는 정도'},
-    {key:'s5',label:'경고',level:'Lv5',min:2.5,max:null,color:'#e03131',description:'운전자가 느낄 수 있을 정도의 강한 충격'}
+    {key:'s5',label:'경고',level:'Lv5',min:2.5,max:null,color:'var(--linq-color-danger)',description:'운전자가 느낄 수 있을 정도의 강한 충격'}
   ];
   function shockLevel(g) {return Number.isFinite(g)?[...SHOCK_LEVELS].reverse().find(level=>g>=level.min)?.key||null:null;}
   // Match the web meeting-model charge window, including equal hours = 24 hours.

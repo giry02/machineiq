@@ -8,7 +8,10 @@ function harness(hash='',vehicleOverrides={},model=M) {
   const runtimeModel={...model,buildVehicles:data=>model.buildVehicles(data).map(v=>({...v,...vehicleOverrides[v.equipmentId]}))};
   const mapCalls=[];
   const context=vm.createContext({URLSearchParams,FormData:class {constructor(form){this.values=form.values;}get(key){return this.values[key];}},location,history,sessionStorage:{getItem:key=>sessionValues.get(key)||null,removeItem:key=>sessionValues.delete(key)},document:{querySelector:node,querySelectorAll:s=>s==='.bottom-nav [data-route]'?nav:[],addEventListener(k,fn){listeners[k]=fn;}},window:{location,CustomerPrototype:runtimeModel,CustomerLocationMap:{open:v=>mapCalls.push(['open',v]),close:()=>mapCalls.push(['close']),resize:()=>mapCalls.push(['resize'])},MIQ_MOCK_DATA:{fleet},lucide:{createIcons(){}},scrollTo(){},addEventListener(k,fn){windowEvents[k]=fn;}}});
-  vm.runInContext(read('customer.js'),context);
+  context.window.MIQLithiumListModel=runtimeModel.web?.lithium;
+  const screenSource=read('customer.js');
+  if(screenSource.includes('window.CustomerHomeView'))vm.runInContext(read('home-view.js'),context);
+  vm.runInContext(screenSource,context);
   const click=(dataset,attr)=>listeners.click({target:{closest:()=>({dataset,hasAttribute:k=>k===attr})}});
   return {node,click,context,mapCalls,html:()=>node('#main').innerHTML,url:()=>current.toString(),open(hash){current=new URL('#'+hash,current);windowEvents.popstate();},listeners};
 }

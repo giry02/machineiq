@@ -1,12 +1,62 @@
 {
+  "customerMobileDailyChartLayout20260923": {
+    "revision": "r96",
+    "screenIds": ["LQ-REF-003", "LQ-REF-003-T02"],
+    "screenIdsChanged": false,
+    "changes": "운영효율 일별·시간대별 그래프도 날짜/시간대 위, 막대 아래3px, 작업/대기시간 위 정렬로 통일. 일자/시간대 축 머리글 제거. 차량별과 공통 행 CSS 사용, 계산/조회/권한 유지.",
+    "report": "docs/handoff/CUSTOMER_MOBILE_DAILY_CHART_LAYOUT_20260923.md",
+    "figjam": "원격 미변경. 레이아웃 변경 누적 반영 대기."
+  },
+  "customerMobileVehicleChartLayout20260923": {
+    "revision": "r95",
+    "screenIds": ["LQ-REF-003-T02"],
+    "screenIdsChanged": false,
+    "changes": "차량번호·모델 한 줄과 하단 그래프. r93 간격3px, r94 시간 위 정렬(행55px). r95 차량 축 라벨과 전용 행 제거, 0/50/100%·시간 유지. 400px 이하 식별자 겹침 방지 유지. 폰트/데이터/조회/권한 불변.",
+    "report": "docs/handoff/CUSTOMER_MOBILE_VEHICLE_CHART_LAYOUT_20260923.md",
+    "figjam": "원격 미변경. 레이아웃 변경 누적 반영 대기."
+  },
+  "customerMobileDangerColor20260923": {
+    "revision": "r91",
+    "screenIdsChanged": false,
+    "changes": "서비스·알림·홈 오류 아이콘, 배터리 위험 상태, 충격 Lv5의 #E03131을 공통 --linq-color-danger(#992100)로 통일. 브랜드 강조·버튼·주의색·배치·입출력·권한·화면 이동 유지.",
+    "report": "docs/handoff/CUSTOMER_MOBILE_DANGER_COLOR_20260923.md",
+    "figjam": "원격 미변경. 색상 변경 기록만 누적 반영 대기."
+  },
+  "customerMobileRemoveDailyReportLink20260921": {
+    "revision": "r90",
+    "screenIds": ["LQ-REF-003"],
+    "screenIdsChanged": false,
+    "changes": "운영효율 일별/시간대별 상세의 '이 날짜 업무 리포트' 버튼·전용 CSS·미사용 클릭 분기 제거. 상단 리포트 메뉴, 그래프/상세값, 직원 범위 및 다른 이동 유지.",
+    "report": "docs/handoff/CUSTOMER_MOBILE_REMOVE_DAILY_REPORT_LINK_20260921.md",
+    "figjam": "LQ-REF-003 상세→해당 일자 업무 현황 보조 링크 삭제 기록. 원격 미변경, 요청 시 일괄 반영."
+  },
+  "customerMobileSourceCleanup20260921": {
+    "revision": "r89",
+    "screenIdsChanged": false,
+    "screenIds": ["LQ-DASH-001", "LQ-MGT-001-T01", "LQ-OPS-002", "LQ-ACC-001"],
+    "implementation": "현행 홈 1회 렌더, 구 실행 소스 8개 및 구 홈 CSS 제거, WEB 공통 모델 단일화, 승인 실행 시각 보정. 요청한 백업만 고정 자산으로 분리하고 기본 배포 제외.",
+    "deployment": "로컬 모바일만 적용, GitHub 미게시. 온라인 APK 0.2.1-github/code 6 빌드. WEB 원본 수정 없음.",
+    "report": "docs/handoff/CUSTOMER_MOBILE_SOURCE_CLEANUP_20260921.md",
+    "figjam": "원격 미변경. 기존 ID/디자인/흐름 유지. 사용자 명시 요청 시 문서 누적 반영."
+  },
+  "customerAndroidGitHub20260921": {
+    "publication": {"commit":"9e0ac8edfb175bccfe1acc94ca0c6fcb7c7bb715","pagesRun":35569753564,"status":"success","apk":"https://giry02.github.io/machineiq/mobile/downloads/Machine-IQ-Customer-GitHub-v0.2.0-20260921-debug.apk"},
+    "screenIds": ["LQ-AUTH-002", "LQ-AUTH-003", "LQ-AUTH-004", "LQ-DASH-001", "LQ-ACC-001", "LQ-COM-004-P01", "LQ-COM-005", "LQ-COM-005-P01"],
+    "version": "0.2.0-github / code 5",
+    "scope": "GitHub Pages 직접 연결형 APK. 기존 이름/아이콘/동의/QR/로컬 알림 유지, 설정 최신 화면 새로고침 및 네트워크 실패 재시도. 같은 패키지/서명 업데이트 설치.",
+    "implementation": "HostedActivity + HostedUrlPolicy + hosted-location-ui.js. 일반 HTML/ZIP은 네이티브/QR UI 제외 유지. 실제 PUSH/인증 서버 및 iOS 미구현.",
+    "report": "docs/handoff/CUSTOMER_ANDROID_GITHUB_20260921.md",
+    "verification": "빌드/lint/JVM9개/DOM·정적검사/서명·아이콘 동일 확인. 실제 휴대폰 설치/카메라/GPS 미검증. FigJam 누적 대기."
+  },
   "customerMobileHomeEfficiency20260921": {
+    "publication": {"repository":"giry02/machineiq","commit":"fa4297a0fae87a39d2bd84cc93431b80b11ee761","pagesRun":35568637791,"status":"success","report":"docs/handoff/CUSTOMER_MOBILE_R88_GITHUB_20260921.md"},
     "revision": "r88 / dashboard v8",
     "screenIds": ["LQ-DASH-001", "LQ-REF-003", "LQ-AUTH-002", "LQ-AUTH-003", "LQ-AUTH-004"],
     "roles": ["customer_owner", "customer_staff"],
     "input": "고객 로그인·회원가입·비밀번호 찾기의 언어 선택 제거. 로고/기존 폼 유지. 최근 7일 작업 추이 카드 전체 클릭 또는 키보드 실행.",
     "output": "현재 역할을 유지해 이번 달 1일~오늘 운영효율로 이동(period=m, efficiencyLayout=menu, efficiencyMode=daily). 이전 조회/차량/그룹 조건 해제. 차트 수치·레이아웃·도움말 유지.",
     "report": "docs/handoff/CUSTOMER_MOBILE_HOME_EFFICIENCY_20260921.md",
-    "deployment": "로컬 고객 모바일 HTML만 적용. 딜러·WEB·서버·GitHub·APK·ZIP·iOS 미반영. 기존 화면 ID 유지, FigJam 누적 대기."
+    "deployment": "2026-09-21 GitHub 및 Pages 반영 완료(v7 직원 홈 정리 포함). 딜러·WEB·서버·APK·ZIP·iOS 미변경. 기존 화면 ID 유지, FigJam 누적 대기."
   },
   "staffHomeSimplification20260920": {
     "screenId": "LQ-DASH-001",

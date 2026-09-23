@@ -86,7 +86,7 @@ body.mobile-type-compact.customer-prototype {
 .customer-prototype .battery-soc-icon { width:15px; height:15px; flex:none; color:var(--linq-color-text-muted); }
 .customer-prototype .battery-soc-icon[data-soc-level="high"] .battery-soc-fill { fill:#37b24d; }
 .customer-prototype .battery-soc-icon[data-soc-level="medium"] .battery-soc-fill { fill:#f59f00; }
-.customer-prototype .battery-soc-icon[data-soc-level="low"] .battery-soc-fill { fill:#e03131; }
+.customer-prototype .battery-soc-icon[data-soc-level="low"] .battery-soc-fill { fill:var(--linq-color-danger); }
 .customer-prototype .battery-soc-reading { display:inline-flex; align-items:center; gap:4px; vertical-align:middle; }
 .customer-prototype .vehicle-compact-shortcut.needs-action { color:var(--linq-color-danger); background:var(--linq-color-danger-soft); }
 .customer-prototype .vehicle-compact-shortcut.needs-action strong { color:var(--linq-color-danger); }
@@ -185,25 +185,6 @@ body.customer-prototype:has(.supply-reset-dialog[open]) { overflow:hidden; }
 .customer-prototype .criteria-tip-panel .source-note + .source-note { margin-top:6px; }
 .customer-prototype .criteria-tip-close { display:flex; align-items:center; justify-content:center; gap:4px; min-width:44px; min-height:44px; margin:4px 0 -6px auto; padding:0; border:0; background:transparent; color:var(--linq-color-text); font:inherit; font-size:14px; }
 .customer-prototype .criteria-tip-close svg { width:14px; height:14px; }
-.customer-prototype .status-charts { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; padding:12px 0 2px; }
-.customer-prototype .status-chart { min-width:0; }
-.customer-prototype .status-chart__head { display:flex; align-items:center; justify-content:space-between; gap:4px; }
-.customer-prototype .status-chart__head > span { display:flex; align-items:center; gap:5px; font-size:14px; }
-.customer-prototype .status-chart__head svg { width:16px; height:16px; }
-.customer-prototype .status-chart__head strong { font-size:22px; font-variant-numeric:tabular-nums; }
-.customer-prototype .status-chart__track { display:flex; height:14px; margin:12px 0 7px; border-radius:3px; overflow:hidden; background:#d9dde1; }
-.customer-prototype .status-chart__track > span { background:var(--linq-color-brand); }
-.customer-prototype .status-chart__track.is-running > span { background:var(--linq-color-text); }
-.customer-prototype .status-chart__legend { display:flex; flex-wrap:wrap; gap:0 10px; }
-.customer-prototype .status-chart__legend button { display:flex; align-items:center; gap:4px; padding:5px 0; min-height:36px; border:0; background:transparent; font:inherit; font-size:14px; }
-.customer-prototype .status-chart__legend i { width:6px; height:6px; border-radius:50%; background:var(--linq-color-brand); }
-.customer-prototype .status-chart:has(.is-running) .status-chart__legend i:not(.is-muted) { background:var(--linq-color-text); }
-.customer-prototype .status-chart__legend i.is-muted { background:#d9dde1; }
-.customer-prototype .performance-headline { display:flex; align-items:center; gap:22px; padding:8px 0 14px; }
-.customer-prototype .performance-headline > strong { font-size:32px; line-height:1.2; color:var(--linq-color-text); }
-.customer-prototype .performance-headline small { display:block; margin-top:7px; font-size:14px; color:var(--linq-color-text-muted); font-weight:400; }
-.customer-prototype .performance-headline p { margin:0; font-size:14px; line-height:1.7; }
-.customer-prototype .performance-headline p b { color:var(--linq-color-primary-fill); }
 .customer-prototype .work-track { display:flex; height:14px; border-radius:3px; background:#ececea; overflow:hidden; }
 .customer-prototype .is-work { background:var(--linq-color-brand); }
 .customer-prototype .is-idle { background:#4d5359; }
@@ -211,10 +192,6 @@ body.customer-prototype:has(.supply-reset-dialog[open]) { overflow:hidden; }
 .customer-prototype .work-legend { display:flex; justify-content:flex-end; flex-wrap:wrap; gap:12px; margin:8px 0 12px; font-size:14px; color:var(--linq-color-text-muted); }
 .customer-prototype .work-legend > span { display:inline-flex; align-items:center; gap:5px; }
 .customer-prototype .work-legend i { width:7px; height:7px; border-radius:1px; }
-.customer-prototype .performance-mini { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
-.customer-prototype .performance-mini span { color:var(--linq-color-text-muted); font-size:14px; }
-.customer-prototype .performance-mini b { display:block; margin-top:5px; font-size:14px; color:var(--linq-color-text); }
-.customer-prototype .performance-group .work-track { grid-column:1/-1; height:7px; margin:5px 0; }
 .customer-prototype .performance-vehicle { position:relative; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:6px 10px; width:100%; padding:14px 22px 14px 0; border:0; border-top:1px solid var(--linq-color-border-subtle); background:#fff; text-align:left; font:inherit; }
 .customer-prototype .performance-vehicle strong { display:block; font-size:14px; overflow-wrap:anywhere; }
 .customer-prototype .performance-vehicle small { display:block; margin-top:4px; font-size:14px; color:var(--linq-color-text-muted); }
@@ -228,17 +205,8 @@ body.customer-prototype:has(.supply-reset-dialog[open]) { overflow:hidden; }
 .customer-prototype .report-tabs.has-vehicle-efficiency { grid-template-columns:repeat(3,minmax(0,1fr)); }
 .customer-prototype .efficiency-view-tabs { grid-template-columns:repeat(2,minmax(0,1fr)); margin:0; flex:1; min-width:0; }
 .customer-prototype .efficiency-graph-count { display:flex; align-items:center; gap:4px; flex:none; }
-.customer-prototype .efficiency-panel.is-by-vehicle .efficiency-axis,
-.customer-prototype .is-by-vehicle .efficiency-vehicle > summary,
-.customer-prototype .efficiency-vehicle .efficiency-day-uncollected { grid-template-columns:minmax(90px,1fr) minmax(50px,1.5fr) 110px; }
-.customer-prototype .efficiency-vehicle-label { font-size:14px; overflow-wrap:anywhere; line-height:1.5; }
-.customer-prototype .efficiency-vehicle-label small { display:block; color:var(--linq-color-text-muted); font-size:14px; }
-.customer-prototype .efficiency-vehicle .efficiency-day__detail { padding-left:0; }
-@media(max-width:360px) {
-  .customer-prototype .efficiency-panel.is-by-vehicle .efficiency-axis,
-  .customer-prototype .is-by-vehicle .efficiency-vehicle > summary,
-  .customer-prototype .efficiency-vehicle .efficiency-day-uncollected { grid-template-columns:minmax(72px,1fr) minmax(40px,1fr) 100px; }
-}
+.customer-prototype .efficiency-vehicle-label { display:flex; align-items:baseline; gap:8px; min-width:0; font-size:14px; line-height:1.5; white-space:nowrap; overflow-wrap:normal; }
+.customer-prototype .efficiency-vehicle-label small { flex:none; color:var(--linq-color-text-muted); font-size:14px; }
 .customer-prototype .report-primary-action { display:flex; justify-content:center; align-items:center; gap:8px; width:100%; min-height:var(--customer-button-action-height); margin:12px 0; padding:0 12px; color:#fff; background:var(--customer-button-fill); border:0; border-radius:var(--linq-radius-control); font:inherit; font-size:var(--customer-button-font); font-weight:600; line-height:20px; }
 .customer-prototype .dashboard-panel__head > button:focus-visible:not(:disabled),
 .customer-prototype .report-primary-action:focus-visible:not(:disabled) { border-color:var(--customer-button-hover-border); background:var(--customer-button-hover); }
@@ -251,34 +219,28 @@ body.customer-prototype:has(.supply-reset-dialog[open]) { overflow:hidden; }
   .customer-prototype .report-primary-action:hover:not(:active):not(:disabled) { border-color:var(--customer-button-hover-border); background:var(--customer-button-hover); }
 }
 .customer-prototype .report-primary-action svg { width:18px; height:18px; }
-.customer-prototype .efficiency-axis,.customer-prototype .efficiency-day > summary { display:grid; grid-template-columns:36px minmax(0,1fr) 110px; align-items:center; gap:8px; }
+.customer-prototype .efficiency-axis,.customer-prototype .efficiency-day > summary { display:grid; grid-template-columns:minmax(0,1fr) 110px; align-items:center; gap:8px; }
 .customer-prototype .efficiency-axis { padding:6px 0 10px; color:var(--linq-color-text-muted); font-size:14px; }
 .customer-prototype .efficiency-axis > span:first-child { white-space:nowrap; }
-.customer-prototype .efficiency-axis > span:nth-child(2) { display:flex; justify-content:space-between; }
+.customer-prototype .efficiency-axis > .efficiency-axis-scale { display:flex; justify-content:space-between; }
 .customer-prototype .efficiency-axis > span:last-child { text-align:right; }
 .customer-prototype .efficiency-day { border-top:1px solid var(--linq-color-border-subtle); }
-.customer-prototype .efficiency-day > summary { min-height:48px; padding:6px 0; cursor:pointer; list-style:none; }
+.customer-prototype .efficiency-day > summary { grid-template-rows:21px minmax(21px,auto); row-gap:0; min-height:48px; padding:6px 0; cursor:pointer; list-style:none; }
 .customer-prototype .efficiency-day > summary::-webkit-details-marker { display:none; }
-.customer-prototype .efficiency-date { display:flex; gap:3px; align-items:baseline; font-size:14px; font-variant-numeric:tabular-nums; }
+.customer-prototype .efficiency-date { display:flex; gap:3px; align-items:baseline; font-size:14px; line-height:1.5; font-variant-numeric:tabular-nums; }
 .customer-prototype .efficiency-date small { font-size:14px; color:var(--linq-color-text-muted); }
-.customer-prototype .efficiency-day > summary > strong { display:flex; justify-content:flex-end; align-items:center; gap:3px; font-size:14px; font-variant-numeric:tabular-nums; }
+.customer-prototype .efficiency-day > summary > strong { display:flex; justify-content:flex-end; align-items:center; gap:3px; font-variant-numeric:tabular-nums; }
 .customer-prototype .efficiency-day > summary > strong > span { text-align:right; }
 .customer-prototype .efficiency-day > summary > strong small { display:block; margin-top:3px; font-size:14px; font-weight:400; color:var(--linq-color-text-muted); }
 .customer-prototype .efficiency-day > summary svg { width:13px; height:13px; color:var(--linq-color-text-muted); }
 .customer-prototype .efficiency-day[open] > summary svg { transform:rotate(180deg); }
 .customer-prototype .efficiency-day[open] > summary .efficiency-date { color:var(--linq-color-primary-fill); font-weight:700; }
-.customer-prototype .efficiency-day__detail { padding:0 0 14px 44px; }
-.customer-prototype .daily-report-link { display:flex; align-items:center; gap:3px; min-height:44px; margin-top:8px; padding:4px 0; border:0; background:transparent; color:var(--linq-color-primary-fill); font:inherit; font-size:14px; font-weight:600; }
-.customer-prototype .daily-report-link svg { width:14px; height:14px; }
+.customer-prototype .efficiency-day__detail { padding:0 0 14px; }
 .customer-prototype button:focus-visible,.customer-prototype summary:focus-visible { outline:2px solid var(--linq-color-text); outline-offset:3px; }
 .customer-prototype .metric-label { display:flex; align-items:center; gap:6px; font-size:14px; }
 .customer-prototype .metric-label svg { width:17px; height:17px; color:var(--linq-color-text-muted); }
 .customer-prototype .connection-meter { height:6px; margin:12px 0; border-radius:3px; background:var(--linq-color-border-subtle); overflow:hidden; }
 .customer-prototype .connection-meter span { display:block; height:100%; background:var(--linq-color-brand); }
-.customer-prototype .health-kpis { margin-top:10px; }
-.customer-prototype .health-kpis .dashboard-kpi { min-height:104px; }
-.customer-prototype .health-kpis .dashboard-kpi strong { white-space:nowrap; }
-.customer-prototype .health-kpis .kpi-unit { display:inline; font-size:14px; font-weight:400; color:var(--linq-color-text-muted); }
 .customer-prototype .dashboard-kpi__label { font-size:14px; }
 .customer-prototype .group-row { display:grid; grid-template-columns:1fr auto; gap:4px 10px; width:100%; padding:12px 0; border:0; border-top:1px solid var(--linq-color-border-subtle); background:#fff; text-align:left; }
 .customer-prototype .group-row small { grid-column:1/-1; color:var(--linq-color-text-muted); font-size:14px; }
@@ -333,15 +295,9 @@ body.customer-prototype:has(.supply-reset-dialog[open]) { overflow:hidden; }
 .customer-prototype .setting-link svg { width:18px; height:18px; }
 .customer-prototype .error-note { padding:12px; color:var(--linq-color-danger); background:var(--linq-color-danger-soft); border-radius:4px; }
 @media(max-width:360px) { .customer-prototype .app-view { padding-inline:12px; } .customer-prototype .metric-label { gap:4px; } .customer-prototype .context-line strong { font-size:14px; } }
-@media(max-width:360px) { .customer-prototype .status-chart__head { flex-wrap:wrap; } .customer-prototype .status-chart__head strong { margin-left:auto; } .customer-prototype .dashboard-panel__head { flex-wrap:wrap; } .customer-prototype .dashboard-panel__head > button { margin-left:auto; } }
+@media(max-width:360px) { .customer-prototype .dashboard-panel__head { flex-wrap:wrap; } .customer-prototype .dashboard-panel__head > button { margin-left:auto; } }
 /* r16: existing components, shared status meaning and data density. */
 .customer-prototype .source-note.period-cutoff { margin:6px 0 10px; }
-.customer-prototype .status-chart__legend button { min-height:44px; }
-.customer-prototype .health-kpis .is-danger .dashboard-kpi__label,
-.customer-prototype .health-kpis .is-danger > strong { color:var(--linq-color-danger); }
-.customer-prototype .health-kpis .is-warning .dashboard-kpi__label,
-.customer-prototype .health-kpis .is-warning > strong { color:var(--linq-color-warning-text); }
-.customer-prototype .health-kpis .dashboard-kpi__label svg { color:inherit; }
 .customer-prototype .service-item-line.is-state-danger > span > svg { color:var(--linq-color-danger); }
 .customer-prototype .service-item-line.is-state-neutral > span > svg { color:var(--linq-color-text-muted); }
 .customer-prototype .error-service-item .error-service-copy { flex:1; min-width:0; display:flex; flex-direction:column; gap:5px; }
@@ -368,13 +324,13 @@ body.customer-prototype:has(.supply-reset-dialog[open]) { overflow:hidden; }
 .customer-prototype .shock-band > small { font-size:14px; color:var(--linq-color-text-muted); white-space:nowrap; }
 .customer-prototype .shock-band.is-s3 > strong { color:#2b8a3e; }
 .customer-prototype .shock-band.is-s4 > strong { color:#f59f00; }
-.customer-prototype .shock-band.is-s5 > strong { color:#e03131; }
+.customer-prototype .shock-band.is-s5 > strong { color:var(--linq-color-danger); }
 .customer-prototype .shock-breakdown + .panel-heading-with-tip { justify-content:flex-end; margin:0 0 10px; }
 .customer-prototype .shock-breakdown + .panel-heading-with-tip h3 { font-size:14px; font-weight:400; color:var(--linq-color-text-muted); }
 .customer-prototype .lithium-state-item svg { width:18px; height:18px; color:var(--linq-color-text-muted); }
 .customer-prototype .lithium-state-item strong { font-size:14px; }
 .customer-prototype .lithium-state-item.is-normal strong { color:#2b8a3e; }
-.customer-prototype .lithium-state-item.is-danger strong { color:#e03131; }
+.customer-prototype .lithium-state-item.is-danger strong { color:var(--linq-color-danger); }
 .customer-prototype .lithium-state-item.is-warning strong { color:#f59f00; }
 .customer-prototype .lithium-state-item.is-unknown strong { color:var(--linq-color-text-muted); }
 .customer-prototype .mobile-smart-charge { margin-top:12px; border-top:1px solid var(--linq-color-border-subtle); }
@@ -395,7 +351,7 @@ body.customer-prototype:has(.supply-reset-dialog[open]) { overflow:hidden; }
 .customer-prototype .group-performance-metrics { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; grid-column:1/-1; margin:6px 0 2px; }
 .customer-prototype .group-performance-metrics span { color:var(--linq-color-text-muted); font-size:14px; }
 .customer-prototype .group-performance-metrics b { display:block; margin-top:3px; color:var(--linq-color-text); font-size:14px; }
-.customer-prototype .efficiency-day-uncollected { display:grid; grid-template-columns:36px minmax(0,1fr) 110px; align-items:center; gap:8px; min-height:48px; padding:6px 0; color:var(--linq-color-text-muted); font-size:14px; }
+.customer-prototype .efficiency-day-uncollected { display:grid; grid-template-columns:minmax(0,1fr) 110px; grid-template-rows:21px minmax(21px,auto); align-items:center; column-gap:8px; row-gap:0; min-height:48px; padding:6px 0; color:var(--linq-color-text-muted); font-size:14px; }
 .customer-prototype .efficiency-day-uncollected > strong { text-align:right; }
 .customer-prototype .efficiency-day > summary > strong { font-size:14px; white-space:nowrap; }
 .customer-prototype .settings-panel-head { margin:0; padding:14px 15px 10px; }
@@ -408,7 +364,7 @@ body.customer-prototype:has(.supply-reset-dialog[open]) { overflow:hidden; }
 /* Source PUSH inbox fields in the existing mobile notification component. */
 .customer-prototype .push-history-item > svg { color:var(--linq-color-text-muted); background:var(--linq-color-surface-muted); }
 .customer-prototype .push-history-item[data-push-category="shock"] > svg { color:#f59f00; }
-.customer-prototype .push-history-item[data-push-category="error"] > svg { color:#e03131; }
+.customer-prototype .push-history-item[data-push-category="error"] > svg { color:var(--linq-color-danger); }
 .customer-prototype .push-history-item[data-push-category="battery"] > svg { color:#2b8a3e; }
 .customer-prototype .push-history-item[data-push-category="other"] > svg { color:#1971c2; }
 .customer-prototype article.push-history-item { cursor:default; }
@@ -519,7 +475,6 @@ body.customer-prototype:has(.location-dialog[open]) { overflow:hidden; }
 .customer-prototype .vehicle-mobile-row > .vehicle-card-shortcuts[data-shortcut-kind="status"]:last-child { margin-bottom:-13px; }
 .customer-prototype .detail-card > .service-record:last-child { margin-bottom:0; }
 /* r37: remove duplicate copy, equalize the final disclosure spacing, and clear badges from labels. */
-.customer-prototype .health-kpis > .dashboard-kpi { min-height:0; }
 .customer-prototype [data-shortcut-kind="status"] .vehicle-shortcut-icon { margin-inline-end:4px; }
 .customer-prototype .app-view:has(> .source-disclosure:last-child, > [data-screen-id] > .source-disclosure:last-child) { padding-bottom:0; }
 .customer-prototype .mobile-app:has(.app-view > .source-disclosure:last-child, .app-view > [data-screen-id] > .source-disclosure:last-child) { padding-bottom:68px; }
@@ -564,24 +519,20 @@ body.customer-prototype:has(.location-dialog[open]) { overflow:hidden; }
 .customer-prototype .efficiency-date small,
 .customer-prototype .efficiency-vehicle-id { font-weight:700; }
 
-/* r76 vehicle chart: preserve 14px and two identity lines, including narrow cover screens. */
-.customer-prototype .efficiency-panel.is-by-vehicle .efficiency-axis,
-.customer-prototype .is-by-vehicle .efficiency-vehicle > summary,
-.customer-prototype .efficiency-vehicle .efficiency-day-uncollected { grid-template-columns:150px minmax(0,1fr) 110px; }
-.customer-prototype .efficiency-vehicle-label { white-space:nowrap; overflow-wrap:normal; }
-.customer-prototype .efficiency-vehicle-id { display:block; }
-@media(max-width:440px) {
-  .customer-prototype .efficiency-panel.is-by-vehicle .efficiency-axis,
+/* r96: daily/hourly and vehicle graphs share the compact two-line row. */
+.customer-prototype .efficiency-date,
+.customer-prototype .efficiency-vehicle-label { grid-column:1; grid-row:1; align-self:start; }
+.customer-prototype .efficiency-vehicle-id { min-width:0; overflow:hidden; text-overflow:ellipsis; }
+.customer-prototype .efficiency-day .work-track,
+.customer-prototype .efficiency-day-uncollected > span:nth-child(2) { grid-column:1; grid-row:2; min-width:0; }
+.customer-prototype .efficiency-day .work-track { align-self:start; margin-top:3px; }
+.customer-prototype .efficiency-day > summary > strong,
+.customer-prototype .efficiency-day-uncollected > strong { grid-column:2; grid-row:1 / 3; align-self:start; }
+/* Keep the full identity readable when a cover screen cannot fit both columns. */
+@media(max-width:400px) {
   .customer-prototype .is-by-vehicle .efficiency-vehicle > summary,
-  .customer-prototype .efficiency-vehicle .efficiency-day-uncollected { grid-template-columns:54px minmax(0,1fr) 110px; column-gap:6px; }
-  .customer-prototype .is-by-vehicle .efficiency-vehicle > summary,
-  .customer-prototype .efficiency-vehicle .efficiency-day-uncollected { grid-template-rows:21px 21px; row-gap:0; }
-  .customer-prototype .efficiency-vehicle-label { display:contents; }
-  .customer-prototype .efficiency-vehicle-id { grid-column:1 / 3; grid-row:1; }
-  .customer-prototype .efficiency-vehicle-label small { grid-column:1; grid-row:2; }
-  .customer-prototype .efficiency-vehicle .work-track,
-  .customer-prototype .efficiency-vehicle .efficiency-day-uncollected > span:not(.efficiency-vehicle-label) { grid-column:2; grid-row:2; min-width:0; }
+  .customer-prototype .efficiency-vehicle .efficiency-day-uncollected { grid-template-rows:21px auto; }
+  .customer-prototype .efficiency-vehicle-label { grid-column:1 / -1; }
   .customer-prototype .efficiency-vehicle > summary > strong,
-  .customer-prototype .efficiency-vehicle .efficiency-day-uncollected > strong { grid-column:3; grid-row:1 / 3; }
+  .customer-prototype .efficiency-vehicle .efficiency-day-uncollected > strong { grid-row:2; }
 }
-/* end r76 vehicle chart */

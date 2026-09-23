@@ -1,38 +1,39 @@
 {
-  "revision": "2026-09-21-r88",
+  "revision": "2026-09-23-r96",
   "entry": "login.html",
+  "includeArchives": false,
   "files": [
     {
       "path": "index.html",
-      "sha256": "931a87b83902288aa723da96a3b05ac80ac40b122a63111daa0dd55ca8f1f31c"
+      "sha256": "17ed9edb34a0d95beaffc9d0bf80514c9b0380b32b4f4ba5426fa4191f1dfd79"
     },
     {
       "path": "customer.js",
-      "sha256": "eec7b0b5cd755beb6de7679ee284feb692b4baacc5b6caf4b0a1c0573070feb9"
+      "sha256": "6a771d20ff3b7be17c4c98f3a0880d4ef40f6717e3f899cf8f03d11be78b3aaa"
     },
     {
       "path": "customer.css",
-      "sha256": "d376862cb07a4244a5b7ee875b83ba7f88681c0ad2dc9a9f95453bbd13ae0943"
+      "sha256": "c756621aca35dcf1f0b99ec33c75cb5e4ac4e00f0ba61f1121acb2929e21a672"
+    },
+    {
+      "path": "home-view.js",
+      "sha256": "10b8b5e76f31107d9184529d3f5eacbda6af0975f33c84534936015e89aac831"
+    },
+    {
+      "path": "release.json",
+      "sha256": "ef514f1a334b1a3dd590f4e89023f8295ae2d011489ed532680c119f42553cc5"
     },
     {
       "path": "error-documents.js",
       "sha256": "641b65ee6a18c1879750a386a60a73ca38e93bd90d12f0e4309cd50a589d76d2"
     },
     {
-      "path": "lithium-status-model.js",
-      "sha256": "f9eff23d5fdeb13b1383d8ebf149e3b0a4c4cee638b161a7dcd0b0b3302d2fb7"
-    },
-    {
-      "path": "location-map.js",
-      "sha256": "073dde74d6b275ee899bd3f048dd27435ece9dbd255f2f5f340c35d0a21bb979"
-    },
-    {
       "path": "model.js",
-      "sha256": "de2dced29c72faba103a581c4f7baee33d818749663e6dfd4d794712aa878bb1"
+      "sha256": "8aa87ad18f45c0d2f92e87badb29f5d02dc59473d0c7bfad5b304b51f3c379f8"
     },
     {
       "path": "login.html",
-      "sha256": "60cea526eee1512bc4e9e0a49a0dba8a8cc35b017565ac5bb32a9980002a2072"
+      "sha256": "b090d4eaf051fbd3ab76e62ae61cc7e5fb16b0e2f63c75f2f2687fa23bfd3a8c"
     },
     {
       "path": "login.js",
@@ -40,7 +41,7 @@
     },
     {
       "path": "signup.html",
-      "sha256": "f9fb1a1f66bd321fb2d7f77b0415e113c30c22632e037c15681e0a1b5eb25158"
+      "sha256": "97946461000c1bde299b486a5d9664029db51d65b473b2f924494d2034694c25"
     },
     {
       "path": "signup.js",
@@ -52,7 +53,7 @@
     },
     {
       "path": "find-password.html",
-      "sha256": "0d1d3e51cfbcb8f77c6a0e267227988ce31f5b72d29b576c1cabe9ff67d2c139"
+      "sha256": "1b3bf635043313ff26067ee349da62527d351b3ebb1c8ad84183c5e142af6653"
     },
     {
       "path": "find-password.js",
@@ -60,39 +61,19 @@
     },
     {
       "path": "web-contracts.generated.js",
-      "sha256": "891a3efa37cbb36159abbba52904ee663b020e77ddcaf52cbdb29a695bedc057"
+      "sha256": "b9e34ec48d48aacc939702e929fc169ed5c08663e0b8dee6794a838ba22f93c7"
     },
     {
       "path": "web-guide-colors.css",
-      "sha256": "b5c4bb8138a8bc1508f507c1df20e40039acdff5b40c5141bd9145033e41cb4e"
-    },
-    {
-      "path": "group-cards-preview.html",
-      "sha256": "1dc5d0d1d23007603ad9881da9fc3ceaaab22c9ed03101bea5547feeea75f767"
-    },
-    {
-      "path": "group-cards-preview.js",
-      "sha256": "f0e9d7909e5a43ae6cdc07fa7aace9734253f0ffbc27a197ce84bd2d0fe91012"
-    },
-    {
-      "path": "group-cards-preview.css",
-      "sha256": "6d53027e46fe493959cbf97b806e9d0a06216682d4f658a90429e7da9900bb9a"
-    },
-    {
-      "path": "owner-dashboard-preview.html",
-      "sha256": "cc13408a98b3be0550fb54bb4ebb9d7842576183a8973216687ff13e38a3dbc5"
-    },
-    {
-      "path": "owner-dashboard-preview.js",
-      "sha256": "6df9f2c67e23e9d99e4b84a4e755405f9f92ef9df3200f31c341328d06d6f29f"
+      "sha256": "311e03f1c1a75fcd6f5fa00611d1e60b97bf4b999f55392893ed366dde10ec00"
     },
     {
       "path": "owner-dashboard-preview.css",
       "sha256": "c57f4305fd3703a43a588f9ce5603ae58972c41bbb94a5caf0dbec90e0c6bbd8"
     },
     {
-      "path": "dashboard-backup-20260919.html",
-      "sha256": "1dc5d0d1d23007603ad9881da9fc3ceaaab22c9ed03101bea5547feeea75f767"
+      "path": "location-map.js",
+      "sha256": "f428b5a1c740a1b81b722c13794ffbacd2b04d302a055f9d520dc3d00ce946fe"
     },
     {
       "path": "shared/mobile-guide-tokens.css",
@@ -692,7 +673,7 @@
     },
     {
       "path": "tests/dashboard.cjs",
-      "sha256": "7ead4bfeba39a59b3821c9a73a1d4c71662c1d6458c3a08cebb5333f8ed6c30e"
+      "sha256": "fc88efe9391f003933e837923b27dbceeabfef6cb8ea6a764f7e8861a7efc18e"
     },
     {
       "path": "tests/auth.cjs",
@@ -700,7 +681,39 @@
     },
     {
       "path": "README.md",
-      "sha256": "5acd8779a0ad93f422d2efac28857942f6b26e9b3bd8141ab719f8005bbe8198"
+      "sha256": "37f85d6896c7fe0c320f00acc034f3c8f9342c5fe53918cbda505b73c957288a"
+    },
+    {
+      "path": "licenses/Lucide-0.468.0-LICENSE.txt",
+      "sha256": "1e7290b35280a048667bbf0ebabac1c7fd52a75300e8b2946ac165715997f2bc"
+    },
+    {
+      "path": "licenses/Feather-MIT-LICENSE.txt",
+      "sha256": "308028e93fcf84972523cdf6e616f73168546b4953895f516d01287f16fe7bee"
+    },
+    {
+      "path": "licenses/NotoSansKR-OFL.txt",
+      "sha256": "babcfe66c8a098b2fa279bc724a3a342f8124f77ce18941fbcc1bbb39823cded"
+    },
+    {
+      "path": "licenses/OpenSans-OFL.txt",
+      "sha256": "01cd5ffb3a528c219a86e49a814c6c53bd8a69b9a3c305dd237074ba1c811af7"
+    },
+    {
+      "path": "docs/danger-color-r91.md",
+      "sha256": "7db4d285405202a078cef4788122a717fbf682ac71b127c8fd9565b1a6118604"
+    },
+    {
+      "path": "docs/vehicle-chart-r95.md",
+      "sha256": "80471dc7210877ccba4a4c4ae033c51196eaad382f2df541c518d583fbe2e6f8"
+    },
+    {
+      "path": "docs/daily-chart-r96.md",
+      "sha256": "fff512df3891cac8f8011c789cd457df8eb24b089c1bbd498b50675b26f3b520"
+    },
+    {
+      "path": "docs/source-cleanup-r89.md",
+      "sha256": "670818944d03429aa6177ed6034070d818da5cc741656271a62afa53e4645bb9"
     },
     {
       "path": "docs/dashboard-main-20260919.md",
@@ -712,7 +725,7 @@
     },
     {
       "path": "docs/home-efficiency-r88.md",
-      "sha256": "ce43b68522c6c19107cb3d45461f1525b675976f50c1eac4ce098fb4a629b18e"
+      "sha256": "476197c4f8069dd52fb276afa5183ab551ae8a3f5fe0504b577db8f23ac04ec7"
     },
     {
       "path": "docs/missing-data-r87.md",
@@ -740,11 +753,11 @@
     },
     {
       "path": "docs/screen-registry.json",
-      "sha256": "9b81da84d8d1deb35b3a6b4fcaa3be01093540d61610abcc6cd0a2399dc0d676"
+      "sha256": "ee09de262c94c99789a27cef7e0cb83fe253ef9be21046efd3d386a8944a5022"
     },
     {
       "path": "docs/menu-page-registry.json",
-      "sha256": "1ad9bd4e0c2ee880fc9fbe31104d005775d236da099c75ae9edba308d4798e03"
+      "sha256": "6d173f8111ffd296cda742a4f4e87e02d74795b32968977fbc1d427a934fd931"
     },
     {
       "path": "docs/figjam-detail-r46.json",
@@ -768,11 +781,11 @@
     },
     {
       "path": "tests/harness.js",
-      "sha256": "7d295e06d6187029183ebb08511e52187b58ba0ae3fdae6e7525d80d63bfc109"
+      "sha256": "8708ea0a5b8da3c79b8ac7248830f20e82ab44b0abc4fbb49a138f3beb8497a0"
     },
     {
       "path": "tests/soc.cjs",
-      "sha256": "d85c12aae9fe85684a6d241e2c611b564ad9fa13c5ed362627bb440b45187401"
+      "sha256": "ff12c10ecb02ddc9a7f1ad3dbb04098f53b3643a07fc297e3a91f09c7d925067"
     },
     {
       "path": "tests/error.cjs",
@@ -780,19 +793,11 @@
     },
     {
       "path": "tests/lithium-shock.cjs",
-      "sha256": "6f46357c5d108cc2d3c292c1140d4f58372fd5f476ecea7c1868ab48545f7d50"
+      "sha256": "8a57cade8e95c928e417412031ecebe1d905867d22587900fdd6e702d19aa769"
     },
     {
       "path": "docs/html-delivery.md",
       "sha256": "4302bef563947521a390f1f6fd6f1a907699ffa4dd6a1942cb238b227480aece"
-    },
-    {
-      "path": "downloads/MACHINE_IQ_MOBILE_HTML_20260913_r46.zip",
-      "sha256": "2f567cd0eab0e1e11e766aa33ff70c100550683781d2d297875c5342041a7566"
-    },
-    {
-      "path": "downloads/Machine-IQ-Customer-Location-Notifications-QR-v0.1.3-20260920-r87-debug.apk",
-      "sha256": "16fa7106db105d6f20efa3b48beede66507bb1e4767b9f224930d47b1da0865c"
     },
     {
       "path": "docs/android-github.md",
@@ -801,6 +806,26 @@
     {
       "path": "downloads/Machine-IQ-Customer-GitHub-v0.2.0-20260921-debug.apk",
       "sha256": "71feff53754e9d38fdc4c4dd9df47b40052dc6dfe90e6cc42f1c541c8f1b9f40"
+    },
+    {
+      "path": "downloads/Machine-IQ-Customer-Location-Notifications-QR-v0.1.3-20260920-r87-debug.apk",
+      "sha256": "16fa7106db105d6f20efa3b48beede66507bb1e4767b9f224930d47b1da0865c"
+    },
+    {
+      "path": "downloads/MACHINE_IQ_MOBILE_HTML_20260913.zip",
+      "sha256": "802a8b41a8123b2bf4ca19da1c88585a93e7cdcfedfb71984e2426d234b787ec"
+    },
+    {
+      "path": "downloads/MACHINE_IQ_MOBILE_HTML_20260913_r44.zip",
+      "sha256": "f8ce4703deb2708ccbfdfdcb42ff75b0ee7e8113e85ac25a22a6f0a3f21b8de7"
+    },
+    {
+      "path": "downloads/MACHINE_IQ_MOBILE_HTML_20260913_r45.zip",
+      "sha256": "a3f0db4e7c3f274620e8307a526263f1f55cb44e547eded55a0310996518b8e6"
+    },
+    {
+      "path": "downloads/MACHINE_IQ_MOBILE_HTML_20260913_r46.zip",
+      "sha256": "2f567cd0eab0e1e11e766aa33ff70c100550683781d2d297875c5342041a7566"
     }
   ]
 }
