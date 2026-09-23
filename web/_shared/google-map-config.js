@@ -6,7 +6,7 @@
    Authorization and the original fleet context headers. Never persist tokens here.
    A host may inject loadRoute(query, {signal}) instead of routeEndpoint. */
 window.MIQMapConfig = Object.assign({
-  apiKey: 'AIzaSyAF9XrtLKzXNNfyiWeOpzKf-JYUTV95a_Y',
+  apiKey: 'AIzaSyCuuwTgq2dW3sF7xWO0KS8PMsdo_fvKwPo',
   routeEndpoint: '',
   routeApiBaseUrl: '',
   routeHeaders: null,
