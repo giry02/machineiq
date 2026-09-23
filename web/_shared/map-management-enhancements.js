@@ -246,12 +246,6 @@
       '<span class="mm-map-toolbar__hint" data-mm-map-hint>아래 장비목록의 차대번호를 누르면 지도에서 차량이 선택됩니다.</span>';
     map.parentNode.insertBefore(toolbar, map);
 
-    var zoomBox = document.createElement('span');
-    zoomBox.className = 'mm-zoom-level';
-    zoomBox.textContent = '–';
-    var controls = map.querySelector('.map-ctl');
-    controls.insertBefore(zoomBox, controls.children[1]);
-
     function rowFault(row) {
       if(!row.children)return Number(row.err)||0;
       var cell = row.children[6];
@@ -521,13 +515,6 @@
       toolbar.querySelector('[data-mm-map-mode="route"]').click();
     });
 
-    var ctlButtons = controls.querySelectorAll('button');
-    function applyZoom() {
-      var level = window.MIQGoogleMap && MIQGoogleMap.getZoom();
-      zoomBox.textContent = level === null || level === undefined ? '–' : String(level);
-    }
-    ctlButtons[0].addEventListener('click', function () { if (window.MIQGoogleMap) MIQGoogleMap.zoomBy(1); });
-    ctlButtons[ctlButtons.length - 1].addEventListener('click', function () { if (window.MIQGoogleMap) MIQGoogleMap.zoomBy(-1); });
     document.getElementById('btnExport').addEventListener('click', function () {
       var rows = MIQMapData.getVisibleRows();
       var columns = ['model', 'vin', 'dataTime', 'runH', 'conn', 'idle', 'err', 'battErr', 'posTime', 'addr'];
@@ -561,7 +548,7 @@
     });
 
     // Restore the current scope and zoom before refreshed hourly rows are painted.
-    document.addEventListener('miq:map-rendered', function () { if(!applying){decorateRows();renderMapScope(MIQMapData.getVisibleRows().length);updatePopupLink();renderRoute();} applyZoom(); });
+    document.addEventListener('miq:map-rendered', function () { if(!applying){decorateRows();renderMapScope(MIQMapData.getVisibleRows().length);updatePopupLink();renderRoute();} });
 
     applyFilters();
     if (routeMode && restoreRouteVin) {

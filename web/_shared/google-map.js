@@ -21,7 +21,6 @@
     canvas.dataset.mapType = type === 'sat' ? 'satellite' : 'roadmap'; canvas.dataset.mapZoom = String(zoom);
     canvas.dataset.selectedVin = selected; canvas.dataset.positionCount = String(current.positionCount || 0);
     canvas.dataset.routeState=route.state;canvas.dataset.routePoints=String(route.points.length);
-    var label = host.querySelector('.mm-zoom-level'); if (label) label.textContent = String(zoom);
   }
   function sync(value) {
     if (disposed) return;

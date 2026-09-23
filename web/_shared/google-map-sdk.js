@@ -248,7 +248,7 @@
       canvas.dataset.selectedVin = selectedVin; canvas.dataset.positionCount = String(positions.length);
       canvas.dataset.routeState = routeMode ? (routeStatus || (points.length ? 'ready' : 'empty')) : 'off';
     }
-    function updateZoom() { canvas.dataset.mapZoom = String(map.getZoom() || 0); var label = host.querySelector('.mm-zoom-level'); if (label) label.textContent = String(map.getZoom() || 0); }
+    function updateZoom() { canvas.dataset.mapZoom = String(map.getZoom() || 0); }
     listeners.push(map.addListener('zoom_changed', updateZoom));
     listeners.push(map.addListener('idle', function(){if(!destroyed&&!routeMode)buildVehicles();}));
     listeners.push(map.addListener('click', function () { clearPointTip(); }));
