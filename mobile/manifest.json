@@ -1,11 +1,13 @@
 {
-  "revision": "2026-09-23-r96",
+  "revision": "2026-09-23-r97",
   "entry": "login.html",
   "includeArchives": false,
+  "mapMode": "embedded-google",
+  "containsBrowserMapKey": true,
   "files": [
     {
       "path": "index.html",
-      "sha256": "17ed9edb34a0d95beaffc9d0bf80514c9b0380b32b4f4ba5426fa4191f1dfd79"
+      "sha256": "25807e6d67b5c50418a0c2517887bc1fccb92e309ab064020b880a1d44a494bf"
     },
     {
       "path": "customer.js",
@@ -21,7 +23,7 @@
     },
     {
       "path": "release.json",
-      "sha256": "ef514f1a334b1a3dd590f4e89023f8295ae2d011489ed532680c119f42553cc5"
+      "sha256": "b709b134e630868fc01447a7670cfbbd66b391ec832580021a33d4fbf78ce640"
     },
     {
       "path": "error-documents.js",
@@ -61,7 +63,7 @@
     },
     {
       "path": "web-contracts.generated.js",
-      "sha256": "b9e34ec48d48aacc939702e929fc169ed5c08663e0b8dee6794a838ba22f93c7"
+      "sha256": "64a6bf5c5fe70e236b4f7822f52201f71d4be460e803e1a0affaa506fdaae20e"
     },
     {
       "path": "web-guide-colors.css",
@@ -73,7 +75,15 @@
     },
     {
       "path": "location-map.js",
-      "sha256": "f428b5a1c740a1b81b722c13794ffbacd2b04d302a055f9d520dc3d00ce946fe"
+      "sha256": "073dde74d6b275ee899bd3f048dd27435ece9dbd255f2f5f340c35d0a21bb979"
+    },
+    {
+      "path": "map-config.local.js",
+      "sha256": "6ee51f21c4fad02a71f5fc7f491a8c970c45fe6ec94be77b4271ae2320090a53"
+    },
+    {
+      "path": "docs/map-setup.md",
+      "sha256": "4d8c6a2fd0b875695e71068700a8e57530b2df4fc8a38c7c8541ffa892df6646"
     },
     {
       "path": "shared/mobile-guide-tokens.css",
@@ -669,11 +679,11 @@
     },
     {
       "path": "tests/package.cjs",
-      "sha256": "61620988a1e6ffb77517335bcfe381fb48ab39c59b90e22592aa47eea54007aa"
+      "sha256": "fe73f98cf40dc601ebbebb0cf9bae9cee58f7cff8fae695625d49c63621774e8"
     },
     {
       "path": "tests/dashboard.cjs",
-      "sha256": "fc88efe9391f003933e837923b27dbceeabfef6cb8ea6a764f7e8861a7efc18e"
+      "sha256": "4a5ab4700b28e1d72beeaed97de94b1afbfb3f0dbc5e66714ec06fc967babde3"
     },
     {
       "path": "tests/auth.cjs",
@@ -681,7 +691,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "37f85d6896c7fe0c320f00acc034f3c8f9342c5fe53918cbda505b73c957288a"
+      "sha256": "0be44c35ac250874066d1e9a7b177c247fe3ef6a927ea44bff723dafba82b205"
     },
     {
       "path": "licenses/Lucide-0.468.0-LICENSE.txt",
@@ -753,7 +763,7 @@
     },
     {
       "path": "docs/screen-registry.json",
-      "sha256": "ee09de262c94c99789a27cef7e0cb83fe253ef9be21046efd3d386a8944a5022"
+      "sha256": "243a0c1623eb394cc9d4bb80a19cd3d9ecb98a461b2dfe67ab7232273bf23724"
     },
     {
       "path": "docs/menu-page-registry.json",

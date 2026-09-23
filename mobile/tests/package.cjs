@@ -24,7 +24,23 @@ for(const role of Object.keys(M.ROLE_LABELS)){
 }
 assert(read('signup.html').includes('name="signupRole"'));
 assert(read('index.html').includes('data-screen-id="LQ-SVC-003-P02"'));
-assert(!manifest.files.some(item=>/map-config\.local|\.env(?:\.|$)/.test(item.path)));
+const withMap=manifest.mapMode==='embedded-google';
+assert(!manifest.files.some(item=>/\.env(?:\.|$)/.test(item.path)));
+assert.equal(fs.existsSync(path.join(root,'map-config.local.js')),withMap,'Only explicit map-enabled builds may contain a browser key');
+if(withMap){
+  assert.equal(manifest.containsBrowserMapKey,true);
+  const configContext={window:{}};vm.runInNewContext(read('map-config.local.js'),configContext);
+  const config=configContext.window.CustomerMapConfig;
+  assert.deepEqual(Object.keys(config).sort(),['apiKey','mapId']);
+  assert(/^AIza[\w-]{35}$/.test(config.apiKey));assert(/^[-\w]+$/.test(config.mapId));
+  assert(read('location-map.js').includes('maps.googleapis.com/maps/api/js'));
+  assert(read('README.md').includes('docs/map-setup.md'));
+}else assert(!read('location-map.js').includes('maps.googleapis.com/maps/api/js'));
+for(const item of manifest.files.filter(item=>/\.(?:js|cjs|html|css|json|md)$/.test(item.path))){
+  const content=read(item.path);
+  assert(!/gh[pousr]_[\w]{25,}|-{5}BEGIN.*PRIVATE KEY/.test(content),'No server credentials in delivery');
+  if(item.path!=='map-config.local.js')assert(!/AIza[\w-]{25,}/.test(content),'Browser key confined to explicit config: '+item.path);
+}
 assert(read('customer.js').includes('data-logout')&&read('customer.js').includes('data-notification-category'));
 assert(!read('customer.js').includes('localhost:'));
 for(const file of ['index.html','customer.js','signup.html','signup.js']) {
@@ -38,6 +54,7 @@ const server=require('../serve.cjs');
   try{
     const start=await fetch(base+'/',{redirect:'manual'});assert.equal(start.status,302);assert.equal(start.headers.get('location'),'./login.html');
     for(const file of ['login.html','index.html','signup.html','find-password.html','customer.js','assets/local-fonts.css','shared/bobcat-machine-iq.svg','data/fleet.generated.js'])assert.equal((await fetch(base+'/'+file)).status,200,file);
+    assert.equal((await fetch(base+'/map-config.local.js')).status,withMap?200:404);
     assert.equal((await fetch(base+'/manifest.json')).status,403);
     assert.equal((await fetch(base+'/login.html',{method:'POST'})).status,405);
     console.log('PASS: packaged checksums, syntax, all local assets, vehicle scopes and local HTTP routes.');

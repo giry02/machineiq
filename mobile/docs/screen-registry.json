@@ -1,4 +1,12 @@
 {
+  "customerMobileMapGithub20260923": {
+    "revision": "r97",
+    "screenIds": ["LQ-OPS-002-P01"],
+    "screenIdsChanged": false,
+    "changes": "사용자 제공 브라우저 지도 키로 GitHub 모바일의 외부 링크 전용 표시를 기존 차량 위치 지도 구현으로 교체. 대표/직원 권한·최종 수신 좌표·마커·전체보기/접기·실패 안내 유지. 새 DOM/중복 렌더러 없음.",
+    "report": "docs/handoff/CUSTOMER_MOBILE_MAP_GITHUB_20260923.md",
+    "figjam": "화면 ID·입출력·권한·동선 변화 없음. 원격 미변경."
+  },
   "customerMobileDailyChartLayout20260923": {
     "revision": "r96",
     "screenIds": ["LQ-REF-003", "LQ-REF-003-T02"],
