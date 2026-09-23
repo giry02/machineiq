@@ -193,7 +193,6 @@
   /* ───────────────────────────────────────────── Map */
   function initMap() {
     var map = document.getElementById('map');
-    var mapSummary = document.querySelector('.miq-map-summary');
     var tbody = document.getElementById('eqBody');
     if (!map || !tbody || !window.MIQ || (!MIQ.FLEET_CATALOG && !MIQ.FLEET)) return;
 
@@ -245,7 +244,7 @@
       '</div>' +
       '<div class="mm-map-toolbar__filters" data-mm-map-filters></div>' +
       '<span class="mm-map-toolbar__hint" data-mm-map-hint>아래 장비목록의 차대번호를 누르면 지도에서 차량이 선택됩니다.</span>';
-    map.parentNode.insertBefore(toolbar, mapSummary || map);
+    map.parentNode.insertBefore(toolbar, map);
 
     var zoomBox = document.createElement('span');
     zoomBox.className = 'mm-zoom-level';
@@ -347,7 +346,6 @@
       select.value=vin;
     }
     function renderRoute() {
-      if (mapSummary) mapSummary.hidden = routeMode;
       var vin = selectedVin();
       var rows=MIQMapData.getVisibleRows();
       var visible = rows.map(function(row){return row.vin;});
@@ -415,7 +413,7 @@
         shock: '../Shock/shock-tobe.html',
         supply: '../Service/service-supply-tobe.html'
       };
-      document.querySelectorAll('.miq-map-summary [data-map-summary-link]').forEach(function (link) {
+      map.querySelectorAll('[data-map-summary-link]').forEach(function (link) {
         var kind = link.dataset.mapSummaryLink;
         var url = new URL(paths[kind], location.href);
         url.searchParams.set('role', managementRole());
