@@ -174,10 +174,42 @@ body.miq-current-shell .miq-sr-only {
   white-space: nowrap;
   border: 0;
 }
-
-
-
-
+body.miq-current-shell .gnb__language {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 30px;
+  margin-right: 4px;
+}
+body.miq-current-shell .gnb__language select {
+  width: 62px;
+  height: 30px;
+  padding: 0 22px 0 10px;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.6);
+  border-radius: 3px;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: none;
+}
+body.miq-current-shell .gnb__language::after {
+  content: "";
+  position: absolute;
+  right: 9px;
+  top: 13px;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid #fff;
+  pointer-events: none;
+}
+body.miq-current-shell .gnb__language option { color: #111; background: #fff; }
 
 /* 로그인 권한에 따른 화면 차이를 모든 TO-BE 화면에서 같은 위치에서 확인한다. */
 body.miq-current-shell[data-variant="tobe"] .gnb__right {

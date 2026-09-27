@@ -2,7 +2,7 @@
 
 - 웹 실행: https://giry02.github.io/machineiq/web/
 - 웹 소스: `web/`
-- 웹 최신 반영: 2026-09-27. 한국어 화면, 회원가입/차량 등록 흐름, 공통 오류 화면 및 최신 지표 표시를 반영했습니다. 이번 게시본에는 언어 선택·다국어 번역 기능을 포함하지 않습니다.
+- 웹 최신 반영: 2026-09-27. 한국어 화면, 회원가입/차량 등록 흐름, 공통 오류 화면 및 최신 지표 표시를 반영했습니다. 언어 선택 메뉴는 표시하며, GitHub 게시본에서는 다른 언어를 선택해도 화면·이메일은 한국어로 유지됩니다. 로컬 다국어 전환 기능은 그대로 유지합니다.
 - 회원가입: https://giry02.github.io/machineiq/web/registration/web-registration-tobe-v3.html?lang=ko
 - 이메일 시안: https://giry02.github.io/machineiq/web/requirements-review/email-templates-20260926/index.html
 - 이메일은 한국어의 회원가입 완료·비밀번호 찾기·회원 인증 검토용 HTML이며 실제 발송 기능은 없습니다. 가입 동의문도 기존 한국어 원문을 사용합니다.

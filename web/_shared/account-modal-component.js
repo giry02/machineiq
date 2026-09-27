@@ -77,8 +77,14 @@
                 </div>
               </section>
               <section class="aae-account-section" aria-labelledby="accountContactTitle">
-                <h3 id="accountContactTitle">연락처</h3>
+                <h3 id="accountContactTitle">언어 · 연락처</h3>
                 <div class="aae-account-grid">
+                  <div class="aae-field">
+                    <label class="aae-label" for="accountLanguage">언어 변경</label>
+                    <select class="aae-select" id="accountLanguage" name="language" data-language-select>
+                      <option value="ko" lang="ko" dir="ltr" translate="no" selected>한국어</option><option value="en" lang="en" dir="ltr" translate="no">English</option><option value="de" lang="de" dir="ltr" translate="no">Deutsch</option><option value="ar" lang="ar" dir="rtl" translate="no">العربية</option><option value="es" lang="es" dir="ltr" translate="no">Español</option><option value="fr" lang="fr" dir="ltr" translate="no">Français</option><option value="it" lang="it" dir="ltr" translate="no">Italiano</option><option value="ja" lang="ja" dir="ltr" translate="no">日本語</option>
+                    </select>
+                  </div>
                   <div class="aae-field">
                     <label class="aae-label" for="accountPhone">연락처 <span class="aae-required">*</span></label>
                     <input class="aae-control" id="accountPhone" name="phone" type="tel" value="01089973747" inputmode="tel" autocomplete="tel" required/>
@@ -142,7 +148,7 @@
       return;
     }
     var script = document.createElement('script');
-    script.src = base + '_shared/auth-account-enhancements.js?v=20260911-account-country';
+    script.src = base + '_shared/auth-account-enhancements.js?rev=637b0487b71d';
     script.dataset.miqAccountEnhancements = '';
     script.addEventListener('load', initialiseAndOpen, { once: true });
     document.body.appendChild(script);

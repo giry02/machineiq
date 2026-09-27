@@ -741,6 +741,8 @@
     function openAccount(trigger) {
       returnFocus = trigger || doc.activeElement;
       restoreSaved();
+      var publishedLanguage = one('#accountLanguage');
+      if (publishedLanguage) publishedLanguage.value = 'ko';
       clearErrors(form);
       var password = one('#accountPassword');
       var confirm = one('#accountPasswordConfirm');
@@ -778,6 +780,8 @@
     }
 
     restoreSaved();
+    var publishedLanguage = one('#accountLanguage');
+    if (publishedLanguage) publishedLanguage.value = 'ko';
     applySmsAvailability();
     initialSnapshot = serialise();
     saveButton.disabled = true;

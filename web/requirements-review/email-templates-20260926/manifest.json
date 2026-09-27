@@ -12,7 +12,7 @@
     "internal"
   ],
   "defaultLocale": "ko",
-  "localePolicy": "Korean-only publication; no language switching.",
+  "localePolicy": "Language selector remains visible; published content stays Korean regardless of selection.",
   "translationStatus": "translated-and-self-reviewed; business/native-language approval pending",
   "sharedFields": [
     "logoUrl",

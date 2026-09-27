@@ -2,7 +2,7 @@
 (() => {
   const data=window.MIQEmailPreview,params=new URLSearchParams(location.search);
   const frame=document.getElementById('mailFrame'),viewport=document.getElementById('viewport');
-  const role=document.getElementById('mailRole');
+  const language=document.getElementById('mailLanguage'),role=document.getElementById('mailRole');
   const labels={signup:'회원가입 완료',password:'비밀번호 찾기',verification:'회원 인증'};
   let key=Object.hasOwn(labels,params.get('template'))?params.get('template'):'signup';
   if([...role.options].some(o=>o.value===params.get('role')))role.value=params.get('role');

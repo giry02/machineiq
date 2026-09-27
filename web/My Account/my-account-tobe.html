@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="../_shared/auth-account-enhancements.css?v=fef0b25d76b5&amp;rev=c4f8e36adc2a"/>
 <link rel="stylesheet" href="../_shared/form-controls.css?v=6fda272acdcc&amp;rev=6fda272acdcc"/>
 <link rel="stylesheet" href="../_shared/list-pagination.css?v=0069e48c1009&amp;rev=0069e48c1009">
-<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?v=fc90bc42e4ac&amp;rev=0ca435b09868"/>
+<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?v=fc90bc42e4ac&amp;rev=fc90bc42e4ac"/>
 <link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?v=1cffa21a9777&amp;rev=1cffa21a9777"/>
 <style>body.miq-current-shell>#gnb{min-height:64px}</style>
 <script defer blocking="render" src="../_mock-data/generated/fleet.generated.js?v=52fa65a2dce1&amp;rev=52fa65a2dce1"></script>
@@ -22,8 +22,8 @@
 <script defer blocking="render" src="../_shared/vehicle-observations.js?v=550edc6b3b85&amp;rev=aea30481fdb6"></script>
 <script defer blocking="render" src="../_shared/meeting-model.js?v=7f3774217339&amp;rev=7f3774217339"></script>
 <script defer blocking="render" src="../_shared/list-pagination.js?v=4b500130528b&amp;rev=4b500130528b"></script>
-<script defer blocking="render" src="../_shared/nav.js?v=baf392ada632&amp;rev=4206801c46cf"></script>
-<script defer blocking="render" src="../_shared/auth-account-enhancements.js?v=82fe898f1225&amp;rev=ad3d93fc134a"></script>
+<script defer blocking="render" src="../_shared/nav.js?v=baf392ada632&amp;rev=c4a21a9c5884"></script>
+<script defer blocking="render" src="../_shared/auth-account-enhancements.js?v=82fe898f1225&amp;rev=637b0487b71d"></script>
 </head>
 <body class="miq-current-shell" data-current-bootstrap="ready" data-gnb="myacct" data-sub="account" data-variant="tobe" data-base="../" data-account-page="true" data-account-country="KR" data-target-selector="none">
 <div id="gnb"></div>
@@ -88,8 +88,12 @@
           </section>
 
           <section class="aae-account-section" aria-labelledby="accountContactTitle">
-            <h3 id="accountContactTitle">연락처</h3>
+            <h3 id="accountContactTitle">언어 · 연락처</h3>
             <div class="aae-account-grid">
+              <div class="aae-field">
+                <label class="aae-label" for="accountLanguage">언어 변경</label>
+                <select class="aae-select" id="accountLanguage" name="language" data-language-select><option value="ko" lang="ko" dir="ltr" translate="no" selected>한국어</option><option value="en" lang="en" dir="ltr" translate="no">English</option><option value="de" lang="de" dir="ltr" translate="no">Deutsch</option><option value="ar" lang="ar" dir="rtl" translate="no">العربية</option><option value="es" lang="es" dir="ltr" translate="no">Español</option><option value="fr" lang="fr" dir="ltr" translate="no">Français</option><option value="it" lang="it" dir="ltr" translate="no">Italiano</option><option value="ja" lang="ja" dir="ltr" translate="no">日本語</option></select>
+              </div>
               <div class="aae-field">
                 <label class="aae-label" for="accountPhone">연락처 <span class="aae-required">*</span></label>
                 <input class="aae-control" id="accountPhone" name="phone" type="tel" value="01089973747" inputmode="tel" autocomplete="tel" required/>

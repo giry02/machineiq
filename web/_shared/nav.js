@@ -465,6 +465,8 @@
     }
 
     html += '</nav><div class="gnb__right">' + managementRoleControl +
+      '<label class="gnb__language"><span class="miq-sr-only">언어 선택</span>' +
+        '<select aria-label="언어 선택">'+"<option value=\"ko\" lang=\"ko\" dir=\"ltr\" translate=\"no\" selected>KO</option><option value=\"en\" lang=\"en\" dir=\"ltr\" translate=\"no\">English</option><option value=\"de\" lang=\"de\" dir=\"ltr\" translate=\"no\">Deutsch</option><option value=\"ar\" lang=\"ar\" dir=\"rtl\" translate=\"no\">العربية</option><option value=\"es\" lang=\"es\" dir=\"ltr\" translate=\"no\">Español</option><option value=\"fr\" lang=\"fr\" dir=\"ltr\" translate=\"no\">Français</option><option value=\"it\" lang=\"it\" dir=\"ltr\" translate=\"no\">Italiano</option><option value=\"ja\" lang=\"ja\" dir=\"ltr\" translate=\"no\">日本語</option>"+'</select></label>' +
       (acctHref ? '<a class="home gnb__account" href="' + acctHref + '"' + (VARIANT === 'tobe' ? ' data-account-modal aria-haspopup="dialog"' : '') + (ACT === 'myacct' ? ' style="background:rgba(255,255,255,.22)"' : '') +
         '>' + (VARIANT === 'tobe' ? MIQCommon.view.get(accountLabel,"innerHTML") : '세종물류 - 관리자') + '</a>' : '<span>세종물류 - 관리자</span>') +
       '<a class="home gnb__logout" href="' + BASE + enc('Login') + '/login-' + VARIANT + '.html">로그아웃</a></div></div>';
@@ -482,7 +484,7 @@
         if (accountModalLoading) return;
         accountModalLoading = true;
         var component = document.createElement('script');
-        component.src = BASE + '_shared/account-modal-component.js?rev=8d516c119d92';
+        component.src = BASE + '_shared/account-modal-component.js?rev=881725d13a39';
         component.dataset.base = BASE;
         component.addEventListener('load', function () {
           accountModalLoading = false;
