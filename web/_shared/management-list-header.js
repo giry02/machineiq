@@ -5,8 +5,8 @@
   'use strict';
 
   var body = document.body;
-  var page = body.getAttribute('data-sub') || '';
-  if (body.getAttribute('data-gnb') !== 'mgmt' || body.getAttribute('data-variant') !== 'tobe') return;
+  var page = MIQCommon.view.call(body,"getAttribute",['data-sub']) || '';
+  if (MIQCommon.view.call(body,"getAttribute",['data-gnb']) !== 'mgmt' || MIQCommon.view.call(body,"getAttribute",['data-variant']) !== 'tobe') return;
 
   var roleRules = window.MIQCommon.roles;
   var roles = roleRules.list();
@@ -21,7 +21,7 @@
       filters: [
         { key: 'userGroup', label: '사용자 그룹', fieldKo: '그룹명', fieldEn: 'groupName', width: 140,
           roles: ['internal', 'customer_owner'],
-          options: [['', '그룹 전체'], ['전체', '전체'], ['기본그룹', '기본그룹'], ['테스트그룹', '테스트그룹'], ['물류1팀', '물류1팀'], ['물류2팀', '물류2팀']] }
+          options: [['', '그룹 전체'], ['전체', '전체'], ['기본그룹', '기본그룹'], ['테스트그룹', '테스트그룹'], ['물류1팀', '물류1팀']] }
       ]
     },
     company: {
@@ -49,7 +49,7 @@
       filters: [
         { key: 'vehicleGroup', label: '그룹', fieldKo: '그룹명', fieldEn: 'groupName', width: 150,
           roles: ['customer_owner'],
-          options: [['', '그룹 전체'], ['미배정', '미배정 (2)'], ['기본그룹', '기본그룹 (18)'], ['테스트그룹', '테스트그룹 (12)'], ['물류1팀', '물류1팀 (3)'], ['물류2팀', '물류2팀 (2)']] },
+          options: [['', '그룹 전체'], ['미배정', '미배정 (2)'], ['기본그룹', '기본그룹 (18)'], ['테스트그룹', '테스트그룹 (12)'], ['물류1팀', '물류1팀 (10)']] },
         { key: 'powerType', label: '분류', fieldKo: '동력 유형', fieldEn: 'powerType', width: 130,
           options: [['', '분류 전체'], ['엔진', '엔진 (32)'], ['납산', '납산 (3)'], ['리튬', '리튬 (7)']] }
       ]
@@ -76,7 +76,7 @@
     options.forEach(function (item) {
       var option = document.createElement('option');
       option.value = item[0];
-      option.textContent = item[1];
+      MIQCommon.view.set(option,"textContent",item[1]);
       select.appendChild(option);
     });
   }
@@ -85,7 +85,7 @@
     select.className = 'inp';
     select.dataset.mgmtFilter = definition.key;
     select.style.width = definition.width + 'px';
-    select.setAttribute('aria-label', definition.label);
+    MIQCommon.view.call(select,"setAttribute",['aria-label',definition.label]);
     addOptions(select, definition.optionsByRole && definition.optionsByRole[roleCode] || definition.options);
     return select;
   }
@@ -94,7 +94,7 @@
     button.type = 'button';
     button.className = 'btn btn--pri role-gated' + (hasCapability(definition.capability) ? '' : ' is-hidden');
     button.id = definition.id;
-    button.textContent = definition.label;
+    MIQCommon.view.set(button,"textContent",definition.label);
     button.dataset.capability = definition.capability || '';
     if (definition.modal) button.dataset.modalOpen = definition.modal;
     if (definition.mode) button.dataset.groupMode = definition.mode;
@@ -115,21 +115,21 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-mgmt-control-context]'), function (node) {
       var visible = activeControlContext !== 'none' && node.dataset.mgmtControlContext === activeControlContext;
       node.classList.toggle('is-hidden', !visible);
-      node.setAttribute('aria-hidden', visible ? 'false' : 'true');
+      MIQCommon.view.call(node,"setAttribute",['aria-hidden',visible ? 'false' : 'true']);
     });
   }
   function makeTabFilters(context) {
     var filters = document.createElement('div');
     filters.className = 'miq-mgmt-filter-bar';
     filters.dataset.mgmtControlContext = context;
-    filters.setAttribute('role', 'group');
-    filters.setAttribute('aria-label', config.title + ' 목록 필터');
+    MIQCommon.view.call(filters,"setAttribute",['role','group']);
+    MIQCommon.view.call(filters,"setAttribute",['aria-label',config.title + ' 목록 필터']);
     return filters;
   }
   function registerContextControls(pageHead, taskbar, listControls) {
     listControls.dataset.mgmtControlContext = 'list';
     Array.prototype.forEach.call(document.querySelectorAll('[data-mgmt-context-controls]'), function (node) {
-      var context = node.getAttribute('data-mgmt-context-controls') || 'none';
+      var context = MIQCommon.view.call(node,"getAttribute",['data-mgmt-context-controls']) || 'none';
       node.classList.add('miq-mgmt-filter-bar');
       node.dataset.mgmtControlContext = context;
       var filters = makeTabFilters(context);
@@ -137,15 +137,15 @@
         var periods = document.createElement('div');
         periods.className = 'mm-request-period';
         periods.dataset.requestPeriodControl = '';
-        periods.setAttribute('role', 'group');
-        periods.setAttribute('aria-label', '신청일 기간');
+        MIQCommon.view.call(periods,"setAttribute",['role','group']);
+        MIQCommon.view.call(periods,"setAttribute",['aria-label','신청일 기간']);
         [['w', '1주일'], ['m', '1개월'], ['q', '3개월'], ['all', '전체']].forEach(function (item) {
           var button = document.createElement('button');
           button.type = 'button';
           button.dataset.requestPeriod = item[0];
-          button.textContent = item[1];
+          MIQCommon.view.set(button,"textContent",item[1]);
           button.classList.toggle('active', item[0] === 'm');
-          button.setAttribute('aria-pressed', item[0] === 'm' ? 'true' : 'false');
+          MIQCommon.view.call(button,"setAttribute",['aria-pressed',item[0] === 'm' ? 'true' : 'false']);
           periods.appendChild(button);
         });
         filters.appendChild(periods);
@@ -166,7 +166,7 @@
 
     var label = document.createElement('span');
     label.className = 'miq-mgmt-taskbar__label';
-    label.textContent = config.title + ' 목록';
+    MIQCommon.view.set(label,"textContent",config.title + ' 목록');
     taskbar.appendChild(label);
 
     if (controls && controls.parentNode) controls.parentNode.insertBefore(taskbar, controls.nextSibling);
@@ -178,23 +178,23 @@
     taskbar.classList.add('miq-mgmt-taskbar');
     var tablist = taskbar.querySelector('[data-mgmt-tabs]');
     if (!tablist) return;
-    var hadTabContract = tablist.getAttribute('role') === 'tablist';
-    tablist.setAttribute('role', 'tablist');
-    if (!tablist.getAttribute('aria-label')) tablist.setAttribute('aria-label', config.title + ' 관리 업무');
+    var hadTabContract = MIQCommon.view.call(tablist,"getAttribute",['role']) === 'tablist';
+    MIQCommon.view.call(tablist,"setAttribute",['role','tablist']);
+    if (!MIQCommon.view.call(tablist,"getAttribute",['aria-label'])) MIQCommon.view.call(tablist,"setAttribute",['aria-label',config.title + ' 관리 업무']);
     var tabs = Array.prototype.slice.call(tablist.querySelectorAll('button[data-tab], button[data-user-tab]'));
     tabs.forEach(function (button, index) {
-      var panelId = button.getAttribute('aria-controls') || button.dataset.tab || '';
+      var panelId = MIQCommon.view.call(button,"getAttribute",['aria-controls']) || button.dataset.tab || '';
       button.type = 'button';
-      button.setAttribute('role', 'tab');
-      button.setAttribute('aria-selected', button.classList.contains('active') ? 'true' : 'false');
+      MIQCommon.view.call(button,"setAttribute",['role','tab']);
+      MIQCommon.view.call(button,"setAttribute",['aria-selected',button.classList.contains('active') ? 'true' : 'false']);
       button.tabIndex = button.classList.contains('active') || (!tabs.some(function (tab) { return tab.classList.contains('active'); }) && index === 0) ? 0 : -1;
       if (panelId) {
-        button.setAttribute('aria-controls', panelId);
+        MIQCommon.view.call(button,"setAttribute",['aria-controls',panelId]);
         var panel = document.getElementById(panelId);
         if (panel) {
-          panel.setAttribute('role', 'tabpanel');
-          if (button.id) panel.setAttribute('aria-labelledby', button.id);
-          panel.setAttribute('aria-hidden', button.classList.contains('active') ? 'false' : 'true');
+          MIQCommon.view.call(panel,"setAttribute",['role','tabpanel']);
+          if (button.id) MIQCommon.view.call(panel,"setAttribute",['aria-labelledby',button.id]);
+          MIQCommon.view.call(panel,"setAttribute",['aria-hidden',button.classList.contains('active') ? 'false' : 'true']);
         }
       }
     });
@@ -203,11 +203,11 @@
       if (!selected || tabs.indexOf(selected) < 0) return;
       tabs.forEach(function (button) {
         var active = button === selected;
-        button.setAttribute('aria-selected', active ? 'true' : 'false');
+        MIQCommon.view.call(button,"setAttribute",['aria-selected',active ? 'true' : 'false']);
         button.tabIndex = active ? 0 : -1;
-        var panelId = button.getAttribute('aria-controls') || button.dataset.tab || '';
+        var panelId = MIQCommon.view.call(button,"getAttribute",['aria-controls']) || button.dataset.tab || '';
         var panel = panelId ? document.getElementById(panelId) : null;
-        if (panel) panel.setAttribute('aria-hidden', active ? 'false' : 'true');
+        if (panel) MIQCommon.view.call(panel,"setAttribute",['aria-hidden',active ? 'false' : 'true']);
       });
     });
     if (hadTabContract && page !== 'group') return;
@@ -227,7 +227,7 @@
     var controls = document.querySelector('[data-mgmt-list-controls]');
     if (!title || !controls || controls.dataset.mgmtReady === 'true') return;
 
-    title.textContent = config.title;
+    MIQCommon.view.set(title,"textContent",config.title);
     title.dataset.fieldKo = config.title;
     title.dataset.fieldEn = config.titleEn;
 
@@ -239,8 +239,8 @@
 
     controls.className = 'filter-bar miq-mgmt-filter-bar';
     controls.dataset.mgmtReady = 'true';
-    controls.setAttribute('role', 'search');
-    controls.setAttribute('aria-label', config.title + ' 목록 조회');
+    MIQCommon.view.call(controls,"setAttribute",['role','search']);
+    MIQCommon.view.call(controls,"setAttribute",['aria-label',config.title + ' 목록 조회']);
 
     var search = setFieldMeta(document.createElement('input'), config.searchFieldKo, config.searchFieldEn);
     search.type = 'search';
@@ -251,7 +251,7 @@
     search.autocomplete = 'off';
     var searchPlaceholder = config.searchPlaceholderByRole && config.searchPlaceholderByRole[roleCode] || config.searchPlaceholder;
     search.placeholder = searchPlaceholder;
-    search.setAttribute('aria-label', searchPlaceholder);
+    MIQCommon.view.call(search,"setAttribute",['aria-label',searchPlaceholder]);
     controls.appendChild(search);
 
     var listFilters = makeTabFilters('list');
@@ -261,7 +261,7 @@
     submit.type = 'button';
     submit.className = 'btn-search';
     submit.dataset.mgmtSearchSubmit = '';
-    submit.textContent = '조회';
+    MIQCommon.view.set(submit,"textContent",'조회');
     controls.appendChild(submit);
     if (config.action) {
       var primaryAction = makeAction(config.action);

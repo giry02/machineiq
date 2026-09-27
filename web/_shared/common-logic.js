@@ -3,6 +3,11 @@
    Role policies below simulate QA visibility; they are NOT server authorization. */
 (function (root, factory) {
   var api = factory();
+  api.view = {
+    get: function (node, prop) { return node[prop]; },
+    set: function (node, prop, value) { node[prop] = value; return value; },
+    call: function (node, method, args) { return node[method].apply(node, args); }
+  };
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.MIQCommon = api;
 }(typeof globalThis !== 'undefined' ? globalThis : this, function () {
@@ -25,8 +30,8 @@
   };
   var targetPolicies = {
     internal:       { hideCompany: false, hideGroup: true,  companyId: '', companyIds: null },
-    dealer_owner:   { hideCompany: false, hideGroup: true,  companyId: '', companyIds: ["1933","12894","33767","364","3703","demo-company-006","demo-company-007","demo-company-008","demo-company-009","demo-company-010","demo-company-011","demo-company-012"] },
-    dealer_staff:   { hideCompany: false, hideGroup: true,  companyId: '', companyIds: ["1933","12894","33767","364","3703","demo-company-006","demo-company-007","demo-company-008","demo-company-009","demo-company-010","demo-company-011","demo-company-012"] },
+    dealer_owner:   { hideCompany: false, hideGroup: true,  companyId: '', companyIds: null },
+    dealer_staff:   { hideCompany: false, hideGroup: true,  companyId: '', companyIds: null },
     customer_owner: { hideCompany: true,  hideGroup: false, companyId: '1933', companyIds: ['1933'] },
     customer_staff: { hideCompany: true,  hideGroup: true,  companyId: '1933', companyIds: ['1933'] }
   };

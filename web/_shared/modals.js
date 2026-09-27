@@ -64,7 +64,7 @@
   '.miq-kv b{color:#333}';
 
   var st = document.createElement('style');
-  st.textContent = CSS;
+  MIQCommon.view.set(st,"textContent",CSS);
   document.head.appendChild(st);
 
   function esc(v) { return String(v == null ? '' : v).replace(/"/g, '&quot;'); }
@@ -155,7 +155,7 @@
     if (host) return host;
     host = document.createElement('div');
     host.className = 'miq-dim';
-    host.innerHTML = '<div class="miq-modal"></div>';
+    MIQCommon.view.set(host,"innerHTML",'<div class="miq-modal"></div>');
     host.addEventListener('mousedown', function (e) { if (e.target === host) close(); });
     document.body.appendChild(host);
     return host;
@@ -169,15 +169,14 @@
     var h = ensureHost();
     var box = h.firstChild;
     box.className = 'miq-modal' + (d.cls ? ' ' + d.cls : '');
-    box.innerHTML =
-      '<div class="miq-h"><h3>' + d.title + '</h3><span class="miq-src">' + d.src + ' 공용</span>' +
+    MIQCommon.view.set(box,"innerHTML",'<div class="miq-h"><h3>' + d.title + '</h3><span class="miq-src">' + d.src + ' 공용</span>' +
       '<button class="miq-x" type="button">✕</button></div>' +
       '<div class="miq-b">' + d.body + '</div>' +
       '<div class="miq-f">' +
         '<a class="miq-btn miq-left" href="' + d.goto + '">' + d.gotoLabel + ' ›</a>' +
         '<button class="miq-btn" type="button">취소</button>' +
         '<button class="miq-btn pri" type="button">저장</button>' +
-      '</div>';
+      '</div>');
     box.querySelector('.miq-x').onclick = close;
     box.querySelectorAll('.miq-f .miq-btn').forEach(function (b) {
       if (b.tagName === 'BUTTON') b.onclick = close;

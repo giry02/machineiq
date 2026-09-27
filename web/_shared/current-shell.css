@@ -174,42 +174,10 @@ body.miq-current-shell .miq-sr-only {
   white-space: nowrap;
   border: 0;
 }
-body.miq-current-shell .gnb__language {
-  position: relative;
-  display: flex;
-  align-items: center;
-  height: 30px;
-  margin-right: 4px;
-}
-body.miq-current-shell .gnb__language select {
-  width: 62px;
-  height: 30px;
-  padding: 0 22px 0 10px;
-  color: #fff;
-  border: 1px solid rgba(255,255,255,.6);
-  border-radius: 3px;
-  outline: 0;
-  background: transparent;
-  font: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background-image: none;
-}
-body.miq-current-shell .gnb__language::after {
-  content: "";
-  position: absolute;
-  right: 9px;
-  top: 13px;
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-top: 5px solid #fff;
-  pointer-events: none;
-}
-body.miq-current-shell .gnb__language option { color: #111; background: #fff; }
+
+
+
+
 
 /* 로그인 권한에 따른 화면 차이를 모든 TO-BE 화면에서 같은 위치에서 확인한다. */
 body.miq-current-shell[data-variant="tobe"] .gnb__right {
@@ -1082,6 +1050,8 @@ body.miq-current-shell .miq-page-foot__help strong { font-size: 17px; }
 }
 
 @media (max-width: 1350px) {
+  html[lang="ko"] body.miq-current-shell .gnb { column-gap: 0; }
+  html[lang="ko"] body.miq-current-shell[data-variant="tobe"] .gnb__right { flex-basis: 390px; }
   body.miq-current-shell .miq-target-selector__row {
     padding-left: 240px;
     padding-right: 20px;
@@ -1107,6 +1077,10 @@ body.miq-current-shell .miq-target-selector.is-hierarchy .miq-target-selector__c
   flex: 0 1 auto;
   min-width: 0;
   gap: 6px;
+}
+body.miq-current-shell .miq-target-selector.is-hierarchy .miq-target-selector__control > select {
+  min-width: 0;
+  flex: 1 1 auto;
 }
 body.miq-current-shell .miq-target-selector.is-hierarchy .miq-target-selector__control.is-disabled {
   opacity: .58;

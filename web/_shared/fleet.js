@@ -32,7 +32,7 @@
       return metric;
     });
 
-  invariant(catalog.length === 235, 'demo catalog must match company totals');
+  invariant(catalog.length === 45, 'fleet catalog must contain 42 original and 3 customer-staff demo vehicles');
   invariant(fleet.length === 13, 'metric fleet must contain 10 original and 3 customer-staff demo vehicles');
 
   var MIQ = global.MIQ = global.MIQ || {};

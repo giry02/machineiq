@@ -2,7 +2,7 @@
   'use strict';
   var q=function(s,r){return (r||document).querySelector(s);};
   var all=function(s,r){return Array.from((r||document).querySelectorAll(s));};
-  var txt=function(n){return n?n.textContent.replace(/\s+/g,' ').trim():'';};
+  var txt=function(n){return n?MIQCommon.view.get(n,"textContent").replace(/\s+/g,' ').trim():'';};
   var esc=MIQCharts.escape;
   var number=function(v){return Number(String(v).replace(/[^\d.\-]/g,''))||0;};
   var fmt=function(v){return v===null||v===undefined?'—':Math.round(v).toLocaleString('ko-KR');};
@@ -12,9 +12,10 @@
   var companyMode=MIQCommon.roles.dashboardDimension(role)==='company';
   var staff=MIQCommon.roles.hideDashboardComparison(role),dimension=companyMode?'업체':'그룹';
   var fleet=MIQCommon.roles.filterVehicles(role,MIQ_MOCK_DATA.fleet.vehicles);
+  if(window.MIQCustomerAccess && MIQCustomerAccess.guardDashboard(role,fleet))return;
   var view=window.MIQDashboardCompanyView;
-  var entities=companyMode?view.companies.map(function(c){return {id:String(c.companyId),name:c.companyName,count:c.vehicleCount,raw:c};}):[];
-  if(staff)entities=view.companies.map(function(c){return {id:String(c.companyId),name:c.companyName,count:c.vehicleCount,raw:c};});
+  var entities=companyMode?view.companies.map(function(c){return {id:String(c.companyId),companyId:String(c.companyId),name:c.companyName,count:c.vehicleCount,raw:c,vehicles:fleet.filter(function(v){return String(v.companyId)===String(c.companyId);})};}):[];
+  if(staff)entities=view.companies.map(function(c){return {id:String(c.companyId),companyId:String(c.companyId),name:c.companyName,count:c.vehicleCount,raw:c,vehicles:fleet.filter(function(v){return String(v.companyId)===String(c.companyId);})};});
   if(!companyMode&&!staff){
     var groups=new Map();
     fleet.forEach(function(vehicle){
@@ -33,7 +34,7 @@
   if(initialEntity)state.scope=initialEntity.id;
   var servicePolicy=MIQCommon.roles.targetPolicy(role);
   var errorRecords=MIQServiceDemo.create(fleet,cutoff).error;
-  var series=MIQDashboardReportSeries;
+  var series=MIQReportSeries;
   var pending=false;
   function range(){return MIQ.getAppliedPeriod(q('.filter-bar',period))||Object.assign({period:'m'},MIQCommon.dates.operatingRange('m'));}
   function shortRange(){var r=range();return r.from.slice(5).replace('-','.')+'–'+r.to.slice(5).replace('-','.');}
@@ -56,14 +57,14 @@
   function trendPill(){return pill(state.year+'년 월별','is-year');}
   function card(id,title,width,kind){
     var el=document.createElement('article');el.className='dc-card dc-span-'+width+' '+(kind||'');el.id=id;
-    el.innerHTML='<header class="dc-head"><h2>'+title+'</h2><span class="dc-card-meta"></span></header><div class="dc-body"></div><footer class="dc-foot"></footer>';return el;
+    MIQCommon.view.set(el,"innerHTML",'<header class="dc-head"><h2>'+title+'</h2><span class="dc-card-meta"></span></header><div class="dc-body"></div><footer class="dc-foot"></footer>');return el;
   }
-  function setHTML(node,html){if(node.innerHTML!==html)node.innerHTML=html;}
+  function setHTML(node,html){if(MIQCommon.view.get(node,"innerHTML")!==html)MIQCommon.view.set(node,"innerHTML",html);}
   function write(el,html,meta,foot){setHTML(q('.dc-body',el),html);setHTML(q('.dc-card-meta',el),meta||'');setHTML(q('.dc-foot',el),foot||'');}
   function overviewLink(el,href,label){
     var link=q('.dc-head-link',el);
     if(!link){link=document.createElement('a');link.className='dc-head-link';q('.dc-head',el).appendChild(link);}
-    link.setAttribute('href',href);link.setAttribute('aria-label',label);link.setAttribute('title',label);
+    MIQCommon.view.call(link,"setAttribute",['href',href]);MIQCommon.view.call(link,"setAttribute",['aria-label',label]);MIQCommon.view.call(link,"setAttribute",['title',label]);
     setHTML(link,'<span>'+esc(label)+'</span> ↗');
   }
   function value(v,unit){return '<strong>'+fmt(v)+'</strong><small>'+esc(unit)+'</small>';}
@@ -161,13 +162,15 @@
   function periodCard(){
     var r=range(),list=scoped(),count=list.reduce(function(n,e){return n+e.count;},0);
     var items=['eff','shock','dist','hour','fuel','batt'].map(function(key){return series.metrics.find(function(m){return m.key===key;});});
+    var provided=MIQObservations.aggregate(list.reduce(function(rows,e){return rows.concat(MIQObservations.select(e));},[]),r.from,r.to,now).knownVehicleCount;
+    count=provided;
     var html='<div class="dc-period-six">'+items.map(function(m){
-      var n=series.aggregate(list,m.key,r.from,r.to,cutoff);
+      var n=series.aggregate(list,m.key,r.from,r.to,now);
       var note=m.agg==='sum'?(m.key==='shock'?'기간 발생 건수':'대당 '+fmt(count&&n!==null?n/count:null)+' '+m.unit):m.key==='batt'?'충전량 비율 · 평균':m.key==='fuel'?'시간당 소비량 · 평균':'선택 기간 평균';
-      var body='<span class="dc-metric-label">'+m.label+'</span><div class="dc-metric-number" data-metric="'+m.key+'">'+value(n,m.unit)+'</div><span class="dc-per-note">'+note+'</span>';
+      var body='<span class="dc-metric-label">'+(m.rateLabel||m.label)+'</span><div class="dc-metric-number" data-metric="'+m.key+'">'+value(n,m.unit)+'</div><span class="dc-per-note">'+note+'</span>';
       return '<div class="dc-kpi '+(m.key==='eff'?'is-primary':'')+'">'+body+'</div>';
     }).join('')+'</div>';
-    write(cards.summary,html,periodPill()+'<span class="dc-scope-count">'+list.length+'개 '+dimension+'</span>','<a class="dc-period-fault" href="'+esc(pageLink('../Service/service-error-tobe.html',r))+'">'+icon('fault')+'기간 고장 <b>'+fmt(totalFaults())+'</b>건 <span>›</span></a>');
+    write(cards.summary,html,periodPill()+'<span class="dc-scope-count">'+list.length+'개 '+dimension+'</span><span class="dc-scope-count">'+provided+'대 지표 제공</span>','<a class="dc-period-fault" href="'+esc(pageLink('../Service/service-error-tobe.html',r))+'">'+icon('fault')+'기간 고장 <b>'+fmt(totalFaults())+'</b>건 <span>›</span></a>');
   }
   // Separate comparison page: keep dcToday and the original outer card geometry.
   function todayCard(){
@@ -197,14 +200,14 @@
     write(cards.battery,chartStat(monthCaption(batt,'평균'),lastValue(batt),'%',batteryRange)+svgChart(batt,'line','#0aa656','배터리 충전량','%',{percent:true,width:width(cards.battery)}),trendPill(),'<span>월별 평균 충전량 · '+trendNote()+'</span>');
     write(cards.distance,chartStat(monthCaption(dist,'합계'),lastValue(dist),'Km')+svgChart(dist,'area','#647786','운행거리','Km',{total:true,width:width(cards.distance)}),trendPill(),'<span>'+trendNote()+'</span>');
     write(cards.hours,chartStat(monthCaption(hour,'합계'),lastValue(hour),'H')+svgChart(hour,'bar','#647786','운행시간','H',{width:width(cards.hours)}),trendPill(),'<span>'+trendNote()+'</span>');
-    q('#dcTrendRange').textContent=state.year+'년 · '+trendNote();
+    MIQCommon.view.set(q('#dcTrendRange'),"textContent",state.year+'년 · '+trendNote());
     write(cards.shock,chartStat(monthCaption(shock,'발생'),lastValue(shock),'건')+svgChart(shock,'bar','#ff9f0a','충격횟수','건',{width:width(cards.shock)}),trendPill(),'<span>'+trendNote()+'</span>');
   }
   function filterRows(kind){
     var search=state[kind+'Query'];
     if(kind==='period'){
       var selected=state.periodSort,r=range(),cache={};
-      function rank(e){if(!(e.id in cache))cache[e.id]=series.aggregate([e],selected,r.from,r.to,cutoff);return cache[e.id];}
+      function rank(e){if(!(e.id in cache))cache[e.id]=series.aggregate([e],selected,r.from,r.to,now);return cache[e.id];}
       return scoped().filter(function(e){return !search||e.id===search;}).sort(function(a,b){
         var tie=a.name.localeCompare(b.name,'ko');
         if(selected==='vehicles')return b.count-a.count||tie;
@@ -242,8 +245,8 @@
     var filtered=filterRows('live'),rows=pager('live',filtered);
     var toggle=q('.dc-head [data-live-toggle]',cards.live);
     toggle.hidden=filtered.length<=livePageSize()&&!state.liveExpanded;
-    toggle.setAttribute('aria-expanded',String(state.liveExpanded));
-    toggle.setAttribute('aria-label',dimension+'별 차량 현황 '+(state.liveExpanded?'접기':'펼치기'));
+    MIQCommon.view.call(toggle,"setAttribute",['aria-expanded',String(state.liveExpanded)]);
+    MIQCommon.view.call(toggle,"setAttribute",['aria-label',dimension+'별 차량 현황 '+(state.liveExpanded?'접기':'펼치기')]);
     toggle.title=state.liveExpanded?'한 줄로 접기':'검색된 '+fmt(filtered.length)+'개 '+dimension+' 전체 표시';
     setHTML(toggle,(state.liveExpanded?'접기':'펼치기')+' <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg>');
     function alertItem(e,n,label,unit,kind,key,target){
@@ -266,8 +269,8 @@
     var filtered=filterRows('period'),rows=usagePager(filtered),r=range();
     var toggle=q('[data-period-toggle]',q('.dc-head',cards.period));
     toggle.hidden=filtered.length<=usagePageSize()&&!state.periodExpanded;
-    toggle.setAttribute('aria-expanded',String(state.periodExpanded));
-    toggle.setAttribute('aria-label',dimension+'별 사용량 '+(state.periodExpanded?'접기':'펼치기'));
+    MIQCommon.view.call(toggle,"setAttribute",['aria-expanded',String(state.periodExpanded)]);
+    MIQCommon.view.call(toggle,"setAttribute",['aria-label',dimension+'별 사용량 '+(state.periodExpanded?'접기':'펼치기')]);
     toggle.title=state.periodExpanded?'기본 목록으로 접기':'검색된 '+fmt(filtered.length)+'개 '+dimension+' 전체 표시';
     setHTML(toggle,(state.periodExpanded?'접기':'펼치기')+' <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg>');
     cards.period.classList.toggle('is-expanded',state.periodExpanded);
@@ -291,49 +294,47 @@
     if(fromFooter)cards.period.scrollIntoView({block:'start'});
   }
   function usageTile(e){
-    var r=range(),values={};['eff','shock','fuel','batt','dist','hour'].forEach(function(key){values[key]=series.aggregate([e],key,r.from,r.to,cutoff);});
+    var r=range(),values={};['eff','shock','fuel','batt','dist','hour'].forEach(function(key){values[key]=series.aggregate([e],key,r.from,r.to,now);});
     function per(key){return fmt(values[key]!==null&&e.count?values[key]/e.count:null);}
-    function metric(key,label,unit,iconKey,note){var full=series.metrics.find(function(m){return m.key===key;}).label;
+    function metric(key,label,unit,iconKey,note){var definition=series.metric(key),full=definition.rateLabel||definition.label;
       return '<div class="dc-usage-metric" data-metric="'+key+'" aria-label="'+esc(full+' '+fmt(values[key])+' '+unit)+'"><span class="dc-company-alert-label" title="'+esc(full)+'">'+icon(iconKey)+esc(label)+'</span><span class="dc-company-alert-value"><b>'+fmt(values[key])+'</b><small>'+unit+'</small></span><small class="dc-usage-note">'+note+'</small></div>';
     }
     function total(key,label,unit){return '<div class="dc-usage-total" data-metric="'+key+'"><span>'+label+'</span><div><b>'+fmt(values[key])+'</b><small>'+unit+'</small></div><small>대당 '+per(key)+' '+unit+'</small></div>';}
     return '<li class="dc-company-tile dc-usage-tile" data-entity="'+esc(e.id)+'"><div class="dc-company-tile-head"><div class="dc-company-identity">'+entityName(e)+'<span>보유 <b>'+fmt(e.count)+'</b>대</span></div><div class="dc-company-rate" data-metric="eff" aria-label="평균 운영효율 '+fmt(values.eff)+'%"><span>운영효율 · 평균</span><strong>'+fmt(values.eff)+'<small>%</small></strong></div></div><div class="dc-usage-totals" role="group" aria-label="운행 합계와 대당 값">'+total('dist','운행거리','Km')+total('hour','운행시간','H')+'</div><div class="dc-company-alerts" role="group" aria-label="충격횟수와 에너지 평균">'+metric('shock','충격횟수','건','fault','대당 '+per('shock')+'건')+metric('fuel','연료 / H','L/H','fuel','평균')+metric('batt','충전량','%','battery','평균')+'</div></li>';
   }
-  // Source nodes retain their original hierarchy for the shared date and link controllers.
-  all('.dashboard-live, .dashboard-period > .dashboard-panel, .dashboard-view-tabs',root).forEach(function(n){n.classList.add('dc-source');});
-  q('.dashboard-titlebar').insertAdjacentHTML('beforeend','<p class="dc-scope-caption"></p><div class="dc-global-tools"><label>'+dimension+' <select id="dcScope" aria-label="조회 '+dimension+'"><option value="">전체 '+dimension+'</option>'+entities.map(function(e){return '<option value="'+esc(e.id)+'">'+esc(e.name)+'</option>';}).join('')+'</select></label><form id="dcYearForm"><label>월별 추이 <select id="dcYear" aria-label="추이 연도">'+[state.year,state.year-1,state.year-2].map(function(y){return '<option>'+y+'</option>';}).join('')+'</select></label><button type="submit">연도 조회</button></form></div>');
-  q('#periodHeading').textContent='기간 실적 조회';
-  q('.period-heading > div:first-child').insertAdjacentHTML('beforeend','<span class="dc-query-note">아래 운영 실적 · 고장 · 업체별 사용량에 적용</span>');
-  period.removeAttribute('aria-labelledby');period.setAttribute('aria-label','대시보드 현황');
+  MIQCommon.view.call(q('.dashboard-titlebar'),"insertAdjacentHTML",['beforeend','<p class="dc-scope-caption"></p><div class="dc-global-tools"><label>'+dimension+' <select id="dcScope" aria-label="조회 '+dimension+'"><option value="">전체 '+dimension+'</option>'+entities.map(function(e){return '<option value="'+esc(e.id)+'">'+esc(e.name)+'</option>';}).join('')+'</select></label><form id="dcYearForm"><label>월별 추이 <select id="dcYear" aria-label="추이 연도">'+[state.year,state.year-1,state.year-2].map(function(y){return '<option>'+y+'</option>';}).join('')+'</select></label><button type="submit">연도 조회</button></form></div>']);
+  MIQCommon.view.set(q('#periodHeading'),"textContent",'기간 실적 조회');
+  MIQCommon.view.call(q('.period-heading > div:first-child'),"insertAdjacentHTML",['beforeend','<span class="dc-query-note">아래 운영 실적 · 고장 · 업체별 사용량에 적용</span>']);
+  period.removeAttribute('aria-labelledby');MIQCommon.view.call(period,"setAttribute",['aria-label','대시보드 현황']);
   var grid=document.createElement('div');grid.className='dc-grid';period.appendChild(grid);
   var cards={fleet:card('dcFleet','차량 연결 · 가동',2,'dc-short'),attention:card('dcAttention','정비 확인',2,'dc-short'),live:card('dcLive',dimension+'별 차량 현황',4,'dc-status-card'),today:card('dcToday','운영효율',1,'dc-today-card dwi-card'),summary:card('dcSummary','기간 운영 실적',4,'dc-summary-card'),efficiency:card('dcEfficiency','운영효율',1,'dc-trend-card'),fuel:card('dcFuel','시간당 연료소비량',1,'dc-trend-card'),battery:card('dcBattery','배터리 충전량',1,'dc-trend-card'),distance:card('dcDistance','운행거리',1,'dc-trend-card'),hours:card('dcHours','운행시간',1,'dc-trend-card'),shock:card('dcShock','충격횟수',1,'dc-trend-card'),period:card('dcPeriod',dimension+'별 사용량 · 효율',4,'dc-table-card')};
   var overview=document.createElement('div');overview.className='dc-overview-row';grid.appendChild(overview);
   ['fleet','attention','today'].forEach(function(k){overview.appendChild(cards[k]);});grid.appendChild(cards.live);
-  var trends=document.createElement('section');trends.className='dc-trends';trends.setAttribute('aria-labelledby','dcTrendsTitle');
-  trends.innerHTML='<header class="dc-trends-head"><div><h2 id="dcTrendsTitle">월별 추이</h2><span id="dcTrendRange"></span></div></header><div class="dc-trends-grid"></div>';
+  var trends=document.createElement('section');trends.className='dc-trends';MIQCommon.view.call(trends,"setAttribute",['aria-labelledby','dcTrendsTitle']);
+  MIQCommon.view.set(trends,"innerHTML",'<header class="dc-trends-head"><div><h2 id="dcTrendsTitle">월별 추이</h2><span id="dcTrendRange"></span></div></header><div class="dc-trends-grid"></div>');
   q('.dc-trends-head',trends).appendChild(q('#dcYearForm'));
   ['efficiency','distance','hours','shock','fuel','battery'].forEach(function(k){q('.dc-trends-grid',trends).appendChild(cards[k]);});
   grid.appendChild(trends);
-  var periodResults=document.createElement('section');periodResults.className='dc-period-results';periodResults.setAttribute('aria-labelledby','periodHeading');
+  var periodResults=document.createElement('section');periodResults.className='dc-period-results';MIQCommon.view.call(periodResults,"setAttribute",['aria-labelledby','periodHeading']);
   cards.period.classList.add('dc-usage-preview','dc-usage-cards');
   periodResults.appendChild(q('.period-heading',period));periodResults.appendChild(cards.summary);periodResults.appendChild(cards.period);grid.appendChild(periodResults);
   function bindEntitySearch(el,kind){
     var input=q('input',el),label=input.parentElement,form=document.createElement('form'),box=document.createElement('div');
-    form.className='dc-entity-search';form.setAttribute('role','search');form.setAttribute('aria-label',input.getAttribute('aria-label'));
+    form.className='dc-entity-search';MIQCommon.view.call(form,"setAttribute",['role','search']);MIQCommon.view.call(form,"setAttribute",['aria-label',MIQCommon.view.call(input,"getAttribute",['aria-label'])]);
     label.replaceWith(form);box.className='dc-entity-input';form.appendChild(box);box.appendChild(input);
-    input.placeholder=dimension+'명 2글자 이상 입력';input.autocomplete='off';input.setAttribute('role','combobox');input.setAttribute('aria-autocomplete','list');input.setAttribute('aria-expanded','false');
-    var list=document.createElement('div');list.className='dc-entity-suggestions';list.id=el.id+'Suggestions';list.setAttribute('role','listbox');list.setAttribute('aria-label',dimension+' 검색 후보');list.hidden=true;box.appendChild(list);input.setAttribute('aria-controls',list.id);
-    var submit=document.createElement('button');submit.type='submit';submit.className='dc-entity-submit';submit.textContent='검색';form.appendChild(submit);
+    input.placeholder=dimension+'명 2글자 이상 입력';input.autocomplete='off';MIQCommon.view.call(input,"setAttribute",['role','combobox']);MIQCommon.view.call(input,"setAttribute",['aria-autocomplete','list']);MIQCommon.view.call(input,"setAttribute",['aria-expanded','false']);
+    var list=document.createElement('div');list.className='dc-entity-suggestions';list.id=el.id+'Suggestions';MIQCommon.view.call(list,"setAttribute",['role','listbox']);MIQCommon.view.call(list,"setAttribute",['aria-label',dimension+' 검색 후보']);list.hidden=true;box.appendChild(list);MIQCommon.view.call(input,"setAttribute",['aria-controls',list.id]);
+    var submit=document.createElement('button');submit.type='submit';submit.className='dc-entity-submit';MIQCommon.view.set(submit,"textContent",'검색');form.appendChild(submit);
     var selected='',candidates=[],active=-1;
-    function close(){list.hidden=true;input.setAttribute('aria-expanded','false');input.removeAttribute('aria-activedescendant');active=-1;}
+    function close(){list.hidden=true;MIQCommon.view.call(input,"setAttribute",['aria-expanded','false']);input.removeAttribute('aria-activedescendant');active=-1;}
     function sync(){submit.disabled=!!input.value.trim()&&!selected;}
     function choose(candidate){selected=candidate.companyId;input.value=candidate.companyName;close();sync();input.focus();}
     function show(){
       candidates=MIQDashboardCompanies.suggest(scoped().map(function(e){return {companyId:e.id,companyName:e.name};}),input.value);list.replaceChildren();active=-1;input.removeAttribute('aria-activedescendant');
       if(Array.from(input.value.trim().replace(/\s/g,'')).length<2){close();return;}
-      candidates.forEach(function(candidate,index){var option=document.createElement('button');option.type='button';option.tabIndex=-1;option.id=list.id+'-'+index;option.setAttribute('role','option');option.setAttribute('aria-selected','false');option.setAttribute('translate','no');option.textContent=candidate.companyName;option.addEventListener('mousedown',function(event){event.preventDefault();});option.addEventListener('click',function(){choose(candidate);});list.appendChild(option);});
-      if(!candidates.length){var empty=document.createElement('p');empty.textContent='일치하는 '+(companyMode?'업체가':'그룹이')+' 없습니다.';list.appendChild(empty);}
-      list.hidden=false;input.setAttribute('aria-expanded','true');
+      candidates.forEach(function(candidate,index){var option=document.createElement('button');option.type='button';option.tabIndex=-1;option.id=list.id+'-'+index;MIQCommon.view.call(option,"setAttribute",['role','option']);MIQCommon.view.call(option,"setAttribute",['aria-selected','false']);MIQCommon.view.call(option,"setAttribute",['translate','no']);MIQCommon.view.set(option,"textContent",candidate.companyName);option.addEventListener('mousedown',function(event){event.preventDefault();});option.addEventListener('click',function(){choose(candidate);});list.appendChild(option);});
+      if(!candidates.length){var empty=document.createElement('p');MIQCommon.view.set(empty,"textContent",'일치하는 '+(companyMode?'업체가':'그룹이')+' 없습니다.');list.appendChild(empty);}
+      list.hidden=false;MIQCommon.view.call(input,"setAttribute",['aria-expanded','true']);
     }
     input.addEventListener('input',function(){selected='';sync();show();});
     input.addEventListener('focus',function(){if(!selected&&input.value.trim())show();});
@@ -343,7 +344,7 @@
       if(event.key==='ArrowDown'||event.key==='ArrowUp'){
         event.preventDefault();if(list.hidden)show();if(!candidates.length)return;
         active=event.key==='ArrowDown'?(active+1)%candidates.length:active<0?candidates.length-1:(active-1+candidates.length)%candidates.length;
-        all('[role="option"]',list).forEach(function(option,i){option.setAttribute('aria-selected',String(i===active));if(i===active){input.setAttribute('aria-activedescendant',option.id);option.scrollIntoView({block:'nearest'});}});
+        all('[role="option"]',list).forEach(function(option,i){MIQCommon.view.call(option,"setAttribute",['aria-selected',String(i===active)]);if(i===active){MIQCommon.view.call(input,"setAttribute",['aria-activedescendant',option.id]);option.scrollIntoView({block:'nearest'});}});
       }else if(event.key==='Enter'&&!list.hidden){event.preventDefault();if(active>=0)choose(candidates[active]);}
     });
     form.addEventListener('submit',function(event){event.preventDefault();if(input.value.trim()&&(!selected||!scoped().some(function(e){return e.id===selected;}))){selected='';sync();show();return;}state[kind+'Query']=input.value.trim()?selected:'';state[kind+'Page']=1;close();kind==='live'?paintLive():paintPeriod();});
@@ -354,10 +355,10 @@
   }
   ['live','period'].forEach(function(kind){
     var el=cards[kind];
-    q('.dc-body',el).id=el.id+'Content';q('.dc-body',el).innerHTML='<div class="dc-table-tools"><label><input type="search" aria-label="'+dimension+'별 '+(kind==='live'?'차량 현황':'사용량')+' 검색" placeholder="'+dimension+'명 검색"/></label>'+(kind==='live'?'<select aria-label="현황 정렬"><option value="name">이름순</option><option value="vehicles">보유 차량순</option><option value="need">교체 필요순</option></select>':'<select aria-label="사용량 정렬"><option value="name">이름순</option><option value="vehicles">보유 차량순</option><option value="eff">운영효율순</option><option value="dist">운행거리순</option><option value="hour">운행시간순</option></select>')+'</div>'+'<div class="'+(kind==='live'?'dc-status-list-host':'dc-table-scroll')+'"></div>';
+    q('.dc-body',el).id=el.id+'Content';MIQCommon.view.set(q('.dc-body',el),"innerHTML",'<div class="dc-table-tools"><label><input type="search" aria-label="'+dimension+'별 '+(kind==='live'?'차량 현황':'사용량')+' 검색" placeholder="'+dimension+'명 검색"/></label>'+(kind==='live'?'<select aria-label="현황 정렬"><option value="name">이름순</option><option value="vehicles">보유 차량순</option><option value="need">교체 필요순</option></select>':'<select aria-label="사용량 정렬"><option value="name">이름순</option><option value="vehicles">보유 차량순</option><option value="eff">운영효율순</option><option value="dist">운행거리순</option><option value="hour">운행시간순</option></select>')+'</div>'+'<div class="'+(kind==='live'?'dc-status-list-host':'dc-table-scroll')+'"></div>');
     {
       q('.dc-head',el).appendChild(q('.dc-table-tools',el));
-      var toggle=document.createElement('button');toggle.type='button';toggle.className='dc-live-toggle';toggle.setAttribute('data-'+kind+'-toggle','');toggle.setAttribute('aria-controls',el.id+'Content');
+      var toggle=document.createElement('button');toggle.type='button';toggle.className='dc-live-toggle';MIQCommon.view.call(toggle,"setAttribute",['data-'+kind+'-toggle','']);MIQCommon.view.call(toggle,"setAttribute",['aria-controls',el.id+'Content']);
       toggle.addEventListener('click',function(){kind==='live'?toggleLive(false):toggleUsage(false);});q('.dc-table-tools',el).appendChild(toggle);
     }
     bindEntitySearch(el,kind);
@@ -371,7 +372,7 @@
     cards.live.hidden=hideCompanyCards;cards.period.hidden=hideCompanyCards;
     periodCard();
     fleetCard();attentionCard();todayCard();paintTrends();if(!staff){paintLive();paintPeriod();}
-    q('.dc-scope-caption').textContent=(state.scope?scoped()[0].name:'전체 '+dimension)+' · '+fmt(scoped().reduce(function(n,e){return n+e.count;},0))+'대';
+    MIQCommon.view.set(q('.dc-scope-caption'),"textContent",(state.scope?scoped()[0].name:'전체 '+dimension)+' · '+fmt(scoped().reduce(function(n,e){return n+e.count;},0))+'대');
     document.body.classList.add('dc-ready');
   }
   function schedule(){if(!pending){pending=true;requestAnimationFrame(paint);}}

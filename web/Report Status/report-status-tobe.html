@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head><script src="../_shared/demo-clock.js?rev=34d9d133492b"></script>
+<head>
 <meta charset="UTF-8"/>
+<script src="../_shared/common-logic.js?v=d77b14750704&amp;rev=15dd4911055c"></script>
+<link rel="stylesheet" href="../_shared/korean-layout.css?v=9e980f3cddea&amp;rev=495db444ef75"/>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>업체별 현황 · MACHINE IQ</title>
+<script src="../_shared/customer-access.js?v=e12eedbcb072&amp;rev=e12eedbcb072"></script>
 <link rel="icon" type="image/x-icon" href="../_shared/favicon.ico"/>
-<link rel="stylesheet" href="../_shared/offline-fonts.css?rev=b405f97e6cf9"><script type="module" blocking="render">await document.fonts.load('400 14px "Noto Sans KR"');await document.fonts.ready;</script>
-<link rel="stylesheet" href="../_shared/mockup.css?rev=bed1f0069135"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
+<link rel="stylesheet" href="../_shared/mockup.css?v=bed1f0069135&amp;rev=bed1f0069135"/>
 <style>
 /* ── 페이지 전용 : 지표 카드 6종 · 지표 전환 · 일자별 막대(hover) ── */
 .filter-bar .inp--sm{width:116px;flex:0 0 auto;text-align:center}
@@ -67,22 +71,24 @@
 .tip-box .r i{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
 .tip-box .r span{margin-left:auto;font-weight:700}
 </style>
-<link rel="stylesheet" href="../_shared/content-system.css?rev=d8f94e7e5049"/>
-<link rel="stylesheet" href="../_shared/report-enhancements.css?rev=dceeccfe9513"/>
-<link rel="stylesheet" href="../_shared/chart-common.css?rev=fc1c23dcf6af"/>
-<link rel="stylesheet" href="../_shared/form-controls.css?rev=6fda272acdcc"/>
-<link rel="stylesheet" href="../_shared/list-pagination.css?rev=0069e48c1009">
-<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?rev=bb6d53aabb78"/>
-<link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?rev=1cffa21a9777"/>
+<link rel="stylesheet" href="../_shared/content-system.css?v=d8f94e7e5049&amp;rev=d8f94e7e5049"/>
+<link rel="stylesheet" href="../_shared/report-enhancements.css?v=dceeccfe9513&amp;rev=dceeccfe9513"/>
+<link rel="stylesheet" href="../_shared/chart-common.css?v=fc1c23dcf6af&amp;rev=fc1c23dcf6af"/>
+<link rel="stylesheet" href="../_shared/form-controls.css?v=6fda272acdcc&amp;rev=6fda272acdcc"/>
+<link rel="stylesheet" href="../_shared/list-pagination.css?v=0069e48c1009&amp;rev=0069e48c1009">
+<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?v=fc90bc42e4ac&amp;rev=0ca435b09868"/>
+<link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?v=1cffa21a9777&amp;rev=1cffa21a9777"/>
 <style>body.miq-current-shell>#gnb{min-height:64px}</style>
-<script defer blocking="render" src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script>
-<script defer blocking="render" src="../_shared/common-logic.js?rev=efb7e741cd7b"></script>
-<script defer blocking="render" src="../_shared/chart-common.js?rev=15c74452f805"></script>
-<script defer blocking="render" src="../_shared/list-pagination.js?rev=33207bf33d11"></script>
-<script defer blocking="render" src="../_mock-data/generated/fleet.generated.js?rev=309d68875499"></script>
-<script defer blocking="render" src="../_shared/fleet.js?rev=dfdf98be0a95"></script>
-<script defer blocking="render" src="../_shared/nav.js?rev=049a18c69072"></script>
-<script defer blocking="render" src="../_shared/report-scope.js?rev=544a25c316d3"></script>
+<script defer blocking="render" src="../_mock-data/generated/fleet.generated.js?v=52fa65a2dce1&amp;rev=52fa65a2dce1"></script>
+<script defer blocking="render" src="../_mock-data/generated/observation-profiles.generated.js?v=1be92dd7a845&amp;rev=4054b4937190"></script>
+<script defer blocking="render" src="../_shared/vehicle-observations.js?v=550edc6b3b85&amp;rev=aea30481fdb6"></script>
+<script defer blocking="render" src="../_shared/meeting-model.js?v=7f3774217339&amp;rev=7f3774217339"></script>
+<script defer blocking="render" src="../_shared/chart-common.js?v=28a8b1161c0e&amp;rev=28a8b1161c0e"></script>
+<script defer blocking="render" src="../_shared/report-series.js?v=c676889771d9&amp;rev=c676889771d9"></script>
+<script defer blocking="render" src="../_shared/list-pagination.js?v=4b500130528b&amp;rev=4b500130528b"></script>
+<script defer blocking="render" src="../_shared/fleet.js?v=b0f68e558a52&amp;rev=b0f68e558a52"></script>
+<script defer blocking="render" src="../_shared/nav.js?v=baf392ada632&amp;rev=4206801c46cf"></script>
+<script defer blocking="render" src="../_shared/report-scope.js?v=32a98349891b&amp;rev=32a98349891b"></script>
 <script type="module" blocking="render">
 /* ══════════════════════════════════════════════════════════════
    업체별 현황 Mock-up 인터랙션 (리포트 · LNB 없음)
@@ -96,26 +102,10 @@
 
   var SCOPE = window.MIQReportScope;
   var COMPANIES = SCOPE.items;
-  document.getElementById('coSel').innerHTML=COMPANIES.map(function(c){return '<option>'+c+'</option>';}).join('');
-  var METRICS = [
-    { key: 'eff',   label: '운영효율',      unit: '%',   agg: 'avg', lo: 55,  hi: 88,  dec: 1, betterHigh: true },
-    { key: 'shock', label: '충격횟수',      unit: '건',  agg: 'sum', lo: 18,  hi: 120, dec: 0, betterHigh: false },
-    { key: 'fuel',  label: '연료소비량',    unit: 'L/H', agg: 'avg', lo: 3.1, hi: 4.7, dec: 1, betterHigh: false },
-    { key: 'batt',  label: '배터리 충전량', unit: '%',   agg: 'avg', lo: 17,  hi: 33,  dec: 1, betterHigh: true },
-    { key: 'dist',  label: '운행거리',      unit: 'Km',  agg: 'sum', lo: 70,  hi: 260, dec: 1, betterHigh: true },
-    { key: 'hour',  label: '운행시간',      unit: 'H',   agg: 'sum', lo: 150, hi: 700, dec: 0, betterHigh: true }
-  ];
+  MIQCommon.view.set(document.getElementById('coSel'),"innerHTML",COMPANIES.map(function(c){return '<option>'+c+'</option>';}).join(''));
+  var METRICS = MIQReportSeries.metrics;
   var PAGE_QUERY = new URLSearchParams(location.search);
-  function dateValue(date) { return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0'); }
-  var latestDate = new Date(); latestDate.setHours(12, 0, 0, 0); latestDate.setDate(latestDate.getDate() - 1);
-  var weekStart = new Date(latestDate.getTime()); weekStart.setDate(weekStart.getDate() - 6);
-  var monthStart = new Date(latestDate.getFullYear(), latestDate.getMonth(), 1, 12, 0, 0, 0);
-  var PERIOD = {
-    d: { from: dateValue(latestDate), to: dateValue(latestDate), cur: '조회일', prev: '전일' },
-    w: { from: dateValue(weekStart), to: dateValue(latestDate), cur: '조회주', prev: '이전주' },
-    m: { from: dateValue(monthStart), to: dateValue(latestDate), cur: '조회월', prev: '이전월' },
-    c: { from: PAGE_QUERY.get('from') || dateValue(monthStart), to: PAGE_QUERY.get('to') || dateValue(latestDate), cur: '조회기간', prev: '이전기간' }
-  };
+  var PERIOD = MIQReportSeries.periods(PAGE_QUERY);
   var initialPeriod = { day: 'd', week: 'w', month: 'm', custom: 'c' }[PAGE_QUERY.get('period')] || PAGE_QUERY.get('period') || 'm';
   if (!PERIOD[initialPeriod]) initialPeriod = 'm';
   if (PAGE_QUERY.get('from') && PAGE_QUERY.get('to') && MIQCharts.axis(initialPeriod,PAGE_QUERY.get('from'),PAGE_QUERY.get('to')).n) PERIOD[initialPeriod] = Object.assign({}, PERIOD[initialPeriod], {from:PAGE_QUERY.get('from'),to:PAGE_QUERY.get('to')});
@@ -127,55 +117,29 @@
     customTo: PERIOD.c.to
   };
 
-  function seeded(key) {
-    var s = 0;
-    for (var i = 0; i < key.length; i++) s = (s * 31 + key.charCodeAt(i)) >>> 0;
-    return function () { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; };
-  }
-  function rd(n, d) { var p = Math.pow(10, d); return Math.round(n * p) / p; }
-  function fmt(n, m) {
-    return window.MIQCommon.numbers.integer(n, true) + m.unit;
-  }
-  function metric(key) { return METRICS.filter(function (m) { return m.key === key; })[0]; }
+  var rd = MIQReportSeries.round;
+  function fmt(n, m) { return n===null||n===undefined?'—':window.MIQCommon.numbers.integer(n, true) + m.unit; }
+  function metric(key) { return MIQReportSeries.metric(key); }
 
-  /* ── 구간 라벨 ── */
-  function buckets() {
-    return MIQCharts.axis(state.period, PERIOD[state.period].from, PERIOD[state.period].to);
-  }
-
-  /* ── 데모 데이터 : 업체 · 지표 · 기간 기준 ── */
   function build(key) {
-    var m = metric(key), b = buckets();
-    function gen(seed, count) {
-      var rnd = seeded(state.co + key + state.period + PERIOD[state.period].from + PERIOD[state.period].to + seed), a = [];
-      for (var i = 0; i < count; i++) {
-        var v = 0;
-        for (var k = 0; k < b.bucket; k++) v += m.lo + rnd() * (m.hi - m.lo);
-        a.push(rd(m.agg === 'sum' ? v : v / b.bucket, m.dec));
-      }
-      return a;
-    }
-    var curA = gen('cur', b.filled), prevA = gen('prev', b.n);
-    var cols = [];
-    for (var i = 0; i < b.n; i++) cols.push({ prev: prevA[i], cur: i < b.filled ? curA[i] : null });
-    var sum = function (a) { return a.reduce(function (s, x) { return s + x; }, 0); };
-    var agg = function (a) { return rd(m.agg === 'sum' ? sum(a) : sum(a) / a.length, m.dec); };
-    return { m: m, labels: b.labels, detailLabels: b.detailLabels, cols: cols, filled: b.filled, cur: agg(curA), prev: agg(prevA) };
+    var range = PERIOD[state.period];
+    return MIQReportSeries.status(SCOPE.resolve(state.co), key, state.period, range.from, range.to);
   }
 
   /* ── ① 지표 카드 ── */
   function renderKpis() {
-    document.getElementById('kpiGrid').innerHTML = METRICS.map(function (mm) {
+    MIQCommon.view.set(document.getElementById('kpiGrid'),"innerHTML",METRICS.map(function (mm) {
       var d = build(mm.key);
-      var diff = rd(d.cur - d.prev, mm.dec);
-      var favorable = diff !== 0 && ((diff > 0) === mm.betterHigh);
-      var cls = diff === 0 ? 'flat' : (favorable ? 'good' : 'bad');
-      var arrow = diff === 0 ? '–' : (diff > 0 ? '▲' : '▼');
+      var comparable=d.cur!==null&&d.prev!==null;
+      var diff = comparable?Math.round(d.cur)-Math.round(d.prev):null;
+      var favorable = comparable && diff !== 0 && ((diff > 0) === mm.betterHigh);
+      var cls = !comparable || diff === 0 ? 'flat' : (favorable ? 'good' : 'bad');
+      var arrow = !comparable || diff === 0 ? '–' : (diff > 0 ? '▲' : '▼');
       var max = Math.max(d.cur, d.prev) || 1;
-      var hp = Math.max(4, d.prev / max * 88), hc = Math.max(4, d.cur / max * 88);
+      var hp = d.prev===null?0:Math.max(4, d.prev / max * 88), hc = d.cur===null?0:Math.max(4, d.cur / max * 88);
       return "<div class='kpi' data-k='" + mm.key + "'>"
         + "<div class='kpi__t'>" + mm.label + (mm.key === 'fuel' ? '/H' : '') + "</div>"
-        + "<div class='kpi__d " + cls + "'>" + arrow + ' ' + fmt(Math.abs(diff), mm) + "</div>"
+        + "<div class='kpi__d " + cls + "'>" + (comparable?arrow+' '+fmt(Math.abs(diff),Object.assign({},mm,{unit:mm.unit==='%'?'%p':mm.unit})):'—') + "</div>"
         + "<div class='kpi__bars' " + MIQCharts.tipAttrs(mm.label + '\n' + PERIOD[state.period].from + ' ~ ' + PERIOD[state.period].to + '\n' + PERIOD[state.period].prev + ' ' + fmt(d.prev, mm) + '\n' + PERIOD[state.period].cur + ' ' + fmt(d.cur, mm)) + ">"
         + "<div class='kpi__b prev'><span class='kpi__bar' style='height:" + hp.toFixed(1) + "px'></span></div>"
         + "<div class='kpi__b cur'><span class='kpi__bar' style='height:" + hc.toFixed(1) + "px'></span></div>"
@@ -186,16 +150,16 @@
         + "<div class='kpi__row cur'><span class='k'><i style='background:#ff3600'></i>" + PERIOD[state.period].cur
         + "</span><span class='v'>" + fmt(d.cur, mm) + "</span></div>"
         + "</div></div>";
-    }).join('');
+    }).join(''));
   }
 
   MIQCharts.bind(document.getElementById('kpiGrid'));
   /* ── ② 지표 탭 ── */
   function renderTabs() {
-    document.getElementById('metricTabs').innerHTML = METRICS.map(function (mm) {
+    MIQCommon.view.set(document.getElementById('metricTabs'),"innerHTML",METRICS.map(function (mm) {
       return "<button type='button' data-metric='" + mm.key + "'" + (state.metric === mm.key ? " class='active'" : "") + ">"
         + mm.label + "</button>";
-    }).join('');
+    }).join(''));
   }
 
   /* ── ② 막대 차트 (스크롤 없음 · hover 툴팁) ── */
@@ -205,14 +169,14 @@
   function useWidth(el) {
     var w = Math.round(el.getBoundingClientRect().width) || el.clientWidth || 960;
     W = Math.max(560, w); R = W - 14;
-    el.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    MIQCommon.view.call(el,"setAttribute",['viewBox','0 0 ' + W + ' ' + H]);
   }
 
   function renderChart(d) {
     var el = document.getElementById('chart');
     useWidth(el);
     var vals = [];
-    d.cols.forEach(function (c) { vals.push(c.prev); if (c.cur !== null) vals.push(c.cur); });
+    d.cols.forEach(function (c) { if(c.prev!==null)vals.push(c.prev); if (c.cur !== null) vals.push(c.cur); });
     var top = Math.max.apply(null, vals) || 1;
     var step = Math.pow(10, Math.floor(Math.log(top) / Math.LN10)) / 2;
     var max = Math.ceil(top / step) * step;
@@ -246,11 +210,12 @@
       svg += "<text x='" + r2(cx, 1) + "' y='" + (B + 18) + "' text-anchor='middle'>" + axisLabel + "</text>";
     });
     document.getElementById('tip').style.display = 'none';
-    el.innerHTML = svg;
+    MIQCommon.view.set(el,"innerHTML",svg);
 
     var tip = document.getElementById('tip'), wrap = document.getElementById('chartWrap');
+    tip.setAttribute('data-i18n-count', d.m.key);
     Array.prototype.forEach.call(el.querySelectorAll('g.col'), function (g) {
-      var i = +g.getAttribute('data-i'), c = d.cols[i];
+      var i = +MIQCommon.view.call(g,"getAttribute",['data-i']), c = d.cols[i];
       g.addEventListener('mouseenter', function (ev) {
         g.classList.add('on');
         var rows = "<b>" + d.detailLabels[i] + "</b>"
@@ -261,7 +226,7 @@
           rows += "<div class='r'><i style='background:#ff3600'></i>" + PERIOD[state.period].cur + "<span>" + fmt(c.cur, d.m) + "</span></div>"
             + "<div class='r'><i style='background:transparent'></i>증감<span>" + (diff > 0 ? '▲ ' : diff < 0 ? '▼ ' : '') + fmt(Math.abs(diff), d.m) + "</span></div>";
         }
-        tip.innerHTML = rows;
+        MIQCommon.view.set(tip,"innerHTML",rows);
         tip.style.display = 'block';
         move(ev);
       });
@@ -282,28 +247,27 @@
     renderKpis();
     renderTabs();
     var d = build(state.metric);
-    document.getElementById('chartName').textContent = d.m.label;
+    MIQCommon.view.set(document.getElementById('chartName'),"textContent",d.m.label);
     renderChart(d);
 
-    Array.prototype.forEach.call(document.querySelectorAll('[data-lbl-cur]'), function (el) { el.textContent = PERIOD[state.period].cur; });
-    Array.prototype.forEach.call(document.querySelectorAll('[data-lbl-prev]'), function (el) { el.textContent = PERIOD[state.period].prev; });
-    document.getElementById('chartHint').textContent =
-      (state.period === 'd' ? 'ⓘ 시간대별 값입니다.'
+    Array.prototype.forEach.call(document.querySelectorAll('[data-lbl-cur]'), function (el) { MIQCommon.view.set(el,"textContent",PERIOD[state.period].cur); });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-lbl-prev]'), function (el) { MIQCommon.view.set(el,"textContent",PERIOD[state.period].prev); });
+    MIQCommon.view.set(document.getElementById('chartHint'),"textContent",(state.period === 'd' ? 'ⓘ 시간대별 값입니다.'
        : state.period === 'c' ? 'ⓘ 선택 기간의 일자별 값입니다.'
        : 'ⓘ 일자별 값입니다.')
-      + ' 막대에 마우스를 올리면 수치가 표시됩니다.';
+      + ' 막대에 마우스를 올리면 수치가 표시됩니다.');
   }
 
   /* ── 이벤트 ── */
   var co = document.getElementById('coSel');
-  co.innerHTML = COMPANIES.map(function (c) { return "<option>" + c + "</option>"; }).join('');
+  MIQCommon.view.set(co,"innerHTML",COMPANIES.map(function (c) { return "<option>" + c + "</option>"; }).join(''));
   co.addEventListener('change', function () { state.co = co.value; render(); });
 
   document.getElementById('periodTabs').addEventListener('click', function (e) {
     if (this.closest('.finder, .filter-bar').__miqPeriodController) return;
     var b = e.target.closest('button[data-period]');
     if (!b) return;
-    state.period = b.getAttribute('data-period');
+    state.period = MIQCommon.view.call(b,"getAttribute",['data-period']);
     render();
   });
   (document.getElementById('periodTabs').closest('.finder, .filter-bar') || document.getElementById('periodTabs')).addEventListener('miq:period-change', function (event) {
@@ -318,7 +282,7 @@
   document.getElementById('metricTabs').addEventListener('click', function (e) {
     var b = e.target.closest('button[data-metric]');
     if (!b) return;
-    state.metric = b.getAttribute('data-metric');
+    state.metric = MIQCommon.view.call(b,"getAttribute",['data-metric']);
     render();
   });
   document.getElementById('btnSearch').addEventListener('click', function () {
@@ -340,7 +304,7 @@
   };
 })();
 </script>
-<script defer blocking="render" src="../_shared/report-enhancements.js?rev=62600e5241f4"></script>
+<script defer blocking="render" src="../_shared/report-enhancements.js?v=d46a09fbf19f&amp;rev=d46a09fbf19f"></script>
 </head>
 <body data-current-bootstrap="ready" data-period-presets="dwm" class="miq-current-shell miq-content-system miq-report-enhanced" data-gnb="rpt" data-sub="rptstatus" data-variant="tobe" data-base="../">
 

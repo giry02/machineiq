@@ -106,27 +106,6 @@
       subs: [{ key: 'findpw', label: '비밀번호 찾기', tobe: 'find-password-tobe.html' }] }
   ];
 
-  /* ── MVP 진행상태 (index.html 상태판과 동일 기준 · 2026-08-13 현행화) ──
-     done = MVP 확정 · nd(not done) = 미진행 · dl(delete) = MVP 제외 */
-  var STATUS = {
-    'dash/group': 'done',
-    'anlz/summary': 'done', 'anlz/detail': 'done', 'anlz/oper': 'done', 'anlz/vehicleeff': 'done',
-    'anlz/shock': 'done', 'anlz/engine': 'done', 'anlz/lithium': 'done',
-    'srvc/all': 'done', 'srvc/maintenance': 'done', 'srvc/supply': 'done', 'srvc/error': 'done',
-    'rpt/rptstatus': 'done', 'rpt/rptcompare': 'done', 'rpt/rptheat': 'done',
-    'map/map': 'done',
-    'interest/summary': 'done', 'interest/favorites': 'done',
-    'ops/data': 'done', 'ops/equipment': 'done', 'ops/codes': 'done', 'ops/languages': 'done',
-    'ops/notices': 'done', 'ops/accounts': 'done', 'ops/menus': 'done', 'ops/history': 'done',
-    'mgmt/user': 'done', 'mgmt/company': 'done', 'mgmt/group': 'done', 'mgmt/geofence': 'done',
-    'mgmt/vehicle': 'done', 'mgmt/acctreq': 'done', 'mgmt/equipreq': 'done',
-    'myacct/account': 'done', 'login/login': 'done', 'findpw/findpw': 'done',
-    'anlz/usage': 'done',
-    /* MVP 제외 */
-    'equip/detail': 'dl', 'rpt/report': 'dl'
-  };
-  function statusOf(mk, sk) { return STATUS[mk + '/' + sk] || ''; }
-
   var body = document.body;
   var d = body.dataset;
   /* 화면별 스크립트가 초기 렌더 중 URL을 바꾸기 전, 실제 진입 조건을 보존한다. */
@@ -157,6 +136,12 @@
     customer_staff: { account: '세종물류 - 직원', operator: '오하늘' }
   };
   var MANAGEMENT_IDENTITY = MANAGEMENT_IDENTITIES[MANAGEMENT_ROLE];
+  var registeredAccount = window.MIQCustomerAccess && window.MIQCustomerAccess.current(MANAGEMENT_ROLE);
+  if (registeredAccount) {
+    MANAGEMENT_IDENTITY = { account: (registeredAccount.company || registeredAccount.name) + ' - ' + (MANAGEMENT_ROLE === 'customer_owner' ? '대표' : '직원'), operator: registeredAccount.name };
+  }
+  var accountLabel = document.createElement('span');
+  MIQCommon.view.set(accountLabel,"textContent",MANAGEMENT_IDENTITY.account);
   if (VARIANT === 'tobe') {
     MENU.forEach(function(menu){
       menu.subs=menu.subs.filter(function(sub){return sub.key!=='engine';});
@@ -236,12 +221,12 @@
         title.parentNode.insertBefore(heading, title);
         heading.appendChild(title);
       }
-      host.setAttribute('data-miq-summary-title-scope', '');
+      MIQCommon.view.call(host,"setAttribute",['data-miq-summary-title-scope','']);
     } else {
-      if (host.getAttribute('data-miq-scope-placement') !== 'title') return;
+      if (MIQCommon.view.call(host,"getAttribute",['data-miq-scope-placement']) !== 'title') return;
       container = document.querySelector('.main .miq-title-period-row, .main .miq-service-header-row');
       title = container && container.querySelector('.page-head__title, .page-title');
-      if ((!container || !title) && (ACT === 'map' || (ACTSUB === 'lithium' && body.getAttribute('data-lithium-list') !== 'true'))) {
+      if ((!container || !title) && (ACT === 'map' || (ACTSUB === 'lithium' && MIQCommon.view.call(body,"getAttribute",['data-lithium-list']) !== 'true'))) {
         title = document.querySelector('.main .page-head .page-head__title');
         container = title && title.closest('.page-head');
       }
@@ -258,7 +243,7 @@
     var oldParent = host.parentElement;
     var previous = heading.querySelector('[data-miq-title-scope]');
     if (previous && previous !== host) previous.remove();
-    host.setAttribute('data-miq-title-scope', '');
+    MIQCommon.view.call(host,"setAttribute",['data-miq-title-scope','']);
     heading.appendChild(host);
     if (oldParent && oldParent !== heading && oldParent !== container && !oldParent.children.length) oldParent.remove();
   }
@@ -278,14 +263,14 @@
       !target.requiredVehicle && !target.vehicleScoped && target.profile !== 'vehicle' &&
       !!path && path !== defaultScopeLabel();
 
-    host.textContent = '';
+    MIQCommon.view.set(host,"textContent",'');
     host.classList.add('miq-scope-summary');
     host.classList.toggle('is-path-first', !!options.pathFirst);
     function append(className, text) {
       if (!text) return;
       var node = document.createElement('span');
       node.className = className;
-      node.textContent = text;
+      MIQCommon.view.set(node,"textContent",text);
       node.title = text;
       host.appendChild(node);
       return node;
@@ -296,17 +281,17 @@
       var label = document.createElement('span');
       node.className = 'miq-scope-summary__path';
       label.className = 'miq-scope-summary__path-label';
-      label.textContent = path;
+      MIQCommon.view.set(label,"textContent",path);
       label.title = path;
       node.appendChild(label);
       if (resettable) {
         var reset = document.createElement('button');
         reset.type = 'button';
         reset.className = 'miq-scope-summary__reset';
-        reset.setAttribute('data-miq-scope-reset', '');
-        reset.setAttribute('aria-label', '조회 범위를 ' + defaultScopeResetLabel() + ' 초기화');
+        MIQCommon.view.call(reset,"setAttribute",['data-miq-scope-reset','']);
+        MIQCommon.view.call(reset,"setAttribute",['aria-label','조회 범위를 ' + defaultScopeResetLabel() + ' 초기화']);
         reset.title = defaultScopeResetLabel() + ' 초기화';
-        reset.textContent = '×';
+        MIQCommon.view.set(reset,"textContent",'×');
         reset.addEventListener('click', function (event) {
           event.preventDefault();
           event.stopPropagation();
@@ -337,8 +322,8 @@
     if (!document.querySelector('link[data-current-shell]')) {
       var shellCss = document.createElement('link');
       shellCss.rel = 'stylesheet';
-      shellCss.href = BASE + '_shared/current-shell.css?v=20260915-ops-date-r1';
-      shellCss.setAttribute('data-current-shell', '');
+      shellCss.href = BASE + '_shared/current-shell.css?v=fc90bc42e4ac';
+      MIQCommon.view.call(shellCss,"setAttribute",['data-current-shell','']);
       document.head.appendChild(shellCss);
     }
     if (VARIANT === 'tobe' && MANAGEMENT_ROLE === 'internal') {
@@ -480,13 +465,11 @@
     }
 
     html += '</nav><div class="gnb__right">' + managementRoleControl +
-      '<label class="gnb__language"><span class="miq-sr-only">언어 선택</span>' +
-        '<select aria-label="언어 선택"><option value="ko">KO</option><option value="en">EN</option></select></label>' +
       (acctHref ? '<a class="home gnb__account" href="' + acctHref + '"' + (VARIANT === 'tobe' ? ' data-account-modal aria-haspopup="dialog"' : '') + (ACT === 'myacct' ? ' style="background:rgba(255,255,255,.22)"' : '') +
-        '>' + (VARIANT === 'tobe' ? MANAGEMENT_IDENTITY.account : '세종물류 - 관리자') + '</a>' : '<span>세종물류 - 관리자</span>') +
+        '>' + (VARIANT === 'tobe' ? MIQCommon.view.get(accountLabel,"innerHTML") : '세종물류 - 관리자') + '</a>' : '<span>세종물류 - 관리자</span>') +
       '<a class="home gnb__logout" href="' + BASE + enc('Login') + '/login-' + VARIANT + '.html">로그아웃</a></div></div>';
 
-    mount.outerHTML = html;
+    MIQCommon.view.set(mount,"outerHTML",html);
     var accountLink = document.querySelector('.gnb__account[data-account-modal]');
     if (accountLink) {
       var accountModalLoading = false;
@@ -499,7 +482,7 @@
         if (accountModalLoading) return;
         accountModalLoading = true;
         var component = document.createElement('script');
-        component.src = BASE + '_shared/account-modal-component.js?v=20260911-account-country';
+        component.src = BASE + '_shared/account-modal-component.js?rev=8d516c119d92';
         component.dataset.base = BASE;
         component.addEventListener('load', function () {
           accountModalLoading = false;
@@ -563,7 +546,7 @@
      로그인 이전 화면에는 표시하지 않으며, 상세검색은 명시적으로 펼쳤을 때만 노출한다. */
   function renderLegacyTargetSelector() {
     if (!document.querySelector('.gnb')) return;
-    if (body.getAttribute('data-target-selector') === 'none') return;
+    if (MIQCommon.view.call(body,"getAttribute",['data-target-selector']) === 'none') return;
     if (ACT === 'dash' || ACT === 'mgmt') return;
     /* 리포트 세 화면은 화면 안의 업체 도구가 조회 기준이다. */
     if (ACT === 'rpt') return;
@@ -579,13 +562,13 @@
       ['7690', '팔팔지게차서비스'], ['8246', '한일중기(주)']
     ];
     var vehicles = [
-      ['FBA32_224250271', 'FBA32_224250271 · B30S-7'], ['FBA20_224250312', 'FBA20_224250312 · B30S-7'],
+      ['FBA32_224250271', 'FBA32_224250271 · B30S-7'], ['FBA32_224250383', 'FBA32_224250383 · B30S-7'],
       ['FBD25_113920044', 'FBD25_113920044 · D25S-9'],
       ['FBA18_224250094', 'FBA18_224250094 · B18S-7'], ['FBA20_224250312', 'FBA20_224250312 · B20S-7'],
       ['FBA25_224250188', 'FBA25_224250188 · B25S-7'], ['FBD30_113920117', 'FBD30_113920117 · D30S-9'],
       ['FBA16_224250045', 'FBA16_224250045 · B16S-7'], ['FBA35_224250403', 'FBA35_224250403 · B35S-7'],
       ['FBD18_113920062', 'FBD18_113920062 · D18S-9'], ['FBA22_224250226', 'FBA22_224250226 · B22S-7'],
-      ['FBD25_113920044', 'FBD25_113920044 · B30S-7'], ['FBA18_224250094', 'FBA18_224250094 · B30S-7'],
+      ['FBA32_032068', 'FBA32_032068 · B30S-7'], ['FBA32_032042', 'FBA32_032042 · B30S-7'],
       ['FBA32-002038', 'FBA32-002038 · B30S-7'], ['FBA32-002039', 'FBA32-002039 · B30S-7'],
       ['FBA32-002040', 'FBA32-002040 · B30S-7'], ['FBA32-002043', 'FBA32-002043 · B30S-7'],
       ['FBA32-002044', 'FBA32-002044 · B30S-7'], ['FBA32-002045', 'FBA32-002045 · B30S-7'],
@@ -622,7 +605,7 @@
     if (isVehicleScoped) {
       var queryVehicle = query.get('veh');
       var lnbVehicle = document.querySelector('[data-lnb-tree][data-vin]');
-      scopedVehicle = queryVehicle || (lnbVehicle && lnbVehicle.getAttribute('data-vin')) || scopedVehicleByPage[ACTSUB];
+      scopedVehicle = queryVehicle || (lnbVehicle && MIQCommon.view.call(lnbVehicle,"getAttribute",['data-vin'])) || scopedVehicleByPage[ACTSUB];
       if (!vehicles.some(function (item) { return item[0] === scopedVehicle; })) scopedVehicle = scopedVehicleByPage[ACTSUB];
     }
 
@@ -645,8 +628,7 @@
       scopedVehicle = requestedMatch ? requestedMatch[0] : '';
     }
 
-    wrap.innerHTML =
-      '<div class="miq-target-selector__row">' +
+    MIQCommon.view.set(wrap,"innerHTML",'<div class="miq-target-selector__row">' +
         '<strong>조회 대상</strong>' +
         '<label>업체 <select data-target-company>' + options(companies, queryCompany) + '</select></label>' +
         '<label>차량 <select data-target-vehicle>' + (isVehicleScoped ? '' : '<option value="">차량을 선택하세요</option>') + options(vehicles, scopedVehicle) + '</select></label>' +
@@ -666,7 +648,7 @@
           '<div class="miq-target-selector__result-head"><strong data-target-result-count>검색 결과</strong><span>차량번호 · 소속 업체 · 모델 · 동력 유형</span></div>' +
           '<div class="miq-target-selector__results" data-target-results><p class="miq-target-selector__result-guide">차량번호를 입력하고 조회해 주세요.</p></div>' +
         '</div>' +
-      '</div>';
+      '</div>');
 
     document.querySelector('.gnb').insertAdjacentElement('afterend', wrap);
 
@@ -688,7 +670,7 @@
     function companyName() { return company.options[company.selectedIndex].text; }
     function vehicleName() { return vehicle.value ? vehicle.options[vehicle.selectedIndex].text.split(' · ')[0] : ''; }
     function updateCurrent() {
-      current.textContent = vehicle.value ? '현재 조회 · 차량 ' + vehicleName() : '현재 조회 · 업체 ' + companyName();
+      MIQCommon.view.set(current,"textContent",vehicle.value ? '현재 조회 · 차량 ' + vehicleName() : '현재 조회 · 업체 ' + companyName());
       window.MIQ_TARGET_CONTEXT = {
         companyId: company.value,
         equipmentId: vehicle.value || null,
@@ -701,18 +683,18 @@
     function runSearch() {
       var q = input.value.trim().toLowerCase();
       if (q.length < 5) {
-        resultCount.textContent = '검색 결과';
-        results.innerHTML = '<p class="miq-target-selector__result-guide">차량번호를 5자 이상 입력해 주세요.</p>';
+        MIQCommon.view.set(resultCount,"textContent",'검색 결과');
+        MIQCommon.view.set(results,"innerHTML",'<p class="miq-target-selector__result-guide">차량번호를 5자 이상 입력해 주세요.</p>');
         return;
       }
       var found = vehicles.filter(function (item) { return item[1].toLowerCase().indexOf(q) > -1; });
-      resultCount.textContent = '검색 결과 ' + found.length + '대';
-      results.innerHTML = found.length ? found.map(function (item) {
+      MIQCommon.view.set(resultCount,"textContent",'검색 결과 ' + found.length + '대');
+      MIQCommon.view.set(results,"innerHTML",found.length ? found.map(function (item) {
         var parts = item[1].split(' · ');
         var model = parts[1] || '-';
         var power = /^B/i.test(model) ? '리튬' : (/^D/i.test(model) ? '엔진' : '-');
         return '<button type="button" data-result-vehicle="' + item[0] + '"><strong>' + item[0] + '</strong><span>(주)세종물류중부지점 · ' + model + ' · ' + power + '</span></button>';
-      }).join('') : '<p class="miq-target-selector__result-guide">일치하는 차량이 없습니다.</p>';
+      }).join('') : '<p class="miq-target-selector__result-guide">일치하는 차량이 없습니다.</p>');
     }
 
     company.addEventListener('change', function () {
@@ -722,7 +704,7 @@
     vehicle.addEventListener('change', updateCurrent);
     detailButton.addEventListener('click', function () {
       panel.hidden = !panel.hidden;
-      detailButton.setAttribute('aria-expanded', panel.hidden ? 'false' : 'true');
+      MIQCommon.view.call(detailButton,"setAttribute",['aria-expanded',panel.hidden ? 'false' : 'true']);
       if (!panel.hidden) input.focus();
     });
     wrap.querySelector('[data-target-search-button]').addEventListener('click', runSearch);
@@ -734,7 +716,7 @@
       vehicle.value = button.dataset.resultVehicle;
       updateCurrent();
       panel.hidden = true;
-      detailButton.setAttribute('aria-expanded', 'false');
+      MIQCommon.view.call(detailButton,"setAttribute",['aria-expanded','false']);
     });
     updateCurrent();
     if (document.readyState === 'loading') {
@@ -751,14 +733,14 @@
      (MIQ.FLEET_CATALOG)를 사용하며, 값이 없는 지표만 화면에서 미수집으로 처리한다. */
   function renderTargetSelector() {
     if (!document.querySelector('.gnb')) return;
-    if (body.getAttribute('data-target-selector') === 'none') return;
+    if (MIQCommon.view.call(body,"getAttribute",['data-target-selector']) === 'none') return;
     if (ACT === 'dash' || ACT === 'mgmt' || ACT === 'rpt') return;
     if (ACT === 'interest' && (ACTSUB !== 'summary' || !canUseInterest(MANAGEMENT_ROLE))) return;
     if (document.querySelector('.miq-target-selector')) return;
 
-    var explicitProfile = body.getAttribute('data-target-profile');
+    var explicitProfile = MIQCommon.view.call(body,"getAttribute",['data-target-profile']);
     var profile = explicitProfile || 'full';
-    var lithiumList = body.getAttribute('data-lithium-list') === 'true';
+    var lithiumList = MIQCommon.view.call(body,"getAttribute",['data-lithium-list']) === 'true';
     /* 사용시간·운영효율은 full: 전체 범위와 차량 한 대를 모두 조회한다. */
     if (!explicitProfile && ACT === 'anlz' && ['detail', 'engine', 'lithium'].indexOf(ACTSUB) > -1) profile = 'vehicle';
 
@@ -889,10 +871,9 @@
 
     var wrap = document.createElement('section');
     wrap.className = 'miq-target-selector is-hierarchy is-profile-' + profile;
-    wrap.setAttribute('data-target-profile', profile);
-    wrap.setAttribute('aria-label', '공통 조회 범위');
-    wrap.innerHTML =
-      '<div class="miq-target-selector__row">' +
+    MIQCommon.view.call(wrap,"setAttribute",['data-target-profile',profile]);
+    MIQCommon.view.call(wrap,"setAttribute",['aria-label','공통 조회 범위']);
+    MIQCommon.view.set(wrap,"innerHTML",'<div class="miq-target-selector__row">' +
         '<label class="miq-target-selector__control" data-target-slot="company">' + icon('company') + '<span class="miq-sr-only">업체</span><select data-target-company aria-label="업체 선택"></select></label>' +
         '<label class="miq-target-selector__control" data-target-slot="group">' + icon('group') + '<span class="miq-sr-only">그룹</span><select data-target-group aria-label="그룹 선택"></select></label>' +
         '<label class="miq-target-selector__control" data-target-slot="type">' + icon('type') + '<span class="miq-sr-only">분류</span><select data-target-type aria-label="분류 선택"></select></label>' +
@@ -912,7 +893,7 @@
           '<div class="miq-target-selector__result-head"><strong data-target-result-count>검색 결과</strong><span>차량번호 · 소속 업체 · 모델 · 동력 유형</span></div>' +
           '<div class="miq-target-selector__results" data-target-results><p class="miq-target-selector__result-guide">차량번호를 입력하고 조회해 주세요.</p></div>' +
         '</div>' +
-      '</div>';
+      '</div>');
     var leadingControl = document.querySelector('[data-target-leading-control]');
     if (leadingControl) {
       wrap.querySelector('.miq-target-selector__row').prepend(leadingControl);
@@ -920,7 +901,7 @@
     }
     document.querySelector('.gnb').insertAdjacentElement('afterend', wrap);
 
-    if (body.getAttribute('data-summary-layout') === 'content-search') {
+    if (MIQCommon.view.call(body,"getAttribute",['data-summary-layout']) === 'content-search') {
       var summaryLayout = document.querySelector('.layout');
       summaryLayout.insertBefore(wrap, summaryLayout.firstChild);
     }
@@ -940,13 +921,13 @@
     function setSearchPanelOpen(open) {
       var label = open ? '상세검색 닫기' : '차량 상세검색';
       panel.hidden = !open;
-      detailButton.setAttribute('aria-expanded', open ? 'true' : 'false');
-      detailButton.setAttribute('aria-label', label);
-      detailButton.setAttribute('title', label);
-      detailButton.querySelector('span').textContent = label;
-      detailButton.querySelector('svg').innerHTML = open
+      MIQCommon.view.call(detailButton,"setAttribute",['aria-expanded',open ? 'true' : 'false']);
+      MIQCommon.view.call(detailButton,"setAttribute",['aria-label',label]);
+      MIQCommon.view.call(detailButton,"setAttribute",['title',label]);
+      MIQCommon.view.set(detailButton.querySelector('span'),"textContent",label);
+      MIQCommon.view.set(detailButton.querySelector('svg'),"innerHTML",open
         ? '<path d="m6 6 12 12M18 6 6 18"></path>'
-        : '<circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m15.5 15.5 5 5"></path>';
+        : '<circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m15.5 15.5 5 5"></path>');
     }
     setSearchPanelOpen(false);
 
@@ -959,12 +940,12 @@
       groupControl.hidden = roleTargetPolicy.hideGroup;
     }
     function setOptions(select, items, selected) {
-      select.textContent = '';
+      MIQCommon.view.set(select,"textContent",'');
       items.forEach(function (item) {
         var option = document.createElement('option');
         option.value = item.value;
-        option.textContent = item.label;
-        option.setAttribute('data-label', item.rawLabel || item.label);
+        MIQCommon.view.set(option,"textContent",item.label);
+        MIQCommon.view.call(option,"setAttribute",['data-label',item.rawLabel || item.label]);
         if (item.value === selected) option.selected = true;
         select.appendChild(option);
       });
@@ -974,7 +955,7 @@
     function setGroupAvailability(disabled) {
       group.disabled = !!disabled;
       groupControl.classList.toggle('is-disabled', !!disabled);
-      groupControl.setAttribute('aria-disabled', disabled ? 'true' : 'false');
+      MIQCommon.view.call(groupControl,"setAttribute",['aria-disabled',disabled ? 'true' : 'false']);
       groupControl.title = disabled ? '업체를 선택하면 해당 업체의 그룹을 선택할 수 있습니다.' : '';
     }
 
@@ -1243,18 +1224,18 @@
     function runSearch() {
       var q = input.value.trim().toLowerCase();
       if (q.length < 5) {
-        resultCount.textContent = '검색 결과';
-        results.innerHTML = '<p class="miq-target-selector__result-guide">차량번호를 5자 이상 입력해 주세요.</p>';
+        MIQCommon.view.set(resultCount,"textContent",'검색 결과');
+        MIQCommon.view.set(results,"innerHTML",'<p class="miq-target-selector__result-guide">차량번호를 5자 이상 입력해 주세요.</p>');
         return;
       }
       var searchPool = profile === 'vehicle' ? vehiclePool : fleet;
       var found = searchPool.filter(function (item) { return (item.vin + ' ' + item.model).toLowerCase().indexOf(q) > -1; });
-      resultCount.textContent = '검색 결과 ' + found.length + '대';
-      results.textContent = '';
+      MIQCommon.view.set(resultCount,"textContent",'검색 결과 ' + found.length + '대');
+      MIQCommon.view.set(results,"textContent",'');
       if (!found.length) {
         var empty = document.createElement('p');
         empty.className = 'miq-target-selector__result-guide';
-        empty.textContent = '일치하는 차량이 없습니다.';
+        MIQCommon.view.set(empty,"textContent",'일치하는 차량이 없습니다.');
         results.appendChild(empty);
         return;
       }
@@ -1264,9 +1245,9 @@
         var vin = document.createElement('strong');
         var meta = document.createElement('span');
         button.type = 'button';
-        button.setAttribute('data-result-vehicle', item.vin);
-        vin.textContent = item.vin;
-        meta.textContent = (companyMeta ? companyMeta.name : item.companyName) + ' · ' + item.model + ' · ' + item.type;
+        MIQCommon.view.call(button,"setAttribute",['data-result-vehicle',item.vin]);
+        MIQCommon.view.set(vin,"textContent",item.vin);
+        MIQCommon.view.set(meta,"textContent",(companyMeta ? companyMeta.name : item.companyName) + ' · ' + item.model + ' · ' + item.type);
         button.appendChild(vin);
         button.appendChild(meta);
         results.appendChild(button);
@@ -1282,7 +1263,7 @@
     results.addEventListener('click', function (event) {
       var button = event.target.closest('[data-result-vehicle]');
       if (!button) return;
-      var selected = vehicleByVin(button.getAttribute('data-result-vehicle'), fleet);
+      var selected = vehicleByVin(MIQCommon.view.call(button,"getAttribute",['data-result-vehicle']), fleet);
       if (!selected) return;
       state.companyId = selected.companyId;
       state.group = roleTargetPolicy.hideGroup ? '' : selected.group;
@@ -1324,20 +1305,20 @@
     Array.prototype.forEach.call(document.querySelectorAll('.role-picker'), function (node) {
       /* 목업용 권한 전환기는 화면에서 감추되 기존 페이지 스크립트의 참조는 보존한다. */
       node.hidden = true;
-      node.setAttribute('aria-hidden', 'true');
+      MIQCommon.view.call(node,"setAttribute",['aria-hidden','true']);
     });
     Array.prototype.forEach.call(document.querySelectorAll('.hidden-note, .merged-note, .web-only'), function (node) {
       node.remove();
     });
     Array.prototype.forEach.call(document.querySelectorAll('.note, .policy-callout'), function (note) {
-      var text = note.textContent.replace(/\s+/g, ' ').trim();
+      var text = MIQCommon.view.get(note,"textContent").replace(/\s+/g, ' ').trim();
       /*
          policy-callout은 처리 결과·삭제 영향처럼 실제 동작 피드백에도 사용한다.
          클래스만 보고 전부 지우지 않고, 고객에게 노출할 이유가 없는 목업 설명만 제거한다.
       */
       if (/TO-BE 개선 사항|개발 참고|화면 설명|화면 병합 안내|권한 노출 대상|계정 권한 종류|노출 대상|목업 확인|확인용|가안|본 목업|내부 처리 안내|내부 사용자.*전체 딜러.*조회 전용|위 권한을 바꾸어|계정신청관리 패널.*계정에만 노출|그룹 셀에서 대상 그룹을 선택/.test(text)) {
         note.hidden = true;
-        note.setAttribute('aria-hidden', 'true');
+        MIQCommon.view.call(note,"setAttribute",['aria-hidden','true']);
       }
     });
     /* 숨긴 목업 설명만 담고 있던 래퍼도 함께 접어 화면마다 남던 빈 여백을 제거한다. */
@@ -1345,16 +1326,16 @@
       var parent = note.parentElement;
       if (!parent || parent === document.body) return;
       var hasVisibleChild = Array.prototype.some.call(parent.children, function (child) {
-        return !child.hidden && child.getAttribute('aria-hidden') !== 'true';
+        return !child.hidden && MIQCommon.view.call(child,"getAttribute",['aria-hidden']) !== 'true';
       });
       if (!hasVisibleChild) {
         parent.hidden = true;
-        parent.setAttribute('aria-hidden', 'true');
+        MIQCommon.view.call(parent,"setAttribute",['aria-hidden','true']);
       }
     });
     /* 검토 포털에서만 쓰던 AS-IS·사이트맵 링크는 실제 구현 화면에서 노출하지 않는다. */
     Array.prototype.forEach.call(document.querySelectorAll('.pre__links a'), function (link) {
-      var href = link.getAttribute('href') || '';
+      var href = MIQCommon.view.call(link,"getAttribute",['href']) || '';
       if (/-asis\.html|\.\.\/index\.html/.test(href)) link.remove();
     });
 
@@ -1371,11 +1352,11 @@
 
     /* 연 단위 기간 탭은 제공하지 않는다. */
     Array.prototype.forEach.call(document.querySelectorAll('button'), function (button) {
-      if (button.textContent.replace(/\s+/g, '') !== '\uB144') return;
+      if (MIQCommon.view.get(button,"textContent").replace(/\s+/g, '') !== '\uB144') return;
       var group = button.parentElement;
       if (!group) return;
       var labels = Array.prototype.map.call(group.querySelectorAll('button'), function (item) {
-        return item.textContent.replace(/\s+/g, '');
+        return MIQCommon.view.get(item,"textContent").replace(/\s+/g, '');
       });
       if (labels.indexOf('\uC77C') > -1 && labels.indexOf('\uC8FC') > -1 && labels.indexOf('\uC6D4') > -1) {
         button.remove();
@@ -1409,11 +1390,11 @@
 
     var label = labels[ACTSUB] || labels.all;
     /* 제목은 화면의 의미만 표시한다. 현재 범위는 목록 상단 공통 범위 요약이 담당한다. */
-    title.textContent = label;
+    MIQCommon.view.set(title,"textContent",label);
 
     /* 기준 미확정 상태에서 추가됐던 31일 안내 문구는 제거한다. */
     Array.prototype.forEach.call(document.querySelectorAll('.period-note, .period-help, .miq-period-guide'), function (node) {
-      if (/31일|조회\s*기간/.test(node.textContent)) node.remove();
+      if (/31일|조회\s*기간/.test(MIQCommon.view.get(node,"textContent"))) node.remove();
     });
 
     var sectionTop = document.querySelector('.main .section-top');
@@ -1441,6 +1422,7 @@
   }
 
   function enhancePeriodControls() {
+    var MIQCommon = window.MIQCommon;
     var controllers = [];
     var query = INITIAL_QUERY;
     var dateRules = window.MIQCommon.dates;
@@ -1462,9 +1444,9 @@
 
     function modeFromButton(button) {
       if (!button) return '';
-      var dataMode = normalizeMode(button.getAttribute('data-period'));
+      var dataMode = normalizeMode(MIQCommon.view.call(button,"getAttribute",['data-period']));
       if (dataMode) return dataMode;
-      var label = button.textContent.replace(/\s+/g, '');
+      var label = MIQCommon.view.get(button,"textContent").replace(/\s+/g, '');
       return { '일': 'd', '주': 'w', '월': 'm', '사용자설정': 'c', '기간': 'c', '사용자검색': 'c', '사용자': 'c' }[label] || '';
     }
 
@@ -1487,7 +1469,7 @@
 
       var range = bar.querySelector('.date-range');
       if (range && !bar.querySelector('input[type="date"]')) {
-        var raw = range.textContent.trim().replace(/\./g, '-');
+        var raw = MIQCommon.view.get(range,"textContent").trim().replace(/\./g, '-');
         var dates = raw.match(/\d{4}-\d{2}-\d{2}/g) || ['2026-07-01', '2026-07-31'];
         var start = document.createElement('input');
         var end = document.createElement('input');
@@ -1497,7 +1479,7 @@
         start.value = dates[0] || '2026-07-01';
         end.value = dates[1] || dates[0] || '2026-07-31';
         sep.className = 'miq-date-separator';
-        sep.textContent = '~';
+        MIQCommon.view.set(sep,"textContent",'~');
         range.replaceWith(start, sep, end);
       }
 
@@ -1509,7 +1491,7 @@
         addedEnd.value = inputs[0].value;
         var addedSeparator = document.createElement('span');
         addedSeparator.className = 'miq-date-separator';
-        addedSeparator.textContent = '~';
+        MIQCommon.view.set(addedSeparator,"textContent",'~');
         inputs[0].insertAdjacentElement('afterend', addedSeparator);
         addedSeparator.insertAdjacentElement('afterend', addedEnd);
         inputs = bar.querySelectorAll('input[type="date"], input[data-from], input[data-to]');
@@ -1521,32 +1503,32 @@
         input.removeAttribute('readonly');
         input.classList.add('is-enabled');
         input.dataset.miqDateRole = index === 0 ? 'start' : 'end';
-        if (!input.getAttribute('aria-label')) {
-          input.setAttribute('aria-label', index === 0 ? '조회 시작일' : '조회 종료일');
+        if (!MIQCommon.view.call(input,"getAttribute",['aria-label'])) {
+          MIQCommon.view.call(input,"setAttribute",['aria-label',index === 0 ? '조회 시작일' : '조회 종료일']);
         }
       });
       Array.prototype.forEach.call(bar.querySelectorAll('.date-range span, .sep, .chart-head__tools > span:not(.period-tabs)'), function (separator) {
-        if (separator.textContent.trim() === '~') separator.classList.add('miq-date-separator');
+        if (MIQCommon.view.get(separator,"textContent").trim() === '~') separator.classList.add('miq-date-separator');
       });
       var buttons = Array.prototype.slice.call(tabs.querySelectorAll('button'));
       var searchButton = Array.prototype.filter.call(bar.querySelectorAll('button'), function (button) {
-        var label = button.textContent.replace(/\s+/g, '');
+        var label = MIQCommon.view.get(button,"textContent").replace(/\s+/g, '');
         return label === '조회' || button.classList.contains('btn-search') || button.id === 'btnSearch';
       })[0];
       var startInput = inputs[0];
       var endInput = inputs[1] || inputs[0];
       var separators = Array.prototype.filter.call(bar.querySelectorAll('.miq-date-separator, .sep'), function (node) {
-        return node.textContent.trim() === '~';
+        return MIQCommon.view.get(node,"textContent").trim() === '~';
       });
       var periodCodes = { d: 'D', w: 'W', m: 'M', c: 'C' };
 
       buttons.forEach(function (button) {
-        var label = button.textContent.replace(/\s+/g, '');
+        var label = MIQCommon.view.get(button,"textContent").replace(/\s+/g, '');
         if (label === '기간' || label === '사용자검색' || label === '사용자') {
-          button.textContent = '사용자설정';
+          MIQCommon.view.set(button,"textContent",'사용자설정');
         }
         var mode = modeFromButton(button);
-        if (mode) button.setAttribute('data-period', mode);
+        if (mode) MIQCommon.view.call(button,"setAttribute",['data-period',mode]);
       });
       if (searchButton) searchButton.classList.add('btn-search');
 
@@ -1561,7 +1543,7 @@
       function setDateVisibility(mode) {
         bar.classList.toggle('miq-period-mode-d', mode === 'd');
         startInput.hidden = false;
-        startInput.setAttribute('aria-label', mode === 'd' ? '조회일' : '조회 시작일');
+        MIQCommon.view.call(startInput,"setAttribute",['aria-label',mode === 'd' ? '조회일' : '조회 시작일']);
         if (endInput !== startInput) endInput.hidden = mode === 'd';
         separators.forEach(function (separator) { separator.hidden = mode === 'd'; });
         [startInput, endInput].forEach(function (input) {
@@ -1595,14 +1577,14 @@
       var applied = null;
       function snapshot() { return { period: state.mode, from: state.from, to: state.to }; }
       function validateDraft() {
-        startInput.setCustomValidity(''); endInput.setCustomValidity('');
+        MIQCommon.view.call(startInput,"setCustomValidity",['']); MIQCommon.view.call(endInput,"setCustomValidity",['']);
         var from = dateRules.parse(startInput.value), to = dateRules.parse(endInput.value);
         var invalid = !from ? startInput : !to ? endInput : from > to ? startInput : null;
         var message = !from || !to ? '조회 시작일과 종료일을 모두 입력해 주세요.' : '조회 시작일은 종료일보다 늦을 수 없습니다.';
         if (!invalid && state.mode === 'c' && dateRules.dayCount(from, to) > 366) {
           invalid = endInput; message = '사용자설정 기간은 최대 366일까지 조회할 수 있습니다.';
         }
-        if (invalid) { invalid.setCustomValidity(message); invalid.reportValidity(); return false; }
+        if (invalid) { MIQCommon.view.call(invalid,"setCustomValidity",[message]); invalid.reportValidity(); return false; }
         state.from = startInput.value; state.to = state.mode === 'd' ? state.from : endInput.value;
         return true;
       }
@@ -1667,9 +1649,9 @@
       });
 
       Array.prototype.forEach.call([startInput, endInput], function (input) {
-        input.addEventListener('input', function () { startInput.setCustomValidity(''); endInput.setCustomValidity(''); });
+        input.addEventListener('input', function () { MIQCommon.view.call(startInput,"setCustomValidity",['']); MIQCommon.view.call(endInput,"setCustomValidity",['']); });
         input.addEventListener('change', function () {
-          startInput.setCustomValidity(''); endInput.setCustomValidity('');
+          MIQCommon.view.call(startInput,"setCustomValidity",['']); MIQCommon.view.call(endInput,"setCustomValidity",['']);
           var mode = state.mode;
           if (!dateRules.parse(input.value)) {
             state.from = startInput.value; state.to = endInput.value;
@@ -1799,7 +1781,7 @@
   function placeTargetSelectorBelowTitle() {
     if (VARIANT !== 'tobe' || body.classList.contains('miq-vehicle-scoped')) return;
     /* 이전 비교안 파일만 보존한다. 현재 메뉴의 조회 영역은 같은 배치를 사용한다. */
-    if (body.getAttribute('data-summary-layout') === 'content-search') return;
+    if (MIQCommon.view.call(body,"getAttribute",['data-summary-layout']) === 'content-search') return;
     var main = document.querySelector('.main');
     var selector = document.querySelector('.miq-target-selector.is-hierarchy');
     if (!main || !selector) return;
@@ -1835,20 +1817,20 @@
     });
 
     breadcrumb.className = 'miq-breadcrumb';
-    breadcrumb.setAttribute('role', 'navigation');
-    breadcrumb.setAttribute('aria-label', '현재 위치');
-    breadcrumb.textContent = '';
+    MIQCommon.view.call(breadcrumb,"setAttribute",['role','navigation']);
+    MIQCommon.view.call(breadcrumb,"setAttribute",['aria-label','현재 위치']);
+    MIQCommon.view.set(breadcrumb,"textContent",'');
     var home = document.createElement('a');
-    home.setAttribute('data-miq-breadcrumb-home', landing.key);
-    home.textContent = menu.label;
+    MIQCommon.view.call(home,"setAttribute",['data-miq-breadcrumb-home',landing.key]);
+    MIQCommon.view.set(home,"textContent",menu.label);
     home.href = contextualHref(menu, landing, window.MIQ_TARGET_CONTEXT || null);
     var separator = document.createElement('span');
     separator.className = 'miq-breadcrumb__separator';
-    separator.setAttribute('aria-hidden', 'true');
-    separator.textContent = '›';
+    MIQCommon.view.call(separator,"setAttribute",['aria-hidden','true']);
+    MIQCommon.view.set(separator,"textContent",'›');
     var currentLabel = document.createElement('span');
-    currentLabel.setAttribute('aria-current', 'page');
-    currentLabel.textContent = current.label;
+    MIQCommon.view.call(currentLabel,"setAttribute",['aria-current','page']);
+    MIQCommon.view.set(currentLabel,"textContent",current.label);
     breadcrumb.appendChild(home);
     breadcrumb.appendChild(separator);
     breadcrumb.appendChild(currentLabel);
@@ -1863,14 +1845,14 @@
     var main = document.querySelector('.main');
     if (!main || main.querySelector('.miq-analysis-return')) return;
     var fromVehicleDetail = (ACTSUB === 'shock' || ACTSUB === 'lithium') && INITIAL_QUERY.get('origin') === 'vehicle-detail';
-    var lithiumDetail = ACTSUB === 'lithium' && body.getAttribute('data-lithium-list') !== 'true';
+    var lithiumDetail = ACTSUB === 'lithium' && MIQCommon.view.call(body,"getAttribute",['data-lithium-list']) !== 'true';
     /* 목록과 제목 옆 범위 표시가 있는 집계 화면에는 빈 상세 복귀 행을 만들지 않는다. */
-    if (body.getAttribute('data-lithium-list') === 'true' || (!fromVehicleDetail && !lithiumDetail && main.querySelector('[data-miq-scope-placement="title"]'))) return;
+    if (MIQCommon.view.call(body,"getAttribute",['data-lithium-list']) === 'true' || (!fromVehicleDetail && !lithiumDetail && main.querySelector('[data-miq-scope-placement="title"]'))) return;
 
     var row = document.createElement('div');
     row.className = 'miq-analysis-return';
-    row.innerHTML = '<a class="miq-analysis-return__link">‹ 요약정보 목록</a>' +
-      '<div class="miq-analysis-return__scope" data-analysis-return-scope aria-live="polite"></div>';
+    MIQCommon.view.set(row,"innerHTML",'<a class="miq-analysis-return__link">‹ 요약정보 목록</a>' +
+      '<div class="miq-analysis-return__scope" data-analysis-return-scope aria-live="polite"></div>');
     var breadcrumb = main.querySelector('.miq-breadcrumb');
     if (breadcrumb) breadcrumb.insertAdjacentElement('afterend', row);
     else main.insertBefore(row, main.firstChild);
@@ -1879,12 +1861,12 @@
     var scope = row.querySelector('[data-analysis-return-scope]');
     var fromLithiumList = lithiumDetail && !fromVehicleDetail;
     if (fromLithiumList) {
-      link.setAttribute('data-lithium-list-return', 'true');
-      link.textContent = '‹ 이전 목록';
+      MIQCommon.view.call(link,"setAttribute",['data-lithium-list-return','true']);
+      MIQCommon.view.set(link,"textContent",'‹ 이전 목록');
     }
     if (fromVehicleDetail) {
-      link.setAttribute('data-vehicle-detail-return', 'true');
-      link.textContent = '‹ 이전 목록';
+      MIQCommon.view.call(link,"setAttribute",['data-vehicle-detail-return','true']);
+      MIQCommon.view.set(link,"textContent",'‹ 이전 목록');
     }
     /* 집계 화면이 제목 옆 공통 범위 pill을 명시한 경우에는
        목록 복귀 안내 행에 같은 범위를 다시 만들지 않는다. */
@@ -1893,8 +1875,8 @@
       scope = null;
     }
     if (scope && lithiumDetail) {
-      scope.setAttribute('data-miq-scope-placement', 'title');
-      scope.setAttribute('aria-label', '현재 조회 범위');
+      MIQCommon.view.call(scope,"setAttribute",['data-miq-scope-placement','title']);
+      MIQCommon.view.call(scope,"setAttribute",['aria-label','현재 조회 범위']);
     }
     function update(target) {
       target = target || window.MIQ_TARGET_CONTEXT || {};
@@ -1937,14 +1919,14 @@
     if (!menu) return;
 
     Array.prototype.forEach.call(document.querySelectorAll('[data-miq-side-sub]'), function (anchor) {
-      var key = anchor.getAttribute('data-miq-side-sub');
+      var key = MIQCommon.view.call(anchor,"getAttribute",['data-miq-side-sub']);
       var sub = menu.subs.filter(function (item) { return item.key === key; })[0];
       if (sub) anchor.href = menuEntryHref(menu, sub);
     });
 
     var home = document.querySelector('[data-miq-breadcrumb-home]');
     if (home) {
-      var homeKey = home.getAttribute('data-miq-breadcrumb-home');
+      var homeKey = MIQCommon.view.call(home,"getAttribute",['data-miq-breadcrumb-home']);
       var landing = menu.subs.filter(function (item) { return item.key === homeKey; })[0];
       if (landing) home.href = contextualHref(menu, landing, target);
     }
@@ -1982,10 +1964,10 @@
     if (!layout) return {};
 
     var aside = layout.querySelector('aside.lnb');
-    if (aside && aside.getAttribute('data-miq-side-menu') === 'true') {
+    if (aside && MIQCommon.view.call(aside,"getAttribute",['data-miq-side-menu']) === 'true') {
       aside.querySelectorAll('[data-miq-side-sub]').forEach(function(link){
         var count=link.querySelector('.miq-side-count'),key=link.dataset.miqSideSub;
-        if(count && Object.prototype.hasOwnProperty.call(serviceCounts,key))count.textContent=serviceCounts[key];
+        if(count && Object.prototype.hasOwnProperty.call(serviceCounts,key))MIQCommon.view.set(count,"textContent",serviceCounts[key]);
       });
       return {layout:layout,aside:aside};
     }
@@ -2067,9 +2049,9 @@
         return '<a class="miq-side-item' + (current ? ' active' : '') + '" data-miq-side-sub="' + item[0] + '"' + (current ? ' aria-current="page"' : '') + ' href="' + sideHref + '"><span>' + item[1] + '</span>' + badge + '</a>';
       }).join('');
       aside.__miqLnbDisabled = true;
-      aside.setAttribute('data-miq-side-menu', 'true');
+      MIQCommon.view.call(aside,"setAttribute",['data-miq-side-menu','true']);
       aside.removeAttribute('data-lnb-tree');
-      aside.innerHTML = '<h2 class="miq-side-title">' + config.title + '</h2><nav class="miq-side-menu">' + links + '</nav>';
+      MIQCommon.view.set(aside,"innerHTML",'<h2 class="miq-side-title">' + config.title + '</h2><nav class="miq-side-menu">' + links + '</nav>');
     }
 
     return {layout:layout,aside:aside};
@@ -2080,7 +2062,7 @@
     removeMockupAnnotations();
     document.body.classList.add('miq-section-' + ACT, 'miq-page-' + ACTSUB);
     var vehicleScopedPages = { detail: true, engine: true, lithium: true };
-    var lithiumList = body.getAttribute('data-lithium-list') === 'true';
+    var lithiumList = MIQCommon.view.call(body,"getAttribute",['data-lithium-list']) === 'true';
     if (vehicleScopedPages[ACTSUB] && !lithiumList) document.body.classList.add('miq-vehicle-scoped');
     if (ACTSUB === 'lithium' && !lithiumList) document.body.classList.add('miq-lithium-detail');
 
@@ -2103,14 +2085,14 @@
       var toggle = document.createElement('button');
       toggle.type = 'button';
       toggle.className = 'miq-side-toggle';
-      toggle.setAttribute('aria-label', '좌측 메뉴 접기');
-      toggle.setAttribute('aria-expanded', 'true');
-      toggle.innerHTML = '<span>‹</span>';
+      MIQCommon.view.call(toggle,"setAttribute",['aria-label','좌측 메뉴 접기']);
+      MIQCommon.view.call(toggle,"setAttribute",['aria-expanded','true']);
+      MIQCommon.view.set(toggle,"innerHTML",'<span>‹</span>');
       toggle.addEventListener('click', function () {
         var collapsed = layout.classList.toggle('miq-side-collapsed');
-        toggle.innerHTML = '<span>' + (collapsed ? '›' : '‹') + '</span>';
-        toggle.setAttribute('aria-label', collapsed ? '좌측 메뉴 펴기' : '좌측 메뉴 접기');
-        toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        MIQCommon.view.set(toggle,"innerHTML",'<span>' + (collapsed ? '›' : '‹') + '</span>');
+        MIQCommon.view.call(toggle,"setAttribute",['aria-label',collapsed ? '좌측 메뉴 펴기' : '좌측 메뉴 접기']);
+        MIQCommon.view.call(toggle,"setAttribute",['aria-expanded',collapsed ? 'false' : 'true']);
         window.requestAnimationFrame(function () {
           /* 창 크기는 그대로여도 본문 폭은 바뀐다. 동적 차트가 새 실폭으로 다시 그리도록 공통 신호를 보낸다. */
           window.dispatchEvent(new Event('resize'));
@@ -2125,11 +2107,11 @@
     if (!document.querySelector('.miq-page-foot')) {
       var foot = document.createElement('footer');
       foot.className = 'miq-page-foot';
-      foot.innerHTML = '<div class="miq-page-foot__brand"><img src="' + BASE + '_shared/favicon.ico" alt="">' +
+      MIQCommon.view.set(foot,"innerHTML",'<div class="miq-page-foot__brand"><img src="' + BASE + '_shared/favicon.ico" alt="">' +
         '<strong>Bobcat</strong><span>MACHINE IQ</span></div>' +
         '<div class="miq-page-foot__links"><b>이용약관</b><b>위치정보 및 위치기반서비스 이용약관</b><b>개인(위치)정보 처리방침</b><b>오픈소스 고지</b>' +
         '<small>©2024 Bobcat Company. ALL RIGHTS RESERVED.</small></div>' +
-        '<div class="miq-page-foot__help"><strong>HELP</strong><span>help.machineiq@doosan.com</span><small>최종접속 : 2026-08-31 21:00</small></div>';
+        '<div class="miq-page-foot__help"><strong>HELP</strong><span>help.machineiq@doosan.com</span><small>최종접속 : 2026-08-31 21:00</small></div>');
       document.body.appendChild(foot);
     }
 
@@ -2155,7 +2137,7 @@
   } else {
     enhanceCurrentShell();
   }
-
+
 
   /* ── 공통 인터랙션 ── */
   document.addEventListener('click', function (e) {
@@ -2169,7 +2151,7 @@
       var lab = t.closest('[data-period-target]');
       if (lab) {
         var tgt = document.querySelector(lab.dataset.periodTarget);
-        if (tgt && t.dataset.range) tgt.textContent = t.dataset.range;
+        if (tgt && t.dataset.range) MIQCommon.view.set(tgt,"textContent",t.dataset.range);
       }
     }
 
@@ -2191,7 +2173,7 @@
     if (t.matches('.lnb__group-title')) {
       var open = t.dataset.open !== 'n';
       t.dataset.open = open ? 'n' : 'y';
-      var ar = t.querySelector('span'); if (ar) ar.textContent = open ? '▼' : '▲';
+      var ar = t.querySelector('span'); if (ar) MIQCommon.view.set(ar,"textContent",open ? '▼' : '▲');
       var n = t.nextElementSibling;
       while (n && !n.classList.contains('lnb__group-title')) { n.style.display = open ? 'none' : ''; n = n.nextElementSibling; }
     }
@@ -2200,7 +2182,7 @@
       if (lnb) Array.prototype.forEach.call(lnb.querySelectorAll('.lnb__item'), function (i) { i.classList.remove('active'); });
       t.classList.add('active');
       var out = document.querySelector('[data-lnb-label]');
-      if (out) out.textContent = '- ' + (t.dataset.label || t.textContent.trim());
+      if (out) MIQCommon.view.set(out,"textContent",'- ' + (t.dataset.label || MIQCommon.view.get(t,"textContent").trim()));
     }
 
     /* 모달 */

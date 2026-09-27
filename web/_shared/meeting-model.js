@@ -1,5 +1,5 @@
 /* Pure prototype contracts. Values passed in by the caller; no server claims. */
-(function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory();else root.MIQMeeting=factory();})(typeof window==='undefined'?this:window,function(){
+(function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory(require('./vehicle-observations.js'));else root.MIQMeeting=factory(root.MIQObservations);})(typeof window==='undefined'?this:window,function(observations){
   'use strict';
   function pad(n){return String(n).padStart(2,'0');}
   function hourlyWindow(now,zone){
@@ -75,20 +75,17 @@
     return Array.isArray(value)?value.filter(function(id,i,a){return typeof id==='string'&&allowed.indexOf(id)>=0&&a.indexOf(id)===i;}):[];
   }
   function hourlyVehicle(v,window){
-    var known=v.conn===true||v.conn===false,connected=v.conn===true,total={minutes:0,km:0,fuel:0,battery:0};
+    var known=v.conn===true||v.conn===false,connected=v.conn===true;
     function random(key){var s=0;for(var i=0;i<key.length;i++)s=(s*31+key.charCodeAt(i))>>>0;return (s%1000)/1000;}
-    window.slots.forEach(function(slot,i){
-      var r=random(v.vin+window.date+':'+i),min=connected&&r>.25?Math.round(r*50):0;
-      total.minutes+=min;total.km+=min/60*(v.type==='엔진'?4:2);
-      if(v.type==='엔진')total.fuel+=min/60*3.8;else total.battery+=min/60*2.4;
-    });
-    var running=connected&&window.hours>0&&random(v.vin+window.date+':'+(window.hours-1))>.25;
+    var raw=observations.aggregate(v,window.date,window.date,window);
+    var last=window.hours?observations.sample(v,window.date,window.hours-1,window):null;
+    var running=connected&&!!last&&last.workMinutes+last.idleMinutes>0;
     var fault=connected&&random(v.vin+'fault')>.86?1:0;
     // Explicit demonstration vehicles share their current fault count with summary/dashboard.
     var activeError=v.summaryDetail&&v.summaryDetail.activeErrorCount;
     if(v.demo===true&&typeof activeError==='number'&&Number.isFinite(activeError)&&activeError>=0)fault=activeError;
-    return {known:known,connected:connected,running:running,idle:connected&&!running,fault:fault,runH:known?total.minutes/60:null,
-      km:known?total.km:null,fuel:known?total.fuel:null,battery:known?total.battery:null,
+    return {known:known,connected:connected,running:running,idle:connected&&!running,fault:fault,runH:known&&raw.known?raw.runningMinutes/60:null,workingMinutes:known?raw.workMinutes:null,idleMinutes:known?raw.idleMinutes:null,
+      km:known?raw.distanceKm:null,fuel:known?raw.fuelLitres:null,battery:known?raw.batteryKwh:null,
       dataTime:connected?window.date+' '+window.to:null,
       status:!known?'unknown':!connected?'off':fault?'bad':'ok'};
   }

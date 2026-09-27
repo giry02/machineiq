@@ -2,6 +2,10 @@
 
 - 웹 실행: https://giry02.github.io/machineiq/web/
 - 웹 소스: `web/`
+- 웹 최신 반영: 2026-09-27. 한국어 화면, 회원가입/차량 등록 흐름, 공통 오류 화면 및 최신 지표 표시를 반영했습니다. 이번 게시본에는 언어 선택·다국어 번역 기능을 포함하지 않습니다.
+- 회원가입: https://giry02.github.io/machineiq/web/registration/web-registration-tobe-v3.html?lang=ko
+- 이메일 시안: https://giry02.github.io/machineiq/web/requirements-review/email-templates-20260926/index.html
+- 이메일은 한국어의 회원가입 완료·비밀번호 찾기·회원 인증 검토용 HTML이며 실제 발송 기능은 없습니다. 가입 동의문도 기존 한국어 원문을 사용합니다.
 - 최초 화면: 대시보드. 상단 권한 선택으로 내부 사용자·딜러·고객 화면을 확인합니다.
 - 고객 모바일 실행: https://giry02.github.io/machineiq/mobile/login.html
 - 고객 모바일 소스와 문서: `mobile/` — 2026-09-23 r97. 차량 상세 → 지도 보기에서 Google 지도와 차량번호 마커를 팝업 안에 표시합니다. 사용자 제공 브라우저 지도 키를 포함하며 사용 도메인/API 제한은 [지도 안내](mobile/docs/map-setup.md)를 참고하세요. 기존 r96 운영효율·차량별효율 배치, 대표/직원 권한, 오류 #992100/브랜드 #FF3600은 유지합니다. 기존 내장형 APK/ZIP은 이번 변경을 포함하지 않으며, GitHub 연결형 APK는 최신 화면 새로고침 후 게시된 화면을 표시합니다.

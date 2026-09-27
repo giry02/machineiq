@@ -1,25 +1,30 @@
 <!doctype html>
-<html lang="ko"><head><script src="../_shared/demo-clock.js?rev=34d9d133492b"></script><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<html lang="ko"><head><meta charset="UTF-8"/>
+<script src="../_shared/common-logic.js?v=d77b14750704&amp;rev=15dd4911055c"></script>
+<link rel="stylesheet" href="../_shared/korean-layout.css?v=9e980f3cddea&amp;rev=495db444ef75"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>구분 관리 · MACHINE IQ</title>
+<script src="../_shared/customer-access.js?v=e12eedbcb072&amp;rev=e12eedbcb072"></script>
 <link rel="icon" type="image/x-icon" href="../_shared/favicon.ico"/>
-<link rel="stylesheet" href="../_shared/mockup.css?rev=bed1f0069135"/>
-<link rel="stylesheet" href="../_shared/list-controls.css?rev=bbb25360b177"/>
-<link rel="stylesheet" href="../_shared/map-management-enhancements.css?rev=e0938d623378"/>
-<link rel="stylesheet" href="../_shared/service-enhancements.css?rev=fb05756ae59b"/>
-<link rel="stylesheet" href="../_shared/favorite-categories.css?rev=0fc77bbb1b78"/>
-<link rel="stylesheet" href="../_shared/form-controls.css?rev=6fda272acdcc"/>
-<link rel="stylesheet" href="../_shared/list-pagination.css?rev=0069e48c1009">
-<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?rev=bb6d53aabb78"/>
-<link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?rev=1cffa21a9777"/>
+<link rel="stylesheet" href="../_shared/mockup.css?v=bed1f0069135&amp;rev=bed1f0069135"/>
+<link rel="stylesheet" href="../_shared/list-controls.css?v=bbb25360b177&amp;rev=bbb25360b177"/>
+<link rel="stylesheet" href="../_shared/map-management-enhancements.css?v=04d0c0eb8994&amp;rev=04d0c0eb8994"/>
+<link rel="stylesheet" href="../_shared/service-enhancements.css?v=fb05756ae59b&amp;rev=fb05756ae59b"/>
+<link rel="stylesheet" href="../_shared/favorite-categories.css?v=0fc77bbb1b78&amp;rev=0fc77bbb1b78"/>
+<link rel="stylesheet" href="../_shared/form-controls.css?v=6fda272acdcc&amp;rev=6fda272acdcc"/>
+<link rel="stylesheet" href="../_shared/list-pagination.css?v=0069e48c1009&amp;rev=0069e48c1009">
+<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?v=fc90bc42e4ac&amp;rev=0ca435b09868"/>
+<link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?v=1cffa21a9777&amp;rev=1cffa21a9777"/>
 <style>body.miq-current-shell>#gnb{min-height:64px}</style>
-<script defer blocking="render" src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script>
-<script defer blocking="render" src="../_shared/common-logic.js?rev=efb7e741cd7b"></script>
-<script defer blocking="render" src="../_shared/list-pagination.js?rev=33207bf33d11"></script>
-<script defer blocking="render" src="../_mock-data/generated/fleet.generated.js?rev=309d68875499"></script>
-<script defer blocking="render" src="../_shared/fleet.js?rev=dfdf98be0a95"></script>
-<script defer blocking="render" src="../_shared/nav.js?rev=049a18c69072"></script>
-<script defer blocking="render" src="../_shared/favorite-store.js?rev=753f6857ed37"></script>
-<script defer blocking="render" src="../_shared/favorite-categories.js?rev=761ee6657669"></script>
+<script defer blocking="render" src="../_mock-data/generated/fleet.generated.js?v=52fa65a2dce1&amp;rev=52fa65a2dce1"></script>
+<script defer blocking="render" src="../_mock-data/generated/observation-profiles.generated.js?v=1be92dd7a845&amp;rev=4054b4937190"></script>
+<script defer blocking="render" src="../_shared/vehicle-observations.js?v=550edc6b3b85&amp;rev=aea30481fdb6"></script>
+<script defer blocking="render" src="../_shared/meeting-model.js?v=7f3774217339&amp;rev=7f3774217339"></script>
+<script defer blocking="render" src="../_shared/list-pagination.js?v=4b500130528b&amp;rev=4b500130528b"></script>
+<script defer blocking="render" src="../_shared/fleet.js?v=b0f68e558a52&amp;rev=b0f68e558a52"></script>
+<script defer blocking="render" src="../_shared/nav.js?v=baf392ada632&amp;rev=4206801c46cf"></script>
+<script defer blocking="render" src="../_shared/favorite-store.js?v=753f6857ed37&amp;rev=753f6857ed37"></script>
+<script defer blocking="render" src="../_shared/favorite-categories.js?v=6e407867c4df&amp;rev=6e407867c4df"></script>
 </head><body data-current-bootstrap="ready" class="miq-current-shell miq-section-mgmt" data-gnb="interest" data-sub="categories" data-variant="tobe" data-base="../" data-target-selector="none" data-screen-id="LQ-MGT-007">
 <div id="gnb"></div><div class="layout"><main class="main miq-mgmt-page">
 <div class="breadcrumb">관심차량 &gt; 구분 관리</div><div class="page-head"><h1 class="page-head__title">구분 관리</h1></div>

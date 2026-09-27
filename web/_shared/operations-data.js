@@ -28,7 +28,7 @@
   function dl(items) { return '<dl class="ops-dl">' + items.map(function (item) { return '<dt>' + e(item[0]) + '</dt><dd>' + e(item[1] == null || item[1] === '' ? '—' : item[1]) + '</dd>'; }).join('') + '</dl>'; }
   function formValue(form, name) { return String(new FormData(form).get(name) || '').trim(); }
   function save(key, value) { return O.write(key, value) !== false; }
-  function notifyError(form, name, message) { var control = form.elements.namedItem(name); if (control && control.setCustomValidity) { control.setCustomValidity(message); control.reportValidity(); control.addEventListener('input', function clear() { control.setCustomValidity(''); control.removeEventListener('input', clear); }); } else O.notify(message); }
+  function notifyError(form, name, message) { var control = form.elements.namedItem(name); if (control && control.setCustomValidity) { MIQCommon.view.call(control,"setCustomValidity",[message]); control.reportValidity(); control.addEventListener('input', function clear() { MIQCommon.view.call(control,"setCustomValidity",['']); control.removeEventListener('input', clear); }); } else O.notify(message); }
   function codeSeeds() {
     // Skip the retired fourth seed slot without renumbering the other records.
     return Array.from({ length: 24 }, function (_, i) { return i; }).filter(function (i) { return i % 4 < BASE_CODES.length; }).map(function (i) {
@@ -68,13 +68,13 @@
       });
     }
     function render() {
-      ctx.el.innerHTML = '<div class="tabs" role="tablist" aria-label="차량 데이터 관리">' + tabs.map(function (item) { return '<button type="button" role="tab" data-ops-data-tab="' + item[0] + '" aria-selected="' + (tab === item[0]) + '" aria-controls="opsDataPane"' + (tab === item[0] ? ' class="active"' : '') + '>' + item[1] + '</button>'; }).join('') + '</div><section id="opsDataPane" role="tabpanel" aria-label="' + e(tabs.filter(function (item) { return item[0] === tab; })[0][1]) + '"><div data-ops-filters></div><div data-ops-table></div></section>';
+      MIQCommon.view.set(ctx.el,"innerHTML",'<div class="tabs" role="tablist" aria-label="차량 데이터 관리">' + tabs.map(function (item) { return '<button type="button" role="tab" data-ops-data-tab="' + item[0] + '" aria-selected="' + (tab === item[0]) + '" aria-controls="opsDataPane"' + (tab === item[0] ? ' class="active"' : '') + '>' + item[1] + '</button>'; }).join('') + '</div><section id="opsDataPane" role="tabpanel" aria-label="' + e(tabs.filter(function (item) { return item[0] === tab; })[0][1]) + '"><div data-ops-filters></div><div data-ops-table></div></section>');
       ctx.el.querySelectorAll('[data-ops-data-tab]').forEach(function (node) { node.addEventListener('click', function () { if (tab === node.dataset.opsDataTab) return; tab = node.dataset.opsDataTab; filters.state = ''; render(); }); });
       if (tab === 'raw') renderRaw(); else renderTerminals();
     }
     function renderTerminals() {
       var area = ctx.el.querySelector('[data-ops-filters]');
-      area.innerHTML = '<form class="ops-filters" aria-label="' + (tab === 'terminal' ? '단말' : '수집현황') + ' 조회">' + field('업체', select('company', COMPANIES, filters.company, '전체 업체')) + field('그룹', select('group', GROUPS, filters.group, '전체 그룹')) + field('연료', select('fuel', FUELS, filters.fuel, '전체 연료')) + field('상태', select('state', tab === 'terminal' ? ['등록', '미등록'] : ['정상', '수집 지연', '미수집'], filters.state, '전체 상태')) + field('검색', input('q', filters.q, 'type="search" maxlength="100" placeholder="단말 ID · 차량 ID"')) + '<button class="btn-search" type="submit">조회</button></form>' + (bulkIds ? '<div class="ops-inline-message" role="status">단말 ' + bulkIds.length + '개 일괄조회 적용 중 <button type="button" class="btn btn--sm" data-ops-bulk-clear>해제</button></div>' : '');
+      MIQCommon.view.set(area,"innerHTML",'<form class="ops-filters" aria-label="' + (tab === 'terminal' ? '단말' : '수집현황') + ' 조회">' + field('업체', select('company', COMPANIES, filters.company, '전체 업체')) + field('그룹', select('group', GROUPS, filters.group, '전체 그룹')) + field('연료', select('fuel', FUELS, filters.fuel, '전체 연료')) + field('상태', select('state', tab === 'terminal' ? ['등록', '미등록'] : ['정상', '수집 지연', '미수집'], filters.state, '전체 상태')) + field('검색', input('q', filters.q, 'type="search" maxlength="100" placeholder="단말 ID · 차량 ID"')) + '<button class="btn-search" type="submit">조회</button></form>' + (bulkIds ? '<div class="ops-inline-message" role="status">단말 ' + bulkIds.length + '개 일괄조회 적용 중 <button type="button" class="btn btn--sm" data-ops-bulk-clear>해제</button></div>' : ''));
       area.querySelector('form').addEventListener('submit', function (event) { event.preventDefault(); var form = event.currentTarget; Object.keys(filters).forEach(function (key) { filters[key] = formValue(form, key); }); renderTerminals(); });
       var clear = area.querySelector('[data-ops-bulk-clear]'); if (clear) clear.addEventListener('click', function () { bulkIds = null; renderTerminals(); });
       var rows = filtered().map(function (row) { return Object.assign({}, row, { company: row.company || '미배정', group: row.group || '미배정', status: tab === 'terminal' ? (row.registered ? '등록' : '미등록') : health(row), working: row.last.working || '—', gps: row.last.gps || '—', lithium: row.last.lithium || '—', lastError: row.last.error || '—', lithiumError: row.last.lithiumError || '—', mesStatus: row.mesReady ? '정상' : '확인 필요' }); });
@@ -101,7 +101,7 @@
         file.text().then(function (text) {
           var values = text.replace(/^\uFEFF/, '').split(/\r?\n/).map(function (line) { var match = line.match(/^\s*"([^"]*)"|^\s*([^,;\t]*)/); return match ? (match[1] || match[2] || '').trim() : ''; }).filter(Boolean);
           if (values.length && /^(terminal.?id|단말\s*id|단말기\s*id|터미널\s*id)$/i.test(values[0])) values.shift();
-          var control = node.querySelector('[name="terminalIds"]'); control.value = values.join('\n'); control.setCustomValidity('');
+          var control = node.querySelector('[name="terminalIds"]'); control.value = values.join('\n'); MIQCommon.view.call(control,"setCustomValidity",['']);
         }).catch(function () { O.notify('파일을 읽지 못했습니다. 다시 선택해 주세요.'); });
       });
     }
@@ -127,7 +127,7 @@
         var code = equipment().filter(function (item) { return same(item.code, row.equipmentCode) && item.useYn === 'Y'; })[0];
         canRegister = row.mesReady && !!code && !row.registered;
         if (registerButton) registerButton.disabled = !canRegister;
-        node.querySelector('[data-ops-mes-result]').textContent = row.registered ? '등록된 장비입니다. MES ' + (row.mesReady ? '정상' : '확인 필요') + ' · 장비코드 ' + (code ? '확인 완료' : '미등록 또는 미사용') : !row.mesReady ? 'MES에서 장비 정보를 확인하지 못했습니다. 등록할 수 없습니다.' : !code ? '장비코드가 없거나 미사용 상태입니다. 장비코드 관리에서 확인해 주세요.' : 'MES 정상 · 장비코드 확인 완료. 업체·그룹을 선택하고 장비를 등록해 주세요.';
+        MIQCommon.view.set(node.querySelector('[data-ops-mes-result]'),"textContent",row.registered ? '등록된 장비입니다. MES ' + (row.mesReady ? '정상' : '확인 필요') + ' · 장비코드 ' + (code ? '확인 완료' : '미등록 또는 미사용') : !row.mesReady ? 'MES에서 장비 정보를 확인하지 못했습니다. 등록할 수 없습니다.' : !code ? '장비코드가 없거나 미사용 상태입니다. 장비코드 관리에서 확인해 주세요.' : 'MES 정상 · 장비코드 확인 완료. 업체·그룹을 선택하고 장비를 등록해 주세요.');
       });
     }
     function rawRows() {
@@ -152,7 +152,7 @@
     }
     function renderRaw() {
       var area = ctx.el.querySelector('[data-ops-filters]');
-      area.innerHTML = '<form class="ops-filters" aria-label="수집 데이터 조회">' + field('데이터 종류', select('kind', TYPES, raw.kind)) + field('단말 ID', select('terminal', terminals().map(function (row) { return [row.terminalId, row.terminalId + ' · ' + row.model]; }), raw.terminal, '전체 단말')) + field('시작일', input('from', raw.from, 'type="date" required max="' + today() + '"')) + field('종료일', input('to', raw.to, 'type="date" required max="' + today() + '"')) + '<button class="btn-search" type="submit">조회</button></form>';
+      MIQCommon.view.set(area,"innerHTML",'<form class="ops-filters" aria-label="수집 데이터 조회">' + field('데이터 종류', select('kind', TYPES, raw.kind)) + field('단말 ID', select('terminal', terminals().map(function (row) { return [row.terminalId, row.terminalId + ' · ' + row.model]; }), raw.terminal, '전체 단말')) + field('시작일', input('from', raw.from, 'type="date" required max="' + today() + '"')) + field('종료일', input('to', raw.to, 'type="date" required max="' + today() + '"')) + '<button class="btn-search" type="submit">조회</button></form>');
       area.querySelector('form').addEventListener('submit', function (event) { event.preventDefault(); var form = event.currentTarget, from = formValue(form, 'from'), to = formValue(form, 'to'); if (!ensureDateRange(form, from, to)) return; raw = { kind: formValue(form, 'kind'), terminal: formValue(form, 'terminal'), from: from, to: to }; renderRaw(); });
       var columns = [ { key: 'time', label: '수집일시' }, { key: 'terminalId', label: '단말 ID' }, { key: 'vin', label: '차량 ID' }, { key: 'company', label: '업체' } ];
       var extra = raw.kind === 'working' ? [['runMinutes', '가동시간(분)'], ['workMinutes', '작업시간(분)'], ['distance', '이동거리(km)'], ['shock', '충격(회)']] : raw.kind === 'gps' ? [['latitude', '위도'], ['longitude', '경도'], ['speed', '속도(km/h)'], ['bearing', '방향(°)']] : /error/i.test(raw.kind) ? [['code', '에러코드'], ['severity', '등급'], ['state', '상태'], ['message', '내용']] : [['soc', '잔량(%)'], ['soh', '성능(%)'], ['voltage', '전압(V)'], ['temperature', '온도(℃)'], ['current', '전류(A)']];
@@ -172,7 +172,7 @@
       var list = O.read(KEYS.history, []); list.unshift({ id: uid('EH'), codeId: row.id, code: row.code, action: action, at: stamp(), actor: '내부 사용자', before: before || null, after: after || null }); return save(KEYS.history, list);
     }
     function render() {
-      ctx.el.innerHTML = '<form class="ops-filters" aria-label="장비코드 조회">' + field('검색', input('q', filters.q, 'type="search" placeholder="장비코드 · 차종명 · 제조사" maxlength="100"')) + field('유형', select('type', [['MOTOR', '전동'], ['ENGINE', '엔진'], ['LPG', 'LPG']], filters.type, '전체 유형')) + field('연료', select('fuel', FUELS, filters.fuel, '전체 연료')) + field('사용여부', select('state', [['Y', '사용'], ['N', '미사용']], filters.state, '전체')) + '<button class="btn-search" type="submit">조회</button></form><div data-ops-table></div>';
+      MIQCommon.view.set(ctx.el,"innerHTML",'<form class="ops-filters" aria-label="장비코드 조회">' + field('검색', input('q', filters.q, 'type="search" placeholder="장비코드 · 차종명 · 제조사" maxlength="100"')) + field('유형', select('type', [['MOTOR', '전동'], ['ENGINE', '엔진'], ['LPG', 'LPG']], filters.type, '전체 유형')) + field('연료', select('fuel', FUELS, filters.fuel, '전체 연료')) + field('사용여부', select('state', [['Y', '사용'], ['N', '미사용']], filters.state, '전체')) + '<button class="btn-search" type="submit">조회</button></form><div data-ops-table></div>');
       ctx.el.querySelector('form').addEventListener('submit', function (event) { event.preventDefault(); Object.keys(filters).forEach(function (key) { filters[key] = formValue(event.currentTarget, key); }); render(); });
       var rows = equipment().filter(function (row) { return search(row, filters.q, ['code', 'name', 'maker']) && (!filters.type || row.type === filters.type) && (!filters.fuel || row.fuel === filters.fuel) && (!filters.state || row.useYn === filters.state); }).map(function (row) { return Object.assign({}, row, { count: used(row.code), typeName: { MOTOR: '전동', ENGINE: '엔진', LPG: 'LPG' }[row.type], status: row.useYn === 'Y' ? '사용' : '미사용' }); });
       var host = ctx.el.querySelector('[data-ops-table]');
@@ -196,12 +196,12 @@
       } });
       var node = document.getElementById(id); if (!node || original) return;
       var codeControl = node.querySelector('[name="code"]');
-      codeControl.addEventListener('input', function () { checkedCode = ''; codeControl.setCustomValidity(''); node.querySelector('[data-ops-code-check-result]').textContent = ''; });
+      codeControl.addEventListener('input', function () { checkedCode = ''; MIQCommon.view.call(codeControl,"setCustomValidity",['']); MIQCommon.view.set(node.querySelector('[data-ops-code-check-result]'),"textContent",''); });
       node.querySelector('[data-ops-code-check]').addEventListener('click', function () {
-        codeControl.value = codeControl.value.trim().toUpperCase(); codeControl.setCustomValidity(''); if (!codeControl.reportValidity()) return;
+        codeControl.value = codeControl.value.trim().toUpperCase(); MIQCommon.view.call(codeControl,"setCustomValidity",['']); if (!codeControl.reportValidity()) return;
         if (!/^[A-Z0-9_-]{1,40}$/.test(codeControl.value)) { notifyError(codeControl.form, 'code', '영문·숫자·하이픈·밑줄로 장비코드를 입력해 주세요.'); return; }
         var exists = equipment().some(function (item) { return same(item.code, codeControl.value); }); checkedCode = exists ? '' : codeControl.value;
-        node.querySelector('[data-ops-code-check-result]').textContent = exists ? '이미 등록된 장비코드입니다.' : '사용할 수 있는 장비코드입니다.';
+        MIQCommon.view.set(node.querySelector('[data-ops-code-check-result]'),"textContent",exists ? '이미 등록된 장비코드입니다.' : '사용할 수 있는 장비코드입니다.');
       });
     }
     function history(row) {
@@ -225,7 +225,7 @@
     var filters = { q: '', role: '', state: 'Y' };
     function accounts() { return O.read(KEYS.accounts, accountSeeds()); }
     function render() {
-      ctx.el.innerHTML = '<form class="ops-filters" aria-label="내부 계정 조회">' + field('검색', input('q', filters.q, 'type="search" maxlength="100" placeholder="사용자 ID · 이름 · 부서"')) + field('권한', select('role', [['ADMIN', 'Admin'], ['SERVICE', 'Service']], filters.role, '전체 권한')) + field('사용여부', select('state', [['Y', '사용'], ['N', '미사용']], filters.state, '전체')) + '<button class="btn-search" type="submit">조회</button></form><div data-ops-table></div>';
+      MIQCommon.view.set(ctx.el,"innerHTML",'<form class="ops-filters" aria-label="내부 계정 조회">' + field('검색', input('q', filters.q, 'type="search" maxlength="100" placeholder="사용자 ID · 이름 · 부서"')) + field('권한', select('role', [['ADMIN', 'Admin'], ['SERVICE', 'Service']], filters.role, '전체 권한')) + field('사용여부', select('state', [['Y', '사용'], ['N', '미사용']], filters.state, '전체')) + '<button class="btn-search" type="submit">조회</button></form><div data-ops-table></div>');
       ctx.el.querySelector('form').addEventListener('submit', function (event) { event.preventDefault(); Object.keys(filters).forEach(function (key) { filters[key] = formValue(event.currentTarget, key); }); render(); });
       var rows = accounts().filter(function (row) { return (!filters.role || row.role === filters.role) && (!filters.state || row.useYn === filters.state) && search(row, filters.q, ['userId', 'name', 'department']); }).map(function (row) { return Object.assign({}, row, { roleName: row.role === 'ADMIN' ? 'Admin' : 'Service', status: row.useYn === 'Y' ? '사용' : '미사용' }); });
       var host = ctx.el.querySelector('[data-ops-table]');

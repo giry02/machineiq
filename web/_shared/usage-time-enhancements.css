@@ -153,15 +153,18 @@ body.miq-usage-time .ct {
 }
 
 body.miq-usage-time .ct__row {
-  display: flex;
-  align-items: baseline;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  align-items: center;
   gap: 8px;
 }
 
 body.miq-usage-time .ct__k {
+  min-width: 0;
   color: var(--metrics-muted);
   font-size: 12px;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 body.miq-usage-time .ct__v {
@@ -261,8 +264,6 @@ body.miq-usage-time .usage-status.is-operating {
   }
 
   body.miq-usage-time .ct__row {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
     gap: 0;
   }
 

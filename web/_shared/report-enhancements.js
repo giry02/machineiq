@@ -10,8 +10,8 @@
   var feedback = document.createElement('div');
   feedback.className = 'report-feedback';
   feedback.id = 'reportFeedback';
-  feedback.setAttribute('role', 'status');
-  feedback.setAttribute('aria-live', 'polite');
+  MIQCommon.view.call(feedback,"setAttribute",['role','status']);
+  MIQCommon.view.call(feedback,"setAttribute",['aria-live','polite']);
   var filter = main.querySelector('.filter-bar');
   if (filter) {
     var feedbackHost = filter.closest('.miq-title-period-row') || filter;
@@ -20,7 +20,7 @@
 
   var live = document.createElement('div');
   live.className = 'miq-sr-only';
-  live.setAttribute('aria-live', 'polite');
+  MIQCommon.view.call(live,"setAttribute",['aria-live','polite']);
   document.body.appendChild(live);
 
   function normalize(value) {
@@ -54,7 +54,7 @@
 
   function targetCompanyName(companyId) {
     var select = targetCompanySelect();
-    if (select && select.selectedIndex >= 0) return select.options[select.selectedIndex].textContent.trim();
+    if (select && select.selectedIndex >= 0) return MIQCommon.view.get(select.options[select.selectedIndex],"textContent").trim();
     return REPORT_COMPANY_IDS[companyId] || '';
   }
 
@@ -74,18 +74,18 @@
     var isStatus = body.dataset.sub === 'rptstatus';
     var row = document.createElement('div');
     row.className = 'miq-report-company-controls' + (isStatus ? ' is-single' : '');
-    row.setAttribute('role', 'group');
-    row.setAttribute('aria-label', isStatus ? '조회 업체 설정' : (body.dataset.sub === 'rptheat' ? '히트맵 업체 설정' : '비교 업체 설정'));
+    MIQCommon.view.call(row,"setAttribute",['role','group']);
+    MIQCommon.view.call(row,"setAttribute",['aria-label',isStatus ? '조회 업체 설정' : (body.dataset.sub === 'rptheat' ? '히트맵 업체 설정' : '비교 업체 설정')]);
     (isStatus ? ['.co-k', '#coSel'] : ['.co-k', '#btnAdd', '#btnDel', '#coWrap', '#coHint']).forEach(function (selector) {
       var node = source.querySelector(selector);
       if (node) row.appendChild(node);
     });
     var label = row.querySelector('.co-k');
-    if (label) label.textContent = isStatus ? '조회 업체' : (body.dataset.sub === 'rptheat' ? '히트맵 업체' : '비교 업체');
+    if (label) MIQCommon.view.set(label,"textContent",isStatus ? '조회 업체' : (body.dataset.sub === 'rptheat' ? '히트맵 업체' : '비교 업체'));
     if (isStatus) {
       var hint = document.createElement('span');
       hint.className = 'co-hint';
-      hint.textContent = '1개 업체 조회';
+      MIQCommon.view.set(hint,"textContent",'1개 업체 조회');
       row.appendChild(hint);
     }
     var filterHost = source.closest('.miq-title-period-row') || source;
@@ -131,7 +131,7 @@
     var select = targetCompanySelect();
     if (!select) return '';
     var option = Array.prototype.filter.call(select.options, function (item) {
-      return normalize(item.textContent) === normalize(name);
+      return normalize(MIQCommon.view.get(item,"textContent")) === normalize(name);
     })[0];
     return option ? option.value : '';
   }
@@ -202,25 +202,25 @@
   }
 
   function setFeedback(message, error) {
-    feedback.textContent = message || '';
+    MIQCommon.view.set(feedback,"textContent",message || '');
     feedback.classList.toggle('is-error', !!error);
   }
 
   function syncTabs() {
     Array.prototype.forEach.call(document.querySelectorAll('.period-tabs'), function (tabs) {
-      tabs.setAttribute('role', 'group');
-      tabs.setAttribute('aria-label', '조회 기간');
+      MIQCommon.view.call(tabs,"setAttribute",['role','group']);
+      MIQCommon.view.call(tabs,"setAttribute",['aria-label','조회 기간']);
       Array.prototype.forEach.call(tabs.querySelectorAll('button'), function (button) {
-        button.setAttribute('aria-pressed', button.classList.contains('active') ? 'true' : 'false');
+        MIQCommon.view.call(button,"setAttribute",['aria-pressed',button.classList.contains('active') ? 'true' : 'false']);
       });
     });
     Array.prototype.forEach.call(document.querySelectorAll('.metric-tabs'), function (tabs) {
-      tabs.setAttribute('role', 'tablist');
-      tabs.setAttribute('aria-label', '리포트 지표');
+      MIQCommon.view.call(tabs,"setAttribute",['role','tablist']);
+      MIQCommon.view.call(tabs,"setAttribute",['aria-label','리포트 지표']);
       Array.prototype.forEach.call(tabs.querySelectorAll('button'), function (button) {
         var active = button.classList.contains('active');
-        button.setAttribute('role', 'tab');
-        button.setAttribute('aria-selected', active ? 'true' : 'false');
+        MIQCommon.view.call(button,"setAttribute",['role','tab']);
+        MIQCommon.view.call(button,"setAttribute",['aria-selected',active ? 'true' : 'false']);
         button.tabIndex = active ? 0 : -1;
       });
     });
@@ -229,7 +229,7 @@
   function chartColumnLabel(node, index) {
     var labelNode = node.nextElementSibling;
     var label = labelNode && labelNode.tagName && labelNode.tagName.toLowerCase() === 'text'
-      ? labelNode.textContent.trim() : '';
+      ? MIQCommon.view.get(labelNode,"textContent").trim() : '';
     return (label || (index + 1) + '번째 구간') + ' 데이터. 포커스하면 상세 값이 표시됩니다.';
   }
 
@@ -243,9 +243,9 @@
     window.setTimeout(function () {
       var tip = node.closest('.chart-wrap, .hm-wrap');
       tip = tip && tip.querySelector('.tip-box');
-      if (tip && tip.textContent.trim()) {
-        node.setAttribute('aria-label', tip.textContent.replace(/\s+/g, ' ').trim());
-        live.textContent = node.getAttribute('aria-label');
+      if (tip && MIQCommon.view.get(tip,"textContent").trim()) {
+        MIQCommon.view.call(node,"setAttribute",['aria-label',MIQCommon.view.get(tip,"textContent").replace(/\s+/g, ' ').trim()]);
+        MIQCommon.view.set(live,"textContent",MIQCommon.view.call(node,"getAttribute",['aria-label']));
       }
     }, 0);
   }
@@ -258,8 +258,8 @@
     if (node.dataset.reportA11y === 'true') return;
     node.dataset.reportA11y = 'true';
     node.tabIndex = 0;
-    if (!node.hasAttribute('role')) node.setAttribute('role', 'button');
-    if (label) node.setAttribute('aria-label', label);
+    if (!node.hasAttribute('role')) MIQCommon.view.call(node,"setAttribute",['role','button']);
+    if (label) MIQCommon.view.call(node,"setAttribute",['aria-label',label]);
     node.addEventListener('focus', function () { showFocusedTooltip(node); });
     node.addEventListener('blur', function () { hideFocusedTooltip(node); });
     node.addEventListener('keydown', function (event) {
@@ -279,20 +279,20 @@
 
     var heatmap = document.getElementById('hm');
     if (heatmap) {
-      heatmap.setAttribute('role', 'grid');
-      heatmap.setAttribute('aria-label', '업체별 일자별 지표 히트맵');
+      MIQCommon.view.call(heatmap,"setAttribute",['role','grid']);
+      MIQCommon.view.call(heatmap,"setAttribute",['aria-label','업체별 일자별 지표 히트맵']);
       var companies = Array.prototype.map.call(heatmap.querySelectorAll('.hm__rh'), function (node) {
-        return node.textContent.trim();
+        return MIQCommon.view.get(node,"textContent").trim();
       }).filter(Boolean);
       var labels = Array.prototype.map.call(heatmap.querySelectorAll('.hm__x'), function (node) {
-        return node.getAttribute('data-full-label') || node.textContent.trim();
+        return MIQCommon.view.call(node,"getAttribute",['data-full-label']) || MIQCommon.view.get(node,"textContent").trim();
       });
       Array.prototype.forEach.call(heatmap.querySelectorAll('.hm__c'), function (cell) {
-        var ri = Number(cell.getAttribute('data-r'));
-        var ci = Number(cell.getAttribute('data-c'));
+        var ri = Number(MIQCommon.view.call(cell,"getAttribute",['data-r']));
+        var ci = Number(MIQCommon.view.call(cell,"getAttribute",['data-c']));
         var label = (companies[ri] || '업체') + ', ' + (labels[ci] || (ci + 1) + '번째 구간')
-          + ', 값 ' + cell.textContent.trim();
-        cell.setAttribute('role', 'gridcell');
+          + ', 값 ' + MIQCommon.view.get(cell,"textContent").trim();
+        MIQCommon.view.call(cell,"setAttribute",['role','gridcell']);
         enhanceInteractiveNode(cell, label);
       });
     }
@@ -304,8 +304,8 @@
       if (cell.querySelector('.best-marker')) return;
       var marker = document.createElement('span');
       marker.className = 'best-marker';
-      marker.textContent = '최적';
-      marker.setAttribute('aria-label', '비교 업체 중 최적 값');
+      MIQCommon.view.set(marker,"textContent",'최적');
+      MIQCommon.view.call(marker,"setAttribute",['aria-label','비교 업체 중 최적 값']);
       cell.appendChild(marker);
     });
     Array.prototype.forEach.call(document.querySelectorAll('#chartLg .sw'), function (swatch, index) {
@@ -321,7 +321,7 @@
     enhanceComparisonMarkers();
     Array.prototype.forEach.call(document.querySelectorAll('#dFrom, #dTo'), function (input) {
       input.required = true;
-      input.setAttribute('aria-describedby', feedback.id);
+      MIQCommon.view.call(input,"setAttribute",['aria-describedby',feedback.id]);
     });
   }
 
@@ -390,8 +390,8 @@
     if (!select || !wanted) return false;
     var option = Array.prototype.filter.call(select.options, function (item) {
       return item.value === wanted
-        || normalize(item.textContent) === normalize(wanted)
-        || normalize(item.textContent).indexOf(normalize(wanted)) > -1;
+        || normalize(MIQCommon.view.get(item,"textContent")) === normalize(wanted)
+        || normalize(MIQCommon.view.get(item,"textContent")).indexOf(normalize(wanted)) > -1;
     })[0];
     if (!option) return false;
     select.value = option.value;
@@ -439,7 +439,7 @@
     var wanted = labels[period];
     if (wanted) {
       var button = Array.prototype.filter.call(document.querySelectorAll('.period-tabs button'), function (item) {
-        return item.textContent.replace(/\s+/g, '') === wanted;
+        return MIQCommon.view.get(item,"textContent").replace(/\s+/g, '') === wanted;
       })[0];
       if (button) {
         Array.prototype.forEach.call(button.parentNode.querySelectorAll('button'), function (item) {

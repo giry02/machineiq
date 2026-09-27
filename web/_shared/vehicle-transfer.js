@@ -23,8 +23,8 @@
       var oldIcon = row.querySelector('.fuel-icon'), model = row.querySelector('b'), vin = row.querySelector('.vin');
       if (!oldIcon || !model || !vin) return;
       var key = Object.keys(types).filter(function (type) { return oldIcon.classList.contains(type); })[0];
-      var vinText = vin.textContent.trim(), modelText = model.textContent.trim();
-      oldIcon.outerHTML = icon(key);model.insertAdjacentHTML('beforebegin', identity(vinText, modelText, types[key] ? types[key].label : ''));model.remove();vin.remove();
+      var vinText = MIQCommon.view.get(vin,"textContent").trim(), modelText = MIQCommon.view.get(model,"textContent").trim();
+      MIQCommon.view.set(oldIcon,"outerHTML",icon(key));MIQCommon.view.call(model,"insertAdjacentHTML",['beforebegin',identity(vinText, modelText, types[key] ? types[key].label : '')]);model.remove();vin.remove();
     });
   }
   window.MIQVehicleTransfer = { icon: icon, identity: identity };

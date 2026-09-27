@@ -26,8 +26,8 @@
     layer.dataset.accountInline = 'true';
     // The same Korean demo account as the standalone My Account page.
     layer.dataset.accountCountry = document.body.dataset.accountCountry || 'KR';
-    layer.setAttribute('aria-hidden', 'true');
-    layer.innerHTML = `
+    MIQCommon.view.call(layer,"setAttribute",['aria-hidden','true']);
+    MIQCommon.view.set(layer,"innerHTML",`
       <div class="modal aae-account-modal" role="dialog" aria-modal="true" aria-labelledby="accountDialogTitle" aria-describedby="accountDialogDesc">
         <div class="modal__head">
           <div class="aae-modal-title-wrap">
@@ -77,14 +77,8 @@
                 </div>
               </section>
               <section class="aae-account-section" aria-labelledby="accountContactTitle">
-                <h3 id="accountContactTitle">언어 · 연락처</h3>
+                <h3 id="accountContactTitle">연락처</h3>
                 <div class="aae-account-grid">
-                  <div class="aae-field">
-                    <label class="aae-label" for="accountLanguage">언어 변경</label>
-                    <select class="aae-select" id="accountLanguage" name="language" data-language-select>
-                      <option value="ko" selected>한국어</option><option value="en">English</option><option value="fr">Français</option><option value="es">Español</option><option value="de">Deutsch</option><option value="it">Italiano</option><option value="ja">日本語</option>
-                    </select>
-                  </div>
                   <div class="aae-field">
                     <label class="aae-label" for="accountPhone">연락처 <span class="aae-required">*</span></label>
                     <input class="aae-control" id="accountPhone" name="phone" type="tel" value="01089973747" inputmode="tel" autocomplete="tel" required/>
@@ -125,7 +119,7 @@
             <button class="aae-button aae-button--primary" id="accountSave" type="submit" disabled>변경 저장</button>
           </div>
         </form>
-      </div>`;
+      </div>`);
     document.body.appendChild(layer);
     return layer;
   }

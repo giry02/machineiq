@@ -2,13 +2,13 @@
   'use strict';
   var host = document.querySelector('main');
   if (!host || !window.MIQCharts) return;
-  function text(node) { return node ? node.textContent.trim().replace(/\s+/g, ' ') : ''; }
+  function text(node) { return node ? MIQCommon.view.get(node,"textContent").trim().replace(/\s+/g, ' ') : ''; }
   function set(node, detail) {
     if (!node || !detail) return;
-    node.setAttribute('data-chart-tip', detail);
-    node.setAttribute('aria-label', detail);
-    node.setAttribute('tabindex', '0');
-    if (!node.hasAttribute('role')) node.setAttribute('role', 'img');
+    MIQCommon.view.call(node,"setAttribute",['data-chart-tip',detail]);
+    MIQCommon.view.call(node,"setAttribute",['aria-label',detail]);
+    MIQCommon.view.call(node,"setAttribute",['tabindex','0']);
+    if (!node.hasAttribute('role')) MIQCommon.view.call(node,"setAttribute",['role','img']);
     MIQCharts.bind(node);
   }
   function enhance() {
@@ -32,8 +32,8 @@
     });
     host.querySelectorAll('.progress__bar').forEach(function (gauge) {
       var progress = gauge.closest('.progress'), row = gauge.closest('tr');
-      var title = row && row.getAttribute('data-name');
-      var vin = row && row.getAttribute('data-vin');
+      var title = row && MIQCommon.view.call(row,"getAttribute",['data-name']);
+      var vin = row && MIQCommon.view.call(row,"getAttribute",['data-vin']);
       var top = progress.querySelector('.progress__top');
       var values = top ? Array.prototype.map.call(top.children, text).join(' · ') : '';
       set(gauge, [title, vin, values, text(progress.querySelector('.progress__context'))].filter(Boolean).join('\n'));

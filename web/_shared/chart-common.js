@@ -54,11 +54,11 @@
   function show(target, text, event) {
     if (!target || !text || !root.document) return;
     if (!tip) {
-      tip = document.createElement('div'); tip.id = 'miqChartTip'; tip.className = 'miq-chart-tip'; tip.setAttribute('role', 'tooltip'); document.body.appendChild(tip);
+      tip = document.createElement('div'); tip.id = 'miqChartTip'; tip.className = 'miq-chart-tip'; MIQCommon.view.call(tip,"setAttribute",['role','tooltip']); document.body.appendChild(tip);
     }
     if (active !== target) hide();
-    active = target; target.classList.add('on'); target.setAttribute('aria-describedby', tip.id);
-    tip.textContent = text; tip.hidden = false;
+    active = target; target.classList.add('on'); MIQCommon.view.call(target,"setAttribute",['aria-describedby',tip.id]);
+    MIQCommon.view.set(tip,"textContent",text); tip.hidden = false;
     var rect = target.getBoundingClientRect();
     var x = event && typeof event.clientX === 'number' ? event.clientX : rect.left + rect.width / 2;
     var y = event && typeof event.clientY === 'number' ? event.clientY : rect.top;
@@ -70,9 +70,9 @@
     if (!host || host.__miqChartsBound) return;
     host.__miqChartsBound = true;
     function target(event) { return event.target.closest && event.target.closest('[data-chart-tip]'); }
-    host.addEventListener('pointermove', function (event) { var node = target(event); if (node) show(node, node.getAttribute('data-chart-tip'), event); else hide(); });
+    host.addEventListener('pointermove', function (event) { var node = target(event); if (node) show(node, MIQCommon.view.call(node,"getAttribute",['data-chart-tip']), event); else hide(); });
     host.addEventListener('pointerleave', hide);
-    host.addEventListener('focusin', function (event) { var node = target(event); if (node) show(node, node.getAttribute('data-chart-tip')); });
+    host.addEventListener('focusin', function (event) { var node = target(event); if (node) show(node, MIQCommon.view.call(node,"getAttribute",['data-chart-tip'])); });
     host.addEventListener('focusout', hide);
     host.addEventListener('keydown', function (event) { if (event.key === 'Escape') hide(); });
     if (root.MutationObserver) new MutationObserver(hide).observe(host, { childList: true, subtree: true });

@@ -1,5 +1,10 @@
 (function () {
   'use strict';
+  var MIQCommon = window.MIQCommon || {view:{
+    get:function(node,prop){return node[prop];},
+    set:function(node,prop,value){node[prop]=value;return value;},
+    call:function(node,method,args){return node[method].apply(node,args);}
+  }};
 
   var doc = document;
   var body = doc.body;
@@ -23,47 +28,34 @@
   }
   function setAlert(element, message, kind) {
     if (!element) return;
-    element.textContent = message || '';
+    MIQCommon.view.set(element,"textContent",message || '');
     element.hidden = !message;
     element.className = 'aae-alert' + (kind ? ' is-' + kind : '');
   }
   function errorFor(input, message) {
     if (!input) return false;
-    input.setAttribute('aria-invalid', message ? 'true' : 'false');
+    MIQCommon.view.call(input,"setAttribute",['aria-invalid',message ? 'true' : 'false']);
     var error = input.id ? one('[data-error-for="' + input.id + '"]') : null;
-    if (error) error.textContent = message || '';
+    if (error) MIQCommon.view.set(error,"textContent",message || '');
     return !message;
   }
   function clearErrors(root) {
-    all('[aria-invalid="true"]', root).forEach(function (element) { element.setAttribute('aria-invalid', 'false'); });
-    all('[data-error-for]', root).forEach(function (element) { element.textContent = ''; });
+    all('[aria-invalid="true"]', root).forEach(function (element) { MIQCommon.view.call(element,"setAttribute",['aria-invalid','false']); });
+    all('[data-error-for]', root).forEach(function (element) { MIQCommon.view.set(element,"textContent",''); });
   }
   function focusFirstInvalid(root) {
     var target = one('[aria-invalid="true"]', root);
     if (target) target.focus();
   }
-  function setLanguageControls() {
-    var saved = storageGet(localStorage, 'miq-language') || doc.documentElement.lang || 'ko';
-    all('.miq-auth-language select, [data-language-select]').forEach(function (select) {
-      if (one('option[value="' + saved + '"]', select)) select.value = saved;
-      select.addEventListener('change', function () {
-        doc.documentElement.lang = select.value;
-        storageSet(localStorage, 'miq-language', select.value);
-        all('.miq-auth-language select, [data-language-select]').forEach(function (other) {
-          if (other !== select && one('option[value="' + select.value + '"]', other)) other.value = select.value;
-        });
-      });
-    });
-  }
   function bindPasswordToggles(root) {
     all('[data-password-toggle]', root).forEach(function (button) {
       button.addEventListener('click', function () {
-        var input = doc.getElementById(button.getAttribute('data-password-toggle'));
+        var input = doc.getElementById(MIQCommon.view.call(button,"getAttribute",['data-password-toggle']));
         if (!input) return;
         var showing = input.type === 'text';
         input.type = showing ? 'password' : 'text';
-        button.textContent = showing ? '표시' : '숨김';
-        button.setAttribute('aria-pressed', showing ? 'false' : 'true');
+        MIQCommon.view.set(button,"textContent",showing ? '표시' : '숨김');
+        MIQCommon.view.call(button,"setAttribute",['aria-pressed',showing ? 'false' : 'true']);
         input.focus();
       });
     });
@@ -92,7 +84,7 @@
 
     function renderAttempts() {
       var remaining = Math.max(0, 5 - attempts);
-      retry.innerHTML = attempts ? '<span>로그인 실패 <strong>' + attempts + '회</strong></span><span>남은 시도 ' + remaining + '회</span>' : '';
+      MIQCommon.view.set(retry,"innerHTML",attempts ? '<span>로그인 실패 <strong data-i18n-key="auth.attemptCount" data-count="'+attempts+'">' + attempts + '회</strong></span><span data-i18n-key="auth.remainingAttempts" data-count="'+remaining+'">남은 시도 ' + remaining + '회</span>' : '');
       retry.hidden = attempts === 0;
       var locked = attempts >= 5;
       identifier.disabled = locked;
@@ -149,8 +141,11 @@
         openForcedChange();
         return;
       }
-      setAlert(status, '인증되었습니다. 대시보드로 이동합니다.', 'success');
-      window.setTimeout(function () { location.href = '../Dashboard/group-dashboard-tobe-v2.html'; }, 350);
+      var access = window.MIQCustomerAccess;
+      var account = access ? access.login(idValue) : null;
+      var needsVehicle = account && access.requiresVehicle(account.role);
+      setAlert(status, needsVehicle ? '인증되었습니다. 차량 등록 안내로 이동합니다.' : '인증되었습니다. 대시보드로 이동합니다.', 'success');
+      window.setTimeout(function () { location.href = account ? access.url(needsVehicle ? 'required' : 'dashboard', account.role) : '../Dashboard/group-dashboard-tobe-v2.html'; }, 350);
     });
 
     if (forcedForm) {
@@ -204,7 +199,7 @@
         button.removeAttribute('aria-current');
         button.classList.toggle('is-complete', number < currentStep);
         button.disabled = number > maxStep || number === currentStep;
-        if (number === currentStep) button.setAttribute('aria-current', 'step');
+        if (number === currentStep) MIQCommon.view.call(button,"setAttribute",['aria-current','step']);
       });
       window.scrollTo({ top: 0, behavior: 'smooth' });
       var first = one('input:not([disabled]), button:not([disabled])', stages[step - 1]);
@@ -234,7 +229,7 @@
     function drawTimer() {
       var minute = String(Math.floor(remaining / 60)).padStart(2, '0');
       var second = String(remaining % 60).padStart(2, '0');
-      one('#recoveryTimer').textContent = minute + ':' + second;
+      MIQCommon.view.set(one('#recoveryTimer'),"textContent",minute + ':' + second);
       one('#recoveryTimerBar').style.width = ((remaining / 180) * 100) + '%';
     }
     function stopTimer() {
@@ -294,7 +289,7 @@
       stopTimer();
       var random = Math.random().toString(36).slice(2, 6).toUpperCase();
       var temp = 'MIQ-' + (Math.floor(1000 + Math.random() * 9000)) + '-' + random + '!';
-      one('#temporaryPassword').textContent = temp;
+      MIQCommon.view.set(one('#temporaryPassword'),"textContent",temp);
       storageSet(sessionStorage, 'miq-temporary-password', temp);
       storageSet(sessionStorage, 'miq-force-password-change', 'true');
       if (recoveryIdentifier) storageSet(localStorage, 'miq-saved-identifier', recoveryIdentifier);
@@ -302,7 +297,7 @@
       go(3);
     });
     one('#copyTemporaryPassword').addEventListener('click', function () {
-      var value = one('#temporaryPassword').textContent;
+      var value = MIQCommon.view.get(one('#temporaryPassword'),"textContent");
       var copyStatus = one('#temporaryCopyStatus');
       function done() { setAlert(copyStatus, '임시 비밀번호를 복사했습니다.', 'success'); }
       if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -318,7 +313,8 @@
   }
 
   var countryData = {
-    KR: { code: '+82', region: 'ALAO' }, US: { code: '+1', region: 'ALAO' },
+    // WEB: /api/common/country snapshot (2026-09-27). App reference unchanged.
+    KR: { code: '+82', region: body.dataset.registrationMode === 'app' ? 'ALAO' : 'KOREA' }, US: { code: '+1', region: 'ALAO' },
     CN: { code: '+86', region: 'ALAO' }, JP: { code: '+81', region: 'ALAO' },
     DE: { code: '+49', region: 'EMEA' }, AU: { code: '+61', region: 'ALAO' },
     GB: { code: '+44', region: 'EMEA' }, FR: { code: '+33', region: 'EMEA' }
@@ -327,6 +323,10 @@
     ALAO: ['두산밥캣코리아 서울남', '두산밥캣코리아 경기', 'Bobcat of Los Angeles', 'Bobcat of New York', 'Bobcat China - Beijing', 'Bobcat Japan - Tokyo', 'Bobcat Australia - Sydney'],
     EMEA: ['Bobcat Germany - Munich', 'Bobcat Germany - Berlin', 'Bobcat UK - London', 'Bobcat UK - Manchester', 'Bobcat France - Paris', 'Bobcat France - Lyon']
   };
+  // Country membership of the existing demonstration dealer catalog.
+  var countryDealerIndexes = { KR:[0,1], US:[2,3], CN:[4], JP:[5], AU:[6], DE:[0,1], GB:[2,3], FR:[4,5] };
+  // Reuse the Korean demo dealer entries; real IDs/list come from /common/dealer.
+  dealerData.KOREA = dealerData.ALAO.slice(0, 2);
   var companyData = [
     '대한물류 주식회사', '대한건설기계', '한국지게차렌탈', '서울종합물류', '경기중공업',
     '부산항만물류', '인천국제물류센터', '삼성SDS 물류', 'CJ대한통운', '한진물류',
@@ -343,6 +343,12 @@
     var requiredTerms = all('[data-term-required="true"]');
     var allTerms = all('[data-term]');
     var continueButton = one('#registrationContinue');
+    // A missing legal-copy bundle must not make an empty required list pass.
+    if (!isApp && (requiredTerms.length !== 4 || allTerms.length !== 6)) {
+      continueButton.disabled = true;
+      setAlert(one('#agreementStatus'), '일시적인 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.', 'danger');
+      return;
+    }
     var allCheckbox = one('#registrationAgreeAll');
     var currentStep = 'agreement';
     var emailTimer = null;
@@ -368,7 +374,7 @@
       formStep.hidden = step !== 'details';
       stepButtons.forEach(function (button) {
         var active = button.dataset.registrationStep === step;
-        if (active) button.setAttribute('aria-current', 'step');
+        if (active) MIQCommon.view.call(button,"setAttribute",['aria-current','step']);
         else button.removeAttribute('aria-current');
       });
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -387,13 +393,13 @@
     });
     all('.aae-agreement-toggle').forEach(function (button) {
       button.addEventListener('click', function () {
-        var target = doc.getElementById(button.getAttribute('aria-controls'));
+        var target = doc.getElementById(MIQCommon.view.call(button,"getAttribute",['aria-controls']));
         var willOpen = target.hidden;
         all('.aae-agreement__content').forEach(function (content) { content.hidden = true; });
-        all('.aae-agreement-toggle').forEach(function (item) { item.setAttribute('aria-expanded', 'false'); item.textContent = '열기'; });
+        all('.aae-agreement-toggle').forEach(function (item) { MIQCommon.view.call(item,"setAttribute",['aria-expanded','false']); MIQCommon.view.set(item,"textContent",'열기'); });
         target.hidden = !willOpen;
-        button.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
-        button.textContent = willOpen ? '닫기' : '열기';
+        MIQCommon.view.call(button,"setAttribute",['aria-expanded',willOpen ? 'true' : 'false']);
+        MIQCommon.view.set(button,"textContent",willOpen ? '닫기' : '열기');
       });
     });
 
@@ -402,24 +408,27 @@
     var dealer = one('#registrationDealer');
     var prefix = one('#registrationTelPrefix');
     function populateDealers(regionValue) {
-      dealer.innerHTML = '<option value="">딜러를 선택하세요</option>';
-      (dealerData[regionValue] || []).forEach(function (name) {
+      MIQCommon.view.set(dealer,"innerHTML",'<option value="">딜러를 선택하세요</option>');
+      var names = dealerData[regionValue] || [];
+      if (!isApp) names = (countryDealerIndexes[country.value] || []).map(function (index) { return names[index]; }).filter(Boolean);
+      names.forEach(function (name) {
         var option = doc.createElement('option');
         option.value = name;
-        option.textContent = name;
+        MIQCommon.view.set(option,"textContent",name);
         dealer.appendChild(option);
       });
-      one('#registrationDealerHelp').textContent = regionValue ? regionValue + ' 지역 딜러 ' + ((dealerData[regionValue] || []).length) + '개' : '지역을 먼저 선택해 주세요.';
+      MIQCommon.view.set(one('#registrationDealerHelp'),"textContent",regionValue ? (isApp ? regionValue : MIQCommon.view.get(country.options[country.selectedIndex],"textContent") + ' · ' + regionValue) + ' 딜러 ' + names.length + '개' : '국가를 먼저 선택해 주세요.');
+      if (!isApp) dealer.disabled = roleValue() !== 'dealer-employee' || !names.length;
     }
     function applyCountry() {
       var value = countryData[country.value];
-      prefix.textContent = value ? value.code : '+';
+      MIQCommon.view.set(prefix,"textContent",value ? value.code : '+');
       region.value = value ? value.region : '';
       populateDealers(region.value);
       dealer.value = '';
     }
     country.addEventListener('change', applyCountry);
-    region.addEventListener('change', function () { populateDealers(region.value); dealer.value = ''; });
+    if (isApp) region.addEventListener('change', function () { populateDealers(region.value); dealer.value = ''; });
 
     var companyInput = one('#registrationCompany');
     var companyList = one('#registrationCompanyList');
@@ -447,24 +456,29 @@
       selectedCompany = '';
       companyInput.value = '';
       companyList.hidden = true;
-      if (role !== 'customer-employee') {
+      if ((isApp && role !== 'customer-employee') || role === 'dealer-employee') {
         var mappedCountry = countryData[country.value];
         region.value = mappedCountry ? mappedCountry.region : '';
         populateDealers(region.value);
         dealer.value = '';
       }
       if (role === 'customer-owner') {
-        companyLabel.textContent = '신규 업체명';
-        companyInput.placeholder = '신규 업체명을 입력하세요';
-        companyHelp.textContent = '기존 업체와 중복되면 확인 메시지를 표시합니다.';
+        MIQCommon.view.set(companyLabel,"textContent",'신규 업체명');
+        MIQCommon.view.set(companyInput,"placeholder",'신규 업체명을 입력하세요');
+        MIQCommon.view.set(companyHelp,"textContent",isApp ? '기존 업체와 중복되면 확인 메시지를 표시합니다.' : '업체명을 직접 입력해 주세요.');
       } else if (role === 'customer-employee') {
-        companyLabel.textContent = '소속 업체';
-        companyInput.placeholder = '2글자 이상 입력 후 소속 업체를 선택하세요';
-        companyHelp.textContent = '등록된 업체 목록에서 선택해야 합니다.';
+        MIQCommon.view.set(companyLabel,"textContent",'소속 업체');
+        MIQCommon.view.set(companyInput,"placeholder",'2글자 이상 입력 후 소속 업체를 선택하세요');
+        MIQCommon.view.set(companyHelp,"textContent",'등록된 업체 목록에서 선택해야 합니다.');
       }
       all('.aae-role').forEach(function (label) {
         label.classList.toggle('is-selected', !!one('input:checked', label));
       });
+      if (!isApp) {
+        MIQCommon.view.call(companyInput,"setAttribute",['role',role === 'customer-employee' ? 'combobox' : 'textbox']);
+        MIQCommon.view.call(companyInput,"setAttribute",['aria-autocomplete',role === 'customer-employee' ? 'list' : 'none']);
+        clearErrors(formStep);
+      }
     }
     all('input[name="registrationRole"]').forEach(function (radio) {
       radio.addEventListener('change', function () { setRole(radio.value, false); });
@@ -472,40 +486,41 @@
 
     function closeCompanyList() {
       companyList.hidden = true;
-      companyInput.setAttribute('aria-expanded', 'false');
+      MIQCommon.view.call(companyInput,"setAttribute",['aria-expanded','false']);
       activeOption = -1;
     }
     function chooseCompany(name) {
       companyInput.value = name;
       selectedCompany = name;
       closeCompanyList();
-      companyHelp.textContent = '선택된 업체: ' + name;
+      MIQCommon.view.set(companyHelp,"textContent",'선택된 업체: ' + name);
       errorFor(companyInput, '');
     }
     function renderCompanies() {
       selectedCompany = '';
+      if (!isApp && roleValue() !== 'customer-employee') { closeCompanyList(); return; }
       var query = companyInput.value.trim().toLowerCase();
       if (query.length < 2) { closeCompanyList(); return; }
       var matches = companyData.filter(function (name) { return name.toLowerCase().indexOf(query) > -1; });
-      companyList.innerHTML = '';
+      MIQCommon.view.set(companyList,"innerHTML",'');
       if (!matches.length) {
         var empty = doc.createElement('div');
         empty.className = 'aae-autocomplete-empty';
-        empty.textContent = roleValue() === 'customer-owner' ? '기존 업체와 중복되지 않습니다. 신규 업체로 신청할 수 있습니다.' : '등록된 업체가 없습니다.';
+        MIQCommon.view.set(empty,"textContent",roleValue() === 'customer-owner' ? '기존 업체와 중복되지 않습니다. 신규 업체로 신청할 수 있습니다.' : '등록된 업체가 없습니다.');
         companyList.appendChild(empty);
       } else {
         matches.forEach(function (name) {
           var option = doc.createElement('button');
           option.type = 'button';
           option.className = 'aae-autocomplete-option';
-          option.setAttribute('role', 'option');
-          option.textContent = name;
+          MIQCommon.view.call(option,"setAttribute",['role','option']);
+          MIQCommon.view.set(option,"textContent",name);
           option.addEventListener('click', function () { chooseCompany(name); });
           companyList.appendChild(option);
         });
       }
       companyList.hidden = false;
-      companyInput.setAttribute('aria-expanded', 'true');
+      MIQCommon.view.call(companyInput,"setAttribute",['aria-expanded','true']);
     }
     companyInput.addEventListener('input', renderCompanies);
     companyInput.addEventListener('keydown', function (event) {
@@ -517,7 +532,7 @@
         options.forEach(function (option, index) { option.classList.toggle('is-active', index === activeOption); });
       } else if (event.key === 'Enter' && activeOption > -1) {
         event.preventDefault();
-        chooseCompany(options[activeOption].textContent);
+        chooseCompany(MIQCommon.view.get(options[activeOption],"textContent"));
       } else if (event.key === 'Escape') {
         closeCompanyList();
       }
@@ -529,8 +544,8 @@
     one('#registrationCheckId').addEventListener('click', function () {
       var value = userId.value.trim();
       errorFor(userId, '');
-      if (!/^(?=.*[A-Za-z0-9])[A-Za-z0-9._-]{6,}$/.test(value)) {
-        errorFor(userId, '6자 이상의 영문·숫자와 . _ -만 사용할 수 있습니다.');
+      if (!EMAIL_RULE.test(value) && !/^(?=.*[A-Za-z0-9])[A-Za-z0-9._-]{6,}$/.test(value)) {
+        errorFor(userId, '이메일 형식 또는 6자 이상의 영문·숫자 아이디를 입력해 주세요. 아이디에는 . _ -도 사용할 수 있습니다.');
         userId.focus();
         return;
       }
@@ -554,7 +569,7 @@
     function drawEmailTimer() {
       var timer = one('#registrationEmailTimer');
       if (!timer) return;
-      timer.textContent = String(Math.floor(emailRemaining / 60)).padStart(2, '0') + ':' + String(emailRemaining % 60).padStart(2, '0');
+      MIQCommon.view.set(timer,"textContent",String(Math.floor(emailRemaining / 60)).padStart(2, '0') + ':' + String(emailRemaining % 60).padStart(2, '0'));
     }
     function beginEmailVerification(resend) {
       errorFor(email, '');
@@ -631,6 +646,12 @@
       if (roleValue() === 'customer-employee' && selectedCompany !== companyInput.value.trim()) {
         errorFor(companyInput, '등록된 업체 목록에서 소속 업체를 선택해 주세요.'); valid = false;
       }
+      if (!isApp && roleValue() === 'dealer-employee') {
+        var mapped = countryData[country.value];
+        var permittedDealers = mapped ? (countryDealerIndexes[country.value] || []).map(function (index) { return dealerData[mapped.region][index]; }) : [];
+        region.value = mapped ? mapped.region : '';
+        if (permittedDealers.indexOf(dealer.value) < 0) { errorFor(dealer, '선택한 국가의 소속 딜러를 선택해 주세요.'); valid = false; }
+      }
       if (!valid) {
         setAlert(one('#registrationStatus'), '입력 내용을 확인해 주세요.', 'danger');
         focusFirstInvalid(form);
@@ -638,11 +659,22 @@
       }
       var submit = one('#registrationSubmit');
       submit.disabled = true;
-      form.setAttribute('aria-busy', 'true');
+      MIQCommon.view.call(form,"setAttribute",['aria-busy','true']);
       setAlert(one('#registrationStatus'), '가입 신청 정보를 확인하고 있습니다.', 'info');
       window.setTimeout(function () {
         form.removeAttribute('aria-busy');
-        setAlert(one('#registrationStatus'), '가입 신청이 완료되었습니다. 승인 결과는 인증한 이메일로 안내됩니다.', 'success');
+        if (isApp) {
+          setAlert(one('#registrationStatus'), '가입 신청이 완료되었습니다. 승인 결과는 인증한 이메일로 안내됩니다.', 'success');
+          return;
+        }
+        try {
+          var registeredAccount = window.MIQCustomerAccess.register({ userId:userId.value.trim(), email:email.value.trim(), name:one('#registrationName').value.trim(), company:companyInput.value.trim(), role:roleValue() });
+        } catch (error) {
+          submit.disabled = false;
+          setAlert(one('#registrationStatus'), error.message, 'danger');
+          return;
+        }
+        location.href = window.MIQCustomerAccess.url('complete', registeredAccount.role);
       }, 450);
     });
 
@@ -720,7 +752,7 @@
       saveButton.disabled = true;
       setAlert(status, '', '');
       modalLayer.classList.add('open');
-      modalLayer.setAttribute('aria-hidden', 'false');
+      MIQCommon.view.call(modalLayer,"setAttribute",['aria-hidden','false']);
       body.classList.add('aae-account-open');
       focusInitialControl();
     }
@@ -729,7 +761,7 @@
       dirty = false;
       if (inline) {
         modalLayer.classList.remove('open');
-        modalLayer.setAttribute('aria-hidden', 'true');
+        MIQCommon.view.call(modalLayer,"setAttribute",['aria-hidden','true']);
         body.classList.remove('aae-account-open');
         if (returnFocus && typeof returnFocus.focus === 'function') returnFocus.focus();
         return;
@@ -742,15 +774,10 @@
       var country = (modalLayer.dataset.accountCountry || body.dataset.accountCountry || '').trim().toUpperCase();
       var korean = country === 'KR';
       all('[data-sms-setting]').forEach(function (input) { input.disabled = !korean; });
-      one('#smsAvailability').textContent = korean ? 'SMS · 한국 사용자' : country ? 'SMS · 지원 국가 아님' : 'SMS · 국가 정보 확인 필요';
+      MIQCommon.view.set(one('#smsAvailability'),"textContent",korean ? 'SMS · 한국 사용자' : country ? 'SMS · 지원 국가 아님' : 'SMS · 국가 정보 확인 필요');
     }
 
     restoreSaved();
-    var restoredLanguage = one('#accountLanguage');
-    if (restoredLanguage) {
-      doc.documentElement.lang = restoredLanguage.value;
-      storageSet(localStorage, 'miq-language', restoredLanguage.value);
-    }
     applySmsAvailability();
     initialSnapshot = serialise();
     saveButton.disabled = true;
@@ -818,7 +845,7 @@
     modalLayer._miqAccountController = { open: openAccount, close: leaveAccount };
     if (inline) {
       modalLayer.classList.remove('open');
-      modalLayer.setAttribute('aria-hidden', 'true');
+      MIQCommon.view.call(modalLayer,"setAttribute",['aria-hidden','true']);
     } else {
       body.classList.add('aae-account-open');
       focusInitialControl();
@@ -827,7 +854,7 @@
   }
 
   function init() {
-    setLanguageControls();
+
     bindPasswordToggles(doc);
     if (body.dataset.authPage === 'login') initLogin();
     if (body.dataset.authPage === 'find-password') initPasswordRecovery();

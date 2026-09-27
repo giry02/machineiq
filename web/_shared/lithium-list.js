@@ -39,11 +39,11 @@
   }
   function renderSort(){
     Array.prototype.forEach.call(document.querySelectorAll('.li-list-table .table-sort'),function(button){
-      var selected=button.getAttribute('data-sort-key')===state.sort;
+      var selected=MIQCommon.view.call(button,"getAttribute",['data-sort-key'])===state.sort;
       button.classList.toggle('is-sorted',selected);
-      button.setAttribute('aria-pressed',String(selected));
-      button.closest('th').setAttribute('aria-sort',selected?(state.dir==='asc'?'ascending':'descending'):'none');
-      button.querySelector('.sort-ind').textContent=selected?(state.dir==='asc'?'▲':'▼'):'↕';
+      MIQCommon.view.call(button,"setAttribute",['aria-pressed',String(selected)]);
+      MIQCommon.view.call(button.closest('th'),"setAttribute",['aria-sort',selected?(state.dir==='asc'?'ascending':'descending'):'none']);
+      MIQCommon.view.set(button.querySelector('.sort-ind'),"textContent",selected?(state.dir==='asc'?'▲':'▼'):'↕');
     });
   }
   function render(){
@@ -52,16 +52,16 @@
     renderScope(rows.length);
     renderSort();
     rows=pager.slice(rows);
-    tbody.innerHTML=rows.length?rows.map(function(vehicle){
+    MIQCommon.view.set(tbody,"innerHTML",rows.length?rows.map(function(vehicle){
       var info=model.snapshot(vehicle),color=info.soc>=60?'#37b24d':info.soc>=30?'#f59f00':'#e03131';
       var soc=info.soc===null?'<span class="li-list-unknown">수집 전</span>':'<div class="battery-graph mode-list" '+MIQCharts.tipAttrs(vehicle.vin+'\n배터리 잔량 (SOC) '+info.soc+'%')+'><div class="battery-graph__image"><div class="battery-graph__progress"><span class="battery-graph__bar" style="width:'+Math.max(0,Math.min(100,info.soc))+'%;background:'+color+'"></span></div></div><span class="battery-graph__text">'+info.soc+'%</span></div>';
       var status=[['온도',info.temperature],['충전',info.charge],['배터리',info.battery]].map(function(item){return '<div class="battery-status__item"><span class="battery-status__text">'+item[0]+'</span><strong class="battery-status__value '+(item[1]==='수집 전'?'is-unknown':item[1]!=='정상'?'is-warning':'')+'">'+item[1]+'</strong></div>';}).join('');
       return '<tr data-vin="'+esc(vehicle.vin)+'"><td><a class="equipment-link" href="'+esc(detailHref(vehicle,params))+'">'+esc(vehicle.vin)+'</a><span class="li-list-model">'+esc(vehicle.model)+'</span></td><td class="c">'+soc+'</td><td class="c">'+(info.soh===null?'수집 전':info.soh+'%')+'</td><td class="c">'+hm(info.workMinutes)+'</td><td class="c">'+hm(info.chargeMinutes)+'</td><td class="c">'+smart(vehicle,info.known)+'</td><td><div class="battery-status mode-list"><div class="battery-status__group">'+status+'</div></div></td></tr>';
-    }).join(''):'<tr><td colspan="7" class="li-list-empty">조회 조건에 해당하는 리튬 차량이 없습니다.</td></tr>';
+    }).join(''):'<tr><td colspan="7" class="li-list-empty">조회 조건에 해당하는 리튬 차량이 없습니다.</td></tr>');
   }
   MIQCharts.bind(tbody);
   checkbox.addEventListener('change',function(){state.abnormal=checkbox.checked;render();});
-  Array.prototype.forEach.call(document.querySelectorAll('.li-list-table .table-sort'),function(button){button.addEventListener('click',function(){var key=button.getAttribute('data-sort-key');state.dir=state.sort===key&&state.dir==='asc'?'desc':'asc';state.sort=key;render();});});
+  Array.prototype.forEach.call(document.querySelectorAll('.li-list-table .table-sort'),function(button){button.addEventListener('click',function(){var key=MIQCommon.view.call(button,"getAttribute",['data-sort-key']);state.dir=state.sort===key&&state.dir==='asc'?'desc':'asc';state.sort=key;render();});});
   document.addEventListener('miq:target-change',function(event){var target=event.detail||{};scopeContext=target;state.companyId=policy.companyId||target.companyId||'all';state.group=role==='customer_staff'?'물류1팀':target.group||'';state.veh=target.equipmentId||'';render();});
   window.addEventListener('pageshow',function(event){if(event.persisted)render();});
   render();

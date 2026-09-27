@@ -64,7 +64,7 @@
     var columns = headers.map(function (header, index) {
       var definition = definitions && definitions[index] || {};
       if (typeof definition === 'number') definition = { min: definition };
-      var label = header.textContent.replace(/[↕↑↓▲▼]/g, '').trim();
+      var label = MIQCommon.view.get(header,"textContent").replace(/[↕↑↓▲▼]/g, '').trim();
       var labelWidth = Array.from(label).reduce(function (sum, ch) { return sum + (/[^\x00-\x7f]/.test(ch) ? 13 : 7); }, 32);
       return {header:header,visible:displayed(header),compact:!!definition.compact,min:Math.max(definition.min || minimum(label), labelWidth)};
     }).filter(function (column) { return column.visible; });

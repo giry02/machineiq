@@ -3,7 +3,6 @@
 
   var roleRules = window.MIQCommon.roles;
   var role = roleRules.resolve(document.body.dataset.managementRole || new URLSearchParams(location.search).get('role'));
-  var companyDimension = roleRules.dashboardDimension(role) === 'company';
   var assignedGroupScope = roleRules.hideDashboardComparison(role);
   var policy = roleRules.targetPolicy(role);
   var mockFleet = window.MIQ_MOCK_DATA && window.MIQ_MOCK_DATA.fleet;
@@ -12,15 +11,6 @@
       return (!policy.companyIds || policy.companyIds.indexOf(company.companyId) > -1) &&
         (!Array.isArray(company.dashboardRoles) || company.dashboardRoles.indexOf(role) > -1);
     }) : [];
-  var lastCatalogCompany = companies.filter(function (company) { return !company.demo; }).slice(-1)[0];
-  var SUMMARY = '../Vehicle%20Summary/vehicle-summary-tobe-3.html';
-  var MAP = '../Map/map-tobe.html';
-  var ERROR = '../Service/service-error-tobe.html';
-  var SUPPLY = '../Service/service-supply-tobe.html';
-  var REPORT = '../Report%20Status/report-status-tobe.html';
-  var reportLinks = [];
-  var navigationLinks = [];
-  var summaryLinks = null;
   var committedReportPeriod = initialReportPeriod();
   var groupVehicles = assignedGroupScope ? roleRules.filterVehicles(role, mockFleet && mockFleet.vehicles || []) : [];
   if (assignedGroupScope) companies = [assignedGroupSummary()];
@@ -67,18 +57,6 @@
       ? { from: from, to: period === 'd' ? from : to } : dates.operatingRange(period);
     return { period: period, from: range.from, to: range.to };
   }
-
-  function esc(value) {
-    return String(value == null ? '' : value).replace(/[&<>"']/g, function (character) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character];
-    });
-  }
-
-  function format(value) { return Math.round(Number(value) || 0).toLocaleString('ko-KR'); }
-  function sum(key) {
-    return companies.reduce(function (total, company) { return total + (Number(company[key]) || 0); }, 0);
-  }
-  function percent(value, total) { return total ? Math.round(value / total * 100) : 0; }
 
   window.MIQDashboardCompanyView={role:role,companies:companies};
 })();

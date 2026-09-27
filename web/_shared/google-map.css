@@ -32,6 +32,7 @@
 .miq-map-count{height:96px;overflow:hidden;display:flex;flex-direction:column;border:1px solid #dfdfdf;border-radius:8px;background:#fff;color:#333;text-align:center;text-decoration:none;pointer-events:auto;cursor:pointer}
 .miq-map-count>span{display:flex;align-items:center;justify-content:center;gap:5px;height:36px;background:#f1f1f1;color:#333;font-size:13px;font-weight:600;white-space:nowrap}
 .miq-map-count>span>svg{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.miq-map-count-label{min-width:0;max-width:calc(100% - 32px);text-wrap:balance;text-align:center;hyphens:none}
 .miq-map-count[data-map-summary-link="fault"]>span>svg{color:#992100}
 .miq-map-count[data-map-summary-link="shock"]>span>svg{color:#ff3600}
 .miq-map-count[data-map-summary-link="supply"]>span>svg{color:#0aa656}

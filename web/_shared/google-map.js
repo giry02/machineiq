@@ -3,15 +3,15 @@
   var host = document.getElementById('map'), canvas = document.getElementById('googleMapCanvas');
   if (!host || !canvas) return;
   var frame = document.createElement('iframe');
-  frame.title = 'Google 지도'; frame.allowFullscreen = true; frame.referrerPolicy = 'no-referrer-when-downgrade';
-  frame.setAttribute('loading', 'eager');
+  MIQCommon.view.set(frame,"title",'Google 지도'); frame.allowFullscreen = true; frame.referrerPolicy = 'no-referrer-when-downgrade';
+  MIQCommon.view.call(frame,"setAttribute",['loading','eager']);
   host.dataset.mapProvider = 'loading';
-  var status = document.createElement('div'); status.className = 'miq-map-status'; status.setAttribute('role', 'status');
+  var status = document.createElement('div'); status.className = 'miq-map-status'; MIQCommon.view.call(status,"setAttribute",['role','status']);
   host.appendChild(status);
   var current = {}, scopeKey = '', selected = '', center = { lat: 36.5, lng: 127.5 }, point = null, zoom = 7, type = 'map', lastSrc = '';
   var renderer = null, upgrading = false, disposed = false;
   var route = {key: '', state: 'idle', points: [], controller: null, message: ''};
-  function message(text) { status.textContent = text || ''; status.hidden = !text; }
+  function message(text) { MIQCommon.view.set(status,"textContent",text || ''); status.hidden = !text; }
   function view() {
     if (window.MIQMapRoutePreview) MIQMapRoutePreview.draw(canvas, current.routeMode && route.state === 'ready' ? route.points : [], selected);
     var url = new URL('https://maps.google.com/maps');
@@ -100,7 +100,7 @@
     }).catch(function(error) {
       if (disposed || route !== request || error.name === 'AbortError') return;
       route.state = error.code === 'ROUTE_NOT_CONFIGURED' ? 'unconfigured' : 'error';
-      route.message = error.code === 'ROUTE_NOT_CONFIGURED' ? '이동 경로 조회 연결이 설정되지 않았습니다.' : error.code==='ROUTE_AUTH_REQUIRED'?'차량 경로 조회 권한 또는 서버 로그인 상태를 확인해 주세요.':'이동 경로를 불러오지 못했습니다. 다시 조회해 주세요.';
+      route.message = error.code === 'ROUTE_NOT_CONFIGURED' ? '이동 경로 조회 연결이 설정되지 않았습니다.' : error.status === 404 ? '조회할 정보를 찾을 수 없습니다. 목록을 새로 조회해 주세요.' : window.MIQErrors.describe(error).detail;
       if (renderer) paintInteractive(); else message(routeMessage());
     });
   }

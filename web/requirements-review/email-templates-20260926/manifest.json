@@ -1,0 +1,60 @@
+{
+  "version": "email-i18n-20260927",
+  "status": "published-korean-prototype-review",
+  "supportedLocales": [
+    "ko"
+  ],
+  "roles": [
+    "customer-owner",
+    "customer-employee",
+    "dealer-owner",
+    "dealer-employee",
+    "internal"
+  ],
+  "defaultLocale": "ko",
+  "localePolicy": "Korean-only publication; no language switching.",
+  "translationStatus": "translated-and-self-reviewed; business/native-language approval pending",
+  "sharedFields": [
+    "logoUrl",
+    "supportEmail",
+    "year"
+  ],
+  "templates": [
+    {
+      "key": "signup",
+      "label": "회원가입 완료",
+      "id": "MIQ-MAIL-001",
+      "variants": [
+        "customer-owner",
+        "customer-employee",
+        "dealer-owner",
+        "dealer-employee",
+        "internal"
+      ]
+    },
+    {
+      "key": "password",
+      "label": "비밀번호 찾기",
+      "id": "MIQ-MAIL-002",
+      "variants": [
+        "default"
+      ]
+    },
+    {
+      "key": "verification",
+      "label": "회원 인증",
+      "id": "MIQ-MAIL-003",
+      "variants": [
+        "default"
+      ]
+    }
+  ],
+  "catalogs": {
+    "ko": {
+      "path": "locales/ko.json",
+      "sha256": "c7f2b7c55f2175218bf976007cbd16ca25c8027a218071c4a74b83cc958b77bc"
+    }
+  },
+  "rendererSha256": "9dca1f4f39986938d3cbb884c6fd83baf87f45e3e9379030d9a26121226169c4",
+  "previewBaseUrl": "https://giry02.github.io/machineiq/web/"
+}

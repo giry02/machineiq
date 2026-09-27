@@ -23,11 +23,12 @@
     { vin: 'FBA32_DEMO_CS01', name: '감속기 오일', cycle: 500, used: 425 }
   ];
   function supplyStatus(cycle, used) {
+    if ([cycle,used].some(function(v){return v==null || typeof v==='boolean' || typeof v==='string' && !v.trim();})) return { state:'unknown', percent:null, rawPercent:null, width:0 };
     cycle = Number(cycle); used = Number(used);
     if (!Number.isFinite(cycle) || cycle <= 0 || !Number.isFinite(used) || used < 0) return { state: 'unknown', percent: null, rawPercent: null, width: 0 };
     var rawPercent = used / cycle * 100;
     var percent = Math.round(rawPercent * 100) / 100;
-    return { state: percent >= 90 ? 'need' : percent >= 80 ? 'soon' : 'ok', percent: percent, rawPercent: rawPercent, width: Math.min(100, percent) };
+    return { state: Math.round(rawPercent) >= 90 ? 'need' : Math.round(rawPercent) >= 80 ? 'soon' : 'ok', percent: percent, rawPercent: rawPercent, width: Math.min(100, percent) };
   }
   function supplyPreview(items, limit) {
     limit = limit === undefined ? 4 : Math.max(0, Math.floor(Number(limit) || 0));

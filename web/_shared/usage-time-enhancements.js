@@ -46,10 +46,6 @@
     return year + '-' + pad(month) + '-' + pad(day);
   }
 
-  function formatDateValue(date) {
-    return isoDate(date.getFullYear(), date.getMonth() + 1, date.getDate());
-  }
-
   function parseDate(value) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return null;
     var parts = value.split('-').map(Number);
@@ -68,7 +64,7 @@
 
   function setFeedback(message, isError) {
     if (!feedback) return;
-    feedback.textContent = message || '';
+    MIQCommon.view.set(feedback,"textContent",message || '');
     feedback.classList.toggle('is-error', !!isError);
   }
 
@@ -109,23 +105,10 @@
   function syncContextLinks() {
     Array.prototype.forEach.call(document.querySelectorAll('[data-context-link]'), function (link) {
       if (link.hasAttribute('data-miq-side-sub')) return;
-      var source = link.getAttribute('href');
+      var source = MIQCommon.view.call(link,"getAttribute",['href']);
       if (!source || /^#|^javascript:/i.test(source)) return;
       link.href = contextualHref(source);
     });
-  }
-
-  function vehicleByVin(vin) {
-    return FLEET.filter(function (vehicle) { return vehicle.vin === vin; })[0] || null;
-  }
-
-  function seeded(key) {
-    var seed = 0;
-    for (var index = 0; index < key.length; index++) seed = (seed * 31 + key.charCodeAt(index)) >>> 0;
-    return function () {
-      seed = (seed * 1103515245 + 12345) & 0x7fffffff;
-      return seed / 0x7fffffff;
-    };
   }
 
   function isUncollected(year, month, day) {
@@ -133,33 +116,15 @@
   }
 
   function vehicleDay(vehicle, year, month, day) {
-    var random = seeded(vehicle.vin + '|' + year + pad(month) + pad(day));
-    var weekday = new Date(year, month - 1, day).getDay();
-    var work;
-    if (weekday === 0) {
-      work = random() < .12 ? Math.round(random() * 45) : 0;
-    } else if (weekday === 6) {
-      work = random() < .55 ? Math.round(70 + random() * 190) : Math.round(random() * 22);
-    } else {
-      work = random() < .10 ? Math.round(random() * 27) : Math.round(300 + random() * 250);
-    }
-    var distancePerHour = vehicle.type === '엔진' ? 13 + random() * 11 : 5 + random() * 8;
-    return {
-      vehicle: vehicle,
-      work: work,
-      distance: Math.round(work / 60 * distancePerHour * 10) / 10
-    };
+    var date=isoDate(year,month,day),value=MIQObservations.aggregate(vehicle,date,date,TODAY);
+    return value.known?{vehicle:vehicle,work:value.workMinutes,distance:value.distanceKm}:null;
   }
-
   function dayAggregate(year, month, day) {
     if (isUncollected(year, month, day)) return null;
-    var rows = state.rows.map(function (vehicle) { return vehicleDay(vehicle, year, month, day); });
-    var aggregate = { rows: rows, work: 0, distance: 0, operating: 0 };
-    rows.forEach(function (row) {
-      aggregate.work += row.work;
-      aggregate.distance += row.distance;
-      if (row.work >= MIN_OPERATING_MINUTES) aggregate.operating++;
-    });
+    var rows=state.rows.map(function(vehicle){return vehicleDay(vehicle,year,month,day);}).filter(Boolean);
+    if(!rows.length)return null;
+    var aggregate={rows:rows,work:0,distance:0,operating:0};
+    rows.forEach(function(row){aggregate.work+=row.work;aggregate.distance+=row.distance;if(row.work>=MIN_OPERATING_MINUTES)aggregate.operating++;});
     return aggregate;
   }
 
@@ -241,17 +206,17 @@
     for (var tail = 0; tail < trailing; tail++) html += '<div class="cal__day void" aria-hidden="true"></div>';
 
     var calendar = document.getElementById('usageCalendar');
-    calendar.innerHTML = html;
+    MIQCommon.view.set(calendar,"innerHTML",html);
     Array.prototype.forEach.call(calendar.querySelectorAll('.cal__day[data-day]'), function (cell) {
-      var day = Number(cell.getAttribute('data-day'));
+      var day = Number(MIQCommon.view.call(cell,"getAttribute",['data-day']));
       var record = totals.records.filter(function (item) {
         return item.year === state.year && item.month === state.month && item.day === day;
       })[0];
       if (!record) return;
       var label = isoDate(state.year, state.month, day) + ', 총 작업시간 ' + formatMinutesText(record.aggregate.work)
         + ', 총 이동거리 ' + formatDistanceText(record.aggregate.distance) + ', 운영 장비 ' + record.aggregate.operating + '대. 상세 보기';
-      cell.setAttribute('aria-label', label);
-      cell.setAttribute('data-chart-tip', label);
+      MIQCommon.view.call(cell,"setAttribute",['aria-label',label]);
+      MIQCommon.view.call(cell,"setAttribute",['data-chart-tip',label]);
       cell.addEventListener('click', function () { openDay(day, record.aggregate); });
       cell.addEventListener('keydown', function (event) {
         if (event.key === 'Enter' || event.key === ' ') {
@@ -266,18 +231,18 @@
   function renderSummary(totals) {
     var from = parseDate(state.from);
     var to = parseDate(state.to);
-    document.getElementById('usageSummaryTitle').textContent = state.year + '년 ' + state.month + '월 요약';
-    document.getElementById('usageSumWork').innerHTML = totals.collectedDays ? formatMinutesHtml(totals.work) : '-';
-    document.getElementById('usageSumDistance').innerHTML = totals.collectedDays ? formatDistanceHtml(totals.distance) : '-';
+    MIQCommon.view.set(document.getElementById('usageSummaryTitle'),"textContent",state.year + '년 ' + state.month + '월 요약');
+    MIQCommon.view.set(document.getElementById('usageSumWork'),"innerHTML",totals.collectedDays ? formatMinutesHtml(totals.work) : '-');
+    MIQCommon.view.set(document.getElementById('usageSumDistance'),"innerHTML",totals.collectedDays ? formatDistanceHtml(totals.distance) : '-');
     var averageOperating = totals.operatingDays ? Math.round(totals.operating / totals.operatingDays * 10) / 10 : 0;
-    document.getElementById('usageSumOperating').innerHTML = totals.collectedDays ? window.MIQCommon.numbers.integer(averageOperating, true) + '<small>대</small>' : '-';
+    MIQCommon.view.set(document.getElementById('usageSumOperating'),"innerHTML",totals.collectedDays ? window.MIQCommon.numbers.integer(averageOperating, true) + '<small>대</small>' : '-');
     var selectedDays = Math.round((to - from) / 86400000) + 1;
     var pendingDays = TODAY >= state.from && TODAY <= state.to ? 1 : 0;
     var futureDays = selectedDays - totals.collectedDays - pendingDays;
     var meta = '조회 월 ' + selectedDays + '일 · 집계 완료 ' + totals.collectedDays + '일';
     if (pendingDays) meta += ' · 집계 전 ' + pendingDays + '일';
     if (futureDays) meta += ' · 미도래 ' + futureDays + '일';
-    document.getElementById('usageSummaryMeta').textContent = meta;
+    MIQCommon.view.set(document.getElementById('usageSummaryMeta'),"textContent",meta);
   }
 
   function vehicleDetailHref(vehicle, day) {
@@ -296,19 +261,18 @@
   function openDay(day, aggregate) {
     activeDay=day;activeDayAggregate=aggregate;
     var weekday = WEEKDAYS[new Date(state.year, state.month - 1, day).getDay()];
-    document.getElementById('dayModalTitle').textContent = isoDate(state.year, state.month, day) + ' (' + weekday + ') 운행시간 상세';
-    document.getElementById('usageDaySummary').innerHTML =
-      '<div class="cell"><div class="cell__v">' + formatMinutesHtml(aggregate.work) + '</div><div class="cell__k">총 작업시간</div></div>'
+    MIQCommon.view.set(document.getElementById('dayModalTitle'),"textContent",isoDate(state.year, state.month, day) + ' (' + weekday + ') 운행시간 상세');
+    MIQCommon.view.set(document.getElementById('usageDaySummary'),"innerHTML",'<div class="cell"><div class="cell__v">' + formatMinutesHtml(aggregate.work) + '</div><div class="cell__k">총 작업시간</div></div>'
       + '<div class="cell"><div class="cell__v">' + formatDistanceHtml(aggregate.distance) + '</div><div class="cell__k">총 이동거리</div></div>'
-      + '<div class="cell hl"><div class="cell__v">' + aggregate.operating + '<small>대</small></div><div class="cell__k">운영 장비 수 (30분 이상)</div></div>';
-    document.getElementById('usageDayMeta').textContent = state.rows.length + '대 중 운영 ' + aggregate.operating + '대 · 작업시간 내림차순';
-    document.getElementById('usageDayRows').innerHTML = dayPager.slice(aggregate.rows.slice().sort(function (left, right) { return right.work - left.work; }),String(day)).map(function (row) {
+      + '<div class="cell hl"><div class="cell__v">' + aggregate.operating + '<small>대</small></div><div class="cell__k">운영 장비 수 (30분 이상)</div></div>');
+    MIQCommon.view.set(document.getElementById('usageDayMeta'),"textContent",state.rows.length + '대 중 운영 ' + aggregate.operating + '대 · 작업시간 내림차순');
+    MIQCommon.view.set(document.getElementById('usageDayRows'),"innerHTML",dayPager.slice(aggregate.rows.slice().sort(function (left, right) { return right.work - left.work; }),String(day)).map(function (row) {
       var operating = row.work >= MIN_OPERATING_MINUTES;
       return '<tr><td class="strong"><a class="metrics-vehicle-link" href="' + escapeHtml(vehicleDetailHref(row.vehicle, day)) + '">' + escapeHtml(row.vehicle.vin)
         + ' <span class="mute">' + escapeHtml(row.vehicle.model) + '</span></a></td><td>' + escapeHtml(row.vehicle.type) + '</td><td class="mute">' + escapeHtml(row.vehicle.group) + '</td>'
         + '<td class="r ' + (operating ? 'strong' : 'mute') + '">' + formatMinutesText(row.work) + '</td><td class="r ' + (operating ? '' : 'mute') + '">' + formatDistanceText(row.distance) + '</td>'
         + '<td class="c"><span class="usage-status' + (operating ? ' is-operating' : '') + '">' + (operating ? '운영' : '미운영') + '</span></td></tr>';
-    }).join('');
+    }).join(''));
     document.getElementById('dayEfficiencyLink').href = contextualHref('../Operational%20Efficiency/operational-efficiency-tobe-option-b.html', {
       period: 'd',
       from: isoDate(state.year, state.month, day),
@@ -402,7 +366,7 @@
       setFeedback('이번 달까지만 선택할 수 있습니다.', true);
     }
     if (monthRules.selectable(monthInput.value, currentDate)) lastValidDraftMonth = monthInput.value;
-    document.getElementById('usageMonthLabel').textContent = monthInput.value || '연월 선택';
+    MIQCommon.view.set(document.getElementById('usageMonthLabel'),"textContent",monthInput.value || '연월 선택');
     var draft = monthRules.range(monthInput.value);
     document.getElementById('usagePrevMonth').disabled = !draft || !monthRules.shift(monthInput.value, -1);
     document.getElementById('usageNextMonth').disabled = !draft || !monthRules.selectable(monthRules.shift(monthInput.value, 1), currentDate);

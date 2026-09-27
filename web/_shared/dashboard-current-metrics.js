@@ -10,7 +10,7 @@
     (fleet||[]).forEach(function(vehicle){
       var sample=meeting.hourlyVehicle(vehicle,window);
       if(!sample.known||!valid(sample.runH))return;
-      var time=summary.times(vehicle,sample.runH*60);
+      var time={working:sample.workingMinutes,idle:sample.idleMinutes};
       if(!valid(time.working)||!valid(time.idle))return;
       known++;work+=time.working;idle+=time.idle;
     });

@@ -210,7 +210,7 @@ body[data-account-page] *,
 .aae-step:focus-visible,
 .aae-agreement-toggle:focus-visible,
 .aae-role:focus-within,
-.aae-check:focus-within,
+.aae-check:focus-within:not(:where(#registrationAgreement *)),
 .aae-close:focus-visible,
 .aae-autocomplete-option:focus-visible {
   outline: 2px solid var(--aae-brand);
@@ -393,6 +393,11 @@ body[data-account-page] *,
   line-height: 20px;
 }
 .aae-agreement__content[hidden] { display: none; }
+
+/* Original WEB agreement bodies; retain the existing agreement surface. */
+[data-registration-terms] .aae-agreement__content p { margin: 0 0 10px; }
+[data-registration-terms] .aae-agreement__content dt { margin-top: 8px; font-weight: 600; }
+[data-registration-terms] .aae-agreement__content dd { margin-inline-start: 12px; }
 
 .aae-role-group { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .aae-role {

@@ -29,9 +29,9 @@
     var node = document.getElementById('opsToast');
     if (!node) {
       node = document.createElement('div'); node.id = 'opsToast'; node.className = 'ops-toast';
-      node.setAttribute('role', 'status'); node.setAttribute('aria-live', 'polite'); document.body.appendChild(node);
+      MIQCommon.view.call(node,"setAttribute",['role','status']); MIQCommon.view.call(node,"setAttribute",['aria-live','polite']); document.body.appendChild(node);
     }
-    node.textContent = text; node.hidden = false;
+    MIQCommon.view.set(node,"textContent",text); node.hidden = false;
     clearTimeout(node._timer); node._timer = setTimeout(function () { node.hidden = true; }, 4000);
   }
   function csvCell(value) {
@@ -54,12 +54,12 @@
     if (!internal()) return;
     var previous = document.activeElement, id = 'opsModal' + (++modalSequence);
     var dim = document.createElement('div'); dim.className = 'dim open ops-modal';
-    dim.style.zIndex = String(250 + modalSequence); dim.setAttribute('data-ops-modal', 'true');
-    dim.innerHTML = '<form class="modal' + (options.wide ? ' lg' : '') + '" role="dialog" aria-modal="true" aria-labelledby="' + id + 'Title">' +
+    dim.style.zIndex = String(250 + modalSequence); MIQCommon.view.call(dim,"setAttribute",['data-ops-modal','true']);
+    MIQCommon.view.set(dim,"innerHTML",'<form class="modal' + (options.wide ? ' lg' : '') + '" role="dialog" aria-modal="true" aria-labelledby="' + id + 'Title">' +
       '<div class="modal__head"><h2 class="modal__title" id="' + id + 'Title">' + esc(options.title) + '</h2><button class="modal__x" type="button" data-ops-close aria-label="닫기">✕</button></div>' +
       '<div class="modal__body">' + options.body + '<p class="ops-modal-error" role="alert" hidden></p></div>' +
       '<div class="modal__foot"><button class="btn" type="button" data-ops-close>' + (options.submitLabel === '닫기' ? '닫기' : '취소') + '</button>' +
-      (options.submitLabel === '닫기' ? '' : '<button class="btn btn--pri" type="submit">' + esc(options.submitLabel || '저장') + '</button>') + '</div></form>';
+      (options.submitLabel === '닫기' ? '' : '<button class="btn btn--pri" type="submit">' + esc(options.submitLabel || '저장') + '</button>') + '</div></form>');
     document.body.appendChild(dim); var form = dim.querySelector('form');
     function close() {
       dim.remove(); document.removeEventListener('keydown', keyHandler);
@@ -83,7 +83,7 @@
       var button = form.querySelector('[type="submit"]'); if (button) button.disabled = true;
       var errorNode = form.querySelector('.ops-modal-error'); errorNode.hidden = true;
       try { if (options.onSubmit) await options.onSubmit(form, close); else close(); }
-      catch (error) { errorNode.textContent = error.message || '입력 내용을 확인해 주세요.'; errorNode.hidden = false; }
+      catch (error) { MIQCommon.view.set(errorNode,"textContent",error.message || '입력 내용을 확인해 주세요.'); errorNode.hidden = false; }
       finally { if (button) button.disabled = false; }
     });
     var focus = form.querySelector('input:not([readonly]), select, textarea, button'); if (focus) focus.focus();
@@ -108,12 +108,12 @@
     var rows = (options.rows || []).slice(), columns = options.columns || [], page = 1;
     var pageSize = options.pageSize || 15, sort = options.defaultSort || {key:'',dir:'asc'};
     host.classList.add('ops-table-host');
-    host.innerHTML = '<div class="list-head ops-list-head"><span class="list-head__count" role="status">총 <b>' + rows.length + '</b>건</span>' +
+    MIQCommon.view.set(host,"innerHTML",'<div class="list-head ops-list-head"><span class="list-head__count" role="status">총 <b>' + rows.length + '</b>건</span>' +
       '<div class="ops-actions">' + (options.export === false ? '' : '<button class="btn" type="button" data-ops-export title="현재 조건에 맞는 모든 페이지의 조회 결과를 내보냅니다.">내보내기</button>') + (options.toolbar || '') + '</div></div>' +
-      '<div class="tbl-wrap ops-grid-body"></div><div class="ops-grid-footer"></div>';
+      '<div class="tbl-wrap ops-grid-body"></div><div class="ops-grid-footer"></div>');
     if (options.actionHeader) {
       var context = options.actionHeader.querySelector('.list-head__count');
-      if (context) host.querySelector('.ops-list-head > .list-head__count').insertAdjacentHTML('beforeend', ' · ' + context.innerHTML);
+      if (context) MIQCommon.view.call(host.querySelector('.ops-list-head > .list-head__count'),"insertAdjacentHTML",['beforeend',' · ' + MIQCommon.view.get(context,"innerHTML")]);
       // Move the whole header so its delegated action listeners remain intact.
       options.actionHeader.classList.add('ops-merged-actions');
       host.querySelector('.ops-list-head > .ops-actions').appendChild(options.actionHeader);
@@ -131,7 +131,7 @@
     function draw() {
       var orderedRows = ordered(), pages = Math.max(1, Math.ceil(rows.length / pageSize));
       page = Math.min(page, pages); currentRows = orderedRows.slice((page - 1) * pageSize, page * pageSize);
-      host.querySelector('.ops-grid-body').innerHTML = '<table class="tbl ops-table"><caption class="ops-sr-only">' + esc(options.caption || '조회 결과') + '</caption><thead><tr>' + columns.map(function (col) {
+      MIQCommon.view.set(host.querySelector('.ops-grid-body'),"innerHTML",'<table class="tbl ops-table"><caption class="ops-sr-only">' + esc(options.caption || '조회 결과') + '</caption><thead><tr>' + columns.map(function (col) {
         var sortable = col.sortable !== false && col.key && col.key !== 'actions';
         return '<th scope="col" class="' + esc(col.className || '') + '"' + columnPresentation(col) + (sortable ? ' aria-sort="' + (sort.key === col.key ? (sort.dir === 'asc' ? 'ascending' : 'descending') : 'none') + '"' : '') + '>' +
           (sortable ? '<button class="ops-sort" type="button" data-ops-sort="' + esc(col.key) + '">' + esc(col.label) + ' <span aria-hidden="true">' + (sort.key === col.key ? (sort.dir === 'asc' ? '↑' : '↓') : '↕') + '</span></button>' : esc(col.label)) + '</th>';
@@ -139,8 +139,9 @@
         return '<tr data-ops-row="' + index + '">' + columns.map(function (col) {
           return '<td class="' + esc(col.className || '') + '"' + columnPresentation(col) + '>' + (col.render ? col.render(row) : esc(row[col.key] == null ? '—' : row[col.key])) + '</td>';
         }).join('') + '</tr>';
-      }).join('') : '<tr><td class="ops-empty" colspan="' + columns.length + '">' + esc(options.emptyText || '조회 결과가 없습니다. 검색 조건을 확인해 주세요.') + '</td></tr>') + '</tbody></table>';
+      }).join('') : '<tr><td class="ops-empty" colspan="' + columns.length + '">' + esc(options.emptyText || '조회 결과가 없습니다. 검색 조건을 확인해 주세요.') + '</td></tr>') + '</tbody></table>');
       var table=host.querySelector('.ops-table');
+      table._miqFitColumns=function(){
       MIQTableLayout.fit(table,columns.map(function(col,index){
         var compact=table.tHead.rows[0].cells[index].dataset.opsCell==='compact';
         var min=col.minWidth||MIQTableLayout.minimum(col.label);
@@ -149,11 +150,13 @@
         if(col.key==='detail')min=76;
         return {min:min,compact:compact};
       }));
+      };
+      table._miqFitColumns();
       var start = Math.max(1, Math.min(page - 2, pages - 4)), end = Math.min(pages, start + 4), buttons = '';
       for (var i = start; i <= end; i++) buttons += '<button class="btn btn--sm' + (i === page ? ' btn--pri' : '') + '" type="button" data-ops-page="' + i + '" aria-label="' + i + '페이지"' + (i === page ? ' aria-current="page"' : '') + '>' + i + '</button>';
-      host.querySelector('.ops-grid-footer').innerHTML = '<span>' + (rows.length ? ((page - 1) * pageSize + 1) + '–' + Math.min(page * pageSize, rows.length) : '0') + ' / ' + rows.length + '건</span><nav class="ops-pagination" aria-label="목록 페이지">' +
+      MIQCommon.view.set(host.querySelector('.ops-grid-footer'),"innerHTML",'<span>' + (rows.length ? ((page - 1) * pageSize + 1) + '–' + Math.min(page * pageSize, rows.length) : '0') + ' / ' + rows.length + '건</span><nav class="ops-pagination" aria-label="목록 페이지">' +
         '<button class="btn btn--sm" type="button" data-ops-page="' + (page - 1) + '" aria-label="이전 페이지"' + (page === 1 ? ' disabled' : '') + '>‹</button>' + buttons +
-        '<button class="btn btn--sm" type="button" data-ops-page="' + (page + 1) + '" aria-label="다음 페이지"' + (page === pages ? ' disabled' : '') + '>›</button></nav>';
+        '<button class="btn btn--sm" type="button" data-ops-page="' + (page + 1) + '" aria-label="다음 페이지"' + (page === pages ? ' disabled' : '') + '>›</button></nav>');
     }
     host.onclick = function (event) {
       var sortButton = event.target.closest('[data-ops-sort]');
@@ -195,7 +198,7 @@
       else {
         var subtitles = {equipment:'장비코드 목록',codes:'공통코드 목록',languages:'다국어 목록',notices:'공지사항 목록',accounts:'내부 계정 목록',history:'메뉴 접속이력 목록'};
         var subtitle = document.createElement('span'); subtitle.className = 'ops-taskbar__label';
-        subtitle.textContent = subtitles[document.body.dataset.opsPage] || '목록'; taskbar.appendChild(subtitle);
+        MIQCommon.view.set(subtitle,"textContent",subtitles[document.body.dataset.opsPage] || '목록'); taskbar.appendChild(subtitle);
       }
     }
     el.querySelectorAll('.ops-filters').forEach(function (form) {
@@ -208,16 +211,16 @@
       var controls = document.createElement('div'), filters = document.createElement('div');
       controls.className = 'ops-query-controls'; filters.className = 'ops-task-filters';
       controls._opsForm = filters._opsForm = form;
-      form.querySelectorAll('input,select,button,textarea').forEach(function (control) { control.setAttribute('form', form.id); });
+      form.querySelectorAll('input,select,button,textarea').forEach(function (control) { MIQCommon.view.call(control,"setAttribute",['form',form.id]); });
       if (searchField) controls.appendChild(searchField);
       var dates = Array.from(form.querySelectorAll('input[type="date"]'));
       if (dates.length === 2) {
         var range = document.createElement('div'); range.className = 'date-range';
-        range.setAttribute('role', 'group'); range.setAttribute('aria-label', '조회 기간');
+        MIQCommon.view.call(range,"setAttribute",['role','group']); MIQCommon.view.call(range,"setAttribute",['aria-label','조회 기간']);
         dates.forEach(function (date, index) {
           var field = date.closest('.ops-field,.ops-form-field');
-          date.setAttribute('aria-label', index === 0 ? '조회 시작일' : '조회 종료일');
-          if (index) { var separator = document.createElement('span'); separator.className = 'sep'; separator.textContent = '~'; range.appendChild(separator); }
+          MIQCommon.view.call(date,"setAttribute",['aria-label',index === 0 ? '조회 시작일' : '조회 종료일']);
+          if (index) { var separator = document.createElement('span'); separator.className = 'sep'; MIQCommon.view.set(separator,"textContent",'~'); range.appendChild(separator); }
           range.appendChild(date); if (field) field.remove();
         });
         controls.appendChild(range);
@@ -228,7 +231,7 @@
         if (select && label) {
           field.classList.add('ops-select-filter');
           Array.from(select.options).forEach(function (option) {
-            if (option.textContent === '전체') option.textContent = label.textContent.trim() + ' 전체';
+            if (MIQCommon.view.get(option,"textContent") === '전체') MIQCommon.view.set(option,"textContent",MIQCommon.view.get(label,"textContent").trim() + ' 전체');
           });
         }
         filters.appendChild(field);
@@ -253,7 +256,7 @@
   function start() {
     var el = document.getElementById('opsContent');
     if (!el || document.body.dataset.gnb !== 'ops') return;
-    if (!internal()) { el.innerHTML = ''; return; }
+    if (!internal()) { MIQCommon.view.set(el,"innerHTML",''); return; }
     var render = registry[document.body.dataset.opsPage];
     if (render) {
       render({el:el}); alignManagementControls(el); el.removeAttribute('aria-busy');

@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head><script src="../_shared/demo-clock.js?rev=34d9d133492b"></script>
+<head>
 <meta charset="UTF-8"/>
+<script src="../_shared/common-logic.js?v=d77b14750704&amp;rev=15dd4911055c"></script>
+<link rel="stylesheet" href="../_shared/korean-layout.css?v=9e980f3cddea&amp;rev=495db444ef75"/>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>충격 · MACHINE IQ</title>
+<script src="../_shared/customer-access.js?v=e12eedbcb072&amp;rev=e12eedbcb072"></script>
 <link rel="icon" type="image/x-icon" href="../_shared/favicon.ico"/>
-<link rel="stylesheet" href="../_shared/offline-fonts.css?rev=b405f97e6cf9"><script type="module" blocking="render">await document.fonts.load('400 14px "Noto Sans KR"');await document.fonts.ready;</script>
-<link rel="stylesheet" href="../_shared/mockup.css?rev=bed1f0069135"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
+<link rel="stylesheet" href="../_shared/mockup.css?v=bed1f0069135&amp;rev=bed1f0069135"/>
 <style>
 /* ── 페이지 전용 : 레벨 카드 · Top5 · 충격량 차트 ── */
 .shock-row{display:flex;gap:14px;align-items:stretch;margin-bottom:14px}
@@ -27,7 +31,7 @@
 .top5 ol{margin:0;padding-left:18px}
 .top5 li{font-size:12px;color:#333;font-weight:600;padding:5px 0;border-bottom:1px solid #f6f7f8}
 .top5 li:last-child{border-bottom:none}
-.top5 li .n{margin-left:auto;font-size:11px;color:#999;font-weight:500}
+.top5 li .n{margin-left:auto;font-size:11px;color:#999;font-weight:500;white-space:nowrap}
 .top5 li span.row{display:flex;align-items:center;gap:6px}
 .top5__empty{font-size:12px;color:#aaa}
 
@@ -46,20 +50,21 @@
 .line-chart .pt.s4{stroke:#f59f00;fill:#f59f00}
 .line-chart .pt.s5{stroke:#e03131;fill:#e03131}
 </style>
-<link rel="stylesheet" href="../_shared/chart-common.css?rev=fc1c23dcf6af"/>
-<link rel="stylesheet" href="../_shared/form-controls.css?rev=6fda272acdcc"/>
-<link rel="stylesheet" href="../_shared/list-pagination.css?rev=0069e48c1009">
-<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?rev=bb6d53aabb78"/>
-<link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?rev=1cffa21a9777"/>
+<link rel="stylesheet" href="../_shared/chart-common.css?v=fc1c23dcf6af&amp;rev=fc1c23dcf6af"/>
+<link rel="stylesheet" href="../_shared/form-controls.css?v=6fda272acdcc&amp;rev=6fda272acdcc"/>
+<link rel="stylesheet" href="../_shared/list-pagination.css?v=0069e48c1009&amp;rev=0069e48c1009">
+<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?v=fc90bc42e4ac&amp;rev=0ca435b09868"/>
+<link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?v=1cffa21a9777&amp;rev=1cffa21a9777"/>
 <style>body.miq-current-shell>#gnb{min-height:64px}</style>
-<script defer blocking="render" src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script>
-<script defer blocking="render" src="../_shared/common-logic.js?rev=efb7e741cd7b"></script>
-<script defer blocking="render" src="../_shared/chart-common.js?rev=15c74452f805"></script>
-<script defer blocking="render" src="../_shared/list-pagination.js?rev=33207bf33d11"></script>
-<script defer blocking="render" src="../_mock-data/generated/fleet.generated.js?rev=309d68875499"></script>
-<script defer blocking="render" src="../_shared/fleet.js?rev=dfdf98be0a95"></script>
-<script defer blocking="render" src="../_shared/nav.js?rev=049a18c69072"></script>
-<script defer blocking="render" src="../_shared/lnb-tree.js?rev=fb81b76cb736"></script>
+<script defer blocking="render" src="../_mock-data/generated/fleet.generated.js?v=52fa65a2dce1&amp;rev=52fa65a2dce1"></script>
+<script defer blocking="render" src="../_mock-data/generated/observation-profiles.generated.js?v=1be92dd7a845&amp;rev=4054b4937190"></script>
+<script defer blocking="render" src="../_shared/vehicle-observations.js?v=550edc6b3b85&amp;rev=aea30481fdb6"></script>
+<script defer blocking="render" src="../_shared/meeting-model.js?v=7f3774217339&amp;rev=7f3774217339"></script>
+<script defer blocking="render" src="../_shared/chart-common.js?v=28a8b1161c0e&amp;rev=28a8b1161c0e"></script>
+<script defer blocking="render" src="../_shared/list-pagination.js?v=4b500130528b&amp;rev=4b500130528b"></script>
+<script defer blocking="render" src="../_shared/fleet.js?v=b0f68e558a52&amp;rev=b0f68e558a52"></script>
+<script defer blocking="render" src="../_shared/nav.js?v=baf392ada632&amp;rev=4206801c46cf"></script>
+<script defer blocking="render" src="../_shared/lnb-tree.js?v=92f5ceffdd3b&amp;rev=92f5ceffdd3b"></script>
 <script type="module" blocking="render">
 /* ══════════════════════════════════════════════════════════════
    충격 Mock-up 인터랙션
@@ -136,40 +141,24 @@
     show: { s3: true, s4: true, s5: true }
   };
 
-  function seeded(key) {
-    var s = 0;
-    for (var i = 0; i < key.length; i++) s = (s * 31 + key.charCodeAt(i)) >>> 0;
-    return function () { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; };
-  }
-
-  /* ── 데모 데이터 : 선택 범위 차량들의 합계 ──
-     일 = 00~23시 / 주 = 7일 / 월 = 1일~31일(오늘 이전까지만 값 존재) / 사용자설정 = 주 단위 11구간 */
   function build() {
-    var p = state.period;
-    var axis = MIQCharts.axis(p, PERIOD[p].from, PERIOD[p].to);
-    var labels = axis.labels, n = axis.n, i, bucket = axis.bucket, filled = axis.filled;
-
-    var series = { s3: [], s4: [], s5: [] }, byVeh = {};
-    for (i = 0; i < n; i++) { series.s3.push(i < filled ? 0 : null); series.s4.push(i < filled ? 0 : null); series.s5.push(i < filled ? 0 : null); }
-
-    state.rows.forEach(function (v) {
-      var rnd = seeded(v.vin + p + PERIOD[p].from + PERIOD[p].to);
-      byVeh[v.vin] = { model: v.model, vin: v.vin, total: 0 };
-      for (i = 0; i < filled; i++) {
-        var work = p === 'd' ? (i >= 7 && i <= 18 ? 1 : 0.15) : 1;     /* 일 조회는 근무시간에 집중 */
-        for (var b = 0; b < bucket; b++) {                             /* 사용자설정은 7일치 합산 */
-          var s3 = Math.round((1 + rnd() * 8 + v.shock * 0.6) * work);
-          var s4 = Math.round(s3 * (0.45 + rnd() * 0.35));
-          var s5 = rnd() < 0.1 ? 1 + Math.round(rnd()) : 0;
-          series.s3[i] += s3; series.s4[i] += s4; series.s5[i] += s5;
-          byVeh[v.vin].total += s3 + s4 + s5;
-        }
-      }
+    var p=state.period,range=PERIOD[p],axis=MIQCharts.axis(p,range.from,range.to),obs=window.MIQObservations;
+    var series={s3:[],s4:[],s5:[]},byVeh={},filled=0;
+    axis.dates.forEach(function(day,hour){
+      var rows=obs.intervals(state.rows,day,day,null,p==='d'?hour:null),known=rows.length>0;
+      var levels={s3:0,s4:0,s5:0};
+      rows.forEach(function(row){
+        // Exclusive illustrative levels; every event belongs to one level.
+        var level=(row.hour+Number(row.date.slice(-2)))%10;
+        levels[level===0?'s5':level<4?'s4':'s3']+=row.shockCount;
+        if(!byVeh[row.vin]){var v=state.rows.find(function(v){return v.vin===row.vin;});byVeh[row.vin]={vin:row.vin,model:v.model,total:0};}
+        byVeh[row.vin].total+=row.shockCount;
+      });
+      ['s3','s4','s5'].forEach(function(key){series[key].push(known?levels[key]:null);});
+      if(known)filled++;
     });
-
-    var top = Object.keys(byVeh).map(function (k) { return byVeh[k]; })
-      .sort(function (a, b) { return b.total - a.total; }).slice(0, 5);
-    return { labels: labels, detailLabels: axis.detailLabels, series: series, top: top, filled: filled };
+    return {labels:axis.labels,detailLabels:axis.detailLabels,series:series,
+      top:Object.keys(byVeh).map(function(k){return byVeh[k];}).sort(function(a,b){return b.total-a.total;}).slice(0,5),filled:filled};
   }
 
   /* ── 차트 (차트형만 제공) ── */
@@ -179,7 +168,7 @@
   function useWidth(el) {
     var w = Math.round(el.getBoundingClientRect().width) || el.clientWidth || 960;
     W = Math.max(560, w); R = W - 14;
-    el.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    MIQCommon.view.call(el,"setAttribute",['viewBox','0 0 ' + W + ' ' + H]);
   }
 
   function renderChart(d) {
@@ -225,21 +214,21 @@
         + '<rect class="hit" x="' + hitLeft + '" y="' + T + '" width="' + (hitRight-hitLeft) + '" height="' + (B-T) + '"/></g>'
         + '<text x="' + cx + '" y="' + (B+18) + '" text-anchor="middle">' + MIQCharts.tickLabel(d.labels,i,R-L) + '</text>';
     });
-    el.innerHTML = svg;
+    MIQCommon.view.set(el,"innerHTML",svg);
     MIQCharts.bind(el);
   }
 
   function renderCards(d) {
     LVL.forEach(function (l) {
       var sum = d.series[l.key].reduce(function (a, v) { return a + (v || 0); }, 0);
-      document.getElementById('cnt' + l.key.toUpperCase()).textContent = sum.toLocaleString();
+      MIQCommon.view.set(document.getElementById('cnt' + l.key.toUpperCase()),"textContent",sum.toLocaleString());
     });
     var ol = document.getElementById('top5List');
-    ol.innerHTML = d.top.length
+    MIQCommon.view.set(ol,"innerHTML",d.top.length
       ? d.top.map(function (v) {
-          return "<li><span class='row'>" + v.vin + "<span class='n'>" + v.total.toLocaleString() + "건</span></span></li>";
+          return "<li><span class='row'>" + v.vin + "<span class='n' data-i18n-key='count.shocks' data-count='" + v.total.toLocaleString() + "'>" + v.total.toLocaleString() + "건</span></span></li>";
         }).join('')
-      : "<li class='top5__empty'>조회 결과 없음</li>";
+      : "<li class='top5__empty'>조회 결과 없음</li>");
   }
 
   function render() {
@@ -253,13 +242,12 @@
       includeVehicle: true
     });
     if (!MIQ.getAppliedPeriod()) Array.prototype.forEach.call(document.querySelectorAll('#periodTabs button[data-period]'), function (button) {
-      button.classList.toggle('active', button.getAttribute('data-period') === state.period);
+      button.classList.toggle('active', MIQCommon.view.call(button,"getAttribute",['data-period']) === state.period);
     });
-    document.getElementById('chartHint').textContent =
-      state.period === 'd' ? 'ⓘ 조회일의 시간대별 충격 건수입니다.'
-      : 'ⓘ 조회 기간의 일자별 충격 건수입니다. 그래프에 마우스를 올리면 상세 값을 확인할 수 있습니다.';
+    MIQCommon.view.set(document.getElementById('chartHint'),"textContent",state.period === 'd' ? 'ⓘ 조회일의 시간대별 충격 건수입니다.'
+      : 'ⓘ 조회 기간의 일자별 충격 건수입니다. 그래프에 마우스를 올리면 상세 값을 확인할 수 있습니다.');
     Array.prototype.forEach.call(document.querySelectorAll('[data-lnb-label]'), function (el) {
-      el.textContent = '- ' + state.label;
+      MIQCommon.view.set(el,"textContent",'- ' + state.label);
     });
   }
 
@@ -297,7 +285,7 @@
     if (this.closest('.finder, .filter-bar').__miqPeriodController) return;
     var b = e.target.closest('button[data-period]');
     if (!b) return;
-    state.period = b.getAttribute('data-period');
+    state.period = MIQCommon.view.call(b,"getAttribute",['data-period']);
     render();
   });
   (document.getElementById('periodTabs').closest('.finder, .filter-bar') || document.getElementById('periodTabs')).addEventListener('miq:period-change', function (event) {
@@ -318,7 +306,7 @@
   document.getElementById('series').addEventListener('change', function (e) {
     var c = e.target.closest('input[data-s]');
     if (!c) return;
-    state.show[c.getAttribute('data-s')] = c.checked;
+    state.show[MIQCommon.view.call(c,"getAttribute",['data-s'])] = c.checked;
     render();
   });
   document.getElementById('btnSearch').addEventListener('click', function () {
@@ -335,9 +323,9 @@
   render();
 })();
 </script>
-<script defer blocking="render" src="../_shared/vehicle-child-context.js?rev=f943fa9b37d3"></script>
+<script defer blocking="render" src="../_shared/vehicle-child-context.js?v=f943fa9b37d3&amp;rev=f943fa9b37d3"></script>
 </head>
-<body class="miq-current-shell" data-current-bootstrap="ready" data-period-presets="dwm" data-gnb="anlz" data-sub="shock" data-variant="tobe" data-base="../">
+<body data-i18n-count="shock" class="miq-current-shell" data-current-bootstrap="ready" data-period-presets="dwm" data-gnb="anlz" data-sub="shock" data-variant="tobe" data-base="../">
 
 <div id="gnb"></div>
 

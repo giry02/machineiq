@@ -7,7 +7,7 @@
   var QUERY = new URLSearchParams(location.search);
   var PERIOD_ALIASES = { day: 'd', daily: 'd', week: 'w', weekly: 'w', month: 'm', monthly: 'm', custom: 'c' };
   var requestedPeriod = PERIOD_ALIASES[QUERY.get('period')] || QUERY.get('period');
-  var PAGE = body.getAttribute('data-metrics-page');
+  var PAGE = MIQCommon.view.call(body,"getAttribute",['data-metrics-page']);
   var FLEET = window.MIQ && Array.isArray(MIQ.FLEET_CATALOG) && MIQ.FLEET_CATALOG.length ? MIQ.FLEET_CATALOG : window.MIQ && MIQ.FLEET ? MIQ.FLEET : [];
   var feedback = document.getElementById('metricsFeedback');
   var scopeContext = window.MIQ_TARGET_CONTEXT || null;
@@ -51,7 +51,7 @@
 
   function setFeedback(message, isError) {
     if (!feedback) return;
-    feedback.textContent = message || '';
+    MIQCommon.view.set(feedback,"textContent",message || '');
     feedback.classList.toggle('is-error', !!isError);
   }
 
@@ -114,7 +114,7 @@
   function syncContextLinks(extra) {
     extra = extra || {};
     Array.prototype.forEach.call(document.querySelectorAll('[data-context-link]:not([data-miq-side-sub])'), function (link) {
-      var source = link.getAttribute('href');
+      var source = MIQCommon.view.call(link,"getAttribute",['href']);
       if (!source || /^#|^javascript:/i.test(source)) return;
       link.href = contextualHref(source, extra);
     });
@@ -182,7 +182,7 @@
     var tooltip = document.createElement('div');
     tooltip.className = 'metrics-tip';
     tooltip.id = 'metricsAccessibleTip';
-    tooltip.setAttribute('role', 'tooltip');
+    MIQCommon.view.call(tooltip,"setAttribute",['role','tooltip']);
     tooltip.hidden = true;
     document.body.appendChild(tooltip);
     return tooltip;
@@ -198,8 +198,8 @@
   }
 
   function initEfficiency() {
-    var vehicleRowsView = body.getAttribute('data-efficiency-view') === 'vehicle-rows';
-    var dailyRowsView = vehicleRowsView || body.getAttribute('data-efficiency-view') === 'daily-rows';
+    var vehicleRowsView = MIQCommon.view.call(body,"getAttribute",['data-efficiency-view']) === 'vehicle-rows';
+    var dailyRowsView = vehicleRowsView || MIQCommon.view.call(body,"getAttribute",['data-efficiency-view']) === 'daily-rows';
     var latestDate = new Date();
     latestDate.setHours(12, 0, 0, 0);
     latestDate.setDate(latestDate.getDate() - 1);
@@ -232,79 +232,33 @@
     var chartUncollected = document.getElementById('chartUncollected');
     var tableBody = document.getElementById('efficiencyTableBody');
 
-    function seeded(key) {
-      var seed = 0;
-      for (var index = 0; index < key.length; index++) seed = (seed * 31 + key.charCodeAt(index)) >>> 0;
-      return function () {
-        seed = (seed * 1103515245 + 12345) & 0x7fffffff;
-        return seed / 0x7fffffff;
-      };
-    }
-
     function round1(value) { return window.MIQCommon.numbers.integer(value); }
 
     function hours(value) {
       return state.period === 'd' ? Math.round(value * 60) + '분' : round1(value) + 'H';
     }
 
-    function dateLabel(date) { return (date.getMonth() + 1) + '/' + date.getDate(); }
-
     function build() {
-      var axis = MIQCharts.axis(state.period, PERIOD[state.period].from, PERIOD[state.period].to);
-      var labels = axis.labels, count = axis.n, bucket = axis.bucket, filled = axis.filled, index;
-
-      var columns = [];
-      var byVehicle = {};
-      var totalWork = 0;
-      var totalIdle = 0;
-      for (index = 0; index < count; index++) columns.push(index < filled ? { work: 0, idle: 0 } : null);
-
-      state.rows.forEach(function (vehicle) {
-        var random = seeded(vehicle.vin + state.period + PERIOD[state.period].from + PERIOD[state.period].to);
-        byVehicle[vehicle.vin] = { vehicle: vehicle, work: 0, idle: 0, capacity: 0 };
-        for (var columnIndex = 0; columnIndex < filled; columnIndex++) {
-          var work = 0;
-          var idle = 0;
-          for (var bucketIndex = 0; bucketIndex < bucket; bucketIndex++) {
-            var running = state.period === 'd'
-              ? (columnIndex >= 7 && columnIndex <= 18 ? .6 + random() * .4 : random() * .25)
-              : 6 + random() * 3.5;
-            var ratio = .6 + random() * .25;
-            work += running * ratio;
-            idle += running * (1 - ratio);
-          }
-          columns[columnIndex].work += work;
-          columns[columnIndex].idle += idle;
-          byVehicle[vehicle.vin].work += work;
-          byVehicle[vehicle.vin].idle += idle;
-          byVehicle[vehicle.vin].capacity += Math.max(state.period === 'd' ? 1 : 10 * bucket, work + idle);
-          totalWork += work;
-          totalIdle += idle;
-        }
+      var range=PERIOD[state.period],axis=MIQCharts.axis(state.period,range.from,range.to);
+      var observations=window.MIQObservations,asOf=observations.windowAt(),totals=[];
+      var knownRows=state.rows.filter(observations.hasProfile),divisor=knownRows.length||1;
+      var columns=axis.dates.map(function(day,hour){
+        var value=observations.aggregate(knownRows,day,day,asOf,state.period==='d'?hour:null);
+        if(!value.known)return null;
+        totals.push(value);
+        return {work:value.workMinutes/60/divisor,idle:value.idleMinutes/60/divisor,capacity:value.capacityMinutes/60/divisor};
       });
-
-      var divisor = state.rows.length || 1;
-      columns.forEach(function (column) {
-        if (!column) return;
-        column.work /= divisor;
-        column.idle /= divisor;
+      var vehicles=state.rows.map(function(vehicle){
+        var value=observations.aggregate(vehicle,range.from,state.period==='d'?range.from:range.to,asOf);
+        return {vehicle:vehicle,work:value.workMinutes/60,idle:value.idleMinutes/60,capacity:value.capacityMinutes/60,known:!!value.known};
       });
-      var top = Object.keys(byVehicle).map(function (vin) { return byVehicle[vin]; })
-        .sort(function (left, right) { return right.work - left.work; }).slice(0, 5);
-      return {
-        labels: labels,
-        detailLabels: axis.detailLabels,
-        columns: columns,
-        top: top,
-        vehicles: Object.keys(byVehicle).map(function (vin) { return byVehicle[vin]; }),
-        filled: filled,
-        bucket: bucket,
-        average: {
-          work: filled ? totalWork / divisor / filled : 0,
-          idle: filled ? totalIdle / divisor / filled : 0
-        },
-        averageVehicleWorkTotal: totalWork / divisor
-      };
+      var totalWork=totals.reduce(function(s,v){return s+v.workMinutes/60;},0);
+      var totalIdle=totals.reduce(function(s,v){return s+v.idleMinutes/60;},0),filled=totals.length;
+      return {labels:axis.labels,detailLabels:axis.detailLabels,columns:columns,
+        top:vehicles.filter(function(v){return v.known;}).sort(function(a,b){return b.work-a.work;}).slice(0,5),vehicles:vehicles,
+        filled:filled,bucket:axis.bucket,knownVehicleCount:knownRows.length,
+        average:{work:filled?totalWork/divisor/filled:0,idle:filled?totalIdle/divisor/filled:0},
+        averageVehicleWorkTotal:totalWork/divisor};
     }
 
     function renderTop(data) {
@@ -315,29 +269,29 @@
       var idleRate = total ? 100 - workRate : 0;
       var split = document.getElementById('split');
       if (!state.rows.length) {
-        split.innerHTML = '<div class="split__seg idle" style="width:100%">조회 조건에 해당하는 차량이 없습니다.</div>';
-        split.setAttribute('aria-label', '조회 조건에 해당하는 차량이 없습니다.');
+        MIQCommon.view.set(split,"innerHTML",'<div class="split__seg idle" style="width:100%">조회 조건에 해당하는 차량이 없습니다.</div>');
+        MIQCommon.view.call(split,"setAttribute",['aria-label','조회 조건에 해당하는 차량이 없습니다.']);
       } else {
-        split.innerHTML = '<div class="split__seg work" style="width:' + workRate.toFixed(1) + '%">작업 ' + hours(work) + ' · ' + window.MIQCommon.numbers.integer(workRate) + '%</div>'
-          + '<div class="split__seg idle" style="width:' + idleRate.toFixed(1) + '%">대기 ' + hours(idle) + ' · ' + window.MIQCommon.numbers.integer(idleRate) + '%</div>';
-        split.setAttribute('aria-label', '평균 작업시간 ' + hours(work) + ', ' + window.MIQCommon.numbers.integer(workRate) + '퍼센트. 평균 대기시간 ' + hours(idle) + ', ' + window.MIQCommon.numbers.integer(idleRate) + '퍼센트.');
+        MIQCommon.view.set(split,"innerHTML",'<div class="split__seg work" style="width:' + workRate.toFixed(1) + '%">작업 ' + hours(work) + ' · ' + window.MIQCommon.numbers.integer(workRate) + '%</div>'
+          + '<div class="split__seg idle" style="width:' + idleRate.toFixed(1) + '%">대기 ' + hours(idle) + ' · ' + window.MIQCommon.numbers.integer(idleRate) + '%</div>');
+        MIQCommon.view.call(split,"setAttribute",['aria-label','평균 작업시간 ' + hours(work) + ', ' + window.MIQCommon.numbers.integer(workRate) + '퍼센트. 평균 대기시간 ' + hours(idle) + ', ' + window.MIQCommon.numbers.integer(idleRate) + '퍼센트.']);
       }
-      Array.prototype.forEach.call(split.querySelectorAll('.split__seg'),function(segment){segment.setAttribute('data-chart-tip',segment.textContent);segment.setAttribute('tabindex','0');});
+      Array.prototype.forEach.call(split.querySelectorAll('.split__seg'),function(segment){MIQCommon.view.call(segment,"setAttribute",['data-chart-tip',MIQCommon.view.get(segment,"textContent")]);MIQCommon.view.call(segment,"setAttribute",['tabindex','0']);});
       MIQCharts.bind(split);
-      document.getElementById('efficiencyTotal').innerHTML = total ? hours(total) + '<small>평균 가동</small>' : '-';
-      document.getElementById('top5List').innerHTML = data.top.length ? data.top.map(function (item) {
+      MIQCommon.view.set(document.getElementById('efficiencyTotal'),"innerHTML",total ? hours(total) + '<small>평균 가동</small>' : '-');
+      MIQCommon.view.set(document.getElementById('top5List'),"innerHTML",data.top.length ? data.top.map(function (item) {
         var vehicle = item.vehicle;
         return '<li><span class="row"><a href="' + escapeHtml(detailHref(vehicle)) + '">' + escapeHtml(vehicle.vin) + '</a><span class="n">' + round1(item.work) + 'H</span></span></li>';
-      }).join('') : '<li>조회 조건에 해당하는 차량이 없습니다.</li>';
+      }).join('') : '<li>조회 조건에 해당하는 차량이 없습니다.</li>');
     }
 
     function showChartTip(group, item, label, event) {
       var total = item.work + item.idle;
       var workRate = total ? item.work / total * 100 : 0;
-      chartTip.innerHTML = '<b>' + escapeHtml(label) + '</b>'
+      MIQCommon.view.set(chartTip,"innerHTML",'<b>' + escapeHtml(label) + '</b>'
         + '<div class="r"><i style="background:#ff3600"></i>작업시간<span>' + hours(item.work) + ' · ' + window.MIQCommon.numbers.integer(workRate) + '%</span></div>'
         + '<div class="r"><i style="background:#4d5359"></i>대기시간<span>' + hours(item.idle) + ' · ' + window.MIQCommon.numbers.integer((100 - workRate)) + '%</span></div>'
-        + '<div class="r"><i style="background:transparent"></i>가동시간<span>' + hours(total) + '</span></div>';
+        + '<div class="r"><i style="background:transparent"></i>가동시간<span>' + hours(total) + '</span></div>');
       chartTip.style.display = 'block';
       group.classList.add('on');
       moveChartTip(group, event);
@@ -366,7 +320,7 @@
       var bottom = 264;
       var right = width - 12;
       var height = 300;
-      chart.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
+      MIQCommon.view.call(chart,"setAttribute",['viewBox','0 0 ' + width + ' ' + height]);
       var plottedIndexes = data.columns.reduce(function (indexes, column, index) {
         if (column) indexes.push(index);
         return indexes;
@@ -398,12 +352,12 @@
         var axisLabel = MIQCharts.tickLabel(data.labels,index,right-left);
         if (axisLabel) svg += '<text x="' + fixed(center) + '" y="' + (bottom + 20) + '" text-anchor="middle">' + escapeHtml(axisLabel) + '</text>';
       });
-      chart.innerHTML = svg;
+      MIQCommon.view.set(chart,"innerHTML",svg);
       chart.classList.remove('is-animating');
       requestAnimationFrame(function () { chart.classList.add('is-animating'); });
 
       Array.prototype.forEach.call(chart.querySelectorAll('.col'), function (group) {
-        var index = Number(group.getAttribute('data-index'));
+        var index = Number(MIQCommon.view.call(group,"getAttribute",['data-index']));
         var item = data.columns[index];
         group.addEventListener('mouseenter', function (event) { showChartTip(group, item, data.detailLabels[index], event); });
         group.addEventListener('mousemove', function (event) { moveChartTip(group, event); });
@@ -413,20 +367,16 @@
         group.addEventListener('keydown', function (event) { if (event.key === 'Escape') { hideChartTip(group); group.blur(); } });
       });
 
-      tableBody.innerHTML = data.columns.map(function (column, index) {
+      MIQCommon.view.set(tableBody,"innerHTML",data.columns.map(function (column, index) {
         if (!column) return '<tr><td>' + escapeHtml(data.labels[index]) + '</td><td class="r" colspan="4">집계 전</td></tr>';
         var total = column.work + column.idle;
         var rate = total ? column.work / total * 100 : 0;
-        return '<tr><th scope="row">' + escapeHtml(data.labels[index]) + '</th><td class="r">' + hours(column.work) + '</td><td class="r">' + hours(column.idle) + '</td><td class="r">' + hours(total) + '</td><td class="r strong">' + window.MIQCommon.numbers.integer(rate) + '%</td></tr>';
-      }).join('');
+        return '<tr><th scope="row">' + escapeHtml(data.labels[index]) + '</th><td class="r">' + hours(column.work) + '</td><td class="r">' + hours(column.idle) + '</td><td class="r">' + hours(total) + '</td><td class="r strong">' + (rate===null?'-':window.MIQCommon.numbers.integer(rate)+'%') + '</td></tr>';
+      }).join(''));
     }
 
     /* 운영효율 B안: 선택 기간을 작업·대기·미사용의 가로 누적 행으로 비교한다.
        미사용은 현재 API 원본값이 없으므로 프로토타입 기준 일 10H에서 파생한다. */
-    function dailyCapacity(data) {
-      return state.period === 'd' ? 1 : 10 * (data.bucket || 1);
-    }
-
     function renderDailyRows(data) {
       if (vehicleRowsView) {
         window.MIQVehicleEfficiency.render(data, {
@@ -435,10 +385,10 @@
         });
         return;
       }
-      var capacity = dailyCapacity(data);
+      var capacity = 0;
       var hasRows = state.rows.length > 0;
       var workTotal = 0;
-      var capacityTotal = 0;
+      var runningTotal = 0;
       var dailyRows = data.columns.map(function (column, index) {
         if (!column || !hasRows) {
           return '<div class="efficiency-daily-row is-empty" role="img" aria-label="' + escapeHtml(data.labels[index]) + ', 집계 없음">'
@@ -448,6 +398,7 @@
             + '<strong class="efficiency-daily-row__actual">-</strong></div>';
         }
 
+        capacity=column.capacity;
         var work = Math.max(0, column.work);
         var idle = Math.max(0, column.idle);
         var unused = Math.max(0, capacity - work - idle);
@@ -456,7 +407,7 @@
         var idleRate = denominator ? idle / denominator * 100 : 0;
         var unusedRate = Math.max(0, 100 - workRate - idleRate);
         workTotal += work;
-        capacityTotal += denominator;
+        runningTotal += work + idle;
         var accessible = data.labels[index] + ', 작업 ' + window.MIQCommon.numbers.integer(workRate) + '퍼센트, 대기 ' + window.MIQCommon.numbers.integer(idleRate)
           + '퍼센트, 미사용 ' + window.MIQCommon.numbers.integer(unusedRate) + '퍼센트, 실제 작업시간 ' + round1(work) + '시간';
         return '<div class="efficiency-daily-row" tabindex="0" role="img" aria-label="' + escapeHtml(accessible) + '" data-index="' + index + '" style="--row-delay:' + Math.min(240, index * 10) + 'ms">'
@@ -472,31 +423,32 @@
           + '<strong class="efficiency-daily-row__actual">' + round1(work) + 'H</strong></div>';
       }).join('');
 
-      chart.innerHTML = dailyRows;
+      MIQCommon.view.set(chart,"innerHTML",dailyRows);
       chart.classList.remove('is-animating');
       requestAnimationFrame(function () { chart.classList.add('is-animating'); });
       var selectedPeriod = document.getElementById('efficiencyDailyPeriod');
       var averageRate = document.getElementById('efficiencyDailyAverage');
       var actualWork = document.getElementById('efficiencyDailyWork');
       var axisLabel = document.getElementById('efficiencyDailyAxisLabel');
-      if (selectedPeriod) selectedPeriod.textContent = fromInput.value + ' ~ ' + toInput.value;
-      if (averageRate) averageRate.textContent = hasRows && capacityTotal ? window.MIQCommon.numbers.integer((workTotal / capacityTotal * 100)) + '%' : '-';
-      if (actualWork) actualWork.textContent = hasRows ? round1(workTotal) + 'H' : '-';
-      if (axisLabel) axisLabel.textContent = state.period === 'd' ? '시간대' : state.period === 'c' ? '기간' : '일자';
+      if (selectedPeriod) MIQCommon.view.set(selectedPeriod,"textContent",fromInput.value + ' ~ ' + toInput.value);
+      if (averageRate) MIQCommon.view.set(averageRate,"textContent",hasRows && runningTotal ? window.MIQCommon.numbers.integer((workTotal / runningTotal * 100)) + '%' : '-');
+      if (actualWork) MIQCommon.view.set(actualWork,"textContent",hasRows && data.filled ? round1(workTotal) + 'H' : '-');
+      if (axisLabel) MIQCommon.view.set(axisLabel,"textContent",state.period === 'd' ? '시간대' : state.period === 'c' ? '기간' : '일자');
 
       Array.prototype.forEach.call(chart.querySelectorAll('.efficiency-daily-row[data-index]'), function (row) {
-        var index = Number(row.getAttribute('data-index'));
+        var index = Number(MIQCommon.view.call(row,"getAttribute",['data-index']));
         var item = data.columns[index];
+        var capacity = item.capacity;
         var unused = Math.max(0, capacity - item.work - item.idle);
         var denominator = Math.max(capacity, item.work + item.idle);
         function show(event) {
           var workRate = denominator ? item.work / denominator * 100 : 0;
           var idleRate = denominator ? item.idle / denominator * 100 : 0;
           var unusedRate = Math.max(0, 100 - workRate - idleRate);
-          chartTip.innerHTML = '<b>' + escapeHtml(data.detailLabels[index]) + '</b>'
+          MIQCommon.view.set(chartTip,"innerHTML",'<b>' + escapeHtml(data.detailLabels[index]) + '</b>'
             + '<div class="r"><i style="background:#ff3600"></i>작업시간<span>' + round1(item.work) + 'H · ' + window.MIQCommon.numbers.integer(workRate) + '%</span></div>'
             + '<div class="r"><i style="background:#4d5359"></i>대기시간<span>' + round1(item.idle) + 'H · ' + window.MIQCommon.numbers.integer(idleRate) + '%</span></div>'
-            + '<div class="r"><i style="background:#d9dde1"></i>미사용시간<span>' + round1(unused) + 'H · ' + window.MIQCommon.numbers.integer(unusedRate) + '%</span></div>';
+            + '<div class="r"><i style="background:#d9dde1"></i>미사용시간<span>' + round1(unused) + 'H · ' + window.MIQCommon.numbers.integer(unusedRate) + '%</span></div>');
           chartTip.style.display = 'block';
           row.classList.add('on');
           moveChartTip(row, event);
@@ -510,13 +462,14 @@
       });
 
       if (tableBody) {
-        tableBody.innerHTML = data.columns.map(function (column, index) {
+        MIQCommon.view.set(tableBody,"innerHTML",data.columns.map(function (column, index) {
           if (!column || !hasRows) return '<tr><th scope="row">' + escapeHtml(data.labels[index]) + '</th><td class="r" colspan="5">집계 없음</td></tr>';
+          var capacity = column.capacity;
           var unused = Math.max(0, capacity - column.work - column.idle);
           var denominator = Math.max(capacity, column.work + column.idle);
-          var rate = denominator ? column.work / denominator * 100 : 0;
-          return '<tr><th scope="row">' + escapeHtml(data.labels[index]) + '</th><td class="r">' + round1(column.work) + 'H</td><td class="r">' + round1(column.idle) + 'H</td><td class="r">' + round1(unused) + 'H</td><td class="r">' + round1(column.work + column.idle) + 'H</td><td class="r strong">' + window.MIQCommon.numbers.integer(rate) + '%</td></tr>';
-        }).join('');
+          var rate = column.work+column.idle>0 ? column.work/(column.work+column.idle)*100 : null;
+          return '<tr><th scope="row">' + escapeHtml(data.labels[index]) + '</th><td class="r">' + round1(column.work) + 'H</td><td class="r">' + round1(column.idle) + 'H</td><td class="r">' + round1(unused) + 'H</td><td class="r">' + round1(column.work + column.idle) + 'H</td><td class="r strong">' + (rate===null?'-':window.MIQCommon.numbers.integer(rate)+'%') + '</td></tr>';
+        }).join(''));
       }
     }
 
@@ -541,20 +494,20 @@
       var hint = state.period === 'd' ? '시간대별 대당 평균입니다.'
         : state.period === 'c' ? '설정 기간은 ' + (dayCount(parseDate(PERIOD[state.period].from), parseDate(PERIOD[state.period].to)) > 31 ? '주' : '일') + ' 단위로 표시합니다.'
           : '일자별 대당 평균입니다.';
-      document.getElementById('chartHint').textContent = vehicleRowsView
+      MIQCommon.view.set(document.getElementById('chartHint'),"textContent",vehicleRowsView
         ? '선택 기간의 차량별 누적 시간입니다. 행을 누르면 상세 항목을 확인할 수 있습니다.'
         : hint + (dailyRowsView
         ? ' 미사용은 일 10H 기준입니다. 행에 마우스를 올리거나 키보드로 초점을 이동하면 수치를 확인할 수 있습니다.'
-        : ' 막대에 마우스를 올리거나 키보드로 초점을 이동하면 수치를 확인할 수 있습니다.');
+        : ' 막대에 마우스를 올리거나 키보드로 초점을 이동하면 수치를 확인할 수 있습니다.'));
       var hasUncollected = state.period === 'm' && data.filled < data.labels.length;
       if (chartUncollected) {
         chartUncollected.hidden = !hasUncollected;
-        chartUncollected.textContent = hasUncollected
+        MIQCommon.view.set(chartUncollected,"textContent",hasUncollected
           ? data.labels[data.filled] + '–' + data.labels[data.labels.length - 1] + ' 집계 전'
-          : '';
+          : '');
       }
-      if (hasUncollected) chart.setAttribute('aria-describedby', 'chartHint chartUncollected');
-      else chart.setAttribute('aria-describedby', 'chartHint');
+      if (hasUncollected) MIQCommon.view.call(chart,"setAttribute",['aria-describedby','chartHint chartUncollected']);
+      else MIQCommon.view.call(chart,"setAttribute",['aria-describedby','chartHint']);
       var scopeHost = document.getElementById('efficiencyScopeSummary');
       if (scopeHost && window.MIQ && typeof MIQ.renderScopeSummary === 'function') {
         var target = scopeContext || {
@@ -581,7 +534,7 @@
       if (this.closest('.finder, .filter-bar').__miqPeriodController) return;
       var button = event.target.closest('button[data-period]');
       if (!button) return;
-      state.period = button.getAttribute('data-period');
+      state.period = MIQCommon.view.call(button,"getAttribute",['data-period']);
       context.period = state.period;
       Array.prototype.forEach.call(this.querySelectorAll('button'), function (item) { item.classList.toggle('active', item === button); });
       applyDates();
@@ -627,7 +580,7 @@
     });
 
     Array.prototype.forEach.call(document.querySelectorAll('#periodTabs button[data-period]'), function (button) {
-      button.classList.toggle('active', button.getAttribute('data-period') === state.period);
+      button.classList.toggle('active', MIQCommon.view.call(button,"getAttribute",['data-period']) === state.period);
     });
     applyDates();
     setupContextRefresh(null, applyContextSelection);
@@ -657,9 +610,9 @@
     var cells = Array.prototype.slice.call(calendar.querySelectorAll('.cal__day'));
     var records = [];
     var baseSummary = [115.4, 37.1, 24.6, 152.5, 86.6, 75.7];
-    var baseDelta = Array.prototype.map.call(document.querySelectorAll('.box.total .cell__d'), function (element) { return element.innerHTML; });
+    var baseDelta = Array.prototype.map.call(document.querySelectorAll('.box.total .cell__d'), function (element) { return MIQCommon.view.get(element,"innerHTML"); });
     var baseDeltaShort = Array.prototype.map.call(document.querySelectorAll('.box.total .cell__d'), function (element) {
-      return element.textContent.replace(/\s*\([^)]*\)\s*/, '').trim();
+      return MIQCommon.view.get(element,"textContent").replace(/\s*\([^)]*\)\s*/, '').trim();
     });
     var summaryCells = Array.prototype.slice.call(document.querySelectorAll('.box.total .stat-cells > .cell'));
 
@@ -670,12 +623,12 @@
     }
     function numberFromWidth(segment) {
       if (!segment) return 0;
-      var match = (segment.getAttribute('style') || '').match(/width\s*:\s*([\d.]+)%/i);
+      var match = (MIQCommon.view.call(segment,"getAttribute",['style']) || '').match(/width\s*:\s*([\d.]+)%/i);
       return match ? Number(match[1]) : 0;
     }
     function dayNumber(cell) {
       var dateElement = cell.querySelector('.cal__d');
-      var match = dateElement && dateElement.textContent.match(/\d+/);
+      var match = dateElement && MIQCommon.view.get(dateElement,"textContent").match(/\d+/);
       return match ? Number(match[0]) : null;
     }
     function cellRecord(cell) {
@@ -686,8 +639,8 @@
       var idle = minutesFromPercent(numberFromWidth(bar && bar.querySelector('.idle')));
       var off = minutesFromPercent(numberFromWidth(bar && bar.querySelector('.off')));
       var rateElement = cell.querySelector('.cal__rate');
-      var rateMatch = rateElement && rateElement.textContent.match(/[\d.]+/);
-      var status = Array.prototype.map.call(cell.querySelectorAll('.flag'), function (flag) { return flag.getAttribute('title') || flag.textContent.trim(); }).join(' · ');
+      var rateMatch = rateElement && MIQCommon.view.get(rateElement,"textContent").match(/[\d.]+/);
+      var status = Array.prototype.map.call(cell.querySelectorAll('.flag'), function (flag) { return MIQCommon.view.call(flag,"getAttribute",['title']) || MIQCommon.view.get(flag,"textContent").trim(); }).join(' · ');
       return { cell: cell, day: day, work: work, idle: idle, off: off, rate: rateMatch ? Number(rateMatch[0]) : null, status: status || (cell.classList.contains('void') ? '휴무' : '정상') };
     }
     cells.forEach(function (cell) {
@@ -752,16 +705,16 @@
       var all = records.filter(function (record) { return !record.cell.classList.contains('void') && !record.cell.classList.contains('holiday'); });
       var factor = all.length ? active.length / all.length : 0;
       var scopedCount = state.rows.length;
-      document.getElementById('usageSummaryTitle').textContent = summaryLabel();
-      document.getElementById('usageBasisBadge').textContent = state.selection && state.selection.vehicle ? '해당 차량' : '대당 평균';
-      document.getElementById('usageSummaryMeta').textContent = '근무일 ' + active.length + '일 · 계획 ' + Math.round(active.length * 8) + 'H · 차량 ' + scopedCount + '대';
+      MIQCommon.view.set(document.getElementById('usageSummaryTitle'),"textContent",summaryLabel());
+      MIQCommon.view.set(document.getElementById('usageBasisBadge'),"textContent",state.selection && state.selection.vehicle ? '해당 차량' : '대당 평균');
+      MIQCommon.view.set(document.getElementById('usageSummaryMeta'),"textContent",'근무일 ' + active.length + '일 · 계획 ' + Math.round(active.length * 8) + 'H · 차량 ' + scopedCount + '대');
       summaryCells.forEach(function (cell, index) {
         var valueElement = cell.querySelector('.cell__v');
         var deltaElement = cell.querySelector('.cell__d');
         if (!valueElement) return;
         var value = index < 4 ? baseSummary[index] * factor : baseSummary[index];
-        valueElement.innerHTML = window.MIQCommon.numbers.integer(value) + '<small>' + (index < 4 ? 'H' : '%') + '</small>';
-        if (deltaElement) deltaElement.innerHTML = state.period === 'm' ? baseDelta[index] : escapeHtml(baseDeltaShort[index]) + ' <span class="miq-sr-only">이전 기간 대비</span>';
+        MIQCommon.view.set(valueElement,"innerHTML",window.MIQCommon.numbers.integer(value) + '<small>' + (index < 4 ? 'H' : '%') + '</small>');
+        if (deltaElement) MIQCommon.view.set(deltaElement,"innerHTML",state.period === 'm' ? baseDelta[index] : escapeHtml(baseDeltaShort[index]) + ' <span class="miq-sr-only">이전 기간 대비</span>');
       });
     }
 
@@ -773,7 +726,7 @@
     }
 
     function showTooltip(record) {
-      tooltip.textContent = recordLabel(record);
+      MIQCommon.view.set(tooltip,"textContent",recordLabel(record));
       tooltip.hidden = false;
       positionTooltip(tooltip, record.cell.getBoundingClientRect());
     }
@@ -784,24 +737,24 @@
       var modal = document.getElementById('dayModal');
       var date = currentDate(record.day);
       var weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-      modal.querySelector('.modal__title').textContent = isoDate(date) + ' (' + weekdays[date.getDay()] + ') 사용시간 상세';
+      MIQCommon.view.set(modal.querySelector('.modal__title'),"textContent",isoDate(date) + ' (' + weekdays[date.getDay()] + ') 사용시간 상세');
       var values = modal.querySelectorAll('.stat-cells .cell__v');
       if (values.length >= 5) {
-        values[0].textContent = formatMinutes(record.work);
-        values[1].textContent = formatMinutes(record.idle);
-        values[2].textContent = formatMinutes(record.off);
-        values[3].innerHTML = (record.rate === null ? '-' : window.MIQCommon.numbers.integer(record.rate)) + (record.rate === null ? '' : '<small>%</small>');
+        MIQCommon.view.set(values[0],"textContent",formatMinutes(record.work));
+        MIQCommon.view.set(values[1],"textContent",formatMinutes(record.idle));
+        MIQCommon.view.set(values[2],"textContent",formatMinutes(record.off));
+        MIQCommon.view.set(values[3],"innerHTML",(record.rate === null ? '-' : window.MIQCommon.numbers.integer(record.rate)) + (record.rate === null ? '' : '<small>%</small>'));
         var shockMatch = (record.status || '').match(/충격\s*(\d+)건/);
-        values[4].textContent = shockMatch ? shockMatch[1] : '0';
+        MIQCommon.view.set(values[4],"textContent",shockMatch ? shockMatch[1] : '0');
       }
-      document.getElementById('usageBasisBadge').textContent = state.selection && state.selection.vehicle ? '해당 차량' : '대당 평균';
+      MIQCommon.view.set(document.getElementById('usageBasisBadge'),"textContent",state.selection && state.selection.vehicle ? '해당 차량' : '대당 평균');
       document.getElementById('dayModal').dataset.day = String(record.day);
-      document.querySelector('#dayModal .modal__body .sub-head .tail').textContent = state.rows.length + '대 중 상위 ' + Math.min(6, state.rows.length) + '대';
-      document.getElementById('usageBasisBadge').setAttribute('title', state.selection && state.selection.vehicle ? state.selection.vehicle.vin : '선택 범위의 대당 평균');
+      MIQCommon.view.set(document.querySelector('#dayModal .modal__body .sub-head .tail'),"textContent",state.rows.length + '대 중 상위 ' + Math.min(6, state.rows.length) + '대');
+      MIQCommon.view.call(document.getElementById('usageBasisBadge'),"setAttribute",['title',state.selection && state.selection.vehicle ? state.selection.vehicle.vin : '선택 범위의 대당 평균']);
       document.getElementById('dayModal').querySelector('.modal__foot .btn--pri').href = contextualHref('../Operational%20Efficiency/operational-efficiency-tobe-option-b.html', { period: 'd', from: isoDate(date), to: isoDate(date) });
       var modalRows = state.rows.slice(0, 6);
       var shockTotal = shockMatch ? Number(shockMatch[1]) : 0;
-      modal.querySelector('tbody').innerHTML = modalRows.length ? modalRows.map(function (vehicle, index) {
+      MIQCommon.view.set(modal.querySelector('tbody'),"innerHTML",modalRows.length ? modalRows.map(function (vehicle, index) {
         var ratio = modalRows.length === 1 ? 1 : .86 + unitFromKey(vehicle.vin + isoDate(date)) * .28;
         var work = Math.round(record.work * ratio);
         var idle = Math.round(record.idle * (1.06 - (ratio - .86) * .35));
@@ -811,14 +764,14 @@
         return '<tr><td class="strong"><a class="metrics-vehicle-link" href="' + escapeHtml(detailHref(vehicle)) + '">' + escapeHtml(vehicle.model) + ' <span class="mute">' + escapeHtml(vehicle.vin) + '</span></a></td>'
           + '<td>' + escapeHtml(vehicle.type) + '</td><td class="r">' + formatMinutes(work) + '</td><td class="r">' + formatMinutes(idle) + '</td>'
           + '<td class="r">' + formatMinutes(off) + '</td><td class="r strong">' + window.MIQCommon.numbers.integer(rate) + '%</td><td class="c' + (shock ? ' strong' : ' mute') + '">' + shock + '</td></tr>';
-      }).join('') : '<tr><td colspan="7">선택한 조건에 해당하는 차량이 없습니다.</td></tr>';
+      }).join('') : '<tr><td colspan="7">선택한 조건에 해당하는 차량이 없습니다.</td></tr>');
     }
 
     function renderTable() {
       var tableRows = records.filter(inCurrentRange);
-      document.getElementById('usageTableBody').innerHTML = tableRows.length ? tableRows.map(function (record) {
+      MIQCommon.view.set(document.getElementById('usageTableBody'),"innerHTML",tableRows.length ? tableRows.map(function (record) {
         return '<tr><th scope="row">' + currentIso(record.day) + '</th><td class="r">' + formatMinutes(record.work) + '</td><td class="r">' + formatMinutes(record.idle) + '</td><td class="r">' + formatMinutes(record.off) + '</td><td class="r strong">' + (record.rate === null ? '-' : window.MIQCommon.numbers.integer(record.rate) + '%') + '</td><td>' + escapeHtml(record.status) + '</td></tr>';
-      }).join('') : '<tr><td colspan="6">선택한 기간에 표시할 데이터가 없습니다.</td></tr>';
+      }).join('') : '<tr><td colspan="6">선택한 기간에 표시할 데이터가 없습니다.</td></tr>');
     }
 
     function renderCalendarState() {
@@ -827,9 +780,9 @@
         record.cell.classList.toggle('is-outside-range', !enabled);
         if (!record.cell.classList.contains('void')) {
           record.cell.tabIndex = enabled ? 0 : -1;
-          record.cell.setAttribute('role', 'button');
-          record.cell.setAttribute('aria-label', recordLabel(record) + '. 상세 보기');
-          record.cell.setAttribute('aria-disabled', enabled ? 'false' : 'true');
+          MIQCommon.view.call(record.cell,"setAttribute",['role','button']);
+          MIQCommon.view.call(record.cell,"setAttribute",['aria-label',recordLabel(record) + '. 상세 보기']);
+          MIQCommon.view.call(record.cell,"setAttribute",['aria-disabled',enabled ? 'false' : 'true']);
         }
       });
       calendar.classList.remove('is-animating');
@@ -841,7 +794,7 @@
     }
 
     function updateMonthLabels() {
-      document.getElementById('usageMonthLabel').textContent = state.year + '-' + pad(state.month + 1);
+      MIQCommon.view.set(document.getElementById('usageMonthLabel'),"textContent",state.year + '-' + pad(state.month + 1));
     }
 
     function render() {
@@ -851,7 +804,7 @@
       renderTable();
       var selected = state.selection && state.selection.vehicle;
       var label = selected ? selected.model + ' · ' + selected.vin : (state.selection && state.selection.label && state.selection.label !== '전체' ? state.selection.label : '전체차량');
-      Array.prototype.forEach.call(document.querySelectorAll('[data-lnb-label]'), function (element) { element.textContent = '- ' + label; });
+      Array.prototype.forEach.call(document.querySelectorAll('[data-lnb-label]'), function (element) { MIQCommon.view.set(element,"textContent",'- ' + label); });
       context.period = state.period;
       setQuery({ companyId: context.companyId, group: context.group, type: context.type, veh: context.veh, period: state.period, from: state.period === 'c' ? fromInput.value : null, to: state.period === 'c' ? toInput.value : null });
       syncContextLinks(state.period === 'c' ? { from: fromInput.value, to: toInput.value } : { from: null, to: null });
@@ -884,29 +837,29 @@
       if (!description) return;
       description.id = 'usageFormulaTip' + index;
       tip.tabIndex = 0;
-      tip.setAttribute('role', 'button');
-      tip.setAttribute('aria-label', description.textContent.trim());
-      tip.setAttribute('aria-describedby', description.id);
+      MIQCommon.view.call(tip,"setAttribute",['role','button']);
+      MIQCommon.view.call(tip,"setAttribute",['aria-label',MIQCommon.view.get(description,"textContent").trim()]);
+      MIQCommon.view.call(tip,"setAttribute",['aria-describedby',description.id]);
     });
 
     Array.prototype.forEach.call(document.querySelectorAll('#dayModal tbody tr'), function (row) {
       var identity = row.querySelector('td.strong');
       var vinElement = identity && identity.querySelector('.mute');
-      var vin = vinElement && vinElement.textContent.trim();
+      var vin = vinElement && MIQCommon.view.get(vinElement,"textContent").trim();
       var vehicle = vehicleByVin(vin);
       if (!identity || !vehicle) return;
       var modelText = identity.childNodes[0] ? identity.childNodes[0].nodeValue.trim() : vehicle.model;
-      identity.innerHTML = '<a class="metrics-vehicle-link" href="' + escapeHtml(detailHref(vehicle)) + '">' + escapeHtml(modelText || vehicle.model) + ' <span class="mute">' + escapeHtml(vehicle.vin) + '</span></a>';
+      MIQCommon.view.set(identity,"innerHTML",'<a class="metrics-vehicle-link" href="' + escapeHtml(detailHref(vehicle)) + '">' + escapeHtml(modelText || vehicle.model) + ' <span class="mute">' + escapeHtml(vehicle.vin) + '</span></a>');
     });
 
     document.getElementById('usageViewTabs').addEventListener('click', function (event) {
       var button = event.target.closest('[data-usage-view]');
       if (!button) return;
-      state.view = button.getAttribute('data-usage-view');
+      state.view = MIQCommon.view.call(button,"getAttribute",['data-usage-view']);
       Array.prototype.forEach.call(this.querySelectorAll('[data-usage-view]'), function (item) {
         var active = item === button;
         item.classList.toggle('active', active);
-        item.setAttribute('aria-selected', active ? 'true' : 'false');
+        MIQCommon.view.call(item,"setAttribute",['aria-selected',active ? 'true' : 'false']);
       });
       document.getElementById('usageCalendarPane').hidden = state.view !== 'calendar';
       document.getElementById('usageTablePane').hidden = state.view !== 'table';
@@ -916,7 +869,7 @@
     document.getElementById('usagePeriodTabs').addEventListener('click', function (event) {
       var button = event.target.closest('button[data-period]');
       if (!button) return;
-      state.period = button.getAttribute('data-period');
+      state.period = MIQCommon.view.call(button,"getAttribute",['data-period']);
       context.period = state.period;
       Array.prototype.forEach.call(this.querySelectorAll('button'), function (item) { item.classList.toggle('active', item === button); });
       setRange(periodRange(state.period));
@@ -925,7 +878,7 @@
         setFeedback('사용자설정 기간을 입력한 뒤 조회해 주세요. 최대 366일까지 조회할 수 있습니다.', false);
       } else {
         render();
-        setFeedback(button.textContent.trim() + ' 기준으로 조회했습니다.', false);
+        setFeedback(MIQCommon.view.get(button,"textContent").trim() + ' 기준으로 조회했습니다.', false);
       }
     });
 
@@ -942,7 +895,7 @@
       if (state.month > 11) { state.month = 0; state.year += 1; }
       setRange(periodRange(state.period === 'c' ? 'm' : state.period));
       render();
-      setFeedback(document.getElementById('usageMonthLabel').textContent + ' 데이터를 표시합니다.', false);
+      setFeedback(MIQCommon.view.get(document.getElementById('usageMonthLabel'),"textContent") + ' 데이터를 표시합니다.', false);
     }
     document.getElementById('usagePrevMonth').addEventListener('click', function () { moveMonth(-1); });
     document.getElementById('usageNextMonth').addEventListener('click', function () { moveMonth(1); });
@@ -988,7 +941,7 @@
     state.selection = tree.get();
 
     Array.prototype.forEach.call(document.querySelectorAll('#usagePeriodTabs button[data-period]'), function (button) {
-      button.classList.toggle('active', button.getAttribute('data-period') === state.period);
+      button.classList.toggle('active', MIQCommon.view.call(button,"getAttribute",['data-period']) === state.period);
     });
     setRange(periodRange(state.period));
     setupContextRefresh(tree, render);

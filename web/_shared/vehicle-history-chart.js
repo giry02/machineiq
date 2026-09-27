@@ -1,70 +1,29 @@
 /* Vehicle-history prototype series. Allocations reproduce the displayed period
    totals; they are mock distributions, not collected hourly/daily telemetry. */
 (function (root, factory) {
-  var api = factory();
+  var api = factory(typeof module==='object'&&module.exports?require('./vehicle-observations.js'):root.MIQObservations);
   if (typeof module === 'object' && module.exports) module.exports = api;
   else { root.MIQVehicleHistory = api; api.mount(root); }
-}(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+}(typeof globalThis !== 'undefined' ? globalThis : this, function (observations) {
   'use strict';
 
   function validNumber(value) { return typeof value === 'number' && isFinite(value) && value >= 0; }
-  function random(key) {
-    var seed = 2166136261;
-    for (var i = 0; i < key.length; i++) { seed ^= key.charCodeAt(i); seed = Math.imul(seed, 16777619); }
-    return (seed >>> 0) / 4294967295;
-  }
   function previousDate(date) {
     var parts = String(date).split('-').map(Number);
     var target = new Date(Date.UTC(parts[0], parts[1] - 2, parts[2]));
     return target.getUTCDate() === parts[2] ? target.toISOString().slice(0, 10) : null;
   }
-  function factor(period, count) { return period === 'd' ? 1 / 22 : period === 'w' ? 1 / 4.3 : period === 'm' ? 1 : count / 30; }
-  function allocate(total, weights) {
-    if (total === null) return weights.map(function () { return null; });
-    var sum = weights.reduce(function (a, b) { return a + b; }, 0);
-    if (!sum) return weights.map(function () { return null; });
-    var exact = weights.map(function (weight) { return total * weight / sum; });
-    var values = exact.map(Math.floor);
-    var remainder = total - values.reduce(function (a, b) { return a + b; }, 0);
-    exact.map(function (value, index) { return { index: index, fraction: value - values[index] }; })
-      .filter(function (item) { return weights[item.index] > 0; })
-      .sort(function (a, b) { return b.fraction - a.fraction || a.index - b.index; })
-      .slice(0, remainder).forEach(function (item) { values[item.index]++; });
-    return values;
-  }
   function build(vehicle, period, axis) {
-    var dates = axis.dates || [], count = dates.length;
-    var prevDates = dates.map(previousDate);
-    var known = !!vehicle && !vehicle.catalogOnly;
-    var multiplier = factor(period, count);
-    var minuteTotal = known && validNumber(vehicle.min) ? Math.round(vehicle.min * multiplier) : null;
-    var shockTotal = known && validNumber(vehicle.shock) ? Math.round(vehicle.shock * multiplier) : null;
-    var efficiency = known && validNumber(vehicle.efficiencyRate) ? vehicle.efficiencyRate
-      : known && vehicle.type !== '엔진' && validNumber(vehicle.eff) ? vehicle.eff : null;
-    var vin = vehicle && vehicle.vin || '';
-    function make(isPrevious) {
-      var sourceDates = isPrevious ? prevDates : dates;
-      var weights = sourceDates.map(function (date, index) {
-        if (!date) return 0;
-        var value = .35 + random(vin + ':' + date + ':' + (period === 'd' ? index : 'day'));
-        return period === 'd' && (index < 7 || index > 18) ? value * .08 : value;
-      });
-      var previousScale = .82 + random(vin + ':previous:' + (dates[0] || '')) * .3;
-      var minutes = allocate(minuteTotal === null ? null : Math.round(minuteTotal * (isPrevious ? previousScale : 1)), weights);
-      var shocks = allocate(shockTotal === null ? null : Math.round(shockTotal * (isPrevious ? previousScale : 1)), weights);
-      return sourceDates.map(function (date, index) {
-        var key = vin + ':' + date + ':' + (period === 'd' ? index : 'day');
-        return {
-          date: date,
-          hour: period === 'd' ? index : null,
-          minute: date ? minutes[index] : null,
-          hourValue: date && minutes[index] !== null ? minutes[index] / 60 : null,
-          shock: date ? shocks[index] : null,
-          eff: date && efficiency !== null ? (efficiency === 0 ? 0 : Math.round(Math.max(0, Math.min(100, efficiency + (random(key + ':eff') - .5) * 12)) * 10) / 10) : null
-        };
-      });
-    }
-    return { current: make(false), previous: make(true), minuteTotal: minuteTotal, shockTotal: shockTotal, mock: true };
+    var dates=axis.dates||[];
+    function make(previous){return dates.map(function(day,hour){
+      var target=previous?previousDate(day):day;
+      var raw=observations.aggregate(vehicle,target,target,null,period==='d'?hour:null);
+      return {date:target,hour:period==='d'?hour:null,minute:raw.runningMinutes,
+        hourValue:raw.runningMinutes===null?null:raw.runningMinutes/60,shock:raw.shockCount,eff:raw.efficiency};
+    });}
+    var current=make(false),previous=make(true),known=current.filter(function(r){return r.minute!==null;});
+    return {current:current,previous:previous,minuteTotal:known.length?known.reduce(function(s,r){return s+r.minute;},0):null,
+      shockTotal:known.length?known.reduce(function(s,r){return s+r.shock;},0):null,mock:true};
   }
 
   function mount(root) {
@@ -112,16 +71,19 @@
       var data = build(vehicle, range.period, axis);
       var values = data.current.concat(data.previous).map(value).filter(function (v) { return v !== null; });
       var metric = METRICS[key];
-      currentLegend.textContent = range.period === 'm' ? '선택 월' : '선택 기간';
-      unit.textContent = '단위: ' + metric.unit;
+      wrap.setAttribute('data-i18n-count', key);
+      unit.setAttribute('data-i18n-count', key);
+      MIQCommon.view.set(currentLegend,"textContent",range.period === 'm' ? '선택 월' : '선택 기간');
+      MIQCommon.view.set(unit,"textContent",'단위: ' + metric.unit);
       empty.hidden = values.length > 0;
       // SVGElement does not reflect a .hidden property into the hidden attribute.
       svg.toggleAttribute('hidden', !values.length);
-      if (!values.length) { svg.innerHTML = ''; return; }
+      if (!values.length) { MIQCommon.view.set(svg,"innerHTML",''); return; }
       var width = Math.max(640, Math.round(svg.getBoundingClientRect().width) || 960);
-      var left = 48, right = width - 14, top = 20, bottom = 282, height = 330;
-      svg.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
-      svg.setAttribute('aria-label', metric.label + ', ' + range.from + '부터 ' + range.to + '까지 전월 같은 일자 비교');
+      // Translated day labels are wider than Korean day suffixes.
+      var left = 48, right = width - (document.documentElement.lang === 'ko' ? 14 : 40), top = 20, bottom = 282, height = 330;
+      MIQCommon.view.call(svg,"setAttribute",['viewBox','0 0 ' + width + ' ' + height]);
+      MIQCommon.view.call(svg,"setAttribute",['aria-label',metric.label + ', ' + range.from + '부터 ' + range.to + '까지 전월 같은 일자 비교']);
       var maximum = key === 'eff' ? 100 : Math.max.apply(null, values);
       var step = key === 'eff' ? 20 : .1;
       if (key === 'hour') {
@@ -137,8 +99,9 @@
       var html = '';
       for (var tick = 0; tick <= Math.round(maximum / step); tick++) {
         var amount = Math.round(tick * step * 100) / 100, yy = number(y(amount));
+        var axisValue = key === 'shock' && document.documentElement.lang !== 'ko' ? amount : amount + metric.unit;
         html += '<line class="grid" x1="' + left + '" y1="' + yy + '" x2="' + right + '" y2="' + yy + '"/>'
-          + '<text x="' + (left - 9) + '" y="' + (yy + 4) + '" text-anchor="end">' + amount + metric.unit + '</text>';
+          + '<text x="' + (left - 9) + '" y="' + (yy + 4) + '" text-anchor="end">' + axisValue + '</text>';
       }
       html += '<line class="axis" x1="' + left + '" y1="' + bottom + '" x2="' + right + '" y2="' + bottom + '"/>'
         + '<line class="axis" x1="' + left + '" y1="' + top + '" x2="' + left + '" y2="' + bottom + '"/>';
@@ -156,7 +119,7 @@
       axis.labels.forEach(function (label, index) {
         var xx = number(x(index)), band = axis.n === 1 ? right - left : (right - left) / (axis.n - 1);
         var hitStart = Math.max(left, xx - band / 2), hitEnd = Math.min(right, xx + band / 2);
-        var tip = metric.label + '\n' + currentLegend.textContent + ' ' + actualDate(data.current[index]) + ': ' + formatted(data.current[index])
+        var tip = metric.label + '\n' + MIQCommon.view.get(currentLegend,"textContent") + ' ' + actualDate(data.current[index]) + ': ' + formatted(data.current[index])
           + '\n전월 ' + actualDate(data.previous[index]) + ': ' + formatted(data.previous[index]);
         html += '<g class="col history-point" data-history-index="' + index + '" ' + charts.tipAttrs(tip) + '>'
           + '<line class="vline" x1="' + xx + '" y1="' + top + '" x2="' + xx + '" y2="' + bottom + '"/>'
@@ -164,7 +127,7 @@
         var tickLabel = charts.tickLabel(axis.labels, index, right - left);
         if (tickLabel) html += '<text x="' + xx + '" y="' + (bottom + 23) + '" text-anchor="middle">' + charts.escape(tickLabel) + '</text>';
       });
-      svg.innerHTML = html;
+      MIQCommon.view.set(svg,"innerHTML",html);
     }
     charts.bind(wrap);
     document.querySelector('.graph-radios').addEventListener('click', function (event) {
@@ -172,7 +135,7 @@
       if (!button || !METRICS[button.dataset.graph]) return;
       key = button.dataset.graph;
       Array.prototype.forEach.call(button.parentNode.children, function (item) {
-        var active = item === button; item.classList.toggle('active', active); item.setAttribute('aria-pressed', String(active));
+        var active = item === button; item.classList.toggle('active', active); MIQCommon.view.call(item,"setAttribute",['aria-pressed',String(active)]);
       });
       draw();
     });

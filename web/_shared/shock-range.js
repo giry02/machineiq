@@ -40,8 +40,7 @@
     var ro = false;
 
     root.classList.add('rng');
-    root.innerHTML =
-      '<div class="rng__bar">' +
+    MIQCommon.view.set(root,"innerHTML",'<div class="rng__bar">' +
         '<span class="rng__band ign"></span>' +
         '<span class="rng__band s3"></span>' +
         '<span class="rng__band s4"></span>' +
@@ -53,7 +52,7 @@
           ' aria-valuemin="' + MIN + '" aria-valuemax="' + MAX + '" aria-valuenow="' + vals[i] + '">' +
           '<b>' + l.name + '</b><i></i></button>';
       }).join('') +
-      '<div class="rng__scale"><span>0</span><span>2</span><span>4</span><span>6</span><span>8 g</span></div>';
+      '<div class="rng__scale"><span>0</span><span>2</span><span>4</span><span>6</span><span>8 g</span></div>');
 
     var bar = root.querySelector('.rng__bar');
     var bands = {
@@ -75,9 +74,9 @@
       bands.s5.style.width = (100 - pct(vals[2])) + '%';
       handles.forEach(function (h, i) {
         h.style.left = pct(vals[i]) + '%';
-        h.querySelector('i').textContent = vals[i].toFixed(1);
-        h.setAttribute('aria-valuenow', vals[i].toFixed(1));
-        h.setAttribute('aria-valuetext', vals[i].toFixed(1) + ' g 이상 ' + LEVELS[i].name);
+        MIQCommon.view.set(h.querySelector('i'),"textContent",vals[i].toFixed(1));
+        MIQCommon.view.call(h,"setAttribute",['aria-valuenow',vals[i].toFixed(1)]);
+        MIQCommon.view.call(h,"setAttribute",['aria-valuetext',vals[i].toFixed(1) + ' g 이상 ' + LEVELS[i].name]);
       });
     }
 

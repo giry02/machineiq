@@ -1,30 +1,35 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head><script src="../_shared/demo-clock.js?rev=34d9d133492b"></script>
+<head>
 <meta charset="UTF-8"/>
+<script src="../_shared/common-logic.js?v=d77b14750704&amp;rev=15dd4911055c"></script>
+<link rel="stylesheet" href="../_shared/korean-layout.css?v=9e980f3cddea&amp;rev=495db444ef75"/>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>리튬배터리 · MACHINE IQ</title>
+<script src="../_shared/customer-access.js?v=e12eedbcb072&amp;rev=e12eedbcb072"></script>
 <link rel="icon" type="image/x-icon" href="../_shared/favicon.ico"/>
-<link rel="stylesheet" href="../_shared/offline-fonts.css?rev=b405f97e6cf9"><script type="module" blocking="render">await document.fonts.load('400 14px "Noto Sans KR"');await document.fonts.ready;</script>
-<link rel="stylesheet" href="../_shared/mockup.css?rev=bed1f0069135"/>
-<link rel="stylesheet" href="../_shared/content-system.css?rev=d8f94e7e5049"/>
-<link rel="stylesheet" href="../_shared/chart-common.css?rev=fc1c23dcf6af"/>
-<link rel="stylesheet" href="../_shared/lithium-list.css?rev=ef3bc70e1fd3"/>
-<link rel="stylesheet" href="../_shared/form-controls.css?rev=6fda272acdcc"/>
-<link rel="stylesheet" href="../_shared/list-pagination.css?rev=0069e48c1009">
-<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?rev=bb6d53aabb78"/>
-<link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?rev=1cffa21a9777"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
+<link rel="stylesheet" href="../_shared/mockup.css?v=bed1f0069135&amp;rev=bed1f0069135"/>
+<link rel="stylesheet" href="../_shared/content-system.css?v=d8f94e7e5049&amp;rev=d8f94e7e5049"/>
+<link rel="stylesheet" href="../_shared/chart-common.css?v=fc1c23dcf6af&amp;rev=fc1c23dcf6af"/>
+<link rel="stylesheet" href="../_shared/lithium-list.css?v=ef3bc70e1fd3&amp;rev=ef3bc70e1fd3"/>
+<link rel="stylesheet" href="../_shared/form-controls.css?v=6fda272acdcc&amp;rev=6fda272acdcc"/>
+<link rel="stylesheet" href="../_shared/list-pagination.css?v=0069e48c1009&amp;rev=0069e48c1009">
+<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?v=fc90bc42e4ac&amp;rev=0ca435b09868"/>
+<link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?v=1cffa21a9777&amp;rev=1cffa21a9777"/>
 <style>body.miq-current-shell>#gnb{min-height:64px}</style>
-<script defer blocking="render" src="../_shared/meeting-model.js?rev=b9aef6dedaba"></script>
-<script defer blocking="render" src="../_shared/common-logic.js?rev=efb7e741cd7b"></script>
-<script defer blocking="render" src="../_shared/chart-common.js?rev=15c74452f805"></script>
-<script defer blocking="render" src="../_shared/list-pagination.js?rev=33207bf33d11"></script>
-<script defer blocking="render" src="../_mock-data/generated/fleet.generated.js?rev=309d68875499"></script>
-<script defer blocking="render" src="../_shared/fleet.js?rev=dfdf98be0a95"></script>
-<script defer blocking="render" src="../_shared/nav.js?rev=049a18c69072"></script>
-<script defer blocking="render" src="../_shared/lnb-tree.js?rev=fb81b76cb736"></script>
-<script defer blocking="render" src="../_shared/lithium-list-model.js?rev=ad33389c02d5"></script>
-<script defer blocking="render" src="../_shared/lithium-list.js?rev=1d4976730bbe"></script>
+<script defer blocking="render" src="../_mock-data/generated/fleet.generated.js?v=52fa65a2dce1&amp;rev=52fa65a2dce1"></script>
+<script defer blocking="render" src="../_mock-data/generated/observation-profiles.generated.js?v=1be92dd7a845&amp;rev=4054b4937190"></script>
+<script defer blocking="render" src="../_shared/vehicle-observations.js?v=550edc6b3b85&amp;rev=aea30481fdb6"></script>
+<script defer blocking="render" src="../_shared/meeting-model.js?v=7f3774217339&amp;rev=7f3774217339"></script>
+<script defer blocking="render" src="../_shared/chart-common.js?v=28a8b1161c0e&amp;rev=28a8b1161c0e"></script>
+<script defer blocking="render" src="../_shared/list-pagination.js?v=4b500130528b&amp;rev=4b500130528b"></script>
+<script defer blocking="render" src="../_shared/fleet.js?v=b0f68e558a52&amp;rev=b0f68e558a52"></script>
+<script defer blocking="render" src="../_shared/nav.js?v=baf392ada632&amp;rev=4206801c46cf"></script>
+<script defer blocking="render" src="../_shared/lnb-tree.js?v=92f5ceffdd3b&amp;rev=92f5ceffdd3b"></script>
+<script defer blocking="render" src="../_shared/lithium-list-model.js?v=ad33389c02d5&amp;rev=ad33389c02d5"></script>
+<script defer blocking="render" src="../_shared/lithium-list.js?v=bd278ee28b58&amp;rev=bd278ee28b58"></script>
 </head>
 <body data-current-bootstrap="ready" class="miq-current-shell miq-content-system miq-lithium-list" data-lithium-list="true" data-target-profile="full" data-gnb="anlz" data-sub="lithium" data-variant="tobe" data-base="../">
 <div id="gnb"></div>

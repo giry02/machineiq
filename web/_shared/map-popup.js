@@ -21,7 +21,7 @@
   function element(tag, className, value) {
     var node = doc.createElement(tag);
     if (className) node.className = className;
-    if (value !== undefined) node.textContent = value;
+    if (value !== undefined) MIQCommon.view.set(node,"textContent",value);
     return node;
   }
 
@@ -37,9 +37,15 @@
     return DEFAULT_DETAIL;
   }
 
+  function labelNode(value) {
+    var node = doc.createTextNode('');
+    MIQCommon.view.set(node, 'textContent', value);
+    return node;
+  }
+
   function valueRow(label, value) {
     var row = element('div', 'map-pop__r');
-    row.appendChild(doc.createTextNode(label));
+    row.appendChild(labelNode(label));
     row.appendChild(element('b', '', text(value)));
     return row;
   }
@@ -62,7 +68,7 @@
 
     var close = element('button', 'map-pop__x', '✕');
     close.type = 'button';
-    close.setAttribute('aria-label', '차량 위치 팝업 닫기');
+    MIQCommon.view.call(close,"setAttribute",['aria-label','차량 위치 팝업 닫기']);
     close.style.border = '0';
     close.style.background = 'transparent';
     close.style.padding = '0';
@@ -89,13 +95,13 @@
     } else {
       var status = statusFor(row);
       var stateRow = element('div', 'map-pop__r');
-      stateRow.appendChild(doc.createTextNode('상태'));
+      stateRow.appendChild(labelNode('상태'));
       var stateValue = element('b');
       var pill = element('span', 'st-pill ' + status.className);
       var dot = element('i');
-      dot.setAttribute('aria-hidden', 'true');
+      MIQCommon.view.call(dot,"setAttribute",['aria-hidden','true']);
       pill.appendChild(dot);
-      pill.appendChild(doc.createTextNode(status.label));
+      pill.appendChild(labelNode(status.label));
       stateValue.appendChild(pill);
       stateRow.appendChild(stateValue);
       popup.appendChild(stateRow);
@@ -121,8 +127,8 @@
   function createIcon(type,status){
     var key=type==='리튬'?'li':type==='납산'?'pb':'e',holder=element('span','miq-energy-pin '+status);
     var prefix='miq-energy-'+(++iconSequence)+'-';
-    holder.innerHTML=energyIcons[key].replace(/path-(7|10)-inside/g,prefix+'path-$1-inside');
-    holder.firstElementChild.setAttribute('aria-hidden','true');
+    MIQCommon.view.set(holder,"innerHTML",energyIcons[key].replace(/path-(7|10)-inside/g,prefix+'path-$1-inside'));
+    MIQCommon.view.call(holder.firstElementChild,"setAttribute",['aria-hidden','true']);
     return holder;
   }
 
@@ -132,8 +138,8 @@
     var marker = element('div', 'marker');
     marker.dataset.vin = text(row.vin, '');
     marker.title = text(row.model) + ' · ' + text(row.vin);
-    marker.setAttribute('role', 'button');
-    marker.setAttribute('aria-label', marker.title + ' 위치 정보 보기');
+    MIQCommon.view.call(marker,"setAttribute",['role','button']);
+    MIQCommon.view.call(marker,"setAttribute",['aria-label',marker.title + ' 위치 정보 보기']);
     marker.tabIndex = 0;
     marker.style.fontFamily = "'Noto Sans KR', sans-serif";
 

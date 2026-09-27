@@ -1,19 +1,19 @@
 (function(){
   'use strict';
 
-  var option=document.body.getAttribute('data-summary-option')||'expand';
+  var option=MIQCommon.view.call(document.body,"getAttribute",['data-summary-option'])||'expand';
   var favoriteSummary=document.body.dataset.favoriteSummary==='true';
   var favoriteRole=document.body.dataset.managementRole;
   var favoriteReadError=false;
   if(favoriteSummary&&!window.MIQCommon.roles.canUseFavorites(favoriteRole)){
-    document.querySelector('.summary-content').textContent='이 메뉴를 사용할 권한이 없습니다.';
+    MIQCommon.view.set(document.querySelector('.summary-content'),"textContent",'이 메뉴를 사용할 권한이 없습니다.');
     return;
   }
   var PERIOD={
-    d:{label:'일',f:1/22,eff:1.03},
-    w:{label:'주',f:1/4.3,eff:.985},
-    m:{label:'월',f:1,eff:1},
-    c:{label:'기간',range:['2026-05-01','2026-07-31'],f:3.05,eff:.96}
+    d:{label:'일'},
+    w:{label:'주'},
+    m:{label:'월'},
+    c:{label:'기간',range:['2026-05-01','2026-07-31']}
   };
   var dateRules=window.MIQCommon.dates;
   ['d','w','m'].forEach(function(mode){
@@ -65,7 +65,6 @@
   var initialDays=Math.floor((initialToDate-initialFromDate)/86400000)+1;
   if(/^\d{4}-\d{2}-\d{2}$/.test(initialFrom||'')&&/^\d{4}-\d{2}-\d{2}$/.test(initialTo||'')&&initialDays>0&&initialDays<=366){
     PERIOD[state.period].range=[initialFrom,initialTo];
-    if(state.period==='c')PERIOD.c.f=initialDays/30
   }
   var summaryKpi=document.getElementById('summaryKpi');
   var optionToolbar=document.getElementById('optionToolbar');
@@ -83,11 +82,13 @@
   state.sel=tree.get();
 
   function num(value,decimal){
+    if(value===null||value===undefined)return '—';
     var n=Number(value)||0;
     return window.MIQCommon.numbers.integer(n).replace(/\B(?=(\d{3})+(?!\d))/g,',')
   }
   function hasNumber(value){return value!==null&&value!==undefined&&value!==''&&!isNaN(Number(value))}
   function hm(minutes){
+    if(minutes===null||minutes===undefined)return '—';
     var total=Math.max(0,Math.round(Number(minutes)||0));
     var hours=Math.floor(total/60);
     var mins=total%60;
@@ -96,29 +97,17 @@
   function isBatt(vehicle){return vehicle.type==='리튬'||vehicle.type==='납산'}
   function socColor(value){return value>=60?'#0aa656':value>=30?'#ff9f0a':'#992100'}
   function periodValue(vehicle){
-    var period=PERIOD[state.period];
-    var efficiency=isBatt(vehicle)&&hasNumber(vehicle.eff)
-      ? Math.min(99.5,Number(vehicle.eff)*period.eff)
-      : null;
-    var operatingEfficiency=hasNumber(vehicle.efficiencyRate)
-      ? Math.min(99.5,Number(vehicle.efficiencyRate)*period.eff)
-      : efficiency;
-    return{
-      km:vehicle.km*period.f,
-      min:vehicle.min*period.f,
-      eff:efficiency,
-      operatingEff:operatingEfficiency,
-      shock:Math.round(vehicle.shock*period.f),
-      fc:vehicle.fc?vehicle.fc*(2-period.eff):null,
-      bc:vehicle.bc?vehicle.bc*period.eff:null
-    }
+    var range=PERIOD[state.period].range;
+    var raw=MIQObservations.aggregate(vehicle,range[0],state.period==='d'?range[0]:range[1]);
+    return {km:raw.distanceKm,min:raw.runningMinutes,workMin:raw.workMinutes,idleMin:raw.idleMinutes,
+      eff:raw.efficiency,operatingEff:raw.efficiency,shock:raw.shockCount,fc:raw.fuelRate,bc:raw.batteryRate};
   }
+  function periodTimes(value){return {running:value.min,working:value.workMin,idle:value.idleMin};}
   function filtered(){
     var rows=state.sel&&state.sel.vehicles?state.sel.vehicles:VEHICLES;
     if(!currentCompanyId||currentCompanyId==='all')return rows;
     return rows.filter(function(vehicle){return String(vehicle.companyId||'1933')===String(currentCompanyId)})
   }
-  function average(list){return list.length?list.reduce(function(sum,value){return sum+value},0)/list.length:null}
   function selectedVehicle(){return state.sel&&state.sel.vehicle?state.sel.vehicle:null}
   function safeId(value){return String(value).replace(/[^a-zA-Z0-9_-]/g,'-')}
   function escapeAttr(value){
@@ -179,48 +168,25 @@
     var fromDate=new Date((from||'')+'T00:00:00');
     var toDate=new Date((to||'')+'T00:00:00');
     if(!/^\d{4}-\d{2}-\d{2}$/.test(from||'')||!/^\d{4}-\d{2}-\d{2}$/.test(to||'')||Number.isNaN(fromDate.getTime())||Number.isNaN(toDate.getTime())||fromDate>toDate){
-      live.textContent='조회 시작일과 종료일을 올바르게 입력해 주세요.';
+      MIQCommon.view.set(live,"textContent",'조회 시작일과 종료일을 올바르게 입력해 주세요.');
       if(inputs[0])inputs[0].focus();
       return false
     }
     var days=Math.floor((toDate-fromDate)/86400000)+1;
     if(days>366){
-      live.textContent='사용자설정 기간은 최대 366일까지 조회할 수 있습니다.';
+      MIQCommon.view.set(live,"textContent",'사용자설정 기간은 최대 366일까지 조회할 수 있습니다.');
       if(inputs[1])inputs[1].focus();
       return false
     }
     PERIOD.c.range=[from,to];
-    PERIOD.c.f=days/30;
     return true
   }
 
   function summaryData(rows){
-    var result={
-      count:rows.length,
-      counts:{},
-      km:0,
-      min:0,
-      shock:0,
-      efficiency:[],
-      fuel:[],
-      battery:[]
-    };
-    TYPES.forEach(function(type){
-      result.counts[type]=rows.filter(function(vehicle){return vehicle.type===type}).length
-    });
-    rows.forEach(function(vehicle){
-      var value=periodValue(vehicle);
-      result.km+=value.km;
-      result.min+=value.min;
-      result.shock+=value.shock;
-      if(value.operatingEff!==null)result.efficiency.push(value.operatingEff);
-      if(value.fc!==null)result.fuel.push(value.fc);
-      if(value.bc!==null)result.battery.push(value.bc)
-    });
-    result.efficiencyAvg=average(result.efficiency);
-    result.fuelAvg=average(result.fuel);
-    result.batteryAvg=average(result.battery);
-    return result
+    var range=PERIOD[state.period].range,raw=MIQObservations.aggregate(rows,range[0],state.period==='d'?range[0]:range[1]);
+    var counts={};TYPES.forEach(function(type){counts[type]=rows.filter(function(v){return v.type===type;}).length;});
+    return {count:rows.length,counts:counts,km:raw.distanceKm,min:raw.runningMinutes,shock:raw.shockCount,
+      efficiencyAvg:raw.efficiency,fuelAvg:raw.fuelRate,batteryAvg:raw.batteryRate};
   }
   function typesText(data){
     return '엔진 '+data.counts['엔진']+' · 납산 '+data.counts['납산']+' · 리튬 '+data.counts['리튬']
@@ -243,21 +209,21 @@
         {label:'운영효율',value:valueOrDash(data.efficiencyAvg,'%',1)},
         {label:'충격 횟수',value:num(data.shock)+'회',alert:data.shock>0},
         {label:'기간 이동거리',value:num(data.km)+' Km'},
-        {label:'기간 가동시간',value:num(data.min/60)+' H'},
+        {label:'기간 가동시간',value:num(data.min===null?null:data.min/60)+' H'},
       ];
-      summaryKpi.innerHTML='<div class="kpi-strip-a">'+items.map(function(item){
+      MIQCommon.view.set(summaryKpi,"innerHTML",'<div class="kpi-strip-a">'+items.map(function(item){
         return '<div class="kpi-strip-a__item'+(item.alert?' alert':'')+'">'
           +'<span class="kpi-label">'+item.label+'</span>'
           +'<div class="kpi-value">'+item.value+'</div>'
           +'</div>'
-      }).join('')+'</div>'
+      }).join('')+'</div>')
     }else{
-      summaryKpi.innerHTML='<div class="kpi-rail-b">'
+      MIQCommon.view.set(summaryKpi,"innerHTML",'<div class="kpi-rail-b">'
         +'<div class="kpi-rail-b__group"><span class="kpi-label">조회 범위</span><div class="kpi-rail-b__values"><strong>'+data.count+'대</strong><span title="'+typesText(data)+'">'+compactTypesText(data)+'</span></div></div>'
         +'<div class="kpi-rail-b__group alert"><span class="kpi-label">확인 우선</span><div class="kpi-rail-b__values"><span>충격 <strong>'+num(data.shock)+'회</strong></span></div></div>'
         +'<div class="kpi-rail-b__group"><span class="kpi-label">운영</span><div class="kpi-rail-b__values"><span>효율 <strong>'+valueOrDash(data.efficiencyAvg,'%',1)+'</strong></span></div></div>'
         +'<div class="kpi-rail-b__group"><span class="kpi-label">기간 활동</span><div class="kpi-rail-b__values"><span><strong>'+num(data.km)+'Km</strong></span><span><strong>'+num(data.min/60)+'H</strong></span></div></div>'
-        +'</div>'
+        +'</div>')
     }
     requestAnimationFrame(function(){summaryKpi.classList.remove('is-updating')})
   }
@@ -272,7 +238,7 @@
       case'cumH':return vehicle.cumH;
       case'km':return value.km;
       case'min':return value.min;
-      case'workMin':return MIQSummaryRow.times(vehicle,value.min).working;
+      case'workMin':return periodTimes(value).working;
       case'performance':return value.operatingEff;
       case'electricEff':return value.operatingEff;
       case'shock':return value.shock;
@@ -349,12 +315,14 @@
     var sample=vehicle.summaryDetail||{};
     function valid(number){return typeof number==='number'&&isFinite(number)&&number>=0}
     function count(number){return valid(number)&&Math.floor(number)===number?num(number)+'건':'—'}
-    var times=MIQSummaryRow.times(vehicle,value.min);
+    var times=periodTimes(value);
+    var supplies=vehicle.vin&&window.MIQServiceRecords?MIQServiceRecords.supplyItems(vehicle.vin):[];
+    var due=supplies.length?supplies.filter(function(item){return item.state==='need';}).length:sample.supplyDueCount===0?0:null;
     var history=MIQSummaryRow.historyCounts(window.MIQServiceRecords,vehicle,PERIOD[state.period].range);
     return [
       ['대기시간',times.idle===null?'—':hm(times.idle)],
       ['충격횟수',valid(value.shock)?num(value.shock)+'회':'—'],
-      ['소모품교체',count(sample.supplyDueCount)],
+      ['소모품교체',due===null?'—':num(due)+'개'],
       ['차량 에러',count(sample.activeErrorCount)],
       ['수리이력',count(history.repair)],
       ['고장이력',count(history.fault)]
@@ -375,7 +343,7 @@
       if(favoriteSummary&&!VEHICLES.length){
         emptyMessage=favoriteReadError?'관심차량을 불러오지 못했습니다. 새로고침 후 다시 확인해 주세요.':(QUERY.get('favoriteCategory')?'선택한 구분에 등록된 관심차량이 없습니다.':'등록된 관심차량이 없습니다.')+' 관심차량 관리에서 차량을 담고 저장해 주세요.';
       }
-      vehicleList.innerHTML='<div class="option-empty">'+emptyMessage+'</div>';
+      MIQCommon.view.set(vehicleList,"innerHTML",'<div class="option-empty">'+emptyMessage+'</div>');
       return
     }
     var body=rows.map(function(vehicle,index){
@@ -383,7 +351,7 @@
       var expanded=Boolean(state.expanded[vehicle.vin]);
       var detailId='vehicle-detail-'+safeId(vehicle.vin);
       var performance=performanceText(vehicle,value);
-      var times=MIQSummaryRow.times(vehicle,value.min);
+      var times=periodTimes(value);
       return '<tr class="vehicle-row" data-vin="'+escapeAttr(vehicle.vin)+'" style="--row-delay:'+(index*16)+'ms">'
         +'<td><div class="vehicle-identity"><button type="button" class="row-expand" data-expand-vin="'+escapeAttr(vehicle.vin)+'" aria-expanded="'+(expanded?'true':'false')+'" aria-controls="'+detailId+'" aria-label="'+escapeAttr(vehicle.vin)+' 상세 '+(expanded?'접기':'펼치기')+'">'+(expanded?'−':'+')+'</button><span class="vehicle-identity__text"><a href="'+detailHref(vehicle)+'">'+connectionDot(vehicle)+'<span class="vehicle-vin">'+vehicle.vin+'</span></a><span class="vehicle-model">'+vehicle.model+'</span></span></div></td>'
         +'<td><span class="affiliation"><strong>'+vehicle.group+'</strong><span class="vehicle-type">'+vehicle.type+(vehicle.type==='리튬'?socHtml(vehicle):'')+'</span></span></td>'
@@ -395,7 +363,7 @@
         +'</tr>'
         +(expanded?'<tr class="detail-row" data-detail-vin="'+escapeAttr(vehicle.vin)+'" id="'+detailId+'"><td colspan="7">'+detailPanel(vehicle,value)+'</td></tr>':'')
     }).join('');
-    vehicleList.innerHTML='<div class="expand-table-wrap"><table class="expand-table" aria-label="차량 운행 요약 상세 펼침형">'
+    MIQCommon.view.set(vehicleList,"innerHTML",'<div class="expand-table-wrap"><table class="expand-table" aria-label="차량 운행 요약 상세 펼침형">'
       +'<colgroup><col><col><col><col><col><col><col></colgroup>'
       +'<thead><tr>'
       +'<th scope="col">'+sortButton('차량','vin')+'</th>'
@@ -405,7 +373,7 @@
       +'<th scope="col">'+sortButton('운영효율(%)','performance')+'</th>'
       +'<th scope="col" class="c">'+sortButton('가동시간','min')+'</th>'
       +'<th scope="col" class="c">'+sortButton('작업시간','workMin')+'</th>'
-      +'</tr></thead><tbody>'+body+'</tbody></table></div>'
+      +'</tr></thead><tbody>'+body+'</tbody></table></div>')
   }
 
   function fieldClass(keys){
@@ -413,10 +381,10 @@
   }
   function renderPriorityCards(rows){
     if(!rows.length){
-      vehicleList.innerHTML='<div class="option-empty">조회 조건에 해당하는 차량이 없습니다.</div>';
+      MIQCommon.view.set(vehicleList,"innerHTML",'<div class="option-empty">조회 조건에 해당하는 차량이 없습니다.</div>');
       return
     }
-    vehicleList.innerHTML='<div class="priority-card-list">'+rows.map(function(vehicle,index){
+    MIQCommon.view.set(vehicleList,"innerHTML",'<div class="priority-card-list">'+rows.map(function(vehicle,index){
       var value=periodValue(vehicle);
       var performance=performanceText(vehicle,value);
       var status=health(vehicle,value);
@@ -442,7 +410,7 @@
         +'<div class="'+fieldClass(['fuel','battery'])+'"><span>평균 소비량</span><strong>'+consumptionText(vehicle,value)+'</strong></div>'
         +'</div>'
         +'</article>'
-    }).join('')+'</div>'
+    }).join('')+'</div>')
   }
 
   function scopeForRows(rows){
@@ -477,9 +445,9 @@
     visible=visible||rows;
     if(option==='expand'){
       var allExpanded=visible.length>0&&visible.every(function(vehicle){return Boolean(state.expanded[vehicle.vin])});
-      optionToolbar.innerHTML='<span class="option-toolbar__count"></span>'
+      MIQCommon.view.set(optionToolbar,"innerHTML",'<span class="option-toolbar__count"></span>'
         +'<span class="connection-legend" aria-label="통신연결 범례"><span class="connection-legend__title">통신연결</span><span><i class="connection-dot on" aria-hidden="true"></i>연결</span><span><i class="connection-dot off" aria-hidden="true"></i>미연결</span></span>'
-        +'<div class="option-toolbar__tools"><span class="option-toolbar__hint">+ 버튼으로 차량별 추가 정보를 확인합니다.</span><button type="button" class="option-toolbar__button" id="toggleAllDetails">'+(allExpanded?'모두 접기':'모두 펼치기')+'</button></div>';
+        +'<div class="option-toolbar__tools"><span class="option-toolbar__hint">+ 버튼으로 차량별 추가 정보를 확인합니다.</span><button type="button" class="option-toolbar__button" id="toggleAllDetails">'+(allExpanded?'모두 접기':'모두 펼치기')+'</button></div>');
       renderToolbarScope(rows);
       document.getElementById('toggleAllDetails').addEventListener('click',function(){
         visible.forEach(function(vehicle){state.expanded[vehicle.vin]=!allExpanded});
@@ -491,13 +459,13 @@
         ['km','기간 이동거리'],['min','기간 가동시간'],['electricEff','운영효율'],['shock','충격 횟수'],
         ['conn','통신연결'],['soc','배터리 SOC'],['fuel','엔진 연료소비'],['battery','전동 배터리소비']
       ];
-      optionToolbar.innerHTML='<span class="option-toolbar__count"></span>'
+      MIQCommon.view.set(optionToolbar,"innerHTML",'<span class="option-toolbar__count"></span>'
         +'<span class="sort-current">현재 '+sortLabel(state.sortKey)+' · '+(state.sortDir===1?'오름차순':'내림차순')+'</span>'
         +'<div class="option-toolbar__tools">'
         +'<label class="sort-control">정렬 기준 <select class="sort-select" data-role="sort-key" aria-label="정렬 기준">'+options.map(function(item){return'<option value="'+item[0]+'"'+(state.sortKey===item[0]?' selected':'')+'>'+item[1]+'</option>'}).join('')+'</select></label>'
         +'<label class="sort-control">방향 <select class="sort-select" data-role="sort-dir" aria-label="정렬 방향"><option value="1"'+(state.sortDir===1?' selected':'')+'>오름차순</option><option value="-1"'+(state.sortDir===-1?' selected':'')+'>내림차순</option></select></label>'
         +'<button type="button" class="option-toolbar__button" id="sortReset">초기화</button>'
-        +'</div>';
+        +'</div>');
       renderToolbarScope(rows);
       optionToolbar.querySelector('[data-role="sort-key"]').addEventListener('change',function(){
         state.sortKey=this.value;
@@ -524,7 +492,7 @@
     // The shared controller owns draft dates; table renders must not overwrite them.
     if(sharedPeriodReady())return;
     Array.prototype.forEach.call(document.querySelectorAll('#periodTabs button[data-period]'),function(button){
-      button.classList.toggle('active',button.getAttribute('data-period')===state.period)
+      button.classList.toggle('active',MIQCommon.view.call(button,"getAttribute",['data-period'])===state.period)
     });
     var range=PERIOD[state.period].range;
     var inputs=document.querySelectorAll('#dateRange input');
@@ -553,11 +521,11 @@
     if(!button)return;
     Array.prototype.forEach.call(this.querySelectorAll('button'),function(item){item.classList.remove('active')});
     button.classList.add('active');
-    state.period=button.getAttribute('data-period');
+    state.period=MIQCommon.view.call(button,"getAttribute",['data-period']);
     render();
     if(state.period==='c'){
       var firstDate=document.querySelector('#dateRange input');
-      live.textContent='사용자설정 기간을 입력한 뒤 조회해 주세요. 최대 366일까지 조회할 수 있습니다.';
+      MIQCommon.view.set(live,"textContent",'사용자설정 기간을 입력한 뒤 조회해 주세요. 최대 366일까지 조회할 수 있습니다.');
       if(firstDate)firstDate.focus()
     }
   });
@@ -569,7 +537,7 @@
     }
     if(sharedPeriodReady())return;
     render();
-    live.textContent=PERIOD[state.period].label+' 기준으로 조회했습니다.'
+    MIQCommon.view.set(live,"textContent",PERIOD[state.period].label+' 기준으로 조회했습니다.')
   });
   document.addEventListener('miq:period-change',function(event){
     var detail=event.detail||{};
@@ -582,12 +550,12 @@
     PERIOD[mode].range=[detail.startDate,detail.endDate];
     if(mode==='c')PERIOD.c.f=dateRules.dayCount(from,to)/30;
     render();
-    live.textContent=PERIOD[state.period].label+' 기준으로 조회했습니다.'
+    MIQCommon.view.set(live,"textContent",PERIOD[state.period].label+' 기준으로 조회했습니다.')
   });
   vehicleList.addEventListener('click',function(event){
     var sort=event.target.closest('[data-sort-key]');
     if(sort){
-      var key=sort.getAttribute('data-sort-key');
+      var key=MIQCommon.view.call(sort,"getAttribute",['data-sort-key']);
       if(state.sortKey===key)state.sortDir=-state.sortDir;
       else{state.sortKey=key;state.sortDir=1}
       render();
@@ -595,7 +563,7 @@
     }
     var expand=event.target.closest('[data-expand-vin]');
     if(expand){
-      var expandVin=expand.getAttribute('data-expand-vin');
+      var expandVin=MIQCommon.view.call(expand,"getAttribute",['data-expand-vin']);
       state.expanded[expandVin]=!state.expanded[expandVin];
       render();
       return

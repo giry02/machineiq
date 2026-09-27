@@ -53,7 +53,7 @@
     var lat = Number(value.lat), lng = Number(value.lng);
     return Number.isFinite(lat) && Number.isFinite(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 ? { lat: lat, lng: lng } : null;
   }
-  function node(tag, className, text) { var result = doc.createElement(tag); if (className) result.className = className; if (text !== undefined) result.textContent = text; return result; }
+  function node(tag, className, text) { var result = doc.createElement(tag); if (className) result.className = className; if (text !== undefined) MIQCommon.view.set(result,"textContent",text); return result; }
   function present(value, suffix) { return value === null || value === undefined || value === '' ? '-' : String(value) + (suffix || ''); }
   function applyStyles(element, styles) { Object.keys(styles).forEach(function (key) { element.style[key] = styles[key]; }); return element; }
 
@@ -142,7 +142,7 @@
       clearPopup();
       var content = node('div', 'map-pop');
       applyStyles(content, { position: 'relative', fontFamily: "'Noto Sans KR', sans-serif", fontWeight: '400', lineHeight: 'normal' });
-      var close = node('button', 'map-pop__x', '✕'); close.type = 'button'; close.setAttribute('aria-label', '묶음 차량 목록 닫기');
+      var close = node('button', 'map-pop__x', '✕'); close.type = 'button'; MIQCommon.view.call(close,"setAttribute",['aria-label','묶음 차량 목록 닫기']);
       applyStyles(close, { border: '0', background: 'transparent', padding: '0', cursor: 'pointer' });
       close.addEventListener('click', clearPopup); content.appendChild(close);
       content.appendChild(node('div', 'map-pop__t', '차량 ' + group.length + '대'));
@@ -175,7 +175,7 @@
           marker.classList.toggle('on', group[0].vin === selectedVin);
         } else {
           marker = node('button', 'cluster', String(group.length)); marker.type = 'button';
-          marker.setAttribute('aria-label', '주변 차량 ' + group.length + '대 확대');
+          MIQCommon.view.call(marker,"setAttribute",['aria-label','주변 차량 ' + group.length + '대 확대']);
           marker.title = group.length + '대 · 클릭하여 확대';
           marker.addEventListener('click', function () {
             var same=group.every(function(r){return Math.abs(r.lat-group[0].lat)<.000001&&Math.abs(r.lng-group[0].lng)<.000001;});
@@ -200,12 +200,12 @@
         var edge = index === 0 || index === points.length - 1;
         var color = index === 0 ? '#158737' : index === points.length - 1 ? '#ff3600' : '#8aaabe';
         var marker = node('button', 'miq-map-route-point'); marker.type = 'button';
-        marker.setAttribute('aria-label', pointDescription(point, index, points.length));
+        MIQCommon.view.call(marker,"setAttribute",['aria-label',pointDescription(point, index, points.length)]);
         applyStyles(marker, { position: 'absolute', left: '0', top: '0', width: edge ? '16px' : '12px', height: edge ? '16px' : '12px', border: '2px solid #fff', borderRadius: '50%', padding: '0', background: color, boxShadow: '0 1px 4px rgba(0,0,0,.35)', transform: 'translate(-50%,-50%)', cursor: 'pointer' });
         function show() {
           if (activeRoutePoint === marker && pointTip) return;
           clearPointTip(); var content = node('div', 'map-pop', pointDescription(point, index, points.length));
-          content.setAttribute('role', 'tooltip');
+          MIQCommon.view.call(content,"setAttribute",['role','tooltip']);
           applyStyles(content, { position: 'relative', whiteSpace: 'pre-line', fontFamily: "'Noto Sans KR', sans-serif", fontSize: '11px', lineHeight: '1.7', color: '#333', pointerEvents: 'none' });
           pointTip = new DomOverlay(point, content, true); activeRoutePoint = marker;
         }

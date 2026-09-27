@@ -39,48 +39,13 @@
   margin-left: auto;
 }
 
-.miq-auth-language {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  height: 36px;
-  border: 1px solid var(--miq-auth-border);
-  border-radius: 4px;
-  overflow: hidden;
-}
 
-.miq-auth-language::after {
-  content: '';
-  position: absolute;
-  right: 11px;
-  top: 50%;
-  width: 6px;
-  height: 6px;
-  border-right: 1px solid #fff;
-  border-bottom: 1px solid #fff;
-  transform: translateY(-68%) rotate(45deg);
-  pointer-events: none;
-}
 
-.miq-auth-language select {
-  min-width: 112px;
-  height: 100%;
-  padding: 0 30px 0 12px;
-  border: 0;
-  outline: 0;
-  appearance: none;
-  background: transparent;
-  color: #fff;
-  font: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-}
 
-.miq-auth-language option {
-  background: #fff;
-  color: #111;
-}
+
+
+
+
 
 .miq-auth-login {
   display: inline-flex;
@@ -107,5 +72,5 @@
 @media (max-width: 720px) {
   .miq-auth-header { padding: 0 16px; }
   .miq-auth-brand img { width: 195px; height: 32px; }
-  .miq-auth-language select { min-width: 78px; }
+
 }

@@ -112,7 +112,6 @@ body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .gnb__role option{c
 .xfer__list.mm-drop-target{background:var(--mm-tint);box-shadow:inset 0 0 0 2px rgba(255,54,0,.35)}
 .list-head .tools{position:relative}
 
-.mm-cascade-error{margin-top:8px;color:#c92a2a;font-size:12px;font-weight:600}
 
 /* Management list common rules
    Keyword search stays in the page header; dropdown and period filters share
@@ -421,8 +420,10 @@ body.miq-current-shell.miq-section-mgmt[data-variant="tobe"] .policy-callout::af
 .mm-approval-grid > div{display:grid;grid-template-columns:92px 1fr;gap:8px;min-width:0;padding:8px 10px;border-bottom:1px solid #eceff2}
 .mm-approval-grid > div:nth-child(odd){border-right:1px solid #eceff2}
 .mm-approval-grid > div:nth-last-child(-n+2){border-bottom:0}
-.mm-approval-grid dt{color:#737b86;font-size:11px}
-.mm-approval-grid dd{margin:0;min-width:0;color:var(--mm-ink);font-size:12px;font-weight:600;white-space:normal;overflow-wrap:anywhere}
+.mm-approval-company{margin:0;background:#fff;border:1px solid #eceff2;border-radius:5px}
+.mm-approval-company > div{display:grid;grid-template-columns:92px minmax(0,1fr);gap:8px;min-width:0;padding:8px 10px}
+.mm-approval-grid dt,.mm-approval-company dt{color:#737b86;font-size:11px}
+.mm-approval-grid dd,.mm-approval-company dd{margin:0;min-width:0;color:var(--mm-ink);font-size:12px;font-weight:600;white-space:normal;overflow-wrap:anywhere}
 .mm-validation-list{display:flex;flex-wrap:wrap;gap:6px 14px;margin:10px 0 0;padding:0;list-style:none;color:#606975;font-size:11px}
 .mm-validation-list li{display:flex;align-items:center;gap:4px}
 .mm-validation-list li span{font-weight:800}
