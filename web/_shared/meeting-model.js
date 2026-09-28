@@ -30,7 +30,7 @@
     refresh();
     return {refresh:refresh,stop:function(){stopped=true;(options.cancel||clearInterval)(timer);}};
   }
-  function dailyEnergy(vin,from,to){
+  function calendarDays(from,to){
     function parse(value){
       if(!/^\d{4}-\d{2}-\d{2}$/.test(value||''))return null;
       var d=new Date(value+'T00:00:00Z');
@@ -39,12 +39,20 @@
     var start=parse(from),end=parse(to),rows=[];
     if(!start||!end||start>end)return rows;
     for(var d=start;d<=end;d=new Date(d.getTime()+86400000)){
-      var date=d.toISOString().slice(0,10),key=vin+':energy-kwh-v2:'+date,seed=0;
-      for(var i=0;i<key.length;i++)seed=(seed*31+key.charCodeAt(i))>>>0;
-      function next(){seed=(seed*1103515245+12345)&0x7fffffff;return seed/0x7fffffff;}
-      rows.push({date:date,x:(d.getUTCMonth()+1)+'/'+d.getUTCDate(),chargeKwh:Math.round((18+next()*22)*10)/10,consumeKwh:Math.round((12+next()*24)*10)/10});
+      var date=d.toISOString().slice(0,10);
+      rows.push({date:date,x:(d.getUTCMonth()+1)+'/'+d.getUTCDate()});
     }
     return rows;
+  }
+  // Independent prototype kWh values, never converted from SOC.
+  // Production displays the server's daily chargeKwh/consumeKwh response.
+  function dailyEnergy(vin,from,to){
+    return calendarDays(from,to).map(function(day){
+      var key=vin+':energy-kwh-v2:'+day.date,seed=0;
+      for(var j=0;j<key.length;j++)seed=(seed*31+key.charCodeAt(j))>>>0;
+      function next(){seed=(seed*1103515245+12345)&0x7fffffff;return seed/0x7fffffff;}
+      return {date:day.date,x:day.x,chargeKwh:Math.round((18+next()*22)*10)/10,consumeKwh:Math.round((12+next()*24)*10)/10};
+    });
   }
   function temperatureHours(vin,date){
     var key=vin+':temperature:'+date,seed=0,rows=[];
@@ -58,8 +66,8 @@
     return rows;
   }
   function dailyTemperature(vin,from,to){
-    // Use the same validated calendar range as energy, and derive extrema from hourly temperature.
-    return dailyEnergy(vin,from,to).map(function(day){
+    // Derive prototype extrema from hourly temperature for the validated calendar range.
+    return calendarDays(from,to).map(function(day){
       var values=temperatureHours(vin,day.date).map(function(hour){return hour.v;});
       return {date:day.date,x:day.x,minC:Math.min.apply(null,values),maxC:Math.max.apply(null,values)};
     });

@@ -97,26 +97,6 @@
                   </div>
                 </div>
               </section>
-              <section class="aae-account-section" aria-labelledby="accountNotificationTitle">
-                <div class="aae-channel-head">
-                  <h3 id="accountNotificationTitle">알림 채널</h3>
-                  <span class="aae-chip" id="smsAvailability">SMS · 한국 사용자</span>
-                </div>
-                <table class="aae-channel-table">
-                  <thead><tr><th scope="col">알림 항목</th><th scope="col">SMS</th><th scope="col">Email</th></tr></thead>
-                  <tbody>
-                    <tr><td>실시간 충격</td><td><input type="checkbox" name="smsRealtimeShock" data-sms-setting aria-label="실시간 충격 SMS"/></td><td class="aae-channel-na">—</td></tr>
-                    <tr><td>실시간 차량 에러</td><td><input type="checkbox" name="smsRealtimeVehicleError" data-sms-setting aria-label="실시간 차량 에러 SMS"/></td><td class="aae-channel-na">—</td></tr>
-                    <tr><td>실시간 배터리 경고</td><td><input type="checkbox" name="smsRealtimeBattery" data-sms-setting aria-label="실시간 배터리 경고 SMS"/></td><td class="aae-channel-na">—</td></tr>
-                    <tr><td>주간 충격</td><td><input type="checkbox" name="smsWeeklyShock" data-sms-setting aria-label="주간 충격 SMS"/></td><td class="aae-channel-na">—</td></tr>
-                    <tr><td>주간 차량 에러</td><td><input type="checkbox" name="smsWeeklyVehicleError" data-sms-setting aria-label="주간 차량 에러 SMS"/></td><td class="aae-channel-na">—</td></tr>
-                    <tr><td>주간 소모품 교체 알림</td><td><input type="checkbox" name="smsWeeklySupply" data-sms-setting aria-label="주간 소모품 교체 SMS"/></td><td class="aae-channel-na">—</td></tr>
-                    
-                    <tr><td>정기 리포트</td><td class="aae-channel-na">—</td><td><input type="checkbox" name="emailReport" aria-label="리포트 수신 동의"/></td></tr>
-                  </tbody>
-                </table>
-                <span class="aae-help">SMS 알림은 한국 사용자에게만 제공됩니다. 지원 대상이 아니면 해당 열이 비활성화됩니다.</span>
-              </section>
             </div>
           </div>
           <div class="modal__foot">
@@ -148,7 +128,7 @@
       return;
     }
     var script = document.createElement('script');
-    script.src = base + '_shared/auth-account-enhancements.js?rev=637b0487b71d';
+    script.src = base + '_shared/auth-account-enhancements.js?rev=0a8cada7e4a3';
     script.dataset.miqAccountEnhancements = '';
     script.addEventListener('load', initialiseAndOpen, { once: true });
     document.body.appendChild(script);

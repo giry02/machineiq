@@ -693,11 +693,39 @@
     showRegistrationStep('agreement');
   }
 
+  function renderAccountNotifications(form) {
+    var role = MIQCommon.roles.resolve(body.dataset.managementRole || new URLSearchParams(location.search).get('role'));
+    if (!MIQCommon.roles.isCustomer(role)) return;
+    var host = one('.aae-account-form', form);
+    if (!host || one('#accountNotificationTitle', host)) return;
+    MIQCommon.view.call(host, 'insertAdjacentHTML', ['beforeend', `<section class="aae-account-section" aria-labelledby="accountNotificationTitle">
+                <div class="aae-channel-head">
+                  <h3 id="accountNotificationTitle">알림 채널</h3>
+                  <span class="aae-chip" id="smsAvailability">SMS · 한국 사용자</span>
+                </div>
+                <table class="aae-channel-table">
+                  <thead><tr><th scope="col">알림 항목</th><th scope="col">SMS</th><th scope="col">Email</th></tr></thead>
+                  <tbody>
+                    <tr><td>실시간 충격</td><td><input type="checkbox" name="smsRealtimeShock" data-sms-setting aria-label="실시간 충격 SMS"/></td><td class="aae-channel-na">—</td></tr>
+                    <tr><td>실시간 차량 에러</td><td><input type="checkbox" name="smsRealtimeVehicleError" data-sms-setting aria-label="실시간 차량 에러 SMS"/></td><td class="aae-channel-na">—</td></tr>
+                    <tr><td>실시간 배터리 경고</td><td><input type="checkbox" name="smsRealtimeBattery" data-sms-setting aria-label="실시간 배터리 경고 SMS"/></td><td class="aae-channel-na">—</td></tr>
+                    <tr><td>주간 충격</td><td><input type="checkbox" name="smsWeeklyShock" data-sms-setting aria-label="주간 충격 SMS"/></td><td class="aae-channel-na">—</td></tr>
+                    <tr><td>주간 차량 에러</td><td><input type="checkbox" name="smsWeeklyVehicleError" data-sms-setting aria-label="주간 차량 에러 SMS"/></td><td class="aae-channel-na">—</td></tr>
+                    <tr><td>주간 소모품 교체 알림</td><td><input type="checkbox" name="smsWeeklySupply" data-sms-setting aria-label="주간 소모품 교체 SMS"/></td><td class="aae-channel-na">—</td></tr>
+
+                    <tr><td>정기 리포트</td><td class="aae-channel-na">—</td><td><input type="checkbox" name="emailReport" aria-label="리포트 수신 동의"/></td></tr>
+                  </tbody>
+                </table>
+                <span class="aae-help">SMS 알림은 한국 사용자에게만 제공됩니다. 지원 대상이 아니면 해당 열이 비활성화됩니다.</span>
+              </section>`]);
+  }
+
   function initAccount() {
     var modalLayer = one('#myAccountModal');
     var form = one('#accountForm');
     if (!modalLayer || !form) return;
     if (modalLayer._miqAccountController) return modalLayer._miqAccountController;
+    renderAccountNotifications(form);
     var modal = one('[role="dialog"]', modalLayer);
     var saveButton = one('#accountSave');
     var status = one('#accountStatus');
@@ -773,10 +801,12 @@
       location.href = '../Vehicle%20Summary/vehicle-summary-tobe-3.html';
     }
     function applySmsAvailability() {
+      var availability = one('#smsAvailability', form);
+      if (!availability) return;
       var country = (modalLayer.dataset.accountCountry || body.dataset.accountCountry || '').trim().toUpperCase();
       var korean = country === 'KR';
       all('[data-sms-setting]').forEach(function (input) { input.disabled = !korean; });
-      MIQCommon.view.set(one('#smsAvailability'),"textContent",korean ? 'SMS · 한국 사용자' : country ? 'SMS · 지원 국가 아님' : 'SMS · 국가 정보 확인 필요');
+      MIQCommon.view.set(availability,"textContent",korean ? 'SMS · 한국 사용자' : country ? 'SMS · 지원 국가 아님' : 'SMS · 국가 정보 확인 필요');
     }
 
     restoreSaved();
@@ -832,7 +862,7 @@
       var saved = {};
       // Preserve channels absent from this web form, including mobile PUSH.
       try { var prior = JSON.parse(storageGet(localStorage, 'miq-account-settings') || '{}');
-        ['pushRealtimeShock','pushRealtimeVehicleError','pushRealtimeBattery','pushMarketing'].forEach(function(key){if(Object.prototype.hasOwnProperty.call(prior,key))saved[key]=prior[key];});
+        ['pushRealtimeShock','pushRealtimeVehicleError','pushRealtimeBattery','pushMarketing','smsRealtimeShock','smsRealtimeVehicleError','smsRealtimeBattery','smsWeeklyShock','smsWeeklyVehicleError','smsWeeklySupply','emailReport'].forEach(function(key){if(!one('[name="'+key+'"]',form)&&Object.prototype.hasOwnProperty.call(prior,key))saved[key]=prior[key];});
       } catch (error) {}
       all('[name]', form).forEach(function (control) {
         if (control.type === 'password') return;

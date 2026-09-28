@@ -484,7 +484,7 @@
         if (accountModalLoading) return;
         accountModalLoading = true;
         var component = document.createElement('script');
-        component.src = BASE + '_shared/account-modal-component.js?rev=881725d13a39';
+        component.src = BASE + '_shared/account-modal-component.js?rev=7e7885ee657c';
         component.dataset.base = BASE;
         component.addEventListener('load', function () {
           accountModalLoading = false;
@@ -2111,10 +2111,38 @@
       foot.className = 'miq-page-foot';
       MIQCommon.view.set(foot,"innerHTML",'<div class="miq-page-foot__brand"><img src="' + BASE + '_shared/favicon.ico" alt="">' +
         '<strong>Bobcat</strong><span>MACHINE IQ</span></div>' +
-        '<div class="miq-page-foot__links"><b>이용약관</b><b>위치정보 및 위치기반서비스 이용약관</b><b>개인(위치)정보 처리방침</b><b>오픈소스 고지</b>' +
+        '<div class="miq-page-foot__links"><button type="button" data-miq-legal="terms" aria-haspopup="dialog">이용약관</button><button type="button" data-miq-legal="location" aria-haspopup="dialog">위치정보 및 위치기반서비스 이용약관</button><button type="button" data-miq-legal="privacy" aria-haspopup="dialog">개인(위치)정보 처리방침</button><button type="button" data-miq-legal="license" aria-haspopup="dialog">오픈소스 고지</button>' +
         '<small>©2024 Bobcat Company. ALL RIGHTS RESERVED.</small></div>' +
         '<div class="miq-page-foot__help"><strong>HELP</strong><span>help.machineiq@doosan.com</span><small>최종접속 : 2026-08-31 21:00</small></div>');
       document.body.appendChild(foot);
+      var legalLoading;
+      foot.addEventListener('click', function (event) {
+        var button = event.target.closest('[data-miq-legal]');
+        if (!button) return;
+        if (window.MIQFooterLegal) { window.MIQFooterLegal.open(button.dataset.miqLegal, button); return; }
+        if (!legalLoading) legalLoading = new Promise(function (resolve, reject) {
+          var script = document.createElement('script');
+          script.src = BASE + '_shared/footer-legal.js?v=footer-legal-20260928';
+          script.onload = function () {
+            if (window.MIQFooterLegal) resolve();
+            else { script.remove(); legalLoading = null; reject(new Error('Missing legal dialog')); }
+          };
+          script.onerror = function () { script.remove(); legalLoading = null; reject(new Error('Legal dialog load failed')); };
+          document.head.appendChild(script);
+        });
+        button.setAttribute('aria-busy', 'true');
+        legalLoading.then(function () {
+          button.removeAttribute('aria-busy');
+          var status = foot.querySelector('[data-legal-status]');
+          if (status) status.remove();
+          if (window.MIQFooterLegal) window.MIQFooterLegal.open(button.dataset.miqLegal, button);
+        }).catch(function () {
+          button.removeAttribute('aria-busy');
+          var status = foot.querySelector('[data-legal-status]');
+          if (!status) { status = document.createElement('small'); status.dataset.legalStatus = ''; status.setAttribute('role', 'status'); foot.querySelector('.miq-page-foot__links').appendChild(status); }
+          status.textContent = '내용을 불러오지 못했습니다. 다시 눌러 주세요.';
+        });
+      });
     }
 
     /* 기간 조회는 현행 화면의 우측 정렬 패턴으로 통일한다. */
