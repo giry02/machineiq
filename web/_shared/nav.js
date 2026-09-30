@@ -429,7 +429,7 @@
   /* ── GNB 렌더 ── */
   var mount = document.getElementById('gnb');
   if (mount) {
-    var logo = '<img src="' + BASE + '_shared/bobcat-machine-iq.svg" alt="Bobcat MACHINE IQ">';
+    var logo = '<img src="' + BASE + '_shared/machine-iq-material-handling-white.svg" alt="Bobcat MACHINE IQ MATERIAL HANDLING">';
     var logoHref = BASE + enc('Dashboard') + '/group-dashboard-' + VARIANT + (VARIANT === 'tobe' ? '-v2' : '') + '.html';
     if (VARIANT === 'tobe') logoHref += '?role=' + encodeURIComponent(MANAGEMENT_ROLE);
 
@@ -2109,8 +2109,7 @@
     if (!document.querySelector('.miq-page-foot')) {
       var foot = document.createElement('footer');
       foot.className = 'miq-page-foot';
-      MIQCommon.view.set(foot,"innerHTML",'<div class="miq-page-foot__brand"><img src="' + BASE + '_shared/favicon.ico" alt="">' +
-        '<strong>Bobcat</strong><span>MACHINE IQ</span></div>' +
+      MIQCommon.view.set(foot,"innerHTML",'<div class="miq-page-foot__brand"><img src="' + BASE + '_shared/bobcat-logo-white.svg" alt="Bobcat"></div>' +
         '<div class="miq-page-foot__links"><button type="button" data-miq-legal="terms" aria-haspopup="dialog">이용약관</button><button type="button" data-miq-legal="location" aria-haspopup="dialog">위치정보 및 위치기반서비스 이용약관</button><button type="button" data-miq-legal="privacy" aria-haspopup="dialog">개인(위치)정보 처리방침</button><button type="button" data-miq-legal="license" aria-haspopup="dialog">오픈소스 고지</button>' +
         '<small>©2024 Bobcat Company. ALL RIGHTS RESERVED.</small></div>' +
         '<div class="miq-page-foot__help"><strong>HELP</strong><span>help.machineiq@doosan.com</span><small>최종접속 : 2026-08-31 21:00</small></div>');

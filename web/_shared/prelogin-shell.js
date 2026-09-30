@@ -9,8 +9,8 @@
 
   host.className = 'miq-auth-header';
   MIQCommon.view.set(host,"innerHTML",`
-    <a class="miq-auth-brand" href="${base}Login/login-tobe.html" aria-label="Bobcat MACHINE IQ 로그인">
-      <img src="${base}_shared/bobcat-machine-iq.svg" alt="Bobcat MACHINE IQ"/>
+    <a class="miq-auth-brand" href="${base}Login/login-tobe.html" aria-label="Bobcat MACHINE IQ MATERIAL HANDLING 로그인">
+      <img src="${base}_shared/machine-iq-material-handling-white.svg" alt="Bobcat MACHINE IQ MATERIAL HANDLING"/>
     </a>
     <div class="miq-auth-actions">
       <label class="miq-auth-language">

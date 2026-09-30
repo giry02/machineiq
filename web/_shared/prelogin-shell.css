@@ -26,10 +26,9 @@
 
 .miq-auth-brand img {
   width: 235px;
-  height: 38px;
+  height: 50px;
   object-fit: contain;
   object-position: left center;
-  filter: brightness(0) invert(1);
 }
 
 .miq-auth-actions {
@@ -106,6 +105,6 @@
 
 @media (max-width: 720px) {
   .miq-auth-header { padding: 0 16px; }
-  .miq-auth-brand img { width: 195px; height: 32px; }
+  .miq-auth-brand img { width: 195px; height: 44px; }
   .miq-auth-language select { min-width: 78px; }
 }
