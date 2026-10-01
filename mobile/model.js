@@ -1,11 +1,14 @@
 /* Web-backed prototype adapter: archived IMQ equipmentId is NOT the displayed VIN.
    Browser session/local settings only; no production API, authentication or device command. */
 (function (root, factory) {
-  const api = factory(typeof module === 'object' && module.exports ? require('./web-contracts.generated.js') : root.CustomerWebContracts);
+  const commonJS=typeof module === 'object' && module.exports;
+  const api = factory(commonJS ? require('./web-contracts.generated.js') : root.CustomerWebContracts,commonJS ? require('./demo-data.generated.js') : root.CustomerDemoData);
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.CustomerPrototype = api;
-})(typeof window === 'undefined' ? globalThis : window, function (W) {
+})(typeof window === 'undefined' ? globalThis : window, function (W,demoData) {
   'use strict';
+  if(!W)throw new Error('Web data contracts must load before the mobile model');
+  if(demoData)W.observations.configureDemoDays(demoData.days);
   // Local demo only: derive its cutoff from today's Korea time on page load.
   // This is generated fixture data, never an actual API collection timestamp.
   const koreaNow = new Date(Date.now()+9*60*60*1000).toISOString();
@@ -28,7 +31,6 @@
     efficiency:value=>Number.isFinite(value)?wholeNumber(value)+'%':'-'
   };
   // Same default bands as web Shock/shock-tobe.html. These are not live sensor thresholds.
-  if(!W)throw new Error('Web data contracts must load before the mobile model');
   const SHOCK_LEVELS=[
     {key:'s3',label:'민감',level:'Lv3',min:1.2,max:1.8,color:'#2b8a3e',description:'노면이 고르지 않거나 과속 방지턱을 넘을 때 발생할 수 있는 정도'},
     {key:'s4',label:'주의',level:'Lv4',min:1.8,max:2.5,color:'#f59f00',description:'충분히 감속하지 않은 상태에서 화물을 들 때 발생할 수 있는 정도'},
@@ -42,7 +44,9 @@
   function createApprovalStore(vehicles,seed) {
     const storageKey='linq.management.userRequests.v2',groups=[...new Set(vehicles.map(v=>v.group).filter(Boolean))];
     let raw=seed?seed.map(r=>({...r,registered:r.createdAt,status:({pending:'REQ',approved:'APRV',rejected:'RJCT'})[r.status],role:!r.role||r.role==='customer_staff'?'고객 직원':r.role,approverId:r.approverId||W.principals.customer_owner})):W.approvalSeed();
-    function refresh(){if(seed)return;try{const saved=JSON.parse(sessionStorage.getItem(storageKey));if(Array.isArray(saved)&&saved.length)raw=saved;}catch{}}
+    function ensureReviewCase(){if(seed||TODAY<'2026-10-01'||raw.some(r=>r.id==='MOBILE-DEMO-REJECTED'))return;const date=isoDay(shiftDay(calendarDate(TODAY),-1));raw.push({id:'MOBILE-DEMO-REJECTED',name:'반려 예시 직원',email:'rejected.demo@example.invalid',role:'고객 직원',company:'(주)세종물류중부지점',companyId:COMPANY,registered:date+' 10:00',processed:date+' 11:00',status:'RJCT',processor:'윤태호',processorRole:'고객 대표',reason:'업체 소속 정보를 확인할 수 없어 반려했습니다. 소속 정보를 확인한 후 다시 신청해 주세요.',approverId:W.principals.customer_owner,group:'',demo:true});}
+    ensureReviewCase();
+    function refresh(){if(seed)return;try{const saved=JSON.parse(sessionStorage.getItem(storageKey));if(Array.isArray(saved)&&saved.length)raw=saved;}catch{}ensureReviewCase();}
     function save(){if(seed)return;try{sessionStorage.setItem(storageKey,JSON.stringify(raw));}catch{}}
     const eligible=(r,role)=>role==='customer_owner'&&W.common.roles.hasCapability(role,'approveUserRequest')&&r?.approverId===W.principals[role]&&r.role==='고객 직원'&&(!r.companyId||String(r.companyId)===COMPANY);
     const copy=r=>({...r,status:({REQ:'pending',APRV:'approved',RJCT:'rejected'})[r.status],companyId:COMPANY,companyName:r.company,role:'customer_staff',createdAt:r.registered,processedAt:r.processed,processedBy:r.processor});
@@ -118,12 +122,15 @@
   let sourceFleet=[];
   function rawHistory() {
     const day=W.common.dates.format(W.common.dates.yesterday(new Date()));
-    const generated=W.demo.create(sourceFleet,day);
+    const prepared=date=>demoData&&date>=demoData.from&&date<=demoData.to;
+    const generated=prepared(day)?{maintenance:[],error:[]}:W.demo.create(sourceFleet,day);
     // Keep the existing history; add today's completed occurrences using the same web fixture rules.
-    const today=W.demo.create(sourceFleet,TODAY);
+    const today=prepared(TODAY)?{maintenance:[],error:[]}:W.demo.create(sourceFleet,TODAY);
     const current=today.error.filter(r=>r.dateTime<SNAPSHOT);
     const maintenance=today.maintenance.filter(r=>r.dateTime<SNAPSHOT);
-    return W.legacy.concat(generated.maintenance,generated.error,current,maintenance);
+    const allowed=new Set(sourceFleet.map(v=>v.vin));
+    const review=(demoData?.history||[]).filter(r=>allowed.has(r.vin)&&r.dateTime<SNAPSHOT).map(r=>r.completedAt&&r.completedAt>=SNAPSHOT?{...r,errorState:'current',completedAt:null}:r);
+    return W.legacy.concat(generated.maintenance,generated.error,current,maintenance,review);
   }
   // Local status adapter: confirmed zero is idle; absent/invalid samples are unknown.
   // Connection freshness belongs to the server; do not infer it from the page clock.
@@ -357,6 +364,11 @@
     period=resolvePeriod(from,to,period);
     return observationMetrics(v,W.observations.aggregate(v,from,period==='d'?from:to),from,to,period);
   }
+  function demoReferenceHours(from,to){
+    const through=to<TODAY?to:TODAY;
+    if(!demoData||from>through||through<demoData.from||from>demoData.to)return '08:00~18:00';
+    return from>=demoData.from&&through<=demoData.to?'00:00~24:00':'00:00~24:00 (10.01~10.11 시연 기간), 그 외 날짜는 08:00~18:00';
+  }
   function aggregatePerformance(rows,from,to,period,hour) {
     const O=W.observations,raw=O.aggregate(rows,from,period==='d'?from:to,null,hour);
     const entries=rows.flatMap(v=>{
@@ -396,5 +408,5 @@
   }
     const percent=(part,total)=>total ? Math.round(part/total*1000)/10 : null;
   function performance(rows,from,to,options={}) {return webPerformance(rows,from,to,options);}
-  return {SNAPSHOT,TODAY,DATA_START,ENERGY_MONTH,STATUS,DISPLAY,SHOCK_LEVELS,shockLevel,chargeWindow,assignedGroup,reportValues,web:W,createApprovalStore,periodWindow,hourlyWindow,dashboardWindow,dashboardErrors,currentSupplies,supplySummary,fleetState,COMPANY,ROLE_LABELS,buildVehicles,currentVehicle,scope,listed,attention,counts,dates,calendarDate,efficiencyRange,efficiencyPerformance,efficiencyWindow,efficiencyCalendar,metrics,performance,serviceItems,supplyItems,resetSupplies,undoSupplyReset,serviceHistory,serviceRecords,pushHistory,pushPresentation,shockEvents,notificationWindow,recentNotifications,unreadPushCount};
+  return {SNAPSHOT,TODAY,DATA_START,ENERGY_MONTH,STATUS,DISPLAY,SHOCK_LEVELS,shockLevel,chargeWindow,assignedGroup,reportValues,web:W,createApprovalStore,periodWindow,hourlyWindow,dashboardWindow,dashboardErrors,currentSupplies,supplySummary,fleetState,COMPANY,ROLE_LABELS,buildVehicles,currentVehicle,scope,listed,attention,counts,dates,calendarDate,demoReferenceHours,efficiencyRange,efficiencyPerformance,efficiencyWindow,efficiencyCalendar,metrics,performance,serviceItems,supplyItems,resetSupplies,undoSupplyReset,serviceHistory,serviceRecords,pushHistory,pushPresentation,shockEvents,notificationWindow,recentNotifications,unreadPushCount};
 });

@@ -264,6 +264,26 @@ root.MIQErrors={describe:describe};
   var catalog = fleet.vehicles || [];
   var vehiclesByVin = new Map(catalog.map(function(v) { return [v.vin,v]; }));
   var sampleCache = new Map();
+  // Optional explicit prototype days. WEB callers keep the original 08~18 profile.
+  // Install once before mobile rendering; never change the clock or query cutoff.
+  var demoDays = new Map();
+  function configureDemoDays(rows) {
+    if (!Array.isArray(rows)) throw new Error('Demo days must be an array');
+    var next = new Map();
+    rows.forEach(function(r) {
+      if (!r || !profiles.has(r.vin) || !date(r.date) ||
+          !Number.isInteger(r.workMinutes) || r.workMinutes < 0 ||
+          !Number.isInteger(r.idleMinutes) || r.idleMinutes < 0 ||
+          !Number.isInteger(r.shockCount) || r.shockCount < 0 ||
+          !Array.isArray(r.idleHours) || r.idleHours.some(function(h){return !Number.isInteger(h)||h<0||h>23;}) ||
+          new Set(r.idleHours).size !== r.idleHours.length || r.idleHours.length >= 24 ||
+          r.workMinutes+r.idleMinutes > (24-r.idleHours.length)*60) throw new Error('Invalid demo day');
+      var key=r.vin+'|'+r.date;
+      if(next.has(key))throw new Error('Duplicate demo day');
+      next.set(key,Object.assign({},r,{idleHours:r.idleHours.slice()}));
+    });
+    demoDays=next;sampleCache.clear();
+  }
   function numeric(v) { return typeof v === 'number' && Number.isFinite(v) && v >= 0; }
   function percent(v) { return numeric(v) && v <= 100; }
   function date(v) {
@@ -286,29 +306,31 @@ root.MIQErrors={describe:describe};
     for (var i=0; i<key.length; i++) { s ^= key.charCodeAt(i); s = Math.imul(s,16777619); }
     return (s >>> 0) / 4294967296;
   }
-  function part(total, hour) { return Math.floor(total / 10) + (hour < total % 10 ? 1 : 0); }
+  function part(total, hour, slots) { slots=slots||10;return Math.floor(total / slots) + (hour < total % slots ? 1 : 0); }
   function sample(vehicle, day, hour, asOf) {
     var p = vehicle && profiles.get(vehicle.vin), limit = cutoff(asOf);
     if (!p || !date(day) || hour < 0 || hour > 23 || day > limit.date || day === limit.date && hour >= limit.hours) return null;
     var key = p.vin + '|' + day;
     var cacheKey=key+'|'+hour;
     if(sampleCache.has(cacheKey))return sampleCache.get(cacheKey);
-    var running = Math.min(600, Math.round(p.dailyRunningMinutes * (.8 + random(key) * .4)));
-    var working = Math.round(running * p.workingShare);
-    var slot = hour - 8, scheduled = slot >= 0 && slot < 10;
-    var work = scheduled ? part(working,slot) : 0;
-    var idle = scheduled ? part(running-working,9-slot) : 0;
+    var fixture=demoDays.get(key), slots=fixture?24-fixture.idleHours.length:10;
+    var running = fixture?fixture.workMinutes+fixture.idleMinutes:Math.min(600, Math.round(p.dailyRunningMinutes * (.8 + random(key) * .4)));
+    var working = fixture?fixture.workMinutes:Math.round(running * p.workingShare);
+    var slot = fixture?hour-fixture.idleHours.filter(function(h){return h<hour;}).length:hour - 8;
+    var scheduled = fixture?!fixture.idleHours.includes(hour):slot >= 0 && slot < 10;
+    var work = scheduled ? part(working,slot,slots) : 0;
+    var idle = scheduled ? part(running-working,slots-1-slot,slots) : 0;
     var minutes = work + idle;
-    var shocks = Math.floor(p.dailyShockCount) + (random(key+'|shock') < p.dailyShockCount % 1 ? 1 : 0);
+    var shocks = fixture?fixture.shockCount:Math.floor(p.dailyShockCount) + (random(key+'|shock') < p.dailyShockCount % 1 ? 1 : 0);
     // Explicit fixed DEMO scenario only: reuse the existing master charge level.
     // This is not collected historical SOC and must not replace a server's
     // period batteryRate response. No kWh-to-percent conversion is performed.
     var masterVehicle=vehiclesByVin.get(p.vin), chargeSource=p.batteryGaugeSource;
     var chargeValue=chargeSource==='fleet.soc.fixed-demo' && masterVehicle && masterVehicle.type!=='엔진' && percent(masterVehicle.soc) ? masterVehicle.soc : null;
     var row={vin:p.vin, date:day, hour:hour, workMinutes:work, idleMinutes:idle,
-      capacityMinutes:scheduled ? 60 : 0,
+      capacityMinutes:fixture?60:scheduled ? 60 : 0,
       distanceMetres:Math.round(minutes / 60 * p.kmPerRunningHour * 1000),
-      shockCount:scheduled ? part(shocks,slot) : 0,
+      shockCount:scheduled ? part(shocks,slot,slots) : 0,
       fuelLitres:numeric(p.fuelLitresPerHour) ? minutes / 60 * p.fuelLitresPerHour : null,
       batteryKwh:numeric(p.batteryKwhPerHour) ? minutes / 60 * p.batteryKwhPerHour : null,
       batteryChargePercent:chargeValue, batteryChargeProvenance:chargeValue===null?null:'fixed-demo-from-existing-master-soc', mock:true};
@@ -368,7 +390,7 @@ root.MIQErrors={describe:describe};
       dist:data.distanceKm,hour:data.runningMinutes===null?null:data.runningMinutes/60}[key];
   }
   return {sample:sample,totals:totals,select:select,unique:unique,intervals:intervals,aggregate:aggregate,value:value,
-    windowAt:windowAt,cutoff:cutoff,hasProfile:function(v){return !!v&&profiles.has(v.vin);},mock:true};
+    windowAt:windowAt,cutoff:cutoff,configureDemoDays:configureDemoDays,hasProfile:function(v){return !!v&&profiles.has(v.vin);},mock:true};
 });
 
 /* Pure prototype contracts. Values passed in by the caller; no server claims. */
@@ -1227,6 +1249,6 @@ function nowText() {
     function p(n) { return String(n).padStart(2, '0'); }
     return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
   }
-root.CustomerWebContracts={errors:root.MIQErrors,common:root.MIQCommon,meeting:root.MIQMeeting,charts:MIQCharts,service:root.MIQServiceRecords,demo:root.MIQServiceDemo,observations:root.MIQObservations,reportSeries:root.MIQReportSeries,lithium:root.MIQLithiumListModel,positions:root.MIQMapPositions,efficiency,shocks,summaryValue,reportValue,approvalSeed:function(){return currentDemoRequests(seedUserRequests(),[1,2,3,4,10,16,22]);},existingUsers:["admin@sejonglog.co.kr","cs.lee@sejonglog.co.kr","dealer.park@sejonglog.co.kr","dealer.choi@sejonglog.co.kr","staff.jung@sejonglog.co.kr","staff.kang@sejonglog.co.kr","leader.yoon@customer.co.kr","leader.shin@customer.co.kr","user.oh@customer.co.kr","user.lim@customer.co.kr"],principals,get approvalReference(){return nowText();},legacy:[{"kind":"error","vin":"FBA32_224250271","companyId":"1933","code":"P0003","description":"연료량 조절 밸브 회로 이상","category":"차량","level":"a","spn":"523","fmi":"3","date":"2026-07-25","dateTime":"2026-07-25 08:12","completedAt":null,"errorState":"current","pdfKey":"p0003"},{"kind":"error","vin":"FBA32_032068","companyId":"1933","code":"P0191","description":"연료 레일 압력 센서 범위 이상","category":"차량","level":"b","spn":"157","fmi":"2","date":"2026-07-20","dateTime":"2026-07-20 13:40","completedAt":"2026-07-21 13:40","errorState":"past","pdfKey":null},{"kind":"error","vin":"FBA32_224250271","companyId":"1933","code":"A7","description":"주행 제어 시스템 경고","category":"차량","level":"b","spn":"-","fmi":"-","date":"2026-07-24","dateTime":"2026-07-24 10:30","completedAt":null,"errorState":"current","pdfKey":null},{"kind":"error","vin":"FBA32_032042","companyId":"1933","code":"51","description":"유압 온도 경고","category":"차량","level":"c","spn":"-","fmi":"-","date":"2026-07-15","dateTime":"2026-07-15 10:05","completedAt":"2026-07-16 10:05","errorState":"past","pdfKey":null},{"kind":"error","vin":"FBA32_032068","companyId":"1933","code":"A","description":"시트 안전벨트 미착용","category":"차량","level":"c","spn":"-","fmi":"-","date":"2026-07-12","dateTime":"2026-07-12 09:15","completedAt":"2026-07-13 09:15","errorState":"past","pdfKey":null},{"kind":"error","vin":"FBA32_224250383","companyId":"1933","code":"16","description":"셀 밸런싱 이상","category":"배터리","level":"a","spn":"-","fmi":"-","date":"2026-07-26","dateTime":"2026-07-26 09:30","completedAt":null,"errorState":"current","pdfKey":null},{"kind":"maintenance","vin":"FBA32_224250271","companyId":"1933","date":"2026-07-03","dateTime":"2026-07-03 09:20","part":"트랜스미션","symptom":"오일누유","detail":"변속기 오일 누유 발생, 실링 교체","completed":true},{"kind":"maintenance","vin":"FBA32_224250271","companyId":"1933","date":"2026-07-08","dateTime":"2026-07-08 13:45","part":"조향장치","symptom":"유격발생","detail":"스티어링 링크 조정 및 체결 토크 확인","completed":true},{"kind":"maintenance","vin":"FBA32_224250271","companyId":"1933","date":"2026-07-11","dateTime":"2026-07-11 16:10","part":"전장","symptom":"경고등","detail":"배선 커넥터 접촉 상태 점검","completed":false},{"kind":"maintenance","vin":"FBA32_224250383","companyId":"1933","date":"2026-07-14","dateTime":"2026-07-14 10:00","part":"냉각계통","symptom":"과열","detail":"냉각수 보충 및 호스 누수 점검","completed":true},{"kind":"maintenance","vin":"FBA32_032042","companyId":"1933","date":"2026-07-18","dateTime":"2026-07-18 14:30","part":"유압","symptom":"작동지연","detail":"유압 실린더 점검 및 작동유 보충","completed":false},{"kind":"maintenance","vin":"FBA32_032042","companyId":"1933","date":"2026-07-22","dateTime":"2026-07-22 11:20","part":"브레이크","symptom":"제동불량","detail":"브레이크 패드 마모 상태 확인 후 교체","completed":true}],sourceHashes:{"_mock-data/master/fleet.json":"9448429490b45b7be2501cd867ebc0a62f0bb135bcd367e7c1e47e0dd52b59ba","_mock-data/master/observation-profiles.json":"c3184cf0f6fdca7e2e1c3e0c138ea07f50ecbf230b4a9bf669df9544695febbd","_shared/common-logic.js":"d77b1475070457497dde931fda9d4a83438b1cfc23f067fb716953bc2227cf87","_shared/common-errors.js":"a96dc7038427e571de0ee5dd07c16ee9d8d75c8c58781d4156405edb30eaf6d3","_shared/vehicle-observations.js":"aea30481fdb62f6c6b3252054c13c8f8f3564778be89951880c673ec03015cd1","_shared/meeting-model.js":"41cc03e0e4db87e38a1b60f3aed263647c29e4363bc87d2037402a2b8fbf488e","_shared/chart-common.js":"7a02484fc3816be104222d27c65f218ae71b42081605c7eb14bfc23175a1371c","_shared/report-series.js":"d1c19291fbce659ca0c38d4a9434f0084dd73b3dc9acf3a9ac56bc7097689855","_shared/service-records.js":"63ec0adead3eba3a4c99e9895a8c922725866a88f1a5ac4303c82de26f60d435","_shared/service-demo-data.js":"dcd01d3f4b3632d03a3fd4ff741a319008137185f5421a42b12885b693f2ed4d","_shared/lithium-list-model.js":"7303031cad80131e220e3172e7e3d3f1ba0770a2923cc80fd92db1555545376a","_shared/map-positions.js":"f0538ed3d6b1d0ce5dd0ae424da3b0ca3ac2f9d446ca1e5fd614194110433d20","_shared/operation-metrics-enhancements.js":"ab1a628c9c41cf4405b2b70b43230f33a2514ae131c0004fad3034e4b92551c3","Shock/shock-tobe.html":"00914c328cb53d9114d3be86a3058a6f3beb0e3c224395058b4e71bad97ccdef","_shared/vehicle-summary-options.js":"37b02e9b4f5519cde4d56203b02fd35f6cb050d8ea91ea4b44684978f7f165ee","_shared/map-management-enhancements.js":"796cf436894a06bbe4d8ce351ebc4bb3513d92cbf54d2b7ac839a99918dee873","Mgmt User/mgmt-user-tobe.html":"968d0c133d0859308c730176862ae6a605ace593f885032b39e458e96a29a019","Service/service-error-tobe.html":"03a01fe9393e7940c7da8d2931582993c48ca5f59afcc1797f5eb93bd0181057","Service/service-maintenance-tobe.html":"0f64facc9478fd170a82a1a827826309d1871ae7fc92492d904985ecab139242"}};
+root.CustomerWebContracts={errors:root.MIQErrors,common:root.MIQCommon,meeting:root.MIQMeeting,charts:MIQCharts,service:root.MIQServiceRecords,demo:root.MIQServiceDemo,observations:root.MIQObservations,reportSeries:root.MIQReportSeries,lithium:root.MIQLithiumListModel,positions:root.MIQMapPositions,efficiency,shocks,summaryValue,reportValue,approvalSeed:function(){return currentDemoRequests(seedUserRequests(),[1,2,3,4,10,16,22]);},existingUsers:["admin@sejonglog.co.kr","cs.lee@sejonglog.co.kr","dealer.park@sejonglog.co.kr","dealer.choi@sejonglog.co.kr","staff.jung@sejonglog.co.kr","staff.kang@sejonglog.co.kr","leader.yoon@customer.co.kr","leader.shin@customer.co.kr","user.oh@customer.co.kr","user.lim@customer.co.kr"],principals,get approvalReference(){return nowText();},legacy:[{"kind":"error","vin":"FBA32_224250271","companyId":"1933","code":"P0003","description":"연료량 조절 밸브 회로 이상","category":"차량","level":"a","spn":"523","fmi":"3","date":"2026-07-25","dateTime":"2026-07-25 08:12","completedAt":null,"errorState":"current","pdfKey":"p0003"},{"kind":"error","vin":"FBA32_032068","companyId":"1933","code":"P0191","description":"연료 레일 압력 센서 범위 이상","category":"차량","level":"b","spn":"157","fmi":"2","date":"2026-07-20","dateTime":"2026-07-20 13:40","completedAt":"2026-07-21 13:40","errorState":"past","pdfKey":null},{"kind":"error","vin":"FBA32_224250271","companyId":"1933","code":"A7","description":"주행 제어 시스템 경고","category":"차량","level":"b","spn":"-","fmi":"-","date":"2026-07-24","dateTime":"2026-07-24 10:30","completedAt":null,"errorState":"current","pdfKey":null},{"kind":"error","vin":"FBA32_032042","companyId":"1933","code":"51","description":"유압 온도 경고","category":"차량","level":"c","spn":"-","fmi":"-","date":"2026-07-15","dateTime":"2026-07-15 10:05","completedAt":"2026-07-16 10:05","errorState":"past","pdfKey":null},{"kind":"error","vin":"FBA32_032068","companyId":"1933","code":"A","description":"시트 안전벨트 미착용","category":"차량","level":"c","spn":"-","fmi":"-","date":"2026-07-12","dateTime":"2026-07-12 09:15","completedAt":"2026-07-13 09:15","errorState":"past","pdfKey":null},{"kind":"error","vin":"FBA32_224250383","companyId":"1933","code":"16","description":"셀 밸런싱 이상","category":"배터리","level":"a","spn":"-","fmi":"-","date":"2026-07-26","dateTime":"2026-07-26 09:30","completedAt":null,"errorState":"current","pdfKey":null},{"kind":"maintenance","vin":"FBA32_224250271","companyId":"1933","date":"2026-07-03","dateTime":"2026-07-03 09:20","part":"트랜스미션","symptom":"오일누유","detail":"변속기 오일 누유 발생, 실링 교체","completed":true},{"kind":"maintenance","vin":"FBA32_224250271","companyId":"1933","date":"2026-07-08","dateTime":"2026-07-08 13:45","part":"조향장치","symptom":"유격발생","detail":"스티어링 링크 조정 및 체결 토크 확인","completed":true},{"kind":"maintenance","vin":"FBA32_224250271","companyId":"1933","date":"2026-07-11","dateTime":"2026-07-11 16:10","part":"전장","symptom":"경고등","detail":"배선 커넥터 접촉 상태 점검","completed":false},{"kind":"maintenance","vin":"FBA32_224250383","companyId":"1933","date":"2026-07-14","dateTime":"2026-07-14 10:00","part":"냉각계통","symptom":"과열","detail":"냉각수 보충 및 호스 누수 점검","completed":true},{"kind":"maintenance","vin":"FBA32_032042","companyId":"1933","date":"2026-07-18","dateTime":"2026-07-18 14:30","part":"유압","symptom":"작동지연","detail":"유압 실린더 점검 및 작동유 보충","completed":false},{"kind":"maintenance","vin":"FBA32_032042","companyId":"1933","date":"2026-07-22","dateTime":"2026-07-22 11:20","part":"브레이크","symptom":"제동불량","detail":"브레이크 패드 마모 상태 확인 후 교체","completed":true}],sourceHashes:{"_mock-data/master/fleet.json":"9448429490b45b7be2501cd867ebc0a62f0bb135bcd367e7c1e47e0dd52b59ba","_mock-data/master/observation-profiles.json":"c3184cf0f6fdca7e2e1c3e0c138ea07f50ecbf230b4a9bf669df9544695febbd","_shared/common-logic.js":"d77b1475070457497dde931fda9d4a83438b1cfc23f067fb716953bc2227cf87","_shared/common-errors.js":"a96dc7038427e571de0ee5dd07c16ee9d8d75c8c58781d4156405edb30eaf6d3","_shared/vehicle-observations.js":"b5e24277418e22e82b8a06ed5dc20761cda7d1156eb896201b06f4ad21cca7e5","_shared/meeting-model.js":"41cc03e0e4db87e38a1b60f3aed263647c29e4363bc87d2037402a2b8fbf488e","_shared/chart-common.js":"7a02484fc3816be104222d27c65f218ae71b42081605c7eb14bfc23175a1371c","_shared/report-series.js":"d1c19291fbce659ca0c38d4a9434f0084dd73b3dc9acf3a9ac56bc7097689855","_shared/service-records.js":"63ec0adead3eba3a4c99e9895a8c922725866a88f1a5ac4303c82de26f60d435","_shared/service-demo-data.js":"dcd01d3f4b3632d03a3fd4ff741a319008137185f5421a42b12885b693f2ed4d","_shared/lithium-list-model.js":"7303031cad80131e220e3172e7e3d3f1ba0770a2923cc80fd92db1555545376a","_shared/map-positions.js":"f0538ed3d6b1d0ce5dd0ae424da3b0ca3ac2f9d446ca1e5fd614194110433d20","_shared/operation-metrics-enhancements.js":"ab1a628c9c41cf4405b2b70b43230f33a2514ae131c0004fad3034e4b92551c3","Shock/shock-tobe.html":"00914c328cb53d9114d3be86a3058a6f3beb0e3c224395058b4e71bad97ccdef","_shared/vehicle-summary-options.js":"37b02e9b4f5519cde4d56203b02fd35f6cb050d8ea91ea4b44684978f7f165ee","_shared/map-management-enhancements.js":"796cf436894a06bbe4d8ce351ebc4bb3513d92cbf54d2b7ac839a99918dee873","Mgmt User/mgmt-user-tobe.html":"968d0c133d0859308c730176862ae6a605ace593f885032b39e458e96a29a019","Service/service-error-tobe.html":"03a01fe9393e7940c7da8d2931582993c48ca5f59afcc1797f5eb93bd0181057","Service/service-maintenance-tobe.html":"0f64facc9478fd170a82a1a827826309d1871ae7fc92492d904985ecab139242"}};
 })(typeof window==='undefined'?globalThis:window);
 if(typeof module==='object'&&module.exports)module.exports=globalThis.CustomerWebContracts;

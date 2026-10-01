@@ -88,7 +88,6 @@ body.mobile-type-compact.customer-prototype {
 .customer-prototype .summary-status-actions { display:inline-flex; flex:none; align-items:center; gap:2px; height:24px; }
 .customer-prototype .summary-map-button { display:inline-flex; flex:none; align-items:center; justify-content:flex-end; width:44px; height:44px; padding:0; border:0; background:transparent; color:var(--linq-color-text-muted); }
 .customer-prototype .summary-map-button svg { width:20px; height:20px; }
-.customer-prototype .summary-map-button:disabled { opacity:.45; cursor:default; }
 .customer-prototype .vehicle-action-row { display:flex; flex-wrap:wrap; align-items:center; gap:4px 10px; padding-top:6px; margin-top:8px; border-top:1px solid var(--linq-color-border-subtle); }
 .customer-prototype .vehicle-action-row button { display:inline-flex; align-items:center; gap:4px; min-height:36px; padding:3px 0; border:0; background:transparent; color:var(--linq-color-primary-fill); font:inherit; font-size:14px; }
 .customer-prototype .vehicle-action-row svg { width:15px; height:15px; flex:none; }
@@ -107,6 +106,7 @@ body.mobile-type-compact.customer-prototype {
 .customer-prototype [data-shortcut-kind="navigation"] .vehicle-compact-shortcut:active:not(:disabled) { border-color:var(--linq-color-text-muted); background:var(--linq-color-border-subtle); }
 @media (hover:hover) { .customer-prototype [data-shortcut-kind="navigation"] .vehicle-compact-shortcut:hover { border-color:var(--linq-color-text-muted); } }
 .customer-prototype .vehicle-compact-shortcut strong { font-size:14px; font-weight:600; font-variant-numeric:tabular-nums; color:var(--linq-color-text); }
+.customer-prototype .vehicle-compact-shortcut .vehicle-energy-unit { font-size:11px; font-weight:400; color:var(--linq-color-text-muted); }
 /* Fixed-size battery interior indicates the SOC band, never a proportional fill. */
 .customer-prototype .battery-soc-icon { width:15px; height:15px; flex:none; color:var(--linq-color-text-muted); }
 .customer-prototype .battery-soc-icon[data-soc-level="high"] .battery-soc-fill { fill:#37b24d; }
@@ -544,6 +544,7 @@ body.customer-prototype:has(.location-dialog[open]) { overflow:hidden; }
 .customer-prototype .location-map-status { position:absolute; inset:0; z-index:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; padding:64px 20px 32px; background:var(--linq-color-surface-muted); color:var(--linq-color-text-muted); text-align:center; font-size:14px; line-height:1.6; }
 .customer-prototype .location-map-status[hidden],.customer-prototype .location-map-status a[hidden] { display:none; }
 .customer-prototype .location-map-status a { color:var(--linq-color-brand); }
+.customer-prototype .location-dialog.is-location-missing .location-map-status { position:static; padding:24px 20px; }
 .customer-prototype .customer-map-marker { display:flex; flex-direction:column; align-items:center; gap:5px; padding-bottom:4px; }
 .customer-prototype .customer-map-marker > strong { padding:5px 8px; border:1px solid var(--linq-color-border); border-radius:var(--linq-radius-control); background:var(--linq-color-surface); color:var(--linq-color-text); font-size:14px; white-space:nowrap; box-shadow:0 2px 6px rgba(0,0,0,.16); }
 .customer-prototype .customer-map-marker > span { display:grid; place-items:center; width:38px; height:38px; border:3px solid white; border-radius:50%; background:var(--linq-color-brand); color:white; box-shadow:0 2px 8px rgba(0,0,0,.25); }

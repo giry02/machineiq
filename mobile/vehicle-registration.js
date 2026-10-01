@@ -71,6 +71,7 @@
     navigate=context.navigate;
   }
   function resultMarkup(){
+    if(result?.qrNotice)return `<section class="detail-card registration-result"><p class="source-note" role="status">${esc(result.qrNotice)}</p></section>`;
     if(result?.error)return `<section class="detail-card registration-result"><p class="error-note" role="alert">${esc(result.error)}</p></section>`;
     if(!result)return '';
     return `<section class="detail-card registration-result" tabindex="-1"><h2>조회 결과</h2>${details(result)}<p class="source-note">다음을 누르면 담당 딜러에게 차량 등록을 신청합니다.</p><button type="button" class="report-primary-action" data-registration-next>다음</button></section>`;
@@ -88,7 +89,7 @@
   }
   function render(context){
     enter(context);
-    const input=(key)=>`<label class="registration-field" for="registration-${key}"><strong>${fields[key]} <span aria-hidden="true">*</span></strong><span class="registration-input-row"><input id="registration-${key}" name="${key}" type="text" value="${esc(draft[key])}" placeholder="${fields[key]} 입력" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="${fields[key]}" aria-required="true">${root.CustomerRegistrationScanner?.button(key)||''}</span></label>`;
+    const input=(key)=>`<label class="registration-field" for="registration-${key}"><strong>${fields[key]} <span aria-hidden="true">*</span></strong><span class="registration-input-row"><input id="registration-${key}" name="${key}" type="text" value="${esc(draft[key])}" placeholder="${fields[key]} 입력" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="${fields[key]}" aria-required="true">${root.CustomerRegistrationScanner?.button(key)||`<button type="button" class="detail-secondary-button registration-scan-button" data-registration-scan="${key}" aria-label="${fields[key]} QR 촬영"><i data-lucide="scan-line" aria-hidden="true"></i>QR 촬영</button>`}</span></label>`;
     return `<div class="vehicle-registration" data-screen-id="LQ-MGT-008"><div class="snapshot"><h1>차량 등록</h1></div><form id="vehicle-registration-form" class="detail-card" novalidate><h2>차량 · 터미널 정보</h2><p class="source-note">차량 시리얼번호와 터미널 ID를 모두 입력해 주세요.</p>${input('vehicle')}${input('terminal')}<button type="submit" class="report-primary-action" data-registration-lookup>조회</button></form><div id="vehicle-registration-result" aria-live="polite">${resultMarkup()}</div></div>`;
   }
   function listMarkup(){
@@ -118,6 +119,9 @@
   doc.addEventListener('click',e=>{
     if(e.target===$('#vehicle-request-detail'))return closeDetail();
     const b=e.target.closest('button');if(!b)return;
+    if(b.dataset.registrationScan&&!root.CustomerRegistrationScanner&&active()&&Object.hasOwn(fields,b.dataset.registrationScan)){
+      result={qrNotice:'QR 촬영은 테스트 앱에서 사용할 수 있습니다. HTML 화면에서는 '+fields[b.dataset.registrationScan]+'를 직접 입력해 주세요.'};refresh();$('#registration-'+b.dataset.registrationScan)?.focus();return;
+    }
     if(b.hasAttribute('data-registration-next')&&active()){
       if(!canRequest())return;
       if(!result||result.error||result.vehicle!==draft.vehicle.trim()||result.terminal!==draft.terminal.trim())return;

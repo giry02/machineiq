@@ -3,7 +3,7 @@ const app=path.resolve(process.argv[2]||path.join(__dirname,'..'));
 const read=file=>fs.readFileSync(path.join(app,file),'utf8');
 class Clock extends Date {constructor(...args){super(...(args.length?args:['2026-09-20T09:37:00+09:00']));}static now(){return new Date('2026-09-20T09:37:00+09:00').getTime();}}
 const ctx=vm.createContext({window:{},Date:Clock,Intl});
-for(const file of ['data/fleet.generated.js','web-contracts.generated.js','model.js'])vm.runInContext(read(file),ctx);
+for(const file of ['data/fleet.generated.js','web-contracts.generated.js','demo-data.generated.js','model.js'])vm.runInContext(read(file),ctx);
 const M=ctx.window.CustomerPrototype,rows=M.buildVehicles(ctx.window.MIQ_MOCK_DATA.fleet);
 const apiContext={module:{exports:{}},URLSearchParams};
 vm.runInNewContext(read('home-view.js'),apiContext);

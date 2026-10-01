@@ -146,9 +146,14 @@
     });
     if(maintenance)links.unshift(`<button type="button" class="vehicle-compact-shortcut" data-slot="maintenance" data-route="maintenance">${icon('clipboard-check')}<span>수리이력</span></button>`);
     if(energy){
-      const applicable=v.type!=='엔진',known=applicable&&Number.isFinite(v.soc)&&v.soc>=0&&v.soc<=100;
-      const value=known?rate(v.soc):'-',label=!applicable?'배터리 잔량 · 해당 없음':(v.conn?'배터리':'마지막 잔량')+' '+(known?value:'미수신');
-      links.push(`<button type="button" class="vehicle-compact-shortcut" data-slot="battery" ${applicable?`data-service-vehicle="${esc(v.equipmentId)}" data-kind="battery"`:'disabled'} aria-label="${label}" title="${label}">${batteryIcon(v)}<strong>${value}</strong></button>`);
+      if(v.type==='엔진'&&state.view==='summary'){
+        const value=fmt(m?.fc),label='시간당 연료소비량 '+value+' L/H';
+        links.push(`<button type="button" class="vehicle-compact-shortcut" data-slot="engine" data-service-vehicle="${esc(v.equipmentId)}" data-kind="engine" aria-label="${label}" title="${label}"><strong>${value}<small class="vehicle-energy-unit"> L/H</small></strong></button>`);
+      }else{
+        const applicable=v.type!=='엔진',known=applicable&&Number.isFinite(v.soc)&&v.soc>=0&&v.soc<=100;
+        const value=known?rate(v.soc):'-',label=!applicable?'배터리 잔량 · 해당 없음':(v.conn?'배터리':'마지막 잔량')+' '+(known?value:'미수신');
+        links.push(`<button type="button" class="vehicle-compact-shortcut" data-slot="battery" ${applicable?`data-service-vehicle="${esc(v.equipmentId)}" data-kind="battery"`:'disabled'} aria-label="${label}" title="${label}">${batteryIcon(v)}<strong>${value}</strong></button>`);
+      }
     }
     if(shock)links.push(`<button type="button" class="vehicle-compact-shortcut" data-slot="shock" data-service-vehicle="${esc(v.equipmentId)}" data-kind="shock" aria-label="충격 ${m?fmt(m.shock,'건'):'미수신'}" title="충격">${icon('vibrate')}<strong>${m?fmt(m.shock,'건'):'-'}</strong></button>`);
     return shortcutRow(links,'차량 점검 및 정보');
@@ -181,7 +186,7 @@
   function vehicleCard(v) {
     const metric=periodMetrics(v);
     const positioned=validPosition(v.position),mapLabel=fieldText(v.equipmentNumber)+(positioned?' 지도 보기':' 위치 정보 없음');
-    return `<article class="vehicle-mobile-row ${M.attention(v)?'is-attention':''}"><div class="vehicle-mobile-row__head"><button type="button" class="vehicle-card-main summary-heading-link" data-vehicle="${esc(v.equipmentId)}"><strong>${escField(v.equipmentNumber)}</strong><small>${escField(v.model)} · ${esc(v.type)} · ${esc(v.group)}</small></button><div class="summary-status-actions"><button type="button" class="summary-map-button" data-map="${esc(v.equipmentId)}" aria-label="${esc(mapLabel)}" title="${positioned?'지도 보기':'위치 정보 없음'}"${positioned?'':' disabled'}>${icon('map-pin')}</button>${communicationStatus(v)}</div></div><button type="button" class="vehicle-card-main" data-vehicle="${esc(v.equipmentId)}"><div class="vehicle-mobile-row__meta"><span>작업시간<b>${metric?hours(metric.work):'-'}</b></span><span>대기시간<b>${metric?hours(metric.idle):'-'}</b></span><span>운행거리<b>${metric?fmt(metric.km,' km'):'-'}</b></span><span>운영효율<b>${rate(metric?.efficiency)}</b></span></div><div class="row-status"><span>${!v.conn?'마지막 수신 '+(v.receivedAt?.slice(5)||'정보 미제공'):'기간 실적 · 현재 상태는 별도'}</span><span>차량 상세 ›</span></div></button>${vehicleActions(v)}</article>`;
+    return `<article class="vehicle-mobile-row ${M.attention(v)?'is-attention':''}"><div class="vehicle-mobile-row__head"><button type="button" class="vehicle-card-main summary-heading-link" data-vehicle="${esc(v.equipmentId)}"><strong>${escField(v.equipmentNumber)}</strong><small>${escField(v.model)} · ${esc(v.type)} · ${esc(v.group)}</small></button><div class="summary-status-actions"><button type="button" class="summary-map-button" data-map="${esc(v.equipmentId)}" aria-label="${esc(mapLabel)}" title="${positioned?'지도 보기':'위치 정보 없음'}">${icon('map-pin')}</button>${communicationStatus(v)}</div></div><button type="button" class="vehicle-card-main" data-vehicle="${esc(v.equipmentId)}"><div class="vehicle-mobile-row__meta"><span>작업시간<b>${metric?hours(metric.work):'-'}</b></span><span>대기시간<b>${metric?hours(metric.idle):'-'}</b></span><span>운행거리<b>${metric?fmt(metric.km,' km'):'-'}</b></span><span>운영효율<b>${rate(metric?.efficiency)}</b></span></div><div class="row-status"><span>${!v.conn?'마지막 수신 '+(v.receivedAt?.slice(5)||'정보 미제공'):'기간 실적 · 현재 상태는 별도'}</span><span>차량 상세 ›</span></div></button>${vehicleActions(v)}</article>`;
   }
   let homeSort='work',homeSortDirection='desc';
   function home() {
@@ -204,8 +209,9 @@
     }).join('');
   }
   const runningTimeCriteria='가동시간 = 작업시간 + 대기시간. 미사용시간은 기준시간에서 가동시간을 뺀 잔여 시간이며, 현재 통신 미연결이나 최신 시간대 유휴 차량 수와는 별개입니다.';
+  const referenceHours=()=>M.demoReferenceHours(state.from,state.to);
   function referenceRateCriteria(today) {
-    return `<p class="source-note">${metricCriteria}<br>${runningTimeCriteria}<br>작업 활용률 = 작업 ÷ 기준시간 × 100<br>기준시간: 이 예시의 08:00~18:00 구간만 사용하며 금일은 완료된 시간까지만 집계합니다. 자료 없는 차량과 미래 구간은 제외합니다.<br>근무·휴게·휴일 미반영 · 성과 판정용이 아닌 참고값</p>`;
+    return `<p class="source-note">${metricCriteria}<br>${runningTimeCriteria}<br>작업 활용률 = 작업 ÷ 기준시간 × 100<br>기준시간: 이 예시의 ${referenceHours()} 구간만 사용하며 금일은 완료된 시간까지만 집계합니다. 자료 없는 차량과 미래 구간은 제외합니다.<br>근무·휴게·휴일 미반영 · 성과 판정용이 아닌 참고값</p>`;
   }
   function summaryVehicles() {
     return sortedSummaryVehicles(filterVehicleQuery(M.listed(rows,state),'listVehicle'));
@@ -530,7 +536,7 @@
     const byVehicle=state.efficiencyMode==='vehicle',inline=state.efficiencyLayout==='inline',screenId=byVehicle?'LQ-REF-003-T02':inline?'LQ-REF-003-T01':'LQ-REF-003';
     const scoped=reportScope(),vehicle=state.reportVehicle&&!state.reportSearch?scoped[0]:null,today=isToday(),hourly=state.period==='d',days=M.efficiencyCalendar(scoped,state.period,state.from,state.to,{today,period:state.period}),p=M.efficiencyPerformance(scoped,state.from,state.to,{today,period:state.period});
     if(state.reportVehicle&&!state.reportSearch&&!vehicle)return reportView(screenId,efficiencyTitle(),reportScopeError(),resultsOnly);
-    const efficiencyScopeCriteria='선택한 전체·그룹·차량과 조회 기간의 정보입니다. 작업·대기·잔여 시간은 해당 범위에서 실적이 확인된 차량의 대당 평균이며, 차량 1대를 선택하면 그 차량의 시간입니다. 기간 값은 기간 누적 시간의 평균, 날짜별 값은 그날 실적의 평균입니다. 운영효율(%) = 작업 합계 ÷ (작업+대기 합계) × 100이며, 가동률 = (작업+대기) ÷ 기준시간입니다. 막대는 기준시간 안의 작업·대기·미사용 구성입니다. 기준시간은 예시의 08:00~18:00 구간으로, 실제 조업 정책이 아닙니다. 금일은 완료된 시간까지만 집계하고 미래·자료 없는 구간은 미집계로 표시합니다.';
+    const efficiencyScopeCriteria='선택한 전체·그룹·차량과 조회 기간의 정보입니다. 작업·대기·잔여 시간은 해당 범위에서 실적이 확인된 차량의 대당 평균이며, 차량 1대를 선택하면 그 차량의 시간입니다. 기간 값은 기간 누적 시간의 평균, 날짜별 값은 그날 실적의 평균입니다. 운영효율(%) = 작업 합계 ÷ (작업+대기 합계) × 100이며, 가동률 = (작업+대기) ÷ 기준시간입니다. 막대는 기준시간 안의 작업·대기·미사용 구성입니다. 기준시간은 예시의 '+referenceHours()+' 구간으로, 실제 조업 정책이 아닙니다. 금일은 완료된 시간까지만 집계하고 미래·자료 없는 구간은 미집계로 표시합니다.';
     const weekday=date=>['일','월','화','수','목','금','토'][new Date(date+'T12:00:00+09:00').getUTCDay()];
     const daily=sortedEfficiencyEntries(days,d=>d.known>0&&Number.isFinite(d.work)?d.work/d.known:null).map(d=>{
       const date=`<span class="efficiency-date">${d.hour||d.date.slice(-2)}${d.hour?'':`<small>${weekday(d.date)}</small>`}</span>`;
@@ -538,7 +544,7 @@
       return `<details class="efficiency-day" data-date="${d.date}"${d.hour?` data-hour="${d.hour}"`:''}><summary aria-label="${d.date}${d.hour?' '+d.hour:''} 운영효율 ${rate(d.rate)}, ${efficiencyTimeDescription(d,d.known)}, 상세 펼치기">${date}${efficiencyChart(d,d.known)}</summary><div class="efficiency-day__detail">${definition([['작업시간',hours(Math.round(d.work/d.known))],['대기시간',hours(Math.round(d.idle/d.known))],['미사용시간',hours(Math.round(d.unused/d.known))],['실적 확인',d.known+' / '+d.total+'대'],['운영효율',rate(d.rate)],['가동률',rate(d.utilization)]])}</div></details>`;
     }).join('');
     const graphTitle=byVehicle?'차량별 운영 현황':hourly?'시간대별 운영 현황':'일별 운영 현황';
-    const graphHelp=byVehicle?'선택한 조회 기간의 차량별 누적 작업·대기·미사용 시간입니다. 운영효율은 작업 ÷ (작업+대기)이며, 가동률은 (작업+대기) ÷ 기준시간입니다. 막대는 예시 조업 구간 08:00~18:00의 작업·대기·미사용 구성입니다. 금일은 완료된 시간까지만 집계합니다. 현재 통신 상태와 무관하게 기간 실적을 표시합니다.':efficiencyScopeCriteria;
+    const graphHelp=byVehicle?'선택한 조회 기간의 차량별 누적 작업·대기·미사용 시간입니다. 운영효율은 작업 ÷ (작업+대기)이며, 가동률은 (작업+대기) ÷ 기준시간입니다. 막대는 예시 조업 구간 '+referenceHours()+'의 작업·대기·미사용 구성입니다. 금일은 완료된 시간까지만 집계합니다. 현재 통신 상태와 무관하게 기간 실적을 표시합니다.':efficiencyScopeCriteria;
     const graphTabs=inline?`<div class="mobile-status-tabs efficiency-view-tabs" role="group" aria-label="운영 현황 표시 기준"><button type="button" data-efficiency-mode="daily" data-inline-efficiency aria-pressed="${!byVehicle}" class="${!byVehicle?'is-active':''}">${hourly?'시간대별':'일별'} 운영 현황</button><button type="button" data-efficiency-mode="vehicle" data-inline-efficiency aria-pressed="${byVehicle}" class="${byVehicle?'is-active':''}">차량별 운영 현황</button></div>`:'';
     const content=`<section class="dashboard-panel"><div class="dashboard-panel__head">${criteriaHeading('기간 운영효율','efficiency-help')}<span>집계 ${p.known} / ${p.total}대</span></div>${criteriaPanel('efficiency-help','<p class="source-note">'+efficiencyScopeCriteria+'</p>')}${!p.known?'<p class="empty-state">집계 정보가 없습니다.</p>':''}<div class="summary-totals"><span>운영효율<strong>${rate(p.rate)}</strong></span><span>작업시간<strong>${shortHours(p.known?Math.round(p.work/p.known):null)}</strong></span><span>대기시간<strong>${shortHours(p.known?Math.round(p.idle/p.known):null)}</strong></span></div></section>
       <section class="dashboard-panel efficiency-panel${byVehicle?' is-by-vehicle':''}" aria-label="${graphTitle}">${inline?`<div class="dashboard-panel__head">${graphTabs}</div>`:''}${criteriaPanel('daily-efficiency-help','<p class="source-note">'+graphHelp+' '+runningTimeCriteria+' 가동 중 작업 비중은 현재 운영효율과 같은 계산값입니다. h는 시간, m은 분입니다. 행을 누르면 운영효율과 상세 시간을 확인합니다.</p>')}<div class="work-legend efficiency-legend"><span class="efficiency-graph-count">${byVehicle?scoped.length+'대':days.length+(hourly?'시간':'일')}<button id="daily-efficiency-help-trigger" type="button" class="criteria-tip" data-criteria-tip="daily-efficiency-help" aria-label="${graphTitle} 기준 안내" aria-expanded="false" aria-controls="daily-efficiency-help">${icon('circle-help')}</button></span><span><i class="is-work"></i>작업</span><span><i class="is-idle"></i>대기</span><span><i class="is-unused"></i>미사용</span></div><div class="efficiency-axis"><span class="efficiency-axis-scale" aria-hidden="true">0<span>50</span>100%</span>${efficiencySortControl(byVehicle?scoped.length:days.length)}</div><div class="efficiency-daily-list">${(byVehicle?vehicleEfficiencyRows(scoped):daily)||'<p class="empty-state">조회 조건에 해당하는 실적이 없습니다.</p>'}</div></section>${dataNote(reportNote(today)+' '+missingCriteria)}`;
@@ -643,11 +649,13 @@
   let locationMapTrigger=null;
   function openLocationDialog(equipmentId='',trigger=null) {
     const v=equipmentId?(state.view==='summary'?summaryVehicles().find(row=>row.equipmentId===equipmentId):null):selected(),p=v?.position;
-    if(!validPosition(p))return;
+    if(!v)return;
+    const positioned=validPosition(p);
+    $('#location-dialog').classList.toggle('is-location-missing',!positioned);
     locationMapTrigger=trigger;
     setLocationMapExpanded(false);
     $('#location-dialog-title').textContent=fieldText(v.equipmentNumber);
-    $('#location-dialog-address').textContent=displayCopy(p.address)||'정보 없음';
+    $('#location-dialog-address').textContent=positioned?(displayCopy(p.address)||'주소 정보 없음'):'위치 정보 없음';
     const cell=(label,value,wide=false)=>'<div'+(wide?' class="is-wide"':'')+'><dt>'+label+'</dt><dd>'+esc(value??'정보 없음')+'</dd></div>';
     const m=periodMetrics(v);
     // Reuse WEB Map/map-tobe.html's shared status, not the summary attention flag.
@@ -659,11 +667,20 @@
       +cell('소속 그룹',v.group)+cell('통신 상태',v.conn===true?'연결':v.conn===false?'미연결':'수집 전')
       +cell('총 가동시간',Number.isFinite(v.cumH)?fmt(v.cumH)+'H':'정보 없음')
       +cell('자료일 가동시간',m?hours(m.min)+' ('+state.from+' ~ '+state.to+')':'정보 없음')
-      +cell('위치 기준 시간',p.lastDatetime,true);
-    $('#location-dialog-coordinate').textContent='('+p.lat.toFixed(6)+', '+p.lng.toFixed(6)+')';
+      +cell('위치 기준 시간',positioned?p.lastDatetime:null,true);
+    $('#location-dialog-coordinate').textContent=positioned?'('+p.lat.toFixed(6)+', '+p.lng.toFixed(6)+')':'';
+    $('#location-map').hidden=!positioned;
+    $('#location-map-expand').hidden=!positioned;
     $('#location-dialog').showModal();
     $('#location-dialog-body').scrollTop=0;
-    window.CustomerLocationMap.open({lat:p.lat,lng:p.lng,equipmentNumber:v.equipmentNumber});
+    if(positioned)window.CustomerLocationMap.open({lat:p.lat,lng:p.lng,equipmentNumber:v.equipmentNumber});
+    else {
+      window.CustomerLocationMap.close();
+      $('#location-map-status-text').textContent='이 차량의 위치 좌표가 수신되지 않아 지도에 표시할 수 없습니다.';
+      $('#location-map-status').hidden=false;
+      $('#location-map-external').hidden=true;
+      $('#location-map').setAttribute('aria-busy','false');
+    }
   }
   document.addEventListener('click',e=>{
     if(vehicleLookupOpen&&!e.target.closest('.vehicle-combobox'))closeVehicleLookup();
