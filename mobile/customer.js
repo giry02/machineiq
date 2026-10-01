@@ -19,6 +19,10 @@
   const validPosition=p=>!!p&&Number.isFinite(p.lat)&&Number.isFinite(p.lng)&&Math.abs(p.lat)<=90&&Math.abs(p.lng)<=180;
   const retryData=()=>'<button type="button" class="detail-secondary-button" data-retry-data>다시 불러오기</button>';
   const dataUnavailable=()=>'<section class="detail-card" data-load-state="error" role="alert"><div class="dashboard-panel__head"><h2>데이터를 불러오지 못했습니다.</h2></div><p class="source-note">연결 상태를 확인한 뒤 다시 시도해 주세요.</p>'+retryData()+'</section>';
+  function missingPage() {
+    const error=M.web.errors.describe('missing');
+    return '<section class="detail-card" data-screen-id="LQ-COM-006" role="alert"><div class="dashboard-panel__head"><h2>'+esc(error.title)+'</h2></div><p class="source-note">'+esc(error.detail)+'</p><a class="detail-secondary-button" href="./login.html">로그인 화면으로</a></section>';
+  }
   function supplyNotice(summary) {
     return summary.hasUnknown?'<div role="status"><p class="source-note">'+(summary.knownItems?'일부 소모품 정보 미수신 · 확인된 항목만 표시':'소모품 정보 미수신 · 상태 확인 불가')+'</p>'+retryData()+'</div>':'';
   }
@@ -27,32 +31,35 @@
   const hours = min => M.DISPLAY.duration(min);
   const shortHours = min => M.DISPLAY.duration(min,true);
   const rate = M.DISPLAY.efficiency;
-  const issueStyle = key => M.STATUS[key]||M.STATUS.unknown;
-  const metricCriteria = '운영효율 = 작업시간 ÷ (작업시간 + 대기시간) × 100. 운행시간이 0이면 산출하지 않습니다. 작업 활용률은 별도 가정 기준시간 대비 작업 비율입니다. ';
+  const metricCriteria = '운영효율 = 작업시간 ÷ (작업시간 + 대기시간) × 100. 가동시간이 0이면 산출하지 않습니다. 작업 활용률은 별도 가정 기준시간 대비 작업 비율입니다. ';
   const reportConnectionCriteria = '미연결은 조회 대상 중 현재 단말 통신을 확인할 수 없는 차량입니다. 대시보드와 같은 통신 상태로 집계하며 조회 기간의 작업 실적 유무와는 구분합니다. 미연결 차량도 선택 기간에 수집된 실적은 표시합니다.';
   const missingCriteria = '숫자 -는 수신/집계 정보가 없거나 산출할 수 없다는 뜻입니다. 해당하지 않는 동력 항목도 -로 표시하며 실제 0은 0으로 표시합니다.';
   function periodCutoff() { const s=periodState(),current=state.view==='services'&&(state.service==='supplies'||state.service==='error'&&state.serviceFocus==='error');const label=state.view==='services'&&state.service==='error'&&state.serviceOrigin==='dashboard'?M.dashboardWindow({from:s.from,to:s.to,through:state.serviceThrough||M.SNAPSHOT}).label:current?M.SNAPSHOT.slice(5).replace('-','.')+' 기준 · 현재 상태':(state.view==='services'?M.periodWindow(s.from,s.to):M.efficiencyWindow(s.from,s.to)).label;return `<span class="period-cutoff">${esc(label)}</span>`; }
-  const labels = {home:'홈',summary:'요약정보',detail:'차량 상세',services:'서비스',reports:'리포트',efficiency:'운영효율',account:'설정',settings:'설정',approvals:'사용자 승인',shock:'충격',engine:'엔진',battery:'배터리',operation:'운행정보',supplies:'소모품',maintenance:'수리이력',error:'에러',notifications:'알림 내역'};
+  const labels = {home:'홈',summary:'요약정보',detail:'차량 상세',services:'서비스',reports:'리포트',efficiency:'운영효율',account:'설정',settings:'설정',vehicleRegistration:'차량 등록',vehicleRequests:'차량 신청내역',vehicleRequired:'차량 등록 안내',approvals:'사용자 승인',shock:'충격',engine:'엔진',battery:'배터리',operation:'운행정보',supplies:'소모품',maintenance:'수리이력',error:'에러',notifications:'알림 내역',notFound:'페이지 없음'};
   const periodViews=new Set(['summary','detail','operation','shock','reports','efficiency']);
   function linkedPeriodSelection(period,from,to) {
     // Preserve old custom-range links; new day/week/month searches use one shared rule.
     if(period==='c'&&from&&to&&from!==to)return {period,from,to};
     return M.efficiencyRange(period==='c'?'d':period,from||to||M.SNAPSHOT.slice(0,10),from?'start':'end');
   }
-  const liveLabels = {connected:'통신 연결',offline:'통신 미연결',running:'가동 중',idle:'미가동',error:M.STATUS.error.label,due:M.STATUS.due.label,soon:M.STATUS.soon.label};
+  const liveLabels = {connected:'통신 연결',offline:'통신 미연결',running:'가동 중',idle:'유휴',connection_unknown:'연결 상태 확인 불가',operation_unknown:'가동 상태 확인 불가',error:M.STATUS.error.label,due:M.STATUS.due.label,soon:M.STATUS.soon.label};
   let state, navigated = false, rangeOpen = false;
+  const summarySortFields=[['work','작업시간'],['idle','대기시간'],['km','운행거리'],['efficiency','운영효율']];
+  let vehicleLookupOpen=false,vehicleLookupIndex=-1;
+  const vehicleSearchKeys=window.CustomerQueryControls.searchKeys;
   const supplySelection=new Set();
   let supplyContext='',supplyPending=[],supplyUndo=[],supplyMessage='';
   const chargeMemory=new Map();
   let chargeContext='',chargeDraft=null,chargeMessage='';
   // Per-role, in-memory UI preferences only. No OS permission, FCM or server write.
-  const pushFields=[['shockWarningYn','실시간 충격'],['vehicleWarningYn','실시간 차량 에러'],['batteryWarningYn','실시간 배터리 경고'],['marketingYn','공지사항/마케팅 알림']];
+  const pushFields=[['shockWarningYn','실시간 충격'],['vehicleWarningYn','실시간 차량 에러'],['batteryWarningYn','실시간 배터리 경고'],['suppliesWarningYn','소모품 교체 안내'],['marketingYn','공지사항/마케팅 알림']];
   const pushPreferences=Object.fromEntries(Object.keys(M.ROLE_LABELS).map(role=>[role,{pushAlarmYn:false,...Object.fromEntries(pushFields.map(([key])=>[key,false]))}]));
-  const notificationCategories=[['all','전체'],['shock','충격'],['error','차량 에러'],['battery','배터리'],['other','기타']];
-  function notificationCategory(item) { const view=M.pushPresentation(item).view;return ['shock','error','battery'].includes(view)?view:'other'; }
+  const notificationCategories=[['all','전체'],['shock','충격'],['error','차량 에러'],['battery','배터리'],['supplies','소모품'],['other','기타']];
+  function notificationCategory(item) { const view=M.pushPresentation(item).view;return ['shock','error','battery','supplies'].includes(view)?view:'other'; }
+  const {scopeControls,periodState,periodPatch,periodControls,vehicleQueryControl,filterVehicleQuery,vehicleControl,vehicleSearchStatus}=window.CustomerQueryControls.create({model:M,rows,getState:()=>state,getRangeOpen:()=>rangeOpen,esc,fieldText,icon,summaryVehicles});
   function readState() {
     const [requestedView, qs] = location.hash.slice(1).split('?');
-    const view = Object.hasOwn(labels,requestedView) ? requestedView : 'home';
+    const view = Object.hasOwn(labels,requestedView) ? requestedView : requestedView?'notFound':'home';
     const p = new URLSearchParams(location.search);
     new URLSearchParams(qs).forEach((v,k)=>p.set(k,v));
     const efficiencyLayout=p.get('efficiencyLayout')==='inline'?'inline':'menu';
@@ -61,12 +68,16 @@
     const serviceSelection=view==='services'?linkedPeriodSelection(p.get('servicePeriod')||'m',p.get('serviceFrom'),p.get('serviceTo')):null;
     const period = selection?.period||(['d','w','m','c'].includes(p.get('period')) ? p.get('period') : 'm');
     const [from,to] = M.dates(period);
-    return {efficiencyLayout,efficiencyMode,view:Object.hasOwn(labels,view) ? view : 'home',role:Object.hasOwn(M.ROLE_LABELS,p.get('role')) ? p.get('role') : p.has('role')?'customer_staff':'customer_owner',serviceOrigin:p.get('serviceOrigin')==='dashboard'?'dashboard':'',serviceThrough:p.get('serviceThrough')||'',notificationCategory:notificationCategories.some(([key])=>key===p.get('notificationCategory'))?p.get('notificationCategory'):'all',serviceEquipmentId:view==='home'?'':p.get('serviceEquipmentId')||'',
+    return {efficiencyLayout,efficiencyMode,efficiencyDirection:['asc','desc'].includes(p.get('efficiencyDirection'))?p.get('efficiencyDirection'):efficiencyMode==='vehicle'?'desc':'',view:Object.hasOwn(labels,view) ? view : 'home',role:Object.hasOwn(M.ROLE_LABELS,p.get('role')) ? p.get('role') : p.has('role')?'customer_staff':'customer_owner',serviceOrigin:p.get('serviceOrigin')==='dashboard'?'dashboard':'',serviceThrough:p.get('serviceThrough')||'',notificationCategory:notificationCategories.some(([key])=>key===p.get('notificationCategory'))?p.get('notificationCategory'):'all',serviceEquipmentId:view==='home'?'':p.get('serviceEquipmentId')||'',
       group:view==='home'?'':p.get('group')||'',type:'',q:['home','summary'].includes(view)?'':p.get('q')||'',listVehicle:view==='home'?'':p.get('listVehicle')||'',status:'all',live:view==='home'?'':p.get('live')||'',
+      summarySearch:view==='home'?'':p.get('summarySearch')||'',reportSearch:view==='home'?'':p.get('reportSearch')||'',serviceSearch:view==='home'?'':p.get('serviceSearch')||'',
+      summarySort:summarySortFields.some(([key])=>key===p.get('summarySort'))?p.get('summarySort'):'work',summaryDirection:summarySortFields.some(([key])=>key===p.get('summarySort'))&&p.get('summaryDirection')==='asc'?'asc':'desc',
       service:['maintenance','supplies','error'].includes(p.get('service'))?p.get('service'):'maintenance',serviceEntry:p.get('serviceEntry')||'',servicePeriod:serviceSelection?.period||p.get('servicePeriod')||'m',serviceFrom:serviceSelection?.from||p.get('serviceFrom')||M.dates('m')[0],serviceTo:serviceSelection?.to||p.get('serviceTo')||M.dates('m')[1],serviceFocus:['error','due','soon'].includes(p.get('serviceFocus'))?p.get('serviceFocus'):'',reportFocus:['all','waiting','unknown'].includes(p.get('reportFocus'))?p.get('reportFocus'):'all',equipmentId:p.get('equipmentId')||'',returnView:['summary','services','detail','notifications'].includes(p.get('returnView'))?p.get('returnView'):'detail',reportVehicle:view==='home'?'':p.get('reportVehicle')||'',period,from:selection?.from||p.get('from')||from,to:selection?.to||p.get('to')||to};
   }
   function go(view,patch={},replace=false) {
     const next = {...state,...patch,view};
+    if('efficiencyMode' in patch&&patch.efficiencyMode!==state.efficiencyMode&&!('efficiencyDirection' in patch))next.efficiencyDirection=patch.efficiencyMode==='vehicle'?'desc':'';
+    for(const [control,query] of Object.entries(vehicleSearchKeys))if(control in patch&&!(query in patch))next[query]='';
     if(view!=='services'||patch.serviceFocus!==undefined&&patch.serviceOrigin===undefined||patch.service&&patch.service!=='error')Object.assign(next,{serviceOrigin:'',serviceThrough:''});
     if(periodViews.has(view))Object.assign(next,linkedPeriodSelection(next.period,next.from,next.to));
     if(view==='services'){
@@ -77,7 +88,7 @@
     if(!['error','maintenance','supplies'].includes(view))next.serviceEntry='';
     next.type = '';
     if (!['all','waiting','unknown'].includes(next.reportFocus)) next.reportFocus = 'all';
-    if (view === 'home') Object.assign(next,{group:'',q:'',live:'',status:'all',equipmentId:'',listVehicle:'',reportVehicle:'',serviceEquipmentId:''});
+    if (view === 'home') Object.assign(next,{group:'',q:'',live:'',status:'all',equipmentId:'',listVehicle:'',reportVehicle:'',serviceEquipmentId:'',summarySearch:'',reportSearch:'',serviceSearch:''});
     if (view === 'summary') next.q='';
     if (!replace) rangeOpen = false;
     if (next.role !== 'customer_owner') next.group = '';
@@ -90,30 +101,8 @@
     navigated = true; render();
     if (!replace) { window.scrollTo(0,0); $('#main').focus({preventScroll:true}); }
   }
-  function scopeControls() {
-    return state.role === 'customer_owner' ? `<label class="compact-group"><select data-control="group" aria-label="그룹"><option value="">전체 그룹</option>${[...new Set(rows.map(v=>v.group))].map(v=>`<option ${state.group===v?'selected':''}>${esc(v)}</option>`).join('')}</select></label>` : '';
-  }
   function serviceScopeControls() {
     return `<section class="compact-filter-top service-scope-controls${state.role==='customer_owner'?'':' no-group'}" aria-label="서비스 조회 대상">${scopeControls()}${vehicleControl('serviceEquipmentId')}</section>`;
-  }
-  function periodState() {
-    const prefix=state.view==='services'?'service':'';
-    return prefix?{period:state[prefix+'Period'],from:state[prefix+'From'],to:state[prefix+'To']}:state;
-  }
-  function periodPatch(period,from,to) {
-    const prefix=state.view==='services'?'service':'';
-    return prefix?{[prefix+'Period']:period,[prefix+'From']:from,[prefix+'To']:to}:{period,from,to};
-  }
-  function periodControls({group=false,search=false,vehicle=false}={}) {
-    const s=periodState(),linked=s.period!=='c',dayOnly=s.period==='d';
-    const hasGroup=group&&state.role==='customer_owner';
-    const shortDate=value=>/^\d{4}-\d{2}-\d{2}$/.test(value)?value.slice(5).replace('-','.'):value;
-    const lookup=search?`<label class="vehicle-search compact-vehicle-search">${icon('search')}<input type="search" id="vehicle-search" value="${esc(state.q)}" placeholder="차량번호 · 기종 검색" aria-label="차량번호 · 기종 · 그룹 검색"></label>`:vehicle?vehicleControl(vehicle===true?'reportVehicle':vehicle):'';
-    return `<section class="compact-filter-panel ${hasGroup?'has-group':'no-group'} ${search?'has-search':'no-search'}${vehicle?' has-report-vehicle':''}" aria-label="조회 조건">
-      ${hasGroup?'<div class="compact-filter-top">'+scopeControls()+lookup+'</div>':lookup}
-      <button class="compact-range-toggle" type="button" data-toggle-range aria-expanded="${rangeOpen}" aria-controls="range-form" aria-label="조회 기간 ${esc(s.from)} ~ ${esc(s.to)}, 날짜 변경">${icon('calendar-days')}<span>${esc(shortDate(s.from))}${dayOnly?'':' ~ '+esc(shortDate(s.to))}</span>${icon('chevron-down')}</button>
-      <div class="period-tabs" role="group" aria-label="조회 기간">${[['d','일'],['w','주'],['m','월']].map(([key,text])=>`<button type="button" data-period="${key}" aria-pressed="${s.period===key}" class="${s.period===key?'is-active':''}">${text}</button>`).join('')}</div>
-      <form class="date-range" id="range-form" ${rangeOpen?'':'hidden'}${linked?' data-linked-period="'+s.period+'"':''}><input name="from" type="date" value="${esc(s.from)}" aria-label="${dayOnly?'조회일':'조회 시작일'}" required><span ${dayOnly?'hidden':''}>~</span><input name="to" type="${dayOnly?'hidden':'date'}" value="${esc(s.to)}" aria-label="조회 종료일" required><button type="submit">조회</button></form></section>`;
   }
   const socLevel = v => ['리튬','납산'].includes(v.type)&&Number.isFinite(v.soc)&&v.soc>=0&&v.soc<=100 ? (v.soc>=60?'high':v.soc>=30?'medium':'low') : '';
   const batteryIcon = v => socLevel(v) ? `<svg class="battery-soc-icon" data-soc-level="${socLevel(v)}" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect class="battery-soc-fill" x="4" y="9" width="12" height="6" rx="1" stroke="none"/><rect x="2" y="7" width="16" height="10" rx="2"/><path d="M22 11v2"/></svg>` : icon('battery');
@@ -181,53 +170,122 @@
       return `<button type="button" class="performance-vehicle is-work-time" data-report-vehicle="${esc(v.equipmentId)}" ${today?'data-today="true"':''}><div><strong>${escField(v.equipmentNumber)}</strong><small>${escField(v.model)} · ${esc(v.group)}</small></div><b>${m?'<small>작업시간</small>'+shortHours(m.work):'-'}</b><p>${!v.conn?'통신 미연결 · ':''}${m?'대기 '+shortHours(m.idle)+' · 운영효율 '+rate(m.efficiency):'선택 기간 실적 없음'}</p>${icon('chevron-right')}</button>`;
     }).join('')||'<p class="empty-state">표시 기준에 해당하는 차량이 없습니다.</p>';
   }
-  function status(v) { return `<span class="status-pill ${!v.conn?'is-offline':v.operating?'':'is-idle-status'}">${!v.conn?'미연결':v.operating?'가동 중':'미가동'}</span>`; }
+  function status(v) {
+    const label=v.conn===false?'미연결':v.conn!==true?'연결 확인 불가':v.operating===true?'가동 중':v.operating===false?'유휴':'가동 확인 불가';
+    return '<span class="status-pill '+(v.conn===false?'is-offline':v.operating===false?'is-idle-status':'')+'">'+label+'</span>';
+  }
   function communicationStatus(v) {
-    const label=v.conn?'연결':'미연결';
+    const label=v.conn===true?'연결':v.conn===false?'미연결':'확인 불가';
     return `<span class="status-pill ${v.conn?'':'is-offline'}" title="통신연결" aria-label="통신연결 ${label}">${label}</span>`;
   }
   function vehicleCard(v) {
     const metric=periodMetrics(v);
-    return `<article class="vehicle-mobile-row ${M.attention(v)?'is-attention':''}"><button type="button" class="vehicle-card-main" data-vehicle="${esc(v.equipmentId)}"><div class="vehicle-mobile-row__head"><div><strong>${escField(v.equipmentNumber)}</strong><small>${escField(v.model)} · ${esc(v.type)} · ${esc(v.group)}</small></div>${communicationStatus(v)}</div><div class="vehicle-mobile-row__meta"><span>작업시간<b>${metric?hours(metric.work):'-'}</b></span><span>대기시간<b>${metric?hours(metric.idle):'-'}</b></span><span>운행거리<b>${metric?fmt(metric.km,' km'):'-'}</b></span><span>운영효율<b>${rate(metric?.efficiency)}</b></span></div><div class="row-status"><span>${!v.conn?'마지막 수신 '+(v.receivedAt?.slice(5)||'정보 미제공'):'기간 실적 · 현재 상태는 별도'}</span><span>차량 상세 ›</span></div></button>${vehicleActions(v)}</article>`;
+    const positioned=validPosition(v.position),mapLabel=fieldText(v.equipmentNumber)+(positioned?' 지도 보기':' 위치 정보 없음');
+    return `<article class="vehicle-mobile-row ${M.attention(v)?'is-attention':''}"><div class="vehicle-mobile-row__head"><button type="button" class="vehicle-card-main summary-heading-link" data-vehicle="${esc(v.equipmentId)}"><strong>${escField(v.equipmentNumber)}</strong><small>${escField(v.model)} · ${esc(v.type)} · ${esc(v.group)}</small></button><div class="summary-status-actions"><button type="button" class="summary-map-button" data-map="${esc(v.equipmentId)}" aria-label="${esc(mapLabel)}" title="${positioned?'지도 보기':'위치 정보 없음'}"${positioned?'':' disabled'}>${icon('map-pin')}</button>${communicationStatus(v)}</div></div><button type="button" class="vehicle-card-main" data-vehicle="${esc(v.equipmentId)}"><div class="vehicle-mobile-row__meta"><span>작업시간<b>${metric?hours(metric.work):'-'}</b></span><span>대기시간<b>${metric?hours(metric.idle):'-'}</b></span><span>운행거리<b>${metric?fmt(metric.km,' km'):'-'}</b></span><span>운영효율<b>${rate(metric?.efficiency)}</b></span></div><div class="row-status"><span>${!v.conn?'마지막 수신 '+(v.receivedAt?.slice(5)||'정보 미제공'):'기간 실적 · 현재 상태는 별도'}</span><span>차량 상세 ›</span></div></button>${vehicleActions(v)}</article>`;
   }
-  let homeSort='work';
+  let homeSort='work',homeSortDirection='desc';
   function home() {
     const dashboard=window.CustomerHomeView;
     if(!dashboard)return dataUnavailable();
     const mode=document.body?.dataset.dashboardMode==='preview'?'preview':'main';
-    return `<div data-screen-id="LQ-DASH-001" data-home-layout="current"><div class="snapshot"><div class="panel-heading-with-tip home-title"><h1>금일 현황</h1><button type="button" class="criteria-tip" data-refresh-home aria-label="금일 현황 새로고침" title="새로고침">${icon('refresh-cw')}</button></div><span title="1시간 단위 수집 · 마지막 수집 완료 구간 기준 · 한국시간">${M.hourlyWindow().label}</span></div>${dashboard.render(M,dashboard.build(M,rows,state.role),homeSort,mode)}</div>`;
+    return `<div data-screen-id="LQ-DASH-001" data-home-layout="current"><div class="snapshot"><div class="panel-heading-with-tip home-title"><h1>금일 현황</h1><button type="button" class="criteria-tip" data-refresh-home aria-label="금일 현황 새로고침" title="새로고침">${icon('refresh-cw')}</button></div><span title="1시간 단위 수집 · 마지막 수집 완료 구간 기준 · 한국시간">${M.hourlyWindow().label}</span></div>${dashboard.render(M,dashboard.build(M,rows,state.role),homeSort,mode,homeSortDirection)}</div>`;
   }
   function performanceBar(p) {
     return `<div class="work-track" role="img" aria-label="작업 ${hours(p.work)}, 대기 ${hours(p.idle)}, 기준시간 미사용 ${hours(p.unused)}"><span class="is-work" style="width:${p.capacity?p.work/p.capacity*100:0}%"></span><span class="is-idle" style="width:${p.capacity?p.idle/p.capacity*100:0}%"></span><span class="is-unused" style="width:${p.capacity?p.unused/p.capacity*100:0}%"></span></div><div class="work-legend"><span><i class="is-work"></i>작업</span><span><i class="is-idle"></i>대기</span><span><i class="is-unused"></i>미사용</span></div>`;
   }
+  // Local demo presentation only: production binds server totals/averages.
+  function performanceAverage(p,key) {
+    return p.known&&p.entries.every(e=>Number.isFinite(e.m[key]))?p.entries.reduce((sum,e)=>sum+e.m[key],0)/p.known:null;
+  }
   function groupPerformance(scoped,from,to,today=false) {
     return [...new Set(scoped.map(v=>v.group))].map(group=>{
       const vehicles=scoped.filter(v=>v.group===group),p=M.efficiencyPerformance(vehicles,from,to,{today,period:state.view==='home'?'d':state.period,source:state.view==='home'?'dashboard':'efficiency'});
-      return `<button class="group-row performance-group" type="button" data-report-group="${esc(group)}" ${today?'data-today="true"':''} aria-label="${esc(group)} 차량별 작업 현황 보기"><strong>${esc(group)}${icon('chevron-right')}</strong><b>운영효율 ${rate(p.workShare)}</b><div class="group-performance-metrics"><span>대당 작업<b>${shortHours(p.known?Math.round(p.work/p.known):null)}</b></span><span>대당 대기<b>${shortHours(p.known?Math.round(p.idle/p.known):null)}</b></span></div><small>집계 ${p.known} / ${p.total}대${p.unknown?' · 미연결 '+p.unknown+'대':''}</small></button>`;
+      return `<button class="group-row performance-group" type="button" data-report-group="${esc(group)}" ${today?'data-today="true"':''} aria-label="${esc(group)} 차량별 작업 현황 보기"><strong>${esc(group)}${icon('chevron-right')}</strong><b>운영효율 ${rate(p.workShare)}</b><div class="group-performance-metrics"><span>대당 가동<b>${shortHours(performanceAverage(p,'min'))}</b></span><span>대당 작업<b>${shortHours(p.known?Math.round(p.work/p.known):null)}</b></span><span>대당 대기<b>${shortHours(p.known?Math.round(p.idle/p.known):null)}</b></span><span>대당 이동거리<b>${fmt(performanceAverage(p,'km'),' km')}</b></span></div><small>집계 ${p.known} / ${p.total}대${p.unknown?' · 미집계 '+p.unknown+'대':''}</small></button>`;
     }).join('');
   }
+  const runningTimeCriteria='가동시간 = 작업시간 + 대기시간. 미사용시간은 기준시간에서 가동시간을 뺀 잔여 시간이며, 현재 통신 미연결이나 최신 시간대 유휴 차량 수와는 별개입니다.';
   function referenceRateCriteria(today) {
-    return `<p class="source-note">${metricCriteria}<br>작업 활용률 = 작업 ÷ 기준시간 × 100<br>기준시간: 수집된 과거 일자는 일 10시간, 금일은 08:00부터 마지막 수집 시각까지의 경과시간을 가정합니다. 차량별 마지막 수신 이후는 제외하며, 초과 운행은 실제 운행시간을 적용합니다.<br>근무·휴게·휴일 미반영 · 성과 판정용이 아닌 참고값</p>`;
+    return `<p class="source-note">${metricCriteria}<br>${runningTimeCriteria}<br>작업 활용률 = 작업 ÷ 기준시간 × 100<br>기준시간: 이 예시의 08:00~18:00 구간만 사용하며 금일은 완료된 시간까지만 집계합니다. 자료 없는 차량과 미래 구간은 제외합니다.<br>근무·휴게·휴일 미반영 · 성과 판정용이 아닌 참고값</p>`;
   }
-  function vehicleControl(control='reportVehicle') {
-    const options=M.scope(rows,state);
-    const selectedId=state[control],valid=options.some(v=>v.equipmentId===selectedId);
-    return `<label class="compact-report-vehicle"><select data-control="${esc(control)}" aria-label="조회 차량"><option value="" ${!selectedId?'selected':''}>전체 차량</option>${selectedId&&!valid?'<option value="'+esc(selectedId)+'" selected disabled>조회할 수 없는 차량</option>':''}${options.map(v=>`<option value="${esc(v.equipmentId)}" ${v.equipmentId===selectedId?'selected':''}>${escField(v.equipmentNumber)} · ${escField(v.model)}</option>`).join('')}</select></label>`;
+  function summaryVehicles() {
+    return sortedSummaryVehicles(filterVehicleQuery(M.listed(rows,state),'listVehicle'));
+  }
+  function summaryCards() {
+    return summaryVehicles().map(vehicleCard).join('')||'<p class="empty-state">조건에 맞는 차량이 없습니다.</p>';
+  }
+  function lookupChoices() {
+    return [{equipmentId:'',equipmentNumber:'전체 차량'},...M.scope(rows,state)];
+  }
+  function updateVehicleLookup() {
+    const control=vehicleQueryControl(),query=vehicleSearchKeys[control],input=$('#vehicle-lookup-input'),popup=$('#vehicle-lookup-popup');
+    if(!control||!input||!popup)return;
+    input.setAttribute('aria-expanded',String(vehicleLookupOpen));
+    input.removeAttribute('aria-activedescendant');
+    popup.hidden=!vehicleLookupOpen;
+    $('[data-clear-vehicle-lookup]').hidden=!state[control]&&!state[query];
+    $('[data-toggle-vehicle-lookup]').setAttribute('aria-label',vehicleLookupOpen?'차량 목록 닫기':'차량 목록 열기');
+    if(!vehicleLookupOpen)return;
+    $('#vehicle-lookup-options').innerHTML=lookupChoices().map((v,index)=>`<button type="button" role="option" tabindex="-1" id="vehicle-lookup-option-${index}" data-select-vehicle-lookup="${esc(v.equipmentId)}" aria-selected="${!state[query]&&v.equipmentId===state[control]}" class="vehicle-combobox-option${index===vehicleLookupIndex?' is-keyboard-active':''}"><strong>${escField(v.equipmentNumber)}</strong>${v.equipmentId?`<span>${escField(v.model)} · ${escField(v.group)}</span>`:''}</button>`).join('');
+    if(vehicleLookupIndex>=0){input.setAttribute('aria-activedescendant','vehicle-lookup-option-'+vehicleLookupIndex);$('#vehicle-lookup-option-'+vehicleLookupIndex)?.scrollIntoView?.({block:'nearest'});}
+  }
+  function openVehicleLookup() {
+    if(!vehicleQueryControl())return;
+    vehicleLookupOpen=true;vehicleLookupIndex=-1;
+    updateVehicleLookup();$('#vehicle-lookup-input').focus();$('#vehicle-lookup-input').select?.();
+  }
+  function closeVehicleLookup() {
+    if(!vehicleLookupOpen)return;
+    vehicleLookupOpen=false;vehicleLookupIndex=-1;updateVehicleLookup();
+  }
+  function chooseLookupVehicle(id) {
+    const control=vehicleQueryControl(),query=vehicleSearchKeys[control];
+    if(!control||id&&!M.scope(rows,state).some(v=>v.equipmentId===id))return;
+    go(state.view,{[control]:id,[query]:'',status:'all',live:'',equipmentId:''},true);
+    $('#vehicle-lookup-input').focus({preventScroll:true});
+  }
+  function applyVehicleSearch(input) {
+    const control=vehicleQueryControl(),searchKey=vehicleSearchKeys[control];
+    if(!control)return;
+    state[searchKey]=input.value;state[control]='';state.equipmentId='';
+    vehicleLookupOpen=false;vehicleLookupIndex=-1;updateVehicleLookup();
+    const query=new URLSearchParams(location.hash.split('?')[1]||'');
+    for(const key of [searchKey,control,'equipmentId']){if(state[key])query.set(key,state[key]);else query.delete(key);}
+    history.replaceState({},'',location.pathname+location.search+'#'+state.view+'?'+query);
+    // Only replace query results: retain the input, caret, IME and unsubmitted date form.
+    if(state.view==='summary')$('.vehicle-mobile-list').innerHTML=summaryCards();
+    else if(state.view==='services'){
+      syncSupplyContext();
+      const data=serviceData();
+      $('#vehicle-service-tabs').innerHTML=serviceTabs(data);
+      $('#vehicle-query-results').innerHTML=serviceResults(data);
+      syncSupplySelection();
+    }else $('#vehicle-query-results').innerHTML=state.view==='reports'?reports(true):efficiency(true);
+    $('#vehicle-lookup-status').textContent=vehicleSearchStatus();
+    window.lucide?.createIcons({attrs:{'stroke-width':2}});
+  }
+  function sortedSummaryVehicles(vehicles,key=state.summarySort,direction=state.summaryDirection) {
+    if(!summarySortFields.some(([field])=>field===key))return vehicles;
+    return vehicles.map((vehicle,index)=>({vehicle,index,value:periodMetrics(vehicle)?.[key]})).sort((a,b)=>{
+      const aKnown=Number.isFinite(a.value),bKnown=Number.isFinite(b.value);
+      if(aKnown!==bKnown)return aKnown?-1:1;
+      return (aKnown?(a.value-b.value)*(direction==='asc'?1:-1):0)||a.index-b.index;
+    }).map(entry=>entry.vehicle);
+  }
+  function summarySortControls() {
+    return `<div class="summary-sort" role="group" aria-label="차량 정렬">${summarySortFields.map(([key,label])=>{const active=state.summarySort===key,asc=state.summaryDirection==='asc';return `<button type="button" data-summary-sort="${key}" aria-pressed="${active}" aria-label="${label}${active?(asc?' 오름차순':' 내림차순'):''}, ${active&&!asc?'오름차순':'내림차순'}으로 정렬">${label}${icon(active?(asc?'arrow-up':'arrow-down'):'arrow-down-up')}</button>`;}).join('')}</div>`;
   }
   function reportScope() {
-    const all=M.scope(rows,state);
-    return state.reportVehicle?all.filter(v=>v.equipmentId===state.reportVehicle):all;
+    return filterVehicleQuery(M.scope(rows,state),'reportVehicle');
   }
   function reportScopeError() {
     return '<p class="error-note">차량을 찾을 수 없거나 조회 범위 밖의 차량입니다.</p><button type="button" class="detail-secondary-button" data-clear-report-vehicle>전체 차량으로</button>';
   }
   function individualReport(v,p,today) {
     const entry=p.entries[0],m=entry?.m;
-    return `<section class="dashboard-panel"><div class="dashboard-panel__head">${criteriaHeading('차량 운행정보','vehicle-operation-help')}<span>선택 차량 기준</span></div>${definition([['운행시간',m?hours(m.min):'-'],['운행거리',m?fmt(m.km,' km'):'-'],['충격',m?fmt(m.shock,'건'):'-'],['가동 중 대기 비중',rate(entry?.idleRate)]])}${criteriaPanel('vehicle-operation-help','<p class="source-note">대기 비중 = 대기 ÷ (작업 + 대기) × 100 · 저활용 판정 없음</p>')}${!entry?`<p class="source-note">${today&&!v.conn?'현재 통신 미연결이며 선택 기간의 수집된 실적이 없습니다. 과거 기간을 선택하면 이전 실적을 확인할 수 있습니다.':'선택 기간의 수신 정보가 없습니다.'}</p>`:''}</section>`;
+    return `<section class="dashboard-panel"><div class="dashboard-panel__head">${criteriaHeading('차량 운행정보','vehicle-operation-help')}<span>선택 차량 기준</span></div>${definition([['가동시간',m?hours(m.min):'-'],['운행거리',m?fmt(m.km,' km'):'-'],['충격',m?fmt(m.shock,'건'):'-'],['가동 중 대기 비중',rate(entry?.idleRate)]])}${criteriaPanel('vehicle-operation-help','<p class="source-note">대기 비중 = 대기 ÷ (작업 + 대기) × 100 · 저활용 판정 없음</p>')}${!entry?`<p class="source-note">${today&&!v.conn?'현재 통신 미연결이며 선택 기간의 수집된 실적이 없습니다. 과거 기간을 선택하면 이전 실적을 확인할 수 있습니다.':'선택 기간의 수신 정보가 없습니다.'}</p>`:''}</section>`;
   }
   function summary() {
-    const visible=M.listed(rows,state).filter(v=>!state.listVehicle||v.equipmentId===state.listVehicle);
-    return `<div data-screen-id="LQ-OPS-001"><div class="snapshot"><h1>요약정보</h1>${periodCutoff()}</div>${periodControls({group:true,vehicle:'listVehicle'})}${state.live?`<button class="clear-filter" type="button" data-clear-live>${esc(liveLabels[state.live]||state.live)} 차량${icon('x')}</button>`:''}<div class="vehicle-mobile-list">${visible.map(vehicleCard).join('')||'<p class="empty-state">조건에 맞는 차량이 없습니다.</p>'}</div>${dataNote('작업·대기·거리·운영효율·충격은 조회 기간 실적입니다. 운영효율은 웹 요약정보의 기간 보정값이며, 작업·대기는 웹의 원장 비율로 나눕니다. 웹 운영효율 메뉴의 별도 분석값과 구분합니다. 업무 현황의 작업 활용률과는 다른 지표입니다. 통신·가동·잔량·에러·교체 알림은 마지막 수신 기준이며, 미연결 차량의 현재 가동 여부는 확인할 수 없으며, 선택 기간에 수집된 실적은 표시합니다. 소모품 숫자는 전체 조회 품목 수입니다. ! 표시는 교체주기 사용률 90% 이상인 교체 필요 품목이 있다는 뜻이며, 임박만 있으면 80% 이상~90% 미만 기준의 주의 색상으로 구분합니다. 품목별 상태는 소모품을 눌러 확인할 수 있습니다. 합계와 비교는 업무 현황에서 확인할 수 있습니다.')}</div>`;
+    return `<div data-screen-id="LQ-OPS-001"><div class="snapshot"><h1>요약정보</h1>${periodCutoff()}</div>${periodControls({group:true,vehicle:'listVehicle'})}${summarySortControls()}${state.live?`<button class="clear-filter" type="button" data-clear-live>${esc(liveLabels[state.live]||state.live)} 차량${icon('x')}</button>`:''}<div class="vehicle-mobile-list">${summaryCards()}</div>${dataNote('작업·대기·거리·운영효율·충격은 조회 기간 실적입니다. 운영효율은 웹 요약정보의 기간 보정값이며, 작업·대기는 웹의 원장 비율로 나눕니다. 웹 운영효율 메뉴의 별도 분석값과 구분합니다. 업무 현황의 작업 활용률과는 다른 지표입니다. 통신·가동·잔량·에러·교체 알림은 마지막 수신 기준이며, 미연결 차량의 현재 가동 여부는 확인할 수 없으며, 선택 기간에 수집된 실적은 표시합니다. 소모품 숫자는 전체 조회 품목 수입니다. ! 표시는 교체주기 사용률 90% 이상인 교체 필요 품목이 있다는 뜻이며, 임박만 있으면 80% 이상~90% 미만 기준의 주의 색상으로 구분합니다. 품목별 상태는 소모품을 눌러 확인할 수 있습니다. 합계와 비교는 업무 현황에서 확인할 수 있습니다.')}</div>`;
   }
   function selected() { return M.scope(rows,{...state,group:'',type:''}).find(v=>v.equipmentId===state.equipmentId); }
   function vehicleHeader(v) { return `<section class="detail-hero"><div class="detail-icon">${icon('truck')}</div><div><small>${esc(v.group)} · ${esc(v.type)}</small><h1>${escField(v.equipmentNumber)}</h1><p>${escField(v.model)} · ${escField(v.companyName)}</p></div>${status(v)}</section>`; }
@@ -273,7 +331,7 @@
     const m=periodMetrics(v),energy=v.type==='엔진'?'엔진':'배터리';
     const latestMaintenance=M.serviceHistory([v]).find(r=>r.kind==='maintenance');
     return `<div data-screen-id="LQ-OPS-002">${vehicleHeader(v)}<section class="detail-card"><div class="dashboard-panel__head"><h2>현재 점검 상태</h2><span>${v.conn?'수신 '+(v.receivedAt?.slice(5)||'정보 미제공'):'마지막 수신 '+(v.receivedAt?.slice(5)||'정보 미제공')}</span></div>${vehicleActions(v,{shock:false,energy:false})}</section>
-      ${periodControls()}<section class="detail-card"><div class="dashboard-panel__head"><h2>조회 기간 운행</h2>${periodCutoff()}</div>${definition([['작업시간',m?hours(m.work):'-'],['대기시간',m?hours(m.idle):'-'],['운행시간',m?hours(m.min):'-'],['운행거리',m?fmt(m.km,' km'):'-'],['운영효율',rate(m?.efficiency)],['충격',m?fmt(m.shock,'건'):'-',null,'shock-level-help']])}${shockBreakdown(m,true)}${reportActions(v)}</section>
+      ${periodControls()}<section class="detail-card"><div class="dashboard-panel__head"><h2>조회 기간 운행</h2>${periodCutoff()}</div>${definition([['작업시간',m?hours(m.work):'-'],['대기시간',m?hours(m.idle):'-'],['가동시간',m?hours(m.min):'-'],['운행거리',m?fmt(m.km,' km'):'-'],['운영효율',rate(m?.efficiency)],['충격',m?fmt(m.shock,'건'):'-',null,'shock-level-help']])}${shockBreakdown(m,true)}${reportActions(v)}</section>
       <section class="detail-card"><div class="dashboard-panel__head"><h2>${energy} 정보</h2><span>${v.conn?'현재 수신':'마지막 수신'}</span></div>${lithiumStates(v)}${v.type==='엔진'?definition([['평균 연료소비량',fmt(v.fc,' L/h')],['기준',M.ENERGY_MONTH+' 월간']]):definition([['종류',v.type],['잔량',rate(v.soc),v],['평균 전력소비량',fmt(v.bc,' kWh/h (월간)')],['배터리 전압',fmt(v.batteryVoltage,' V')],['배터리 용량',fmt(v.batteryCapacity,' Ah')],['수신시각',v.receivedAt]])}<p class="source-note">${energy==='엔진'?'회전수·냉각수 온도 이력 미수신':v.type==='리튬'?'마지막 수신 기준입니다.':'시계열·충전 이력 미수신'}</p>${smartCharge(v)}</section>
       <section class="detail-card"><div class="dashboard-panel__head"><h2>최근 수리</h2><button type="button" data-route="maintenance">수리이력${icon('chevron-right')}</button></div><p class="source-note">${latestMaintenance?esc(latestMaintenance.occurredAt.slice(5,10).replace('-','.'))+' '+esc(latestMaintenance.label)+' · '+(latestMaintenance.resolved?'완료':'진행중'):'수리이력 없음'}</p></section>
       <section class="detail-card"><div class="dashboard-panel__head"><h2>최종 위치</h2>${validPosition(v.position)?`<button type="button" data-map>지도 보기${icon('chevron-right')}</button>`:''}</div><p class="source-note">${validPosition(v.position)?esc(typeof v.position.address==='string'&&v.position.address.trim()?v.position.address:'주소 정보 없음')+'<br>('+v.position.lat+', '+v.position.lng+')':'위치 정보 없음'}</p></section>
@@ -285,7 +343,7 @@
     const m=periodMetrics(v), kind=state.view;
     const ids={shock:'LQ-OPS-005',engine:'LQ-OPS-006',battery:'LQ-OPS-007',operation:'LQ-OPS-002-T01',supplies:'LQ-SVC-003',maintenance:'LQ-SVC-002'};
     let content='';
-    if(kind==='operation') content=definition([['운행시간',m?hours(m.min):'-'],['운행거리',m?fmt(m.km,' km'):'-'],['작업시간',m?hours(m.work):'-'],['대기시간',m?hours(m.idle):'-']]);
+    if(kind==='operation') content=definition([['가동시간',m?hours(m.min):'-'],['운행거리',m?fmt(m.km,' km'):'-'],['작업시간',m?hours(m.work):'-'],['대기시간',m?hours(m.idle):'-']]);
     if(kind==='shock') content=definition([['기간 내 충격',m?fmt(m.shock,'건'):'-']])+shockBreakdown(m);
     if(kind==='engine') content=v.type==='엔진'?definition([['평균 연료소비량 ('+M.ENERGY_MONTH+')',fmt(v.fc,' L/h')]])+'<p class="source-note">냉각수 온도·엔진 회전수 이력 미수신</p>':'<p class="empty-state">엔진 차량이 아닙니다.</p>';
     if(kind==='battery') content=v.type!=='엔진'?lithiumStates(v)+definition([['배터리 종류',v.type],['잔량'+(!v.conn?' (마지막 수신)':''),rate(v.soc),v],['수신시각',v.receivedAt],['평균 전력소비량 ('+M.ENERGY_MONTH+')',fmt(v.bc,' kWh/h')],['배터리 전압',fmt(v.batteryVoltage,' V')],['배터리 용량',fmt(v.batteryCapacity,' Ah')],...(v.type==='리튬'?[]:[['충전 예약','이용 불가']])])+smartCharge(v):'<p class="empty-state">배터리 차량이 아닙니다.</p>';
@@ -295,10 +353,9 @@
     }
     if(kind==='maintenance') content=M.serviceRecords([v],{kind,from:state.from,to:state.to}).map(maintenanceRow).join('')||'<p class="empty-state">해당 내역이 없습니다.</p>';
     if(state.serviceEntry&&kind==='maintenance') {
-      const records=kind==='supplies'?M.serviceRecords([v],{kind}):M.serviceHistory([v]);
+      const records=M.serviceHistory([v]);
       const entry=records.find(r=>r.id===state.serviceEntry&&r.kind===kind);
       if(!entry) content='<p class="empty-state">조회할 수 없는 내역입니다.</p>';
-      else if(kind==='supplies') content=supplyDetail(entry);
       else content=definition([['그룹',v.group],['기종',v.model],['호기',v.equipmentNumber],...maintenanceFields(entry)]);
     }
     return `<div data-screen-id="${ids[kind]}">${vehicleHeader(v)}<div class="section-heading"><h2>${labels[kind]}</h2>${['operation','shock'].includes(kind)?periodCutoff():`<small>${kind==='battery'&&!v.conn?'마지막 수신 정보':kind==='error'&&state.serviceEntry?'발생 이력':['battery','supplies','error'].includes(kind)?'현재 수신 상태':kind==='engine'?M.ENERGY_MONTH+' 월간':'기간별 정보'}</small>`}</div>${['operation','shock'].includes(kind)?periodControls():''}<section class="detail-card">${content}</section>${dataNote('운행·충격은 선택 기간 기준, 연료·전력소비량은 '+M.ENERGY_MONTH+' 현재 집계 기준입니다. 잔량·점검 알림은 마지막 수신 기준이며 수신되지 않은 숫자는 -로 표시합니다.')}<button class="detail-secondary-button" type="button" data-return>${state.returnView==='notifications'?'알림 목록으로 돌아가기':state.returnView==='summary'?'요약정보로 돌아가기':state.returnView==='services'?'서비스 목록으로 돌아가기':'차량 상세로 돌아가기'}</button></div>`;
@@ -314,7 +371,7 @@
   function visibleSupplies() {
     if(state.role!=='customer_owner')return [];
     if(state.view==='services'&&state.service==='supplies'){
-      const scoped=M.scope(rows,state).filter(v=>!state.serviceEquipmentId||v.equipmentId===state.serviceEquipmentId);
+      const scoped=filterVehicleQuery(M.scope(rows,state),'serviceEquipmentId');
       return M.serviceRecords(scoped,{kind:'supplies',focus:state.serviceFocus});
     }
     if(state.view==='supplies'){const v=selected();return v?M.supplyItems(v).filter(r=>!state.serviceEntry||r.id===state.serviceEntry):[];}
@@ -374,22 +431,33 @@
   function maintenanceRow(r) {
     return `<button type="button" class="service-item-line is-state-${r.resolved?'neutral':'danger'}" data-service-vehicle="${esc(r.equipmentId)}" data-kind="${r.kind}" data-entry="${esc(r.id)}"><span>${icon('clipboard-check')}${esc(r.label)}<small>${esc(r.occurredAt.slice(5).replace('-','.'))}</small></span><b>${r.resolved?'처리완료':'진행중'}</b>${icon('chevron-right')}</button>`;
   }
-  function services() {
-    const available=M.scope(rows,state);
-    const scoped=state.serviceEquipmentId?available.filter(v=>v.equipmentId===state.serviceEquipmentId):available,s=periodState(),current=state.service==='supplies',activeErrors=state.service==='error'&&state.serviceFocus==='error';
-    const tabs=[['maintenance','수리이력','clipboard-check'],['supplies','소모품','refresh-cw'],['error','에러','triangle-alert']];
+  function serviceData() {
+    const scoped=filterVehicleQuery(M.scope(rows,state),'serviceEquipmentId'),s=periodState(),current=state.service==='supplies',activeErrors=state.service==='error'&&state.serviceFocus==='error';
     const filtered=M.serviceRecords(scoped,{kind:state.service,from:s.from,to:s.to,focus:state.serviceFocus,origin:state.serviceOrigin,through:state.serviceThrough||M.SNAPSHOT});
     const vehicles=scoped.filter(v=>filtered.some(r=>r.equipmentId===v.equipmentId));
     const supplyStatus=M.supplySummary(scoped);
     const tabCount=key=>key==='supplies'&&supplyStatus.hasUnknown?'-':M.serviceRecords(scoped,{kind:key,from:s.from,to:s.to,focus:key===state.service?state.serviceFocus:'',origin:state.serviceOrigin,through:state.serviceThrough||M.SNAPSHOT}).reduce((n,r)=>n+r.count,0);
     const open=filtered.filter(r=>!r.resolved).reduce((n,r)=>n+r.count,0);
     const itemRow=r=>r.kind==='error'?errorRow(r):current?`<div class="service-item-line supply-service-item"><span class="supply-service-name">${state.role==='customer_owner'?supplyCheckbox(r):`<strong>${esc(r.name)}</strong>`}</span>${supplyUsage(r)}</div>`:maintenanceRow(r);
-    return `<div data-screen-id="LQ-SVC-001"><div class="snapshot">${criteriaHeading('서비스','service-help','h1')}${periodCutoff()}</div>${criteriaPanel('service-help','<p class="source-note">수리이력·에러 탭은 선택 기간의 발생 이력 건수, 소모품 탭은 마지막 수집 기준의 현재 품목 수입니다. 수리이력과 에러 이력은 조회 기간을 공유합니다. 대시보드 에러는 금일 집계 구간의 발생 건수이며, 해제된 건도 포함하고 EE·FL 코드는 제외합니다. 차량의 에러 숫자에서 진입하면 발생일과 관계없이 현재 미해제 에러를 표시하며, 에러 탭을 다시 선택하면 기간별 이력으로 전환합니다. 조회 차량은 상단 선택기에서 변경합니다. 소모품에는 기간을 적용하지 않습니다. 소모품 사용률 = 사용시간 ÷ 교체주기 × 100 (표시: 소수 둘째 자리, 상태 판정: 정수 반올림). 90% 이상 교체 필요, 80% 이상 90% 미만 교체 임박입니다. 정상 품목은 서비스 목록에서 제외합니다.</p>')}${serviceScopeControls()}<div class="mobile-status-tabs service-category-tabs" role="group" aria-label="서비스 종류">${tabs.map(([key,title,ico])=>`<button type="button" data-service="${key}" aria-pressed="${state.service===key}" class="${state.service===key?'is-active':''}">${icon(ico)}<span>${title}</span><strong>${tabCount(key)}</strong></button>`).join('')}</div>
-      ${current?supplyToolbar():activeErrors?'':periodControls()}
+    return {current,activeErrors,vehicles,filtered,supplyStatus,tabCount,open,itemRow};
+  }
+  function serviceTabs(data) {
+    const tabs=[['maintenance','수리이력','clipboard-check'],['supplies','소모품','refresh-cw'],['error','에러','triangle-alert']];
+    const {tabCount}=data;
+    return `${tabs.map(([key,title,ico])=>`<button type="button" data-service="${key}" aria-pressed="${state.service===key}" class="${state.service===key?'is-active':''}">${icon(ico)}<span>${title}</span><strong>${tabCount(key)}</strong></button>`).join('')}`;
+  }
+  function serviceResults(data=serviceData()) {
+    const {current,activeErrors,vehicles,filtered,supplyStatus,open,itemRow}=data;
+    return `${current?supplyToolbar():''}
       ${['due','soon'].includes(state.serviceFocus)?`<button type="button" class="clear-filter" data-clear-service-focus aria-label="서비스 조회 조건 해제">${esc(liveLabels[state.serviceFocus])}${icon('x')}</button>`:''}
       ${current&&supplyStatus.hasUnknown?supplyNotice(supplyStatus):`<p class="source-note service-scope-note">${current?'현재':activeErrors?'현재 미해제':'기간 내'} ${vehicles.length}대 · ${filtered.reduce((n,r)=>n+r.count,0)}${current?'개':'건'}${state.service==='error'?' · 미해제 '+open+'건':current?' · 교체 필요 '+filtered.filter(r=>r.key==='due').reduce((n,r)=>n+r.count,0)+'개 · 임박 '+filtered.filter(r=>r.key==='soon').reduce((n,r)=>n+r.count,0)+'개':''}</p>`}
       <div class="vehicle-mobile-list">${vehicles.map(v=>`<article class="service-mobile-row" data-service-card="${esc(v.equipmentId)}"><div class="service-mobile-row__head"><button type="button" class="vehicle-card-main" data-vehicle="${esc(v.equipmentId)}"><strong>${escField(v.equipmentNumber)}</strong><small>${escField(v.model)} · ${esc(v.group)}</small></button>${current?status(v):''}</div>${filtered.filter(r=>r.equipmentId===v.equipmentId).map(itemRow).join('')}</article>`).join('')||'<p class="empty-state">'+(current&&supplyStatus.hasUnknown?'확인 가능한 소모품 항목이 없습니다.':'해당 내역이 없습니다.')+'</p>'}</div>
-      ${dataNote(current?'소모품은 차량별 마지막 수신 시점의 상태입니다. 미연결 차량은 최신 상태가 아닐 수 있습니다.':'발생 건수와 해당 이력의 현재 처리 상태를 구분합니다. '+reportNote())}</div>`;
+      ${dataNote(current?'소모품은 차량별 마지막 수신 시점의 상태입니다. 미연결 차량은 최신 상태가 아닐 수 있습니다.':'발생 건수와 해당 이력의 현재 처리 상태를 구분합니다. '+reportNote())}`;
+  }
+  function services() {
+    const data=serviceData(),{current,activeErrors}=data;
+    return `<div data-screen-id="LQ-SVC-001"><div class="snapshot">${criteriaHeading('서비스','service-help','h1')}${periodCutoff()}</div>${criteriaPanel('service-help','<p class="source-note">수리이력·에러 탭은 선택 기간의 발생 이력 건수, 소모품 탭은 마지막 수집 기준의 현재 품목 수입니다. 수리이력과 에러 이력은 조회 기간을 공유합니다. 대시보드 에러는 금일 집계 구간의 발생 건수이며, 해제된 건도 포함하고 EE·FL 코드는 제외합니다. 차량의 에러 숫자에서 진입하면 발생일과 관계없이 현재 미해제 에러를 표시하며, 에러 탭을 다시 선택하면 기간별 이력으로 전환합니다. 조회 차량은 상단 선택기에서 변경합니다. 소모품에는 기간을 적용하지 않습니다. 소모품 사용률 = 사용시간 ÷ 교체주기 × 100 (표시: 소수 둘째 자리, 상태 판정: 정수 반올림). 90% 이상 교체 필요, 80% 이상 90% 미만 교체 임박입니다. 정상 품목은 서비스 목록에서 제외합니다.</p>')}${serviceScopeControls()}<div id="vehicle-service-tabs" class="mobile-status-tabs service-category-tabs" role="group" aria-label="서비스 종류">${serviceTabs(data)}</div>
+      ${current||activeErrors?'':periodControls()}<div id="vehicle-query-results">${serviceResults(data)}</div></div>`;
   }
   function notificationItems() { return M.recentNotifications(M.pushHistory(M.scope(rows,{...state,group:''}))); }
   function notifications() {
@@ -408,45 +476,73 @@
     return `<div class="mobile-status-tabs report-tabs${inline?'':' has-vehicle-efficiency'}" role="group" aria-label="리포트 메뉴"><button type="button" data-route="reports" class="${state.view==='reports'?'is-active':''}" aria-pressed="${state.view==='reports'}">${icon('chart-no-axes-combined')}<span>업무 현황</span></button><button type="button" data-efficiency-mode="daily" class="${daily?'is-active':''}" aria-pressed="${daily}">${icon('chart-no-axes-gantt')}<span>운영효율</span></button>${inline?'':`<button type="button" data-efficiency-mode="vehicle" class="${vehicle?'is-active':''}" aria-pressed="${vehicle}">${icon('truck')}<span>차량별효율</span></button>`}</div>`;
   }
   function efficiencyTitle() {return state.efficiencyLayout!=='inline'&&state.efficiencyMode==='vehicle'?'차량별효율':'운영효율';}
+  function sortedEfficiencyEntries(entries,value,direction=state.efficiencyDirection) {
+    if(!['asc','desc'].includes(direction))return entries;
+    return entries.map((entry,index)=>({entry,index,value:value(entry)})).sort((a,b)=>{
+      const aKnown=Number.isFinite(a.value),bKnown=Number.isFinite(b.value);
+      if(aKnown!==bKnown)return aKnown?-1:1;
+      return (aKnown?(a.value-b.value)*(direction==='asc'?1:-1):0)||a.index-b.index;
+    }).map(item=>item.entry);
+  }
+  function efficiencySortControl(count) {
+    const direction=state.efficiencyDirection,vehicle=state.efficiencyMode==='vehicle',current=direction==='desc'?'많은 순':direction==='asc'?'적은 순':'기본순',next=direction==='desc'?'적은 순':vehicle?'많은 순':direction==='asc'?'기본순':'많은 순';
+    return `<button type="button" class="efficiency-sort" data-efficiency-sort data-direction="${direction}" aria-label="작업시간 정렬: ${current}. ${next}으로 변경" title="${vehicle?'작업시간 많은 순 ↔ 적은 순':'작업시간 많은 순 → 적은 순 → 기본순'}" ${count<2?'disabled':''}>작업시간${icon(direction==='desc'?'arrow-down':direction==='asc'?'arrow-up':'arrow-up-down')}</button>`;
+  }
+  function efficiencyTimeDescription(p,divisor=1) {return '작업 '+hours(p.work/divisor)+', 대기 '+hours(p.idle/divisor);}
+  function efficiencyChart(p,divisor=1) {
+    const segments=[['is-work',p.work],['is-idle',p.idle],['is-unused',p.unused]];
+    const bar='<div class="work-track" aria-hidden="true">'+segments.map(([kind,value])=>'<span class="'+kind+'" style="width:'+(p.capacity?value/p.capacity*100:0)+'%"></span>').join('')+'</div>';
+    return bar+'<strong><span>작업 '+shortHours(p.work/divisor)+'<small>대기 '+shortHours(p.idle/divisor)+'</small></span>'+icon('chevron-down')+'</strong>';
+  }
+  function vehicleEfficiencyDetails(p) {
+    return '<h3 class="efficiency-metric-heading">기준시간과 효율</h3>'+definition([['기준시간',hours(p.capacity)],['운영효율',rate(p.rate)]])+
+      '<h3 class="efficiency-metric-heading">가동시간 구성</h3>'+definition([['가동시간',hours(p.work+p.idle)],['작업시간',hours(p.work)],['대기시간',hours(p.idle)],['가동 중 작업 비중',rate(p.workShare)]]);
+  }
   function vehicleEfficiencyRows(scoped) {
-    return scoped.map(v=>{
-      const p=M.efficiencyPerformance([v],state.from,state.to,{period:state.period}),work=p.work,idle=p.idle,unused=p.unused,capacity=p.capacity;
+    const entries=scoped.map(v=>({v,p:M.efficiencyPerformance([v],state.from,state.to,{period:state.period})}));
+    return sortedEfficiencyEntries(entries,({p})=>p.known&&p.capacity>0?p.work:null).map(({v,p})=>{
+      const capacity=p.capacity;
       const label=`<span class="efficiency-vehicle-label"><span class="efficiency-vehicle-id">${escField(v.equipmentNumber)}</span><small>${escField(v.model)}</small></span>`;
       if(!p.known||!capacity)return `<div class="efficiency-day efficiency-vehicle" data-efficiency-vehicle="${esc(v.equipmentId)}"><div class="efficiency-day-uncollected">${label}<span>미집계</span><strong>-</strong></div></div>`;
-      return `<details class="efficiency-day efficiency-vehicle" data-efficiency-vehicle="${esc(v.equipmentId)}"><summary aria-label="${escField(v.equipmentNumber)} 운영효율 ${rate(p.rate)}, 작업 ${hours(work)}, 대기 ${hours(idle)}, 상세 펼치기">${label}<div class="work-track" aria-hidden="true"><span class="is-work" style="width:${work/capacity*100}%"></span><span class="is-idle" style="width:${idle/capacity*100}%"></span><span class="is-unused" style="width:${unused/capacity*100}%"></span></div><strong><span>작업 ${shortHours(work)}<small>대기 ${shortHours(idle)}</small></span>${icon('chevron-down')}</strong></summary><div class="efficiency-day__detail">${definition([['운영효율',rate(p.rate)],['작업시간',hours(work)],['대기시간',hours(idle)],['미사용시간',hours(unused)],['기준시간',hours(capacity)],['가동 중 작업 비중',rate(p.workShare)]])}</div></details>`;
+      return `<details class="efficiency-day efficiency-vehicle" data-efficiency-vehicle="${esc(v.equipmentId)}"><summary aria-label="${escField(v.equipmentNumber)} 운영효율 ${rate(p.rate)}, ${efficiencyTimeDescription(p)}, 상세 펼치기">${label}${efficiencyChart(p)}</summary><div class="efficiency-day__detail">${vehicleEfficiencyDetails(p)}</div></details>`;
     }).join('');
   }
   function reportNote(today) {return '표시 시간은 분 단위로 반올림합니다.';}
-  function reports() {
-    const scoped=reportScope(),vehicle=state.reportVehicle?scoped[0]:null,today=isToday(),p=M.efficiencyPerformance(scoped,state.from,state.to,{today,period:state.period});
-    if(state.reportVehicle&&!vehicle) return `<div data-screen-id="LQ-RPT-001"><div class="snapshot"><h1>업무 리포트</h1>${periodCutoff()}</div>${reportTabs()}${periodControls({group:true,vehicle:true})}${reportScopeError()}</div>`;
-    const webReport=M.reportValues(scoped,state.from,state.to,state.period),values=p.entries.map(e=>e.m),sum=k=>values.every(m=>Number.isFinite(m[k]))?values.reduce((n,m)=>n+m[k],0):null;
+  function reportView(screenId,title,content,resultsOnly) {
+    return resultsOnly?content:`<div data-screen-id="${screenId}"><div class="snapshot"><h1>${title}</h1>${periodCutoff()}</div>${reportTabs()}${periodControls({group:true,vehicle:true})}<div id="vehicle-query-results">${content}</div></div>`;
+  }
+  function reports(resultsOnly=false) {
+    const scoped=reportScope(),vehicle=state.reportVehicle&&!state.reportSearch?scoped[0]:null,today=isToday(),p=M.efficiencyPerformance(scoped,state.from,state.to,{today,period:state.period});
+    if(state.reportVehicle&&!state.reportSearch&&!vehicle)return reportView('LQ-RPT-001','업무 리포트',reportScopeError(),resultsOnly);
+    const webReport=M.reportValues(scoped,state.from,state.to,state.period);
     // Preserve existing reportFocus=unknown links; the filter now means current disconnection.
     const focusTabs=[['all','전체',p.total],['waiting','긴 대기',p.waiting.length],['unknown','미연결',M.counts(scoped).offline]];
-    return `<div data-screen-id="LQ-RPT-001"><div class="snapshot"><h1>업무 리포트</h1>${periodCutoff()}</div>${reportTabs()}${periodControls({group:true,vehicle:true})}
-      <section class="dashboard-panel"><div class="dashboard-panel__head">${criteriaHeading(vehicle?'차량 작업 현황':today?'오늘의 작업 현황':'기간 작업 현황','report-work-help')}<span>집계 ${p.known} / ${p.total}대</span></div>${criteriaPanel('report-work-help',referenceRateCriteria(today))}${p.known?`<div class="summary-totals report-key-metrics"><span>운영효율<strong>${rate(vehicle?p.workShare:webReport.eff)}</strong></span><span>${vehicle?'작업시간':'운행시간'}<strong>${hours(vehicle?p.work:webReport.hour*60)}</strong></span><span>${vehicle?'대기시간':'운행거리'}<strong>${vehicle?hours(p.idle):fmt(webReport.dist,' km')}</strong></span></div>${performanceBar(p)}`: '<p class="empty-state">선택 범위의 집계 정보가 없습니다.</p>'}${today&&p.unknown?'<p class="source-note">선택 기간의 실적이 없는 차량은 '+p.unknown+'대입니다.</p>':''}</section>
-      ${!vehicle?`<details class="detail-card vehicle-basics"><summary>리포트 지표${icon('chevron-down')}</summary>${definition([['운행시간',webReport.hour==null?'-':hours(webReport.hour*60)],['운행거리',fmt(webReport.dist,' km')],['충격',fmt(webReport.shock,'건')],['연료소비량',fmt(webReport.fuel,' L/H')],['운영효율',rate(webReport.eff)],['배터리 충전량',rate(webReport.batt)]])}</details>`:''}
-      ${!vehicle&&state.role==='customer_owner'&&new Set(scoped.map(v=>v.group)).size>1?`<section class="dashboard-panel"><div class="dashboard-panel__head">${criteriaHeading('그룹별 작업 현황','report-group-help')}<span>대당 실적</span></div>${criteriaPanel('report-group-help','<p class="source-note">'+metricCriteria+' 대당 시간은 실적 확인 차량의 평균입니다.</p>')}${groupPerformance(scoped,state.from,state.to,today)}</section>`:''}
+    const content=`
+      <section class="dashboard-panel"><div class="dashboard-panel__head">${criteriaHeading(vehicle?'차량 작업 현황':state.role==='customer_staff'?'내 그룹 전체 작업 현황':state.group||state.reportSearch?'조회 범위 전체 작업 현황':'전체 차량 작업 현황','report-work-help')}<span>집계 ${p.known} / ${p.total}대</span></div>${criteriaPanel('report-work-help',referenceRateCriteria(today))}${p.known?`<div class="summary-totals report-key-metrics"><span>운영효율<strong>${rate(vehicle?p.workShare:webReport.eff)}</strong></span><span>${vehicle?'작업시간':'총 가동시간'}<strong>${hours(vehicle?p.work:webReport.hour==null?null:webReport.hour*60)}</strong></span><span>${vehicle?'대기시간':'총 운행거리'}<strong>${vehicle?hours(p.idle):fmt(webReport.dist,' km')}</strong></span></div>${performanceBar(p)}${!vehicle?definition([['대당 가동시간',shortHours(performanceAverage(p,'min'))],['총 작업시간',hours(p.work)],['총 대기시간',hours(p.idle)],['대당 이동거리',fmt(performanceAverage(p,'km'),' km')]]):''}`: '<p class="empty-state">선택 범위의 집계 정보가 없습니다.</p>'}${today&&p.unknown?'<p class="source-note">선택 기간의 실적이 없는 차량은 '+p.unknown+'대입니다.</p>':''}</section>
+      ${!vehicle?`<details class="detail-card vehicle-basics"><summary>리포트 지표${icon('chevron-down')}</summary>${definition([['가동시간',webReport.hour==null?'-':hours(webReport.hour*60)],['운행거리',fmt(webReport.dist,' km')],['충격',fmt(webReport.shock,'건')],['연료소비량',fmt(webReport.fuel,' L/H')],['운영효율',rate(webReport.eff)],['배터리 충전량',rate(webReport.batt)]])}</details>`:''}
+      ${!vehicle&&state.role==='customer_owner'&&new Set(scoped.map(v=>v.group)).size>1?`<section class="dashboard-panel"><div class="dashboard-panel__head">${criteriaHeading('그룹별 작업 현황','report-group-help')}<span>대당 실적</span></div>${criteriaPanel('report-group-help','<p class="source-note">'+metricCriteria+' 대당 시간·이동거리는 실적 확인 차량의 평균입니다.</p>')}${groupPerformance(scoped,state.from,state.to,today)}</section>`:''}
       ${vehicle?individualReport(vehicle,p,today):`<section class="dashboard-panel"><div class="dashboard-panel__head">${criteriaHeading('차량별 작업 현황','roster-help')}<span>작업시간</span></div><div class="mobile-status-tabs report-focus-tabs" role="group" aria-label="차량 확인 기준">${focusTabs.map(([key,label,n])=>`<button type="button" data-report-focus="${key}" aria-pressed="${state.reportFocus===key}" class="${state.reportFocus===key?'is-active':''}"><span>${label}</span><strong>${n}</strong></button>`).join('')}</div>${criteriaPanel('roster-help',rosterCriteria(p,{today})+'<p class="source-note">긴 대기: 대기 비중 30% 이상이면서 대기 30분 이상 (임시 조회 조건)</p>')}${reportRoster(scoped,p,{today,focus:state.reportFocus})}</section>`}
       <button type="button" class="report-primary-action" data-efficiency>${icon('chart-no-axes-gantt')}월간 운영효율 보기${icon('chevron-right')}</button>
-      ${dataNote(reportNote(today)+' 상단 및 리포트 지표는 웹 업무 현황의 그룹별 지표입니다. 여러 그룹의 합계형 지표는 합산하고 평균형 지표는 그룹 평균을 표시합니다. 아래 작업·대기 분석은 웹 운영효율 기준입니다. 차량별 목록은 작업시간이 적은 순이며, 실적 없는 차량은 뒤에 별도 표시합니다. 미연결은 현재 통신 상태로 집계하며 기간 실적과는 구분합니다. 긴 대기는 표시된 임시 조회 조건이며 성과 판정이 아닙니다. 작업 활용률=작업÷기준시간, 운영효율=작업÷운행시간. ')}</div>`;
+      ${dataNote(reportNote(today)+' 상단 지표와 작업·대기 분석은 선택 차량의 같은 관측 자료입니다. 운영효율은 전체 작업 합계 ÷ (작업+대기 합계)이며 차량별 비율을 평균하지 않습니다. 배터리 충전량은 선택 범위의 충전 비율(%)이며 소비율(kWh/h)과 다릅니다. 값이 없으면 -로 표시합니다. 차량별 목록은 작업시간이 적은 순이며, 실적 없는 차량은 뒤에 별도 표시합니다. 미연결은 현재 통신 상태로 집계하며 기간 실적과는 구분합니다. 긴 대기는 표시된 임시 조회 조건이며 성과 판정이 아닙니다. 작업 활용률=작업÷기준시간, 운영효율=작업÷가동시간. ')}`;
+    return reportView('LQ-RPT-001','업무 리포트',content,resultsOnly);
   }
-  function efficiency() {
+  function efficiency(resultsOnly=false) {
     const byVehicle=state.efficiencyMode==='vehicle',inline=state.efficiencyLayout==='inline',screenId=byVehicle?'LQ-REF-003-T02':inline?'LQ-REF-003-T01':'LQ-REF-003';
-    const scoped=reportScope(),vehicle=state.reportVehicle?scoped[0]:null,today=isToday(),hourly=state.period==='d',days=M.efficiencyCalendar(scoped,state.period,state.from,state.to,{today,period:state.period}),p=M.efficiencyPerformance(scoped,state.from,state.to,{today,period:state.period});
-    if(state.reportVehicle&&!vehicle) return `<div data-screen-id="${screenId}"><div class="snapshot"><h1>${efficiencyTitle()}</h1>${periodCutoff()}</div>${reportTabs()}${periodControls({group:true,vehicle:true})}${reportScopeError()}</div>`;
-    const efficiencyScopeCriteria='선택한 전체·그룹·차량과 조회 기간의 정보입니다. 작업·대기·잔여 시간은 해당 범위에서 실적이 확인된 차량의 대당 평균이며, 차량 1대를 선택하면 그 차량의 시간입니다. 기간 값은 기간 누적 시간의 평균, 날짜별 값은 그날 실적의 평균입니다. 운영효율(%) = 작업시간 ÷ 기준시간 × 100입니다. 시간대별 기준은 1시간, 일별 기준은 10시간이며 작업+대기가 기준을 초과하면 그 운행시간을 분모로 사용합니다. 기간 평균은 시간 구간별 작업 합계 ÷ 기준시간 합계입니다.';
+    const scoped=reportScope(),vehicle=state.reportVehicle&&!state.reportSearch?scoped[0]:null,today=isToday(),hourly=state.period==='d',days=M.efficiencyCalendar(scoped,state.period,state.from,state.to,{today,period:state.period}),p=M.efficiencyPerformance(scoped,state.from,state.to,{today,period:state.period});
+    if(state.reportVehicle&&!state.reportSearch&&!vehicle)return reportView(screenId,efficiencyTitle(),reportScopeError(),resultsOnly);
+    const efficiencyScopeCriteria='선택한 전체·그룹·차량과 조회 기간의 정보입니다. 작업·대기·잔여 시간은 해당 범위에서 실적이 확인된 차량의 대당 평균이며, 차량 1대를 선택하면 그 차량의 시간입니다. 기간 값은 기간 누적 시간의 평균, 날짜별 값은 그날 실적의 평균입니다. 운영효율(%) = 작업 합계 ÷ (작업+대기 합계) × 100이며, 가동률 = (작업+대기) ÷ 기준시간입니다. 막대는 기준시간 안의 작업·대기·미사용 구성입니다. 기준시간은 예시의 08:00~18:00 구간으로, 실제 조업 정책이 아닙니다. 금일은 완료된 시간까지만 집계하고 미래·자료 없는 구간은 미집계로 표시합니다.';
     const weekday=date=>['일','월','화','수','목','금','토'][new Date(date+'T12:00:00+09:00').getUTCDay()];
-    const daily=days.map(d=>{
+    const daily=sortedEfficiencyEntries(days,d=>d.known>0&&Number.isFinite(d.work)?d.work/d.known:null).map(d=>{
       const date=`<span class="efficiency-date">${d.hour||d.date.slice(-2)}${d.hour?'':`<small>${weekday(d.date)}</small>`}</span>`;
       if(!d.known)return `<div class="efficiency-day" data-date="${d.date}"${d.hour?` data-hour="${d.hour}"`:''}><div class="efficiency-day-uncollected" aria-label="${d.date} 미집계">${date}<span>미집계</span><strong>-</strong></div></div>`;
-      return `<details class="efficiency-day" data-date="${d.date}"${d.hour?` data-hour="${d.hour}"`:''}><summary aria-label="${d.date}${d.hour?' '+d.hour:''} 운영효율 ${rate(d.rate)}, 작업 ${hours(Math.round(d.work/d.known))}, 대기 ${hours(Math.round(d.idle/d.known))}, 상세 펼치기">${date}<div class="work-track" aria-hidden="true"><span class="is-work" style="width:${d.capacity?d.work/d.capacity*100:0}%"></span><span class="is-idle" style="width:${d.capacity?d.idle/d.capacity*100:0}%"></span><span class="is-unused" style="width:${d.capacity?d.unused/d.capacity*100:0}%"></span></div><strong><span>작업 ${shortHours(Math.round(d.work/d.known))}<small>대기 ${shortHours(Math.round(d.idle/d.known))}</small></span>${icon('chevron-down')}</strong></summary><div class="efficiency-day__detail">${definition([['운영효율',rate(d.rate)],['작업시간',hours(Math.round(d.work/d.known))],['대기시간',hours(Math.round(d.idle/d.known))],['실적 확인',d.known+' / '+d.total+'대'],['가동 중 작업 비중',rate(d.workShare)],['미사용시간',hours(Math.round(d.unused/d.known))]])}</div></details>`;
+      return `<details class="efficiency-day" data-date="${d.date}"${d.hour?` data-hour="${d.hour}"`:''}><summary aria-label="${d.date}${d.hour?' '+d.hour:''} 운영효율 ${rate(d.rate)}, ${efficiencyTimeDescription(d,d.known)}, 상세 펼치기">${date}${efficiencyChart(d,d.known)}</summary><div class="efficiency-day__detail">${definition([['작업시간',hours(Math.round(d.work/d.known))],['대기시간',hours(Math.round(d.idle/d.known))],['미사용시간',hours(Math.round(d.unused/d.known))],['실적 확인',d.known+' / '+d.total+'대'],['운영효율',rate(d.rate)],['가동률',rate(d.utilization)]])}</div></details>`;
     }).join('');
     const graphTitle=byVehicle?'차량별 운영 현황':hourly?'시간대별 운영 현황':'일별 운영 현황';
-    const graphHelp=byVehicle?'선택한 조회 기간의 차량별 누적 작업·대기·미사용 시간입니다. 차량별 기준시간은 운영효율과 동일하게 시간대(1시간) 또는 날짜(10시간)별 기준을 더하며, 작업+대기가 기준을 넘는 구간은 해당 운행시간을 더합니다. 막대와 운영효율은 각 차량의 작업시간 ÷ 기준시간입니다. 현재 통신 상태와 무관하게 기간 실적을 표시합니다.':efficiencyScopeCriteria;
+    const graphHelp=byVehicle?'선택한 조회 기간의 차량별 누적 작업·대기·미사용 시간입니다. 운영효율은 작업 ÷ (작업+대기)이며, 가동률은 (작업+대기) ÷ 기준시간입니다. 막대는 예시 조업 구간 08:00~18:00의 작업·대기·미사용 구성입니다. 금일은 완료된 시간까지만 집계합니다. 현재 통신 상태와 무관하게 기간 실적을 표시합니다.':efficiencyScopeCriteria;
     const graphTabs=inline?`<div class="mobile-status-tabs efficiency-view-tabs" role="group" aria-label="운영 현황 표시 기준"><button type="button" data-efficiency-mode="daily" data-inline-efficiency aria-pressed="${!byVehicle}" class="${!byVehicle?'is-active':''}">${hourly?'시간대별':'일별'} 운영 현황</button><button type="button" data-efficiency-mode="vehicle" data-inline-efficiency aria-pressed="${byVehicle}" class="${byVehicle?'is-active':''}">차량별 운영 현황</button></div>`:'';
-    return `<div data-screen-id="${screenId}"><div class="snapshot"><h1>${efficiencyTitle()}</h1>${periodCutoff()}</div>${reportTabs()}${periodControls({group:true,vehicle:true})}<section class="dashboard-panel"><div class="dashboard-panel__head">${criteriaHeading('기간 운영효율','efficiency-help')}<span>집계 ${p.known} / ${p.total}대</span></div>${criteriaPanel('efficiency-help','<p class="source-note">'+efficiencyScopeCriteria+'</p>')}${!p.known?'<p class="empty-state">집계 정보가 없습니다.</p>':''}<div class="summary-totals"><span>운영효율<strong>${rate(p.rate)}</strong></span><span>작업시간<strong>${shortHours(p.known?Math.round(p.work/p.known):null)}</strong></span><span>대기시간<strong>${shortHours(p.known?Math.round(p.idle/p.known):null)}</strong></span></div></section>
-      <section class="dashboard-panel efficiency-panel${byVehicle?' is-by-vehicle':''}"><div class="dashboard-panel__head">${inline?graphTabs:criteriaHeading(graphTitle,'daily-efficiency-help')}<span class="efficiency-graph-count">${byVehicle?scoped.length+'대':days.length+(hourly?'시간':'일')}${inline?`<button type="button" class="criteria-tip" data-criteria-tip="daily-efficiency-help" aria-label="${graphTitle} 기준 안내" aria-expanded="false" aria-controls="daily-efficiency-help">${icon('circle-help')}</button>`:''}</span></div>${criteriaPanel('daily-efficiency-help','<p class="source-note">'+graphHelp+' h는 시간, m은 분입니다. 행을 누르면 운영효율과 상세 시간을 확인합니다.</p>')}<div class="work-legend"><span><i class="is-work"></i>작업</span><span><i class="is-idle"></i>대기</span><span><i class="is-unused"></i>미사용</span></div><div class="efficiency-axis" aria-hidden="true"><span class="efficiency-axis-scale">0<span>50</span>100%</span><span>시간</span></div><div class="efficiency-daily-list">${(byVehicle?vehicleEfficiencyRows(scoped):daily)||'<p class="empty-state">조회 조건에 해당하는 실적이 없습니다.</p>'}</div></section>${dataNote(reportNote(today)+' '+missingCriteria)}</div>`;
+    const content=`<section class="dashboard-panel"><div class="dashboard-panel__head">${criteriaHeading('기간 운영효율','efficiency-help')}<span>집계 ${p.known} / ${p.total}대</span></div>${criteriaPanel('efficiency-help','<p class="source-note">'+efficiencyScopeCriteria+'</p>')}${!p.known?'<p class="empty-state">집계 정보가 없습니다.</p>':''}<div class="summary-totals"><span>운영효율<strong>${rate(p.rate)}</strong></span><span>작업시간<strong>${shortHours(p.known?Math.round(p.work/p.known):null)}</strong></span><span>대기시간<strong>${shortHours(p.known?Math.round(p.idle/p.known):null)}</strong></span></div></section>
+      <section class="dashboard-panel efficiency-panel${byVehicle?' is-by-vehicle':''}" aria-label="${graphTitle}">${inline?`<div class="dashboard-panel__head">${graphTabs}</div>`:''}${criteriaPanel('daily-efficiency-help','<p class="source-note">'+graphHelp+' '+runningTimeCriteria+' 가동 중 작업 비중은 현재 운영효율과 같은 계산값입니다. h는 시간, m은 분입니다. 행을 누르면 운영효율과 상세 시간을 확인합니다.</p>')}<div class="work-legend efficiency-legend"><span class="efficiency-graph-count">${byVehicle?scoped.length+'대':days.length+(hourly?'시간':'일')}<button id="daily-efficiency-help-trigger" type="button" class="criteria-tip" data-criteria-tip="daily-efficiency-help" aria-label="${graphTitle} 기준 안내" aria-expanded="false" aria-controls="daily-efficiency-help">${icon('circle-help')}</button></span><span><i class="is-work"></i>작업</span><span><i class="is-idle"></i>대기</span><span><i class="is-unused"></i>미사용</span></div><div class="efficiency-axis"><span class="efficiency-axis-scale" aria-hidden="true">0<span>50</span>100%</span>${efficiencySortControl(byVehicle?scoped.length:days.length)}</div><div class="efficiency-daily-list">${(byVehicle?vehicleEfficiencyRows(scoped):daily)||'<p class="empty-state">조회 조건에 해당하는 실적이 없습니다.</p>'}</div></section>${dataNote(reportNote(today)+' '+missingCriteria)}`;
+    return reportView(screenId,efficiencyTitle(),content,resultsOnly);
   }
   function approvalCards() {
     const all=approvalStore.list(state.role),query=approvalQuery.trim().toLowerCase();
@@ -488,22 +584,32 @@
     const pending=approvalPending;approvalPending=null;$('#customer-approval-dialog')?.close();
     if(pending)$('[data-review-request="'+pending.id+'"][data-review-action="'+pending.action+'"]')?.focus();
   }
-  function account() {return `<section class="detail-card" data-screen-id="LQ-ACC-001"><h2>내 정보</h2>${definition([['이름',state.role==='customer_owner'?'윤태호':'정보 미제공'],['구분',M.ROLE_LABELS[state.role]],['소속 업체','(주)세종물류중부지점'],['조회 범위',state.role==='customer_owner'?'소속 업체 전체 차량':M.assignedGroup(state.role)+' 배정 차량'],['이메일',M.web.principals[state.role]]])}</section>`;}
+  function account() {const profile=window.CustomerOnboarding?.current();return `<section class="detail-card" data-screen-id="LQ-ACC-001"><h2>내 정보</h2>${definition([['이름',profile?.name||(state.role==='customer_owner'?'윤태호':'정보 미제공')],['구분',M.ROLE_LABELS[state.role]],['소속 업체',profile?.company||'(주)세종물류중부지점'],['조회 범위',profile?'승인된 조회 차량 없음':state.role==='customer_owner'?'소속 업체 전체 차량':M.assignedGroup(state.role)+' 배정 차량'],['이메일',profile?.email||M.web.principals[state.role]]])}</section>`;}
+  function vehicleRequired(){const owner=state.role==='customer_owner';return `<div class="vehicle-registration" data-screen-id="LQ-AUTH-006"><div class="snapshot"><h1>차량 등록 안내</h1></div><section class="detail-card"><h2>서비스를 이용하려면 차량 등록이 필요합니다.</h2><p class="source-note">${owner?'차량을 등록하고 담당 딜러의 승인을 받으면 서비스를 이용할 수 있습니다.':'소속 업체 대표가 차량을 등록하고 조회 그룹에 배정하면 서비스를 이용할 수 있습니다.'}</p>${owner?'<button type="button" class="report-primary-action" data-route="vehicleRegistration">차량 등록</button>':''}<button type="button" class="detail-secondary-button" data-route="vehicleRequests">차량 신청내역</button></section></div>`;}
   function settings() {
+    const nativeTools=window.CustomerNativeTools?.settingsSection?.()||'';
+    if(window.CustomerOnboarding?.current())return `<h1>설정</h1>${account()}<section class="settings-group customer-registration-entry">${state.role==='customer_owner'?`<button type="button" class="settings-link-row registration-entry-button" data-route="vehicleRegistration"><span><strong>차량 등록</strong><small>차량 시리얼번호 · 터미널 ID 연결</small></span>${icon('chevron-right')}</button>`:''}<button type="button" class="settings-link-row registration-entry-button" data-route="vehicleRequests"><span><strong>차량 신청내역</strong><small>대기 · 승인 · 반려 내역 확인</small></span>${icon('chevron-right')}</button></section><section class="settings-group"><button type="button" class="settings-link-row settings-logout" data-logout><span><strong>로그아웃</strong></span>${icon('log-out')}</button></section>`+nativeTools;
     const preferences=pushPreferences[state.role];
     const toggle=(key,label,disabled=false)=>`<label class="setting-row"><span><strong>${label}</strong></span><input type="checkbox" data-push-setting="${key}" ${preferences[key]?'checked':''} ${disabled?'disabled':''}><i aria-hidden="true"></i></label>`;
-    return `<h1>설정</h1>${account()}<section class="settings-group"><h2>권한 화면 확인</h2><label class="select-row"><span><strong>조회 역할</strong><small>화면 확인용</small></span><select data-control="role" aria-label="조회 역할">${Object.entries(M.ROLE_LABELS).map(([key,label])=>`<option value="${key}" ${state.role===key?'selected':''}>${label}</option>`).join('')}</select></label></section>
+    return `<h1>설정</h1>${account()}<section class="settings-group customer-registration-entry"><button type="button" class="settings-link-row registration-entry-button" data-route="vehicleRegistration"><span><strong>차량 등록</strong><small>차량 시리얼번호 · 터미널 ID 연결</small></span>${icon('chevron-right')}</button><button type="button" class="settings-link-row registration-entry-button" data-route="vehicleRequests"><span><strong>차량 신청내역</strong><small>대기 · 승인 · 반려 내역 확인</small></span>${icon('chevron-right')}</button></section><section class="settings-group"><h2>권한 화면 확인</h2><label class="select-row"><span><strong>조회 역할</strong><small>화면 확인용</small></span><select data-control="role" aria-label="조회 역할">${Object.entries(M.ROLE_LABELS).map(([key,label])=>`<option value="${key}" ${state.role===key?'selected':''}>${label}</option>`).join('')}</select></label></section>
       <section class="settings-group"><div class="dashboard-panel__head settings-panel-head">${criteriaHeading('PUSH 알림','push-settings-help')}</div>${criteriaPanel('push-settings-help','<p class="source-note">PUSH 전체를 끄면 하위 항목도 모두 꺼집니다. 다시 켠 뒤 받을 항목을 선택해 주세요. 공지사항/마케팅 알림은 별도 선택 항목입니다. 알림 내역은 발생 이력이며 PUSH 수신 설정과 구분됩니다.</p>')}${toggle('pushAlarmYn','PUSH 알림 받기')}${pushFields.map(([key,label])=>toggle(key,label,!preferences.pushAlarmYn)).join('')}</section>
-      <section class="settings-group"><h2>계정 메뉴</h2>${state.role==='customer_owner'?`<button type="button" class="settings-link-row customer-approval-entry" data-route="approvals"><span><strong>사용자 승인</strong><small>소속 업체 직원 가입 신청</small></span><b>${approvalStore.list(state.role).filter(r=>r.status==='pending').length}건 대기</b>${icon('chevron-right')}</button>`:''}<button type="button" class="settings-link-row settings-logout" data-logout><span><strong>로그아웃</strong></span>${icon('log-out')}</button></section>`;
+      <section class="settings-group"><h2>계정 메뉴</h2>${state.role==='customer_owner'?`<button type="button" class="settings-link-row customer-approval-entry" data-route="approvals"><span><strong>사용자 승인</strong><small>소속 업체 직원 가입 신청</small></span><b>${approvalStore.list(state.role).filter(r=>r.status==='pending').length}건 대기</b>${icon('chevron-right')}</button>`:''}<button type="button" class="settings-link-row settings-logout" data-logout><span><strong>로그아웃</strong></span>${icon('log-out')}</button></section>`+nativeTools;
+  }
+  function syncSupplyContext() {
+    const nextSupplyContext=JSON.stringify([state.view,state.service,state.role,state.group,state.serviceEquipmentId,state.equipmentId,state.serviceEntry,state.serviceFocus,state.serviceSearch]);
+    if(supplyContext!==nextSupplyContext){supplySelection.clear();supplyPending=[];supplyUndo=[];supplyMessage='';supplyContext=nextSupplyContext;if($('#supply-reset-dialog')?.open)$('#supply-reset-dialog').close();}
   }
   function render() {
+    window.CustomerVehicleRegistration?.leave();
     state=readState();
+    const onboarding=window.CustomerOnboarding,profile=onboarding?.current();
+    if(profile){state.role=profile.role;if(onboarding.requiresVehicle()&&(!['settings','account','vehicleRegistration','vehicleRequests','vehicleRequired'].includes(state.view)||state.view==='vehicleRegistration'&&profile.role==='customer_staff'))return go('vehicleRequired',{role:profile.role},true);}
+    vehicleLookupOpen=false;vehicleLookupIndex=-1;
     if(approvalPending&&(state.view!=='approvals'||state.role!==approvalPending.role))closeCustomerApproval();
     if(!['detail','battery'].includes(state.view)){chargeContext='';chargeDraft=null;chargeMessage='';}
     // Keep old error links usable without retaining a separate detail screen.
     if(state.view==='error')return go('services',{service:'error',serviceEquipmentId:state.equipmentId||state.serviceEquipmentId,serviceEntry:'',serviceFocus:'',q:'',live:''},true);
-    const nextSupplyContext=JSON.stringify([state.view,state.service,state.role,state.group,state.serviceEquipmentId,state.equipmentId,state.serviceEntry,state.serviceFocus]);
-    if(supplyContext!==nextSupplyContext){supplySelection.clear();supplyPending=[];supplyUndo=[];supplyMessage='';supplyContext=nextSupplyContext;if($('#supply-reset-dialog')?.open)$('#supply-reset-dialog').close();}
+    syncSupplyContext();
     if(periodViews.has(state.view)||state.view==='services'){
       const query=new URLSearchParams(location.hash.split('?')[1]||'');
       const keys=state.view==='services'?['servicePeriod','serviceFrom','serviceTo']:['period','from','to'];
@@ -512,16 +618,16 @@
         history.replaceState({},'',location.pathname+location.search+'#'+state.view+'?'+query);
       }
     }
-    const fn={home,summary,detail:details,services,notifications,reports,efficiency,account:settings,settings,approvals}[state.view]||child;
+    const fn={notFound:missingPage,home,summary,detail:details,services,notifications,reports,efficiency,vehicleRequired,account:settings,settings,approvals,vehicleRegistration:()=>window.CustomerVehicleRegistration?.render({role:state.role,navigate:go})||dataUnavailable(),vehicleRequests:()=>window.CustomerVehicleRegistration?.renderList({role:state.role,navigate:go})||dataUnavailable()}[state.view]||child;
     $('#main').innerHTML=loadState.available?fn():dataUnavailable();
     if(loadState.available)syncSupplySelection();
     const homeView=state.view==='home'; $('#brand').hidden=!homeView; $('#header-title').hidden=homeView;
     $('#header-title').textContent=state.view==='efficiency'?efficiencyTitle():labels[state.view]; $('[data-back]').hidden=homeView;
-    const totalNotifications=loadState.available?notificationItems().length:0,hasNotifications=totalNotifications>0;
+    const totalNotifications=loadState.available&&!profile?notificationItems().length:0,hasNotifications=totalNotifications>0;
     $('#notification-count').textContent=hasNotifications?totalNotifications:'';
     $('.header-button').setAttribute('aria-label',hasNotifications?`전체 PUSH 알림 ${totalNotifications}건 열기`:'알림 내역 열기');
     $('#notification-count').hidden=!hasNotifications;
-    const activeRoute=state.view==='notifications'||state.returnView==='notifications'&&['error','supplies','shock','battery','maintenance','engine','operation'].includes(state.view)?'':['reports','efficiency'].includes(state.view)?'reports':['settings','account','approvals'].includes(state.view)?'settings':['home','summary','services'].includes(state.view)?state.view:state.view!=='detail'&&state.returnView==='services'?'services':'summary';
+    const activeRoute=state.view==='notFound'?'':state.view==='notifications'||state.returnView==='notifications'&&['error','supplies','shock','battery','maintenance','engine','operation'].includes(state.view)?'':['reports','efficiency'].includes(state.view)?'reports':['settings','account','approvals','vehicleRegistration','vehicleRequests','vehicleRequired'].includes(state.view)?'settings':['home','summary','services'].includes(state.view)?state.view:state.view!=='detail'&&state.returnView==='services'?'services':'summary';
     document.querySelectorAll('.bottom-nav [data-route]').forEach(b=>{const active=b.dataset.route===activeRoute;b.classList.toggle('is-active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
     document.title=`${state.view==='efficiency'?efficiencyTitle():labels[state.view]} · MACHINE IQ`;
     window.lucide?.createIcons({attrs:{'stroke-width':2}});
@@ -534,17 +640,23 @@
     $('#location-map-expand-label').textContent=expanded?'접기':'전체보기';
     window.CustomerLocationMap.resize();
   }
-  function openLocationDialog() {
-    const v=selected(),p=v?.position;
+  let locationMapTrigger=null;
+  function openLocationDialog(equipmentId='',trigger=null) {
+    const v=equipmentId?(state.view==='summary'?summaryVehicles().find(row=>row.equipmentId===equipmentId):null):selected(),p=v?.position;
     if(!validPosition(p))return;
+    locationMapTrigger=trigger;
     setLocationMapExpanded(false);
     $('#location-dialog-title').textContent=fieldText(v.equipmentNumber);
     $('#location-dialog-address').textContent=displayCopy(p.address)||'정보 없음';
     const cell=(label,value,wide=false)=>'<div'+(wide?' class="is-wide"':'')+'><dt>'+label+'</dt><dd>'+esc(value??'정보 없음')+'</dd></div>';
     const m=periodMetrics(v);
+    // Reuse WEB Map/map-tobe.html's shared status, not the summary attention flag.
+    const mapState=M.currentVehicle(v).status;
+    const mapLabel=({ok:'정상',bad:'Fault',off:'미연결',unknown:'통신 미수집'})[mapState]||'통신 미수집';
+    const mapClass=mapState==='bad'?'is-danger':mapState==='off'?'is-offline':mapState==='ok'?'':'is-unknown';
     $('#location-dialog-info').innerHTML=cell('기종',v.model)
-      +'<div><dt>상태</dt><dd><span class="status-pill '+(M.attention(v)?'is-danger':'')+'">'+(M.attention(v)?'확인 필요':'정상')+'</span></dd></div>'
-      +cell('소속 그룹',v.group)+cell('통신 상태',v.conn?'연결':'미연결')
+      +'<div><dt>상태</dt><dd><span class="status-pill '+mapClass+'" data-map-vehicle-status="'+esc(mapState)+'">'+mapLabel+'</span></dd></div>'
+      +cell('소속 그룹',v.group)+cell('통신 상태',v.conn===true?'연결':v.conn===false?'미연결':'수집 전')
       +cell('총 가동시간',Number.isFinite(v.cumH)?fmt(v.cumH)+'H':'정보 없음')
       +cell('자료일 가동시간',m?hours(m.min)+' ('+state.from+' ~ '+state.to+')':'정보 없음')
       +cell('위치 기준 시간',p.lastDatetime,true);
@@ -554,11 +666,20 @@
     window.CustomerLocationMap.open({lat:p.lat,lng:p.lng,equipmentNumber:v.equipmentNumber});
   }
   document.addEventListener('click',e=>{
+    if(vehicleLookupOpen&&!e.target.closest('.vehicle-combobox'))closeVehicleLookup();
+    if(e.target.id==='vehicle-lookup-input')return;
     if(e.target===$('#customer-approval-dialog')){closeCustomerApproval();return;}
     if(e.target===$('#supply-reset-dialog')){$('#supply-reset-dialog').close();return;}
     if(e.target===$('#location-dialog')){ $('#location-dialog').close();return; }
     const b=e.target.closest('button'); if(!b)return;
-    if(b.dataset.ownerSort&&state.view==='home'&&state.role==='customer_owner'&&['work','idle'].includes(b.dataset.ownerSort)){homeSort=b.dataset.ownerSort;render();$('[data-owner-sort="'+homeSort+'"]')?.focus({preventScroll:true});return;}
+    if(b.hasAttribute('data-toggle-vehicle-lookup')){if(vehicleLookupOpen){closeVehicleLookup();$('#vehicle-lookup-input').focus();}else openVehicleLookup();return;}
+    if(b.hasAttribute('data-clear-vehicle-lookup')){chooseLookupVehicle('');return;}
+    if(b.hasAttribute('data-select-vehicle-lookup')){chooseLookupVehicle(b.dataset.selectVehicleLookup);return;}
+    if(b.dataset.summarySort&&state.view==='summary'&&summarySortFields.some(([key])=>key===b.dataset.summarySort)){
+      go('summary',{summarySort:b.dataset.summarySort,summaryDirection:state.summarySort===b.dataset.summarySort&&state.summaryDirection==='desc'?'asc':'desc'},true);
+      $('[data-summary-sort="'+state.summarySort+'"]').focus({preventScroll:true});return;
+    }
+    if(b.dataset.ownerSort&&state.view==='home'&&state.role==='customer_owner'&&['work','idle','running'].includes(b.dataset.ownerSort)){homeSortDirection=homeSort===b.dataset.ownerSort&&homeSortDirection==='desc'?'asc':'desc';homeSort=b.dataset.ownerSort;render();$('[data-owner-sort="'+homeSort+'"]')?.focus({preventScroll:true});return;}
     if(b.hasAttribute('data-retry-data')){window.location.reload();return;}
     if(b.hasAttribute('data-refresh-home')){if(state.view!=='home'||b.disabled)return;b.disabled=true;b.setAttribute('aria-busy','true');window.location.reload();return;}
     if(b.dataset.efficiencyMode){if(!['daily','vehicle'].includes(b.dataset.efficiencyMode))return;const inline=b.hasAttribute('data-inline-efficiency');go('efficiency',{efficiencyMode:b.dataset.efficiencyMode},inline);if(inline)$('[data-inline-efficiency][data-efficiency-mode="'+state.efficiencyMode+'"]').focus({preventScroll:true});return;}
@@ -574,6 +695,7 @@
       if(M.undoSupplyReset(rows,state,supplyUndo)){supplyUndo=[];supplyMessage='교체 완료 처리를 취소했습니다.';render();$('[data-open-supply-reset]')?.focus();}return;
     }
     if(b.hasAttribute('data-logout')) {
+      if(window.CustomerOnboarding?.logout()===false)return alert('로그아웃 상태를 저장하지 못했습니다. 다시 시도해 주세요.');
       sessionStorage.removeItem('linq-customer-prototype-authenticated-role');
       window.location.replace('./login.html?role='+(state.role==='customer_staff'?'customer_staff':'customer_owner'));
       return;
@@ -592,8 +714,13 @@
       if(panel)panel.hidden=true;
       if(trigger){trigger.setAttribute('aria-expanded','false'); trigger.focus();} return;
     }
-    if(b.hasAttribute('data-back')) return navigated?history.back():go(state.view==='approvals'?'settings':'home');
+    if(b.hasAttribute('data-back')) return ['vehicleRegistration','vehicleRequests','vehicleRequired'].includes(state.view)?go('settings'):navigated?history.back():go(state.view==='approvals'?'settings':'home');
     if(b.hasAttribute('data-return')) return go(state.returnView);
+    if(b.hasAttribute('data-efficiency-sort')) {
+      if(state.view!=='efficiency')return;
+      go('efficiency',{efficiencyDirection:state.efficiencyDirection==='desc'?'asc':state.efficiencyMode==='vehicle'?'desc':state.efficiencyDirection==='asc'?'':'desc'},true);
+      $('[data-efficiency-sort]')?.focus({preventScroll:true});return;
+    }
     if(b.hasAttribute('data-toggle-range')) {rangeOpen=!rangeOpen;render();$('[data-toggle-range]').focus();return;}
     if(b.hasAttribute('data-efficiency')) return go('efficiency',{...M.efficiencyRange('m',state.from||M.SNAPSHOT.slice(0,10)),efficiencyMode:'daily'});
     if(b.hasAttribute('data-home-efficiency')) return go('efficiency',{...M.efficiencyRange('m',M.TODAY),efficiencyLayout:'menu',efficiencyMode:'daily',group:'',q:'',live:'',reportFocus:'all',reportVehicle:'',equipmentId:'',listVehicle:''});
@@ -623,12 +750,13 @@
       const view=entry&&M.pushPresentation(entry).view;
       if(view==='shock')return go('shock',{equipmentId:entry.equipmentId,period:'d',from:entry.pushDatetime.slice(0,10),to:entry.pushDatetime.slice(0,10),serviceEntry:'',returnView:'notifications',group:''});
       if(view==='error')return go('services',{service:'error',serviceEquipmentId:entry.equipmentId,serviceEntry:'',serviceFocus:'',servicePeriod:'d',serviceFrom:entry.pushDatetime.slice(0,10),serviceTo:entry.pushDatetime.slice(0,10),returnView:'notifications',group:'',q:'',live:''});
+      if(view==='supplies')return go('supplies',{equipmentId:entry.equipmentId,serviceEntry:entry.supplyRecordId||'',returnView:'notifications',group:''});
       if(view)return go(view,{equipmentId:entry.equipmentId,serviceEntry:'',returnView:'notifications',group:''});
       return;
     }
     if(b.dataset.service) return go('services',{service:b.dataset.service,serviceFocus:''},true);
     if(b.dataset.period) { rangeOpen=false;const range=M.efficiencyRange(b.dataset.period,M.SNAPSHOT.slice(0,10),'end');return go(state.view,periodPatch(range.period,range.from,range.to),true); }
-    if(b.hasAttribute('data-map')) return openLocationDialog();
+    if(b.hasAttribute('data-map')) return openLocationDialog(b.dataset.map||'',b);
     if(b.hasAttribute('data-close-map')) return $('#location-dialog').close();
     if(b.hasAttribute('data-expand-map')) return setLocationMapExpanded(!$('#location-dialog').classList.contains('is-map-expanded'));
   });
@@ -663,8 +791,22 @@
       return;
     }
     if(e.target.dataset.control)go(state.view,{[e.target.dataset.control]:e.target.value,status:'all',live:'',equipmentId:'',...(e.target.dataset.control==='role'?{serviceFocus:''}:{})},true);});
-  document.addEventListener('input',e=>{if(e.target.id==='customer-approval-reason'){$('#customer-approval-error').hidden=true;return;}if(e.target.hasAttribute('data-approval-search')){approvalQuery=e.target.value;if(state.view==='approvals'&&state.role==='customer_owner'){$('#customer-approval-list').innerHTML=approvalCards();window.lucide?.createIcons({attrs:{'stroke-width':2}});}return;}if(e.target.closest('#range-form'))e.target.form.querySelectorAll('input').forEach(input=>input.setCustomValidity(''));if(e.target.id==='vehicle-search'&&!e.isComposing){const value=e.target.value;go('summary',{q:value},true);$('#vehicle-search').focus();}});
-  document.addEventListener('compositionend',e=>{if(e.target.id==='vehicle-search'){go('summary',{q:e.target.value},true);$('#vehicle-search').focus();}});
+  document.addEventListener('input',e=>{if(e.target.id==='vehicle-lookup-input'){if(!e.isComposing)applyVehicleSearch(e.target);return;}if(e.target.id==='customer-approval-reason'){$('#customer-approval-error').hidden=true;return;}if(e.target.hasAttribute('data-approval-search')){approvalQuery=e.target.value;if(state.view==='approvals'&&state.role==='customer_owner'){$('#customer-approval-list').innerHTML=approvalCards();window.lucide?.createIcons({attrs:{'stroke-width':2}});}return;}if(e.target.closest('#range-form'))e.target.form.querySelectorAll('input').forEach(input=>input.setCustomValidity(''));});
+  document.addEventListener('compositionend',e=>{if(e.target.id==='vehicle-lookup-input'){applyVehicleSearch(e.target);return;}});
+  document.addEventListener('keydown',e=>{
+    if(e.target.id!=='vehicle-lookup-input'||e.isComposing||e.keyCode===229)return;
+    if(e.key==='Escape'||e.key==='Tab'){if(e.key==='Escape'&&vehicleLookupOpen)e.preventDefault();closeVehicleLookup();return;}
+    if(['ArrowDown','ArrowUp'].includes(e.key)){
+      e.preventDefault();if(!vehicleLookupOpen)openVehicleLookup();
+      const count=lookupChoices().length;
+      vehicleLookupIndex=vehicleLookupIndex<0?(e.key==='ArrowDown'?0:count-1):(vehicleLookupIndex+(e.key==='ArrowDown'?1:-1)+count)%count;
+      updateVehicleLookup();return;
+    }
+    if(e.key==='Enter'&&vehicleLookupOpen){
+      e.preventDefault();const choices=lookupChoices();
+      if(vehicleLookupIndex>=0)chooseLookupVehicle(choices[vehicleLookupIndex].equipmentId);
+    }
+  });
   document.addEventListener('submit',e=>{if(e.target.id==='range-form'){
     e.preventDefault();const fd=new FormData(e.target),period=periodState().period,from=fd.get('from'),to=period==='d'?from:fd.get('to');
     if(!M.calendarDate(from)||!M.calendarDate(to)){e.target.querySelector('input').setCustomValidity('올바른 조회 날짜를 입력해 주세요.');e.target.reportValidity();return;}
@@ -681,7 +823,7 @@
   document.addEventListener('close',event=>{
     if(event.target===$('#customer-approval-dialog')&&approvalPending)closeCustomerApproval();
     if(event.target===$('#supply-reset-dialog')){supplyPending=[];$('[data-open-supply-reset]')?.focus();}
-    if(event.target===$('#location-dialog')){window.CustomerLocationMap.close();setLocationMapExpanded(false);$('[data-map]')?.focus();}
+    if(event.target===$('#location-dialog')){window.CustomerLocationMap.close();setLocationMapExpanded(false);if(locationMapTrigger?.isConnected)locationMapTrigger.focus({preventScroll:true});locationMapTrigger=null;}
   },true);
   window.addEventListener('popstate',()=>{rangeOpen=false;render();});
   window.addEventListener('resize',alignNavigationIcons);

@@ -2,8 +2,7 @@
   const $ = selector => document.querySelector(selector);
   const $$ = selector => [...document.querySelectorAll(selector)];
   // Existing dealer UI, customer-only local authentication state.
-  const role=new URLSearchParams(window.location.search).get('role')==='customer_staff'?'customer_staff':'customer_owner';
-  const key=name=>'linq-customer-prototype-'+name;
+  const auth=window.CustomerAuthCommon,role=auth.role(window.location.search),key=auth.key;
   let reached=1;
   let verifiedEmail='';
   let sentEmail='';
@@ -59,7 +58,7 @@
   });
   $('#recovery-send').addEventListener('click', () => {
     const email=$('#recovery-email').value.trim();
-    if(!$('#recovery-name').value.trim()||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return showToast('이름과 등록 이메일을 확인해 주세요.');
+    if(!$('#recovery-name').value.trim()||!auth.email.test(email))return showToast('이름과 등록 이메일을 확인해 주세요.');
     sentEmail=email;verifiedEmail='';$('#recovery-code').value='';startTimer();showToast('인증 코드를 발송했습니다.');
   });
   $('#recovery-email').addEventListener('input',()=>{sentEmail='';remaining=0;if(timerId)window.clearInterval(timerId);drawTimer();});

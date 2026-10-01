@@ -35,6 +35,9 @@ function page(file,query='',storage=stores()){
   const location={search:query,href:'http://localhost/'+file+query};
   const window={location,scrollTo(){},lucide:{createIcons(){}},addEventListener(){},setTimeout(fn){fn();},setInterval(fn){const id=++intervalId;intervals.set(id,fn);return id;},clearInterval(id){intervals.delete(id);},prompt(){}};
   const context=vm.createContext({document,window,location,navigator:{},URLSearchParams,Date,setTimeout:window.setTimeout,clearTimeout(){},...storage,Option:function(text,value){return element('option',{value});}});
+  window.document=document;window.sessionStorage=storage.sessionStorage;
+  vm.runInContext(read('onboarding.js'),context);
+  vm.runInContext(read('auth-common.js'),context);
   vm.runInContext(read(file==='signup.html'?'signup.js':file==='login.html'?'login.js':'find-password.js'),context);
   return {node:id=>document.getElementById(id),document,storage,location,tick(count){for(let i=0;i<count;i++)for(const fn of intervals.values())fn();}};
 }
@@ -72,38 +75,26 @@ for(const role of ['customer-owner','customer-employee'])for(const switchRole of
     roleInputs.find(input=>input.checked).fire('change');
     assert.equal(n('signup-name').value,'유지할 이름');assert.equal(n('signup-company').value,'');
   }
-  assert.equal(Boolean(n('signup-region').closest('[hidden]')),role==='customer-employee');
-  assert.equal(Boolean(n('signup-dealer').closest('[hidden]')),role==='customer-employee');
-  assert.equal(Boolean(n('signup-representative').closest('[hidden]')),role==='customer-employee');
-  for(const id of ['signup-equipment-serial','signup-terminal-serial']){
-    assert.equal(Boolean(n(id).closest('[hidden]')),role==='customer-employee');
-    assert.equal(n(id).disabled,role==='customer-employee');
-  }
+  for(const id of ['signup-region','signup-dealer','signup-representative','signup-equipment-serial','signup-terminal-serial'])assert.equal(n(id),undefined,'Obsolete customer signup field removed: '+id);
   for(const field of p.document.querySelectorAll('[data-required]'))if(!field.closest('[hidden]'))field.value='filled';
   n('signup-user-id').value=role==='customer-owner'?'new.owner':'new.staff';n('signup-check-id').fire('click');
   n('signup-name').value='김가입';n('signup-email').value=role+'@example.com';n('signup-send-email').fire('click');n('signup-email-code').value='123456';n('signup-verify-email').fire('click');
   n('signup-phone').value='01012345678';n('signup-password').value='newPassword123!';n('signup-password-confirm').value='newPassword123!';
-  n('signup-company').value=role==='customer-owner'?'신규업체':'세종';n('signup-company').fire('input');
+  n('signup-company').value=role==='customer-owner'?'(주)세종물류중부지점':'세종';n('signup-company').fire('input');
   if(role==='customer-employee'){
-    assert(n('signup-region').closest('[hidden]'));
     n('signup-form').fire('submit');assert(n('signup-complete').hidden,'Staff must select an existing company, including after changing role');
     assert(p.document.querySelector('[data-error-for="signup-company"]').textContent.includes('등록된 업체'));
     n('signup-company-list').children.find(c=>c.tagName==='BUTTON').fire('click');
   }
-  if(role==='customer-owner'){
-    n('signup-equipment-serial').value='';n('signup-terminal-serial').value='';
-    n('signup-form').fire('submit');assert(n('signup-complete').hidden,'Owner serial fields must remain required');
-    for(const id of ['signup-equipment-serial','signup-terminal-serial'])assert(p.document.querySelector('[data-error-for="'+id+'"]').textContent.includes('필수'));
-    n('signup-equipment-serial').value='OWNER-EQUIPMENT';n('signup-terminal-serial').value='OWNER-TERMINAL';
-  }else{
-    assert.equal(n('signup-equipment-serial').value,'');assert.equal(n('signup-terminal-serial').value,'');
-  }
-  n('signup-form').fire('submit');assert(!n('signup-complete').hidden);assert(n('signup-approval-target').textContent.includes(role==='customer-owner'?'딜러대표':'고객 대표'));
-  assert.equal(n('signup-summary').children.some(child=>child.tagName==='DT'&&child.textContent==='장비 Serial'),role==='customer-owner');
+  if(role==='customer-owner')assert(n('signup-company-list').hidden,'Owner uses plain company input and permits same trade name');
+  n('signup-form').fire('submit');assert(!n('signup-complete').hidden);assert(n('signup-vehicle-help').textContent.includes(role==='customer-owner'?'차량을 등록하고 승인':'소속 업체 대표'));
   assert.equal(n('signup-password').value,'');assert.equal(n('signup-password-confirm').value,'');
-  const pending=JSON.parse(p.storage.sessionStorage.getItem('linq-customer-prototype-pending-signup'));assert.equal(pending.status,'pending');assert.equal(pending.role,role);assert.deepEqual(Object.keys(pending).sort(),['email','role','status','userId']);
-  n('signup-to-login').fire('click');assert.equal(p.location.href,'./login.html');
-  const login=page('login.html','',p.storage);login.node('login-id').value=pending.userId;login.node('mobile-login-form').fire('submit');assert(login.document.querySelector('.login-toast').textContent.includes('승인 대기'));assert(!login.location.href.startsWith('./index'));
+  const saved=JSON.parse(p.storage.sessionStorage.getItem('linq-customer-onboarding-v1')),mobileRole=role==='customer-owner'?'customer_owner':'customer_staff';
+  assert.equal(saved.profile.role,mobileRole);assert.equal(saved.profile.approvedVehicleCount,0);assert.equal(saved.active,true);assert.equal(saved.requests.length,0);
+  assert.deepEqual(Object.keys(saved.profile).sort(),['approvedVehicleCount','company','email','name','role','userId']);
+  assert(!JSON.stringify(saved).includes('newPassword123!'));
+  n('signup-next').fire('click');assert.equal(p.location.href,'./index.html#'+(role==='customer-owner'?'vehicleRegistration':'vehicleRequired')+'?role='+mobileRole);
+  const login=page('login.html','',p.storage);login.node('login-id').value=saved.profile.userId;login.node('mobile-login-form').fire('submit');assert.equal(login.location.href,'./index.html#vehicleRequired?role='+mobileRole);
 }
 const recovery=page('find-password.html','?role=customer_staff');recovery.node('recovery-identify-form').fire('submit');recovery.node('recovery-send').fire('click');recovery.node('recovery-code').value='000000';recovery.node('recovery-verify-form').fire('submit');assert(recovery.document.querySelector('.login-toast').textContent.includes('일치하지'));
 recovery.node('recovery-code').value='123456';recovery.node('recovery-verify-form').fire('submit');const temp=recovery.node('temporary-password').textContent;assert(temp.length>=12);assert.equal(recovery.storage.sessionStorage.getItem('linq-customer-prototype-force-password-change'),null);
@@ -111,6 +102,21 @@ const tempLogin=page('login.html','?role=customer_staff',recovery.storage);asser
 tempLogin.node('forced-password').value='differentPass123!';tempLogin.node('forced-password-confirm').value='differentPass123!';tempLogin.node('forced-password-form').fire('submit');assert.equal(tempLogin.location.href,'./index.html#home?role=customer_staff');assert.equal(recovery.storage.sessionStorage.getItem('linq-customer-prototype-temporary-password'),null);
 assert.equal(tempLogin.node('forced-password').value,'');assert(![...recovery.storage.sessionStorage.values.values()].some(v=>v.includes('differentPass123!')));
 const expiry=page('find-password.html');expiry.node('recovery-identify-form').fire('submit');expiry.node('recovery-send').fire('click');expiry.tick(180);expiry.node('recovery-code').value='123456';expiry.node('recovery-verify-form').fire('submit');assert(expiry.document.querySelector('[data-recovery-stage="3"]').hidden);
+// r110: the WEB hint and accepted identifier formats must stay aligned.
+const webIdHint='이메일 형식 또는 아이디 (영어, 숫자 6자리 이상)';
+for(const role of ['customer_owner','customer_staff']){
+  const p=page('signup.html','?role='+role),id=p.node('signup-user-id'),status=p.node('signup-user-id-status');
+  p.node('signup-agree-all').checked=true;p.node('signup-agree-all').fire('change');p.node('signup-continue').fire('click');
+  assert.equal(id.getAttribute('placeholder'),webIdHint);
+  for(const [value,valid] of [['user@example.com',true],['a@b.c',true],['abcdef',true],['123456',true],['a.b_-1',true],['abc12',false],['______',false],['user@',false],['a b@example.com',false],['한글아이디',false]]){
+    id.value=value;id.fire('input');p.node('signup-check-id').fire('click');
+    assert.equal(id.getAttribute('aria-invalid'),String(!valid),role+': '+value);
+    assert.equal(status.textContent,valid?'사용할 수 있는 사용자 ID입니다.':'');
+  }
+  id.value='user@example.com';id.fire('input');p.node('signup-check-id').fire('click');
+  id.value='changed@example.com';id.fire('input');assert.equal(status.textContent,'','Editing a verified ID clears verification');
+  p.node('signup-form').fire('submit');assert(p.document.querySelector('[data-error-for="signup-user-id"]').textContent.includes('중복확인'));
+}
 for(const file of ['login.html','find-password.html','signup.html'])assert(!/dealer-employee|ROLE_DEALER/.test(read(file)));
 for(const file of ['login.js','signup.js','find-password.js'])assert(!/fetch\s*\(|XMLHttpRequest/.test(read(file)));
-console.log('PASS: customer-only login, 12-character validation, retry lock, remembered ID, owner/staff signup approval paths, pending identity without passwords, email code/expiry, temporary password and forced change. In-memory form tests only; no real auth/mail/SMS calls.');
+console.log('PASS: customer login, 12-character validation, retry lock, remembered ID, WEB-aligned signup fields/completion, own account without passwords or demo fleet, email code/expiry, temporary password and forced change. No real auth/mail/SMS calls.');

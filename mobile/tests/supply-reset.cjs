@@ -16,7 +16,10 @@ assert.equal(M.supplyItems(rows[0])[0].lastChangedAt,M.SNAPSHOT);assert.equal(ro
 assert.equal(M.resetSupplies(rows,owner,[items[0].id]).length,0,'Do not reset already-zero items');
 assert.equal(M.undoSupplyReset(rows,{role:'customer_staff'},done),false);assert.equal(M.undoSupplyReset(rows,owner,done),true);
 assert.equal(JSON.stringify(rows),initial,'Undo restores counts and replacement dates');
-const harness=vm.runInNewContext('('+fs.readFileSync(path.join(__dirname,'harness.js'),'utf8')+')',{vm,URL,URLSearchParams,M,fleet,read});
+const old=fs.readFileSync(path.join(__dirname,'helpers/customer-mobile-harness.js'),'utf8');
+const start=old.indexOf('function harness('),end=old.length;
+assert(start>=0&&end>start);
+const harness=vm.runInNewContext('('+old.slice(start,end)+')',{vm,URL,URLSearchParams,M,fleet,read});
 const h=harness('#services?service=supplies&role=customer_owner');
 const select=(h,id,on=true)=>h.listeners.change({target:{dataset:{supplySelect:id},checked:on}});
 const all=(h,on=true)=>h.listeners.change({target:{dataset:{},checked:on,hasAttribute:k=>k==='data-supply-select-all'}});

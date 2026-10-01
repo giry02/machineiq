@@ -1,4 +1,115 @@
 {
+  "customerMobileHomeLegend20260925": {
+    "revision": "r118-local",
+    "screenId": "LQ-DASH-001",
+    "output": "상태 기준 시각 및 두 원 위 전체/연결 대수 문구 삭제. 원 비율·하단 대수 유지. 각 원 아래 범례 한 줄, 480px 이하 원 세로 배치",
+    "preserved": "집계/숫자/색상/폰트/터치 높이/목록 이동/권한 유지",
+    "scope": "모바일 로컬만, WEB/서버/Vue/Git/APK/ZIP 미변경, FigJam 대기",
+    "report": "docs/handoff/CUSTOMER_MOBILE_BATCH_FIX_20260925.md"
+  },
+  "customerMobileBatchFix20260925": {
+    "revision": "r116-local",
+    "screenIds": [
+      "LQ-DASH-001",
+      "LQ-OPS-001",
+      "LQ-OPS-002",
+      "LQ-RPT-001",
+      "LQ-REF-003-T01",
+      "LQ-REF-003-T02"
+    ],
+    "supersedes": "r114/r115의 대기안·3+4 중복·선택 탭·그룹 가동 제외 기록은 과거 이력",
+    "input": "기존 기간/검색/정렬/권한 유지. efficiencyMetric 입력 폐기, current-state unknown 분리",
+    "output": "상태 상세 제거, 연결/가동·유휴 2원, 상세 2+4, 차량 시간14px, 선택 탭 제거, 가동→작업→대기→이동거리",
+    "scope": "모바일 로컬만. WEB/서버/Vue/Git/APK/ZIP 미변경. 기존 ID 유지, FigJam 대기",
+    "report": "docs/handoff/CUSTOMER_MOBILE_BATCH_FIX_20260925.md"
+  },
+  "customerMobileRequestFollowup20260925": {
+    "revision": "r115-local",
+    "screenIds": ["LQ-DASH-001", "LQ-OPS-001", "LQ-OPS-002", "LQ-REF-003-T01", "LQ-REF-003-T02"],
+    "input": "기존 live=idle/offline 문맥과 권한 유지. 차량별 효율 기본 desc, asc/desc 주소 유지. 일별 기본 날짜순",
+    "output": "기존 상세 상단 상태 확인: 마지막 시간대/금일 실적/0과자료없음 구분. 차량별 지표 정확히 3+4개, 가동시간 중복 표시",
+    "limits": "원본 connectState는 최근24시간 정보 기준. 로컬 conn 시연값 유지. 정확한 단절/정지 시각·원인과 운영 API는 미연결",
+    "scope": "모바일 로컬만. WEB/서버/Vue/Git/APK/ZIP 미변경. 신규 독립 화면 없음, 기존 ID 유지. FigJam 대기",
+    "report": "docs/handoff/CUSTOMER_MOBILE_REQUEST_FOLLOWUP_20260925.md"
+  },
+  "customerMobileRunningReport20260925": {
+    "revision": "r114-local",
+    "screenIds": [
+      "LQ-DASH-001",
+      "LQ-RPT-001",
+      "LQ-REF-003",
+      "LQ-REF-003-T01",
+      "LQ-REF-003-T02"
+    ],
+    "input": "기존 권한/기간/검색 유지, 효율 표시 항목 all/running/work/unused 추가, 홈 running 정렬 추가",
+    "output": "가동 명칭·대당 가동/이동거리·전체 합계·차량별 지표 묶음·선택 그래프/16px 시간",
+    "scope": "모바일 로컬만. WEB/서버/Vue/Git/APK/ZIP 미변경. 기존 ID 유지, FigJam 대기",
+    "report": "docs/handoff/CUSTOMER_MOBILE_RUNNING_REPORT_20260925.md"
+  },
+  "customerMobileBatteryCharge20260924": {
+    "revision": "r113-local",
+    "screenId": "LQ-RPT-001",
+    "input": "기존 역할/그룹/차량/기간 유지",
+    "output": "기간 배터리 충전량: 기존 공통 연결로 명시 시연 자료 표시(전체58%). 실제0과null 구분",
+    "source": "서버 batteryRate(%) 직접 표시 PASS. 목업 batteryRate(kWh/h)와 혼용 금지. 고정 SOC 시연평균은 운영 이식 금지",
+    "preserved": "CSS/카드/메뉴/권한/현재SOC/소비율 유지. 신규 화면 없음",
+    "scope": "모바일 로컬만, WEB/Vue/서버/Git/APK/ZIP 미변경, FigJam 대기",
+    "report": "docs/handoff/CUSTOMER_MOBILE_BATTERY_CHARGE_20260924.md"
+  },
+  "signupUserIdRevision": {
+    "revision":"r110-local",
+    "screenId":"LQ-AUTH-002",
+    "changes":"사용자 ID 힌트와 허용 형식을 WEB 회원가입에 맞춤. 이메일 또는 기존 6자 이상 아이디, 형식 오류 안내 일치",
+    "scope":"기존 메뉴/디자인/가입 완료 동선 유지. 로컬만, 서버 중복조회 미연결, WEB/Vue/Git 미반영, FigJam 대기",
+    "report":"docs/handoff/CUSTOMER_MOBILE_PREDEV_AUDIT_20260924.md"
+  },
+  "compactPushTabsRevision": {
+    "revision":"r109-local",
+    "screenId":"LQ-COM-004",
+    "layout":"480px 이하에서 전체를 포함한 알림 탭 두 줄(5개:3+2, 6개:3+3), 481px 이상 기존 한 줄",
+    "preserved":"탭 ID/메뉴/역할/건수/선택/상세 복귀 유지. 기존 글자·44px 터치 높이 유지",
+    "scope":"모바일 로컬만. 실제 폴드 기기 대신 브라우저 폭 검증. WEB/Vue/Git/APK/ZIP 미반영, FigJam 대기",
+    "report":"docs/handoff/CUSTOMER_MOBILE_CONSUMABLE_PUSH_20260923.md"
+  },
+  "summaryDefaultSortRevision": {
+    "revision":"r108-local",
+    "screenId":"LQ-OPS-001",
+    "default":"summarySort=work / summaryDirection=desc",
+    "notes":"사용자 이미지 기준으로 차량 목록 첫 진입은 작업시간 많은 순. 선택한 다른 정렬은 유지. 기존 카드/4개 버튼/권한/계산/운영효율 별도 정렬은 불변. 로컬만, FigJam 대기"
+  },
+  "efficiencySortRevision": {
+    "revision":"r107-local",
+    "screens":["LQ-REF-003","LQ-REF-003-T01","LQ-REF-003-T02"],
+    "input":"작업시간 정렬 단일 버튼, efficiencyDirection 빈값/desc/asc",
+    "output":"정렬 방향·URL 유지, 기본순 복원, 미집계 마지막. 일자/시간대 상세와 차량별 상세를 시간 → 집계 정보 → 비율 순서로 정리",
+    "scope":"모바일 로컬만. 기존 조회/권한/계산/화면 ID 유지. 실제 API/Vue/WEB/Git 미반영, FigJam 대기",
+    "report":"docs/handoff/CUSTOMER_MOBILE_EFFICIENCY_SORT_20260923.md"
+  },
+  "consumablePushRevision": {
+    "revision":"r105-local",
+    "screenIds":["LQ-ACC-001","LQ-COM-004","LQ-COM-004-T05","LQ-SVC-003"],
+    "changes":"PUSH 설정 소모품 교체 안내 추가. 소모품 독립 필터 및 필요/임박 수신 예시. 해당 차량·품목 현재 상세 → 알림 선택 탭 복귀",
+    "runtime":"로컬만, 실제 API/FCM/서버 발송과 설정 저장 미연결. 기존 0대 신규 가입 가드 유지. FigJam 반영 대기",
+    "report":"docs/handoff/CUSTOMER_MOBILE_CONSUMABLE_PUSH_20260923.md"
+  },
+  "vehicleRegistrationRevision": {
+    "revision":"r104-local",
+    "menuId":"LQM-MNU-022",
+    "parent":"LQM-MNU-010",
+    "name":"차량 등록",
+    "key":"mobile/vehicle-registration",
+    "page":"LQ-MGT-008",
+    "route":"index.html#vehicleRegistration",
+    "position":"설정 내 정보 바로 아래",
+    "input":"차량 시리얼번호·터미널 ID 직접 입력 또는 로컬 QR 촬영/이미지 선택",
+    "output":"두 값 입력 → 조회 후 예시 기종/딜러 표시 → 다음 → REQ 대기 및 차량 신청내역 LQ-MGT-004-T01. 항목 클릭 시 하단 상세 LQ-MGT-004-P03",
+    "popup":"LQ-MGT-008-P02 로컬 촬영, HTML 전달에서 제외",
+    "roles":"기존 대표/직원 시연 검수 유지. 신규 가입 직원은 WEB처럼 직접 신청 제한 및 대표 등록/그룹 배정 안내. 고객 결과 조회 전용",
+    "runtime":"로컬은 미입력만 오류. 실제 Vue용 형식/존재/중복/기연결/딜러 일치 검증 코드·테스트 보존. 실제 API·차량 목록·딜러 승인 미연결. Figma 반영 대기",
+    "requestMenu":{"id":"LQM-MNU-023","parent":"LQM-MNU-010","name":"차량 신청내역","key":"mobile/vehicle-requests","page":"LQ-MGT-004-T01","position":"설정 차량 등록 바로 아래","route":"index.html#vehicleRequests"},
+    "onboarding":"LQ-AUTH-002 입력 정리 → LQ-AUTH-005 가입 완료 → 대표 등록/직원 안내 LQ-AUTH-006. 가입 자체의 승인 대기 제거, 실제 차량 승인은 별도",
+    "report":"docs/handoff/CUSTOMER_MOBILE_REGISTRATION_ONBOARDING_20260923.md"
+  },
   "r90Revision": {
     "revision": "2026-09-21-r90",
     "screenIdsChanged": false,
@@ -292,9 +403,20 @@
       "area": "공통 메뉴",
       "key": "모바일 전용",
       "page": "LQ-COM-004-T04",
-      "position": "알림 탭 5",
+      "position": "알림 탭 6 (수신 내역이 있을 때)",
       "description": "기타 유형의 수신 이력만 확인한다.",
       "trigger": "유형별 건수와 빈 상태 표시."
+    },
+    {
+      "id": "LQM-MNU-024",
+      "name": "소모품",
+      "parent": "LQM-MNU-012",
+      "area": "공통 메뉴",
+      "key": "mobile/notifications/supplies",
+      "page": "LQ-COM-004-T05",
+      "position": "알림 탭 5",
+      "description": "소모품 교체 필요·임박 알림을 확인하고 해당 차량·품목 현재 상태로 이동한다.",
+      "trigger": "유형별 수신 건수와 빈 상태, 선택 탭 복귀 유지."
     },
     {
       "id": "LQM-MNU-018",
@@ -315,7 +437,7 @@
       "key": "모바일 전용",
       "page": "LQ-AUTH-002",
       "position": "로그인 하단 링크",
-      "description": "약관 동의, 정보 입력, 신청 완료를 진행한다.",
+      "description": "약관 동의, WEB 기준 고객 정보 입력, 가입 완료 후 차량 등록/그룹 배정 안내를 진행한다.",
       "trigger": "고객 대표와 고객 직원만 가입 선택."
     },
     {
@@ -592,8 +714,8 @@
       "area": "리포트",
       "roles": "고객 대표 · 고객 직원",
       "description": "기간 운영효율과 일별 작업·대기·잔여(가정) 구성을 확인한다. 일자 상세를 인라인으로 펼친다.",
-      "input": "그룹(대표), 차량, 일·주·월, 해당 단위의 날짜. 일자 펼침.",
-      "output": "펼친 일자의 업무 리포트로 이동. 선택 차량의 상세 이동. 업무 현황 탭과 조건 공유.",
+      "input": "그룹(대표), 차량 선택/검색, 일·주·월, 해당 단위의 날짜. 일자 펼침. 작업시간 많은 순/적은 순/기본순 정렬.",
+      "output": "작업·대기·미사용·실적 확인 후 비율을 하단에 표시. 전체 조회 결과를 대당 작업시간으로 정렬, 미집계 마지막. 업무 현황·차량별효율 탭과 조건 공유. 기존 날짜 업무 리포트 링크는 제거된 상태 유지.",
       "exception": "오늘 이후 날짜는 미표시. 과거 미수집은 미집계. 비율은 합산 기준, 시간은 실적 확인 차량 평균.",
       "route": "index.html#efficiency",
       "isNew": false
@@ -606,7 +728,7 @@
       "area": "설정",
       "roles": "고객 대표 · 고객 직원",
       "description": "내 정보와 화면 확인용 역할 선택, PUSH 수신 항목 및 로그아웃을 제공한다.",
-      "input": "고객 대표/직원 테스트 역할. PUSH 전체·충격·차량 에러·배터리 경고·공지/마케팅 토글.",
+      "input": "고객 대표/직원 테스트 역할. PUSH 전체·충격·차량 에러·배터리 경고·소모품 교체 안내·공지/마케팅 토글.",
       "output": "역할별 화면 범위 전환. 로그아웃 즉시 로그인으로 이동.",
       "exception": "PUSH 전체 OFF는 하위도 OFF. 설정은 현재 실행 메모리만 유지. 실제 기기 권한/서버 PUSH 및 SMS 스위치 없음.",
       "route": "index.html#settings",
@@ -620,8 +742,8 @@
       "area": "알림",
       "roles": "고객 대표 · 고객 직원",
       "description": "최근 30일의 알림 발생 이력을 최신순으로 표시한다. 실제 조회 기간과 보관·현재 경고 상태 구분 안내를 제공한다. 전체 탭이 기본이다.",
-      "input": "전체/충격/차량 에러/배터리/기타 탭, 이동 가능한 알림 행.",
-      "output": "충격은 해당 차량·발생일 상세, 차량 에러는 해당 차량·수신일 서비스 에러 목록, 배터리는 해당 차량 상세로 이동. 복귀 시 선택 탭 유지.",
+      "input": "전체/충격/차량 에러/배터리/소모품/기타 탭, 이동 가능한 알림 행.",
+      "output": "충격은 해당 차량·발생일 상세, 차량 에러는 해당 차량·수신일 서비스 에러 목록, 배터리는 해당 차량 상세, 소모품은 해당 차량·품목의 현재 상세로 이동. 복귀 시 선택 탭 유지.",
       "exception": "역할별 배정 차량 및 최근 30일 범위. 현재 종은 조회 기간 전체 건수이며 방문/선택으로 차감하지 않는다. 개별 읽음 표시 없음. 실제 구현 때만 화면 방문 기준으로 미확인 카운트를 갱신한다. 실제 PUSH 수신·서버 읽음 처리는 미구현. customer-mobile-notification-policy.md 참조.",
       "route": "index.html#notifications",
       "isNew": false
@@ -795,9 +917,39 @@
       "exception": "유형별 건수는 해당 역할의 수신 이력 기준. 기록이 없으면 빈 목록. 기타는 별도 상세 페이지 없음.",
       "route": "index.html#notifications?notificationCategory=other",
       "isNew": true
+    },
+    {
+      "id": "LQ-COM-004-T05",
+      "name": "소모품 알림",
+      "type": "탭",
+      "parent": "LQ-COM-004",
+      "area": "알림",
+      "roles": "고객 대표 · 고객 직원",
+      "description": "최근 30일 소모품 교체 필요·임박 수신 이력만 표시한다.",
+      "input": "소모품 탭 및 알림 행 선택. equipmentId/supplyRecordId/pushDatetime/message",
+      "output": "LQ-SVC-003의 해당 품목 현재 상태. 복귀 시 소모품 탭과 전체 알림 건수 유지",
+      "exception": "예시는 4건으로 분리 정의, 현재 교체/Reset으로 과거 기록을 지우거나 새로 생성하지 않음. 품목이 없으면 찾을 수 없음 표시. 실제 서버 PUSH 미연결",
+      "route": "index.html#notifications?notificationCategory=supplies",
+      "isNew": true
     }
   ],
   "transitions": [
+    {
+      "from": "LQ-COM-004",
+      "action": "소모품 탭 선택",
+      "to": "LQ-COM-004-T05",
+      "state": "현재 역할·최근 30일 수신 이력, notificationCategory=supplies",
+      "back": "전체 또는 다른 유형 탭 선택",
+      "note": "전체 종 건수 불변, 기타 기존 ID 유지"
+    },
+    {
+      "from": "LQ-COM-004-T05",
+      "action": "소모품 알림 선택",
+      "to": "LQ-SVC-003",
+      "state": "equipmentId/supplyRecordId → serviceEntry, returnView=notifications",
+      "back": "알림 목록으로 돌아가기 → 소모품 선택 탭",
+      "note": "발생 당시 기록과 현재 품목 상태 구분. 현재 품목 없음은 빈 상태, 직원은 교체 처리 불가"
+    },
     {
       "from": "LQ-SVC-001-T01",
       "action": "대표가 품목 선택 후 교체 완료 · Reset",

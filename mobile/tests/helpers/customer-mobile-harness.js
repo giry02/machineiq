@@ -1,3 +1,4 @@
+// Shared isolated-DOM test harness. Loaded in a VM with explicit model, fleet and read dependencies.
 function harness(hash='',vehicleOverrides={},model=M) {
   const nodes=new Map(),listeners={},windowEvents={};let current=new URL('http://localhost:8806/customer/mobile-prototype/index.html'+hash);
   const node=selector=>{if(!nodes.has(selector))nodes.set(selector,{hidden:false,innerHTML:'',textContent:'',dataset:{},classList:{values:new Set(),toggle(k,on){const add=on??!this.values.has(k);if(add)this.values.add(k);else this.values.delete(k);return add;},remove(k){this.values.delete(k);},contains(k){return this.values.has(k);}},showModal(){this.open=true;},close(){this.open=false;listeners.close?.({target:this});},setAttribute(k,v){this[k]=v;},removeAttribute(k){delete this[k];},focus(){},hasAttribute(k){return k in this;}});return nodes.get(selector);};
@@ -11,6 +12,7 @@ function harness(hash='',vehicleOverrides={},model=M) {
   context.window.MIQLithiumListModel=runtimeModel.web?.lithium;
   const screenSource=read('customer.js');
   if(screenSource.includes('window.CustomerHomeView'))vm.runInContext(read('home-view.js'),context);
+  if(screenSource.includes('window.CustomerQueryControls'))vm.runInContext(read('query-controls.js'),context);
   vm.runInContext(screenSource,context);
   const click=(dataset,attr)=>listeners.click({target:{closest:()=>({dataset,hasAttribute:k=>k===attr})}});
   return {node,click,context,mapCalls,html:()=>node('#main').innerHTML,url:()=>current.toString(),open(hash){current=new URL('#'+hash,current);windowEvents.popstate();},listeners};

@@ -18,8 +18,8 @@ for(const v of rows){
   const current=M.metrics(v,M.dates('m')[0],M.TODAY);
   if(current)assert.equal(Object.values(current.shockBands).reduce((a,b)=>a+b,0),current.shock);
 }
-const harnessSource=fs.readFileSync(path.join(__dirname,fs.existsSync(path.join(__dirname,'harness.js'))?'harness.js':'customer-mobile-prototype.cjs'),'utf8');
-const start=harnessSource.indexOf('function harness('),end=harnessSource.indexOf('\nconst h=harness()',start);
+const harnessSource=fs.readFileSync(path.join(__dirname,'helpers/customer-mobile-harness.js'),'utf8');
+const start=harnessSource.indexOf('function harness('),end=harnessSource.length;
 const read=f=>fs.readFileSync(path.join(app,f),'utf8');
 const harness=vm.runInNewContext('('+harnessSource.slice(start,end<0?undefined:end)+')',{vm,URL,URLSearchParams,M,fleet,read});
 const h=harness('#detail?equipmentId=demo-equipment-01');

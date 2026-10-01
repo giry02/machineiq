@@ -1,10 +1,18 @@
 /* GENERATED from current web sources. Run scripts/build-customer-web-contracts.cjs --check. */
 (function(root){var module,globalThis=root,window=root;
+root.MIQ_MOCK_DATA=root.MIQ_MOCK_DATA||{};
+root.MIQ_MOCK_DATA.fleet={"schemaVersion":"1.0.0","dataset":"MACHINE IQ prototype fleet master","defaultCompany":{"companyId":"1933","companyName":"(주)세종물류중부지점"},"powerTypes":["엔진","납산","리튬"],"dashboardCompanies":[{"companyId":"1933","companyName":"(주)세종물류중부지점","vehicleCount":13,"connected":11,"disconnected":2,"running":8,"idle":3,"fault":2,"replacementNeeded":1,"replacementSoon":1,"dashboardRoles":["internal","dealer_owner","dealer_staff"]},{"companyId":"12894","companyName":"중원건기","vehicleCount":23,"connected":20,"disconnected":3,"running":13,"idle":7,"fault":1,"replacementNeeded":1,"replacementSoon":3,"dashboardRoles":["internal","dealer_owner","dealer_staff"]},{"companyId":"33767","companyName":"두산지게차 경남중부판매 주식회사","vehicleCount":5,"connected":4,"disconnected":1,"running":3,"idle":1,"fault":0,"replacementNeeded":1,"replacementSoon":1,"dashboardRoles":["internal","dealer_owner","dealer_staff"]},{"companyId":"364","companyName":"온양지게차(호성건설중기)","vehicleCount":3,"connected":2,"disconnected":1,"running":1,"idle":1,"fault":0,"replacementNeeded":0,"replacementSoon":0,"dashboardRoles":["internal","dealer_owner","dealer_staff"]},{"companyId":"3703","companyName":"태형금속공업(주)","vehicleCount":1,"connected":1,"disconnected":0,"running":1,"idle":0,"fault":0,"replacementNeeded":0,"replacementSoon":0,"dashboardRoles":["internal","dealer_owner","dealer_staff"]},{"companyId":"demo-company-006","companyName":"서울한빛물류(주)","vehicleCount":18,"connected":14,"disconnected":4,"running":7,"idle":7,"fault":0,"replacementNeeded":0,"replacementSoon":1,"dashboardRoles":["internal","dealer_owner","dealer_staff"],"demo":true},{"companyId":"demo-company-007","companyName":"서울새솔산업(주)","vehicleCount":35,"connected":27,"disconnected":8,"running":14,"idle":13,"fault":1,"replacementNeeded":3,"replacementSoon":3,"dashboardRoles":["internal","dealer_owner","dealer_staff"],"demo":true},{"companyId":"demo-company-008","companyName":"서울미래지게차(주)","vehicleCount":52,"connected":40,"disconnected":12,"running":21,"idle":19,"fault":2,"replacementNeeded":1,"replacementSoon":5,"dashboardRoles":["internal","dealer_owner","dealer_staff"],"demo":true},{"companyId":"demo-company-009","companyName":"서울대명유통(주)","vehicleCount":13,"connected":10,"disconnected":3,"running":5,"idle":5,"fault":3,"replacementNeeded":4,"replacementSoon":1,"dashboardRoles":["internal","dealer_owner","dealer_staff"],"demo":true},{"companyId":"demo-company-010","companyName":"서울청우정밀(주)","vehicleCount":30,"connected":24,"disconnected":6,"running":13,"idle":11,"fault":0,"replacementNeeded":2,"replacementSoon":3,"dashboardRoles":["internal","dealer_owner","dealer_staff"],"demo":true},{"companyId":"demo-company-011","companyName":"부산한빛물류(주)","vehicleCount":47,"connected":38,"disconnected":9,"running":21,"idle":17,"fault":1,"replacementNeeded":0,"replacementSoon":5,"dashboardRoles":["internal","dealer_owner","dealer_staff"],"demo":true},{"companyId":"demo-company-012","companyName":"부산새솔산업(주)","vehicleCount":8,"connected":6,"disconnected":2,"running":3,"idle":3,"fault":2,"replacementNeeded":3,"replacementSoon":1,"dashboardRoles":["internal","dealer_owner","dealer_staff"],"demo":true},{"companyId":"demo-company-013","companyName":"부산미래지게차(주)","vehicleCount":25,"connected":21,"disconnected":4,"running":12,"idle":9,"fault":3,"replacementNeeded":1,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-014","companyName":"부산대명유통(주)","vehicleCount":42,"connected":35,"disconnected":7,"running":20,"idle":15,"fault":0,"replacementNeeded":4,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-015","companyName":"부산청우정밀(주)","vehicleCount":59,"connected":50,"disconnected":9,"running":30,"idle":20,"fault":1,"replacementNeeded":2,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-016","companyName":"대구한빛물류(주)","vehicleCount":20,"connected":17,"disconnected":3,"running":10,"idle":7,"fault":2,"replacementNeeded":0,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-017","companyName":"대구새솔산업(주)","vehicleCount":37,"connected":32,"disconnected":5,"running":20,"idle":12,"fault":3,"replacementNeeded":3,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-018","companyName":"대구미래지게차(주)","vehicleCount":54,"connected":47,"disconnected":7,"running":29,"idle":18,"fault":0,"replacementNeeded":1,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-019","companyName":"대구대명유통(주)","vehicleCount":15,"connected":13,"disconnected":2,"running":8,"idle":5,"fault":1,"replacementNeeded":4,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-020","companyName":"대구청우정밀(주)","vehicleCount":32,"connected":28,"disconnected":4,"running":18,"idle":10,"fault":2,"replacementNeeded":2,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-021","companyName":"인천한빛물류(주)","vehicleCount":49,"connected":44,"disconnected":5,"running":29,"idle":15,"fault":3,"replacementNeeded":0,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-022","companyName":"인천새솔산업(주)","vehicleCount":10,"connected":9,"disconnected":1,"running":6,"idle":3,"fault":0,"replacementNeeded":3,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-023","companyName":"인천미래지게차(주)","vehicleCount":27,"connected":25,"disconnected":2,"running":17,"idle":8,"fault":1,"replacementNeeded":1,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-024","companyName":"인천대명유통(주)","vehicleCount":44,"connected":41,"disconnected":3,"running":28,"idle":13,"fault":2,"replacementNeeded":4,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-025","companyName":"인천청우정밀(주)","vehicleCount":5,"connected":5,"disconnected":0,"running":3,"idle":2,"fault":3,"replacementNeeded":2,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-026","companyName":"광주한빛물류(주)","vehicleCount":22,"connected":21,"disconnected":1,"running":15,"idle":6,"fault":0,"replacementNeeded":0,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-027","companyName":"광주새솔산업(주)","vehicleCount":39,"connected":29,"disconnected":10,"running":21,"idle":8,"fault":1,"replacementNeeded":3,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-028","companyName":"광주미래지게차(주)","vehicleCount":56,"connected":43,"disconnected":13,"running":31,"idle":12,"fault":2,"replacementNeeded":1,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-029","companyName":"광주대명유통(주)","vehicleCount":17,"connected":13,"disconnected":4,"running":9,"idle":4,"fault":3,"replacementNeeded":4,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-030","companyName":"광주청우정밀(주)","vehicleCount":34,"connected":27,"disconnected":7,"running":20,"idle":7,"fault":0,"replacementNeeded":2,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-031","companyName":"대전한빛물류(주)","vehicleCount":51,"connected":40,"disconnected":11,"running":30,"idle":10,"fault":1,"replacementNeeded":0,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-032","companyName":"대전새솔산업(주)","vehicleCount":12,"connected":10,"disconnected":2,"running":8,"idle":2,"fault":2,"replacementNeeded":3,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-033","companyName":"대전미래지게차(주)","vehicleCount":29,"connected":23,"disconnected":6,"running":18,"idle":5,"fault":3,"replacementNeeded":1,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-034","companyName":"대전대명유통(주)","vehicleCount":46,"connected":38,"disconnected":8,"running":30,"idle":8,"fault":0,"replacementNeeded":4,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-035","companyName":"대전청우정밀(주)","vehicleCount":7,"connected":6,"disconnected":1,"running":5,"idle":1,"fault":1,"replacementNeeded":2,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-036","companyName":"울산한빛물류(주)","vehicleCount":24,"connected":20,"disconnected":4,"running":16,"idle":4,"fault":2,"replacementNeeded":0,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-037","companyName":"울산새솔산업(주)","vehicleCount":41,"connected":35,"disconnected":6,"running":28,"idle":7,"fault":3,"replacementNeeded":3,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-038","companyName":"울산미래지게차(주)","vehicleCount":58,"connected":50,"disconnected":8,"running":41,"idle":9,"fault":0,"replacementNeeded":1,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-039","companyName":"울산대명유통(주)","vehicleCount":19,"connected":17,"disconnected":2,"running":14,"idle":3,"fault":1,"replacementNeeded":4,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-040","companyName":"울산청우정밀(주)","vehicleCount":36,"connected":32,"disconnected":4,"running":27,"idle":5,"fault":2,"replacementNeeded":2,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-041","companyName":"수원한빛물류(주)","vehicleCount":53,"connected":47,"disconnected":6,"running":40,"idle":7,"fault":3,"replacementNeeded":0,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-042","companyName":"수원새솔산업(주)","vehicleCount":14,"connected":13,"disconnected":1,"running":7,"idle":6,"fault":0,"replacementNeeded":3,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-043","companyName":"수원미래지게차(주)","vehicleCount":31,"connected":28,"disconnected":3,"running":14,"idle":14,"fault":1,"replacementNeeded":1,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-044","companyName":"수원대명유통(주)","vehicleCount":48,"connected":44,"disconnected":4,"running":23,"idle":21,"fault":2,"replacementNeeded":4,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-045","companyName":"수원청우정밀(주)","vehicleCount":9,"connected":8,"disconnected":1,"running":4,"idle":4,"fault":3,"replacementNeeded":2,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-046","companyName":"용인한빛물류(주)","vehicleCount":26,"connected":24,"disconnected":2,"running":13,"idle":11,"fault":0,"replacementNeeded":0,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-047","companyName":"용인새솔산업(주)","vehicleCount":43,"connected":41,"disconnected":2,"running":23,"idle":18,"fault":1,"replacementNeeded":3,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-048","companyName":"용인미래지게차(주)","vehicleCount":60,"connected":45,"disconnected":15,"running":25,"idle":20,"fault":2,"replacementNeeded":1,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-049","companyName":"용인대명유통(주)","vehicleCount":21,"connected":16,"disconnected":5,"running":9,"idle":7,"fault":3,"replacementNeeded":4,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-050","companyName":"용인청우정밀(주)","vehicleCount":38,"connected":29,"disconnected":9,"running":17,"idle":12,"fault":0,"replacementNeeded":2,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-051","companyName":"평택한빛물류(주)","vehicleCount":55,"connected":43,"disconnected":12,"running":25,"idle":18,"fault":1,"replacementNeeded":0,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-052","companyName":"평택새솔산업(주)","vehicleCount":16,"connected":13,"disconnected":3,"running":8,"idle":5,"fault":2,"replacementNeeded":3,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-053","companyName":"평택미래지게차(주)","vehicleCount":33,"connected":26,"disconnected":7,"running":16,"idle":10,"fault":3,"replacementNeeded":1,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-054","companyName":"평택대명유통(주)","vehicleCount":50,"connected":41,"disconnected":9,"running":25,"idle":16,"fault":0,"replacementNeeded":4,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-055","companyName":"평택청우정밀(주)","vehicleCount":11,"connected":9,"disconnected":2,"running":6,"idle":3,"fault":1,"replacementNeeded":2,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-056","companyName":"천안한빛물류(주)","vehicleCount":28,"connected":23,"disconnected":5,"running":15,"idle":8,"fault":2,"replacementNeeded":0,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-057","companyName":"천안새솔산업(주)","vehicleCount":45,"connected":38,"disconnected":7,"running":25,"idle":13,"fault":3,"replacementNeeded":3,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-058","companyName":"천안미래지게차(주)","vehicleCount":6,"connected":5,"disconnected":1,"running":3,"idle":2,"fault":0,"replacementNeeded":1,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-059","companyName":"천안대명유통(주)","vehicleCount":23,"connected":20,"disconnected":3,"running":13,"idle":7,"fault":1,"replacementNeeded":4,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-060","companyName":"천안청우정밀(주)","vehicleCount":40,"connected":35,"disconnected":5,"running":24,"idle":11,"fault":2,"replacementNeeded":2,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-061","companyName":"아산한빛물류(주)","vehicleCount":57,"connected":50,"disconnected":7,"running":35,"idle":15,"fault":3,"replacementNeeded":0,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-062","companyName":"아산새솔산업(주)","vehicleCount":18,"connected":16,"disconnected":2,"running":11,"idle":5,"fault":0,"replacementNeeded":3,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-063","companyName":"아산미래지게차(주)","vehicleCount":35,"connected":32,"disconnected":3,"running":23,"idle":9,"fault":1,"replacementNeeded":1,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-064","companyName":"아산대명유통(주)","vehicleCount":52,"connected":47,"disconnected":5,"running":34,"idle":13,"fault":2,"replacementNeeded":4,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-065","companyName":"아산청우정밀(주)","vehicleCount":13,"connected":12,"disconnected":1,"running":9,"idle":3,"fault":3,"replacementNeeded":2,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-066","companyName":"청주한빛물류(주)","vehicleCount":30,"connected":28,"disconnected":2,"running":21,"idle":7,"fault":0,"replacementNeeded":0,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-067","companyName":"청주새솔산업(주)","vehicleCount":47,"connected":44,"disconnected":3,"running":33,"idle":11,"fault":1,"replacementNeeded":3,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-068","companyName":"청주미래지게차(주)","vehicleCount":8,"connected":8,"disconnected":0,"running":6,"idle":2,"fault":2,"replacementNeeded":1,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-069","companyName":"청주대명유통(주)","vehicleCount":25,"connected":19,"disconnected":6,"running":15,"idle":4,"fault":3,"replacementNeeded":4,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-070","companyName":"청주청우정밀(주)","vehicleCount":42,"connected":32,"disconnected":10,"running":25,"idle":7,"fault":0,"replacementNeeded":2,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-071","companyName":"전주한빛물류(주)","vehicleCount":59,"connected":45,"disconnected":14,"running":36,"idle":9,"fault":1,"replacementNeeded":0,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-072","companyName":"전주새솔산업(주)","vehicleCount":20,"connected":16,"disconnected":4,"running":13,"idle":3,"fault":2,"replacementNeeded":3,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-073","companyName":"전주미래지게차(주)","vehicleCount":37,"connected":29,"disconnected":8,"running":23,"idle":6,"fault":3,"replacementNeeded":1,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-074","companyName":"전주대명유통(주)","vehicleCount":54,"connected":43,"disconnected":11,"running":35,"idle":8,"fault":0,"replacementNeeded":4,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-075","companyName":"전주청우정밀(주)","vehicleCount":15,"connected":12,"disconnected":3,"running":10,"idle":2,"fault":1,"replacementNeeded":2,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-076","companyName":"군산한빛물류(주)","vehicleCount":32,"connected":26,"disconnected":6,"running":22,"idle":4,"fault":2,"replacementNeeded":0,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-077","companyName":"군산새솔산업(주)","vehicleCount":49,"connected":41,"disconnected":8,"running":35,"idle":6,"fault":3,"replacementNeeded":3,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-078","companyName":"군산미래지게차(주)","vehicleCount":10,"connected":8,"disconnected":2,"running":4,"idle":4,"fault":0,"replacementNeeded":1,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-079","companyName":"군산대명유통(주)","vehicleCount":27,"connected":23,"disconnected":4,"running":12,"idle":11,"fault":1,"replacementNeeded":4,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-080","companyName":"군산청우정밀(주)","vehicleCount":44,"connected":38,"disconnected":6,"running":20,"idle":18,"fault":2,"replacementNeeded":2,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-081","companyName":"창원한빛물류(주)","vehicleCount":5,"connected":4,"disconnected":1,"running":2,"idle":2,"fault":3,"replacementNeeded":0,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-082","companyName":"창원새솔산업(주)","vehicleCount":22,"connected":19,"disconnected":3,"running":10,"idle":9,"fault":0,"replacementNeeded":3,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-083","companyName":"창원미래지게차(주)","vehicleCount":39,"connected":35,"disconnected":4,"running":19,"idle":16,"fault":1,"replacementNeeded":1,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-084","companyName":"창원대명유통(주)","vehicleCount":56,"connected":50,"disconnected":6,"running":28,"idle":22,"fault":2,"replacementNeeded":4,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-085","companyName":"창원청우정밀(주)","vehicleCount":17,"connected":15,"disconnected":2,"running":9,"idle":6,"fault":3,"replacementNeeded":2,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-086","companyName":"김해한빛물류(주)","vehicleCount":34,"connected":31,"disconnected":3,"running":18,"idle":13,"fault":0,"replacementNeeded":0,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-087","companyName":"김해새솔산업(주)","vehicleCount":51,"connected":47,"disconnected":4,"running":28,"idle":19,"fault":1,"replacementNeeded":3,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-088","companyName":"김해미래지게차(주)","vehicleCount":12,"connected":11,"disconnected":1,"running":7,"idle":4,"fault":2,"replacementNeeded":1,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-089","companyName":"김해대명유통(주)","vehicleCount":29,"connected":28,"disconnected":1,"running":17,"idle":11,"fault":3,"replacementNeeded":4,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-090","companyName":"김해청우정밀(주)","vehicleCount":46,"connected":35,"disconnected":11,"running":22,"idle":13,"fault":0,"replacementNeeded":2,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-091","companyName":"양산한빛물류(주)","vehicleCount":7,"connected":5,"disconnected":2,"running":3,"idle":2,"fault":1,"replacementNeeded":0,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-092","companyName":"양산새솔산업(주)","vehicleCount":24,"connected":18,"disconnected":6,"running":12,"idle":6,"fault":2,"replacementNeeded":3,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-093","companyName":"양산미래지게차(주)","vehicleCount":41,"connected":32,"disconnected":9,"running":21,"idle":11,"fault":3,"replacementNeeded":1,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-094","companyName":"양산대명유통(주)","vehicleCount":58,"connected":46,"disconnected":12,"running":30,"idle":16,"fault":0,"replacementNeeded":4,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-095","companyName":"양산청우정밀(주)","vehicleCount":19,"connected":15,"disconnected":4,"running":10,"idle":5,"fault":1,"replacementNeeded":2,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-096","companyName":"제주한빛물류(주)","vehicleCount":36,"connected":29,"disconnected":7,"running":20,"idle":9,"fault":2,"replacementNeeded":0,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-097","companyName":"제주새솔산업(주)","vehicleCount":53,"connected":43,"disconnected":10,"running":30,"idle":13,"fault":3,"replacementNeeded":3,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-098","companyName":"제주미래지게차(주)","vehicleCount":14,"connected":12,"disconnected":2,"running":8,"idle":4,"fault":0,"replacementNeeded":1,"replacementSoon":5,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-099","companyName":"제주대명유통(주)","vehicleCount":31,"connected":26,"disconnected":5,"running":18,"idle":8,"fault":1,"replacementNeeded":4,"replacementSoon":1,"dashboardRoles":["internal"],"demo":true},{"companyId":"demo-company-100","companyName":"제주청우정밀(주)","vehicleCount":48,"connected":41,"disconnected":7,"running":30,"idle":11,"fault":2,"replacementNeeded":2,"replacementSoon":3,"dashboardRoles":["internal"],"demo":true}],"vehicles":[{"companyId":"1933","companyName":"(주)세종물류중부지점","catalogOnly":false,"model":"B30S-7","vin":"FBA32_224250271","group":"기본그룹","type":"리튬","cumKm":12430,"cumH":3180,"conn":true,"soc":80,"km":16,"min":461,"summaryDetail":{"workMinutes":430,"idleMinutes":31,"supplyDueCount":1,"activeErrorCount":2},"eff":93.2,"shock":2,"bc":2.4},{"companyId":"1933","companyName":"(주)세종물류중부지점","catalogOnly":false,"model":"D25S-9","vin":"FBD25_113920044","group":"기본그룹","type":"엔진","cumKm":28910,"cumH":5640,"conn":false,"soc":null,"km":212,"min":5772,"summaryDetail":{"workMinutes":4502,"idleMinutes":1270,"supplyDueCount":null,"activeErrorCount":null},"eff":3.8,"shock":9,"fc":3.8},{"companyId":"1933","companyName":"(주)세종물류중부지점","catalogOnly":false,"model":"B18S-7","vin":"FBA18_224250094","group":"테스트그룹","type":"납산","cumKm":9870,"cumH":2410,"conn":true,"soc":null,"km":15,"min":1000,"summaryDetail":{"workMinutes":644,"idleMinutes":356,"supplyDueCount":null,"activeErrorCount":null},"eff":64.4,"shock":1,"bc":1.9},{"companyId":"1933","companyName":"(주)세종물류중부지점","catalogOnly":false,"model":"B20S-7","vin":"FBA20_224250312","group":"기본그룹","type":"리튬","cumKm":7240,"cumH":1860,"conn":true,"soc":62,"km":34,"min":1265,"summaryDetail":{"workMinutes":1121,"idleMinutes":144,"supplyDueCount":null,"activeErrorCount":null},"eff":88.6,"shock":3,"bc":2.1},{"companyId":"1933","companyName":"(주)세종물류중부지점","catalogOnly":false,"model":"B25S-7","vin":"FBA25_224250188","group":"기본그룹","type":"리튬","cumKm":15120,"cumH":4020,"conn":true,"soc":45,"km":58,"min":2598,"summaryDetail":{"workMinutes":2375,"idleMinutes":223,"supplyDueCount":null,"activeErrorCount":null},"eff":91.4,"shock":5,"bc":2.8},{"companyId":"1933","companyName":"(주)세종물류중부지점","catalogOnly":false,"model":"D30S-9","vin":"FBD30_113920117","group":"테스트그룹","type":"엔진","cumKm":33480,"cumH":6210,"conn":true,"soc":null,"km":187,"min":5307,"summaryDetail":{"workMinutes":3927,"idleMinutes":1380,"supplyDueCount":null,"activeErrorCount":null},"eff":4.1,"shock":7,"fc":4.1},{"companyId":"1933","companyName":"(주)세종물류중부지점","catalogOnly":false,"model":"B16S-7","vin":"FBA16_224250045","group":"물류2팀","type":"리튬","cumKm":4530,"cumH":1120,"conn":false,"soc":27,"km":12,"min":592,"summaryDetail":{"workMinutes":562,"idleMinutes":30,"supplyDueCount":null,"activeErrorCount":null},"eff":95,"shock":0,"bc":1.6},{"companyId":"1933","companyName":"(주)세종물류중부지점","catalogOnly":false,"model":"B35S-7","vin":"FBA35_224250403","group":"테스트그룹","type":"리튬","cumKm":19760,"cumH":5080,"conn":true,"soc":71,"km":76,"min":3693,"summaryDetail":{"workMinutes":3313,"idleMinutes":380,"supplyDueCount":null,"activeErrorCount":null},"eff":89.7,"shock":4,"bc":3.2},{"companyId":"1933","companyName":"(주)세종물류중부지점","catalogOnly":false,"model":"D18S-9","vin":"FBD18_113920062","group":"물류2팀","type":"엔진","cumKm":21340,"cumH":3970,"conn":true,"soc":null,"km":143,"min":3129,"summaryDetail":{"workMinutes":2566,"idleMinutes":563,"supplyDueCount":null,"activeErrorCount":null},"eff":3.5,"shock":6,"fc":3.5},{"companyId":"1933","companyName":"(주)세종물류중부지점","catalogOnly":false,"model":"B22S-7","vin":"FBA22_224250226","group":"테스트그룹","type":"납산","cumKm":11090,"cumH":2880,"conn":false,"soc":null,"km":22,"min":1104,"summaryDetail":{"workMinutes":786,"idleMinutes":318,"supplyDueCount":null,"activeErrorCount":null},"eff":71.2,"shock":2,"bc":2},{"vin":"FDB19-000122","model":"D50S-9","type":"엔진","companyId":"12894","companyName":"중원건기","group":"기본그룹","km":0,"min":239,"operatingRate":6.2,"efficiencyRate":99.5,"eff":99.5,"shock":0,"fc":3.7,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB19_225060343","model":"D50S-9","type":"엔진","companyId":"12894","companyName":"중원건기","group":"기본그룹","km":5,"min":1316,"operatingRate":15.2,"efficiencyRate":98.7,"eff":98.7,"shock":61,"fc":4.3,"bc":null,"soc":null,"energyRate":45,"conn":true,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB19_225060042","model":"D50S-9","type":"엔진","companyId":"33767","companyName":"두산지게차 경남중부판매 주식회사","group":"기본그룹","km":16,"min":4600,"operatingRate":56.4,"efficiencyRate":97.2,"eff":97.2,"shock":430,"fc":6,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21-001898","model":"D70S-9","type":"엔진","companyId":"33767","companyName":"두산지게차 경남중부판매 주식회사","group":"기본그룹","km":27,"min":2044,"operatingRate":42.6,"efficiencyRate":77.5,"eff":77.5,"shock":2,"fc":5,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21_224250294","model":"D70S-9","type":"엔진","companyId":"12894","companyName":"중원건기","group":"기본그룹","km":6,"min":1501,"operatingRate":31.3,"efficiencyRate":99.3,"eff":99.3,"shock":23,"fc":5.3,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21_225060126","model":"D70S-9","type":"엔진","companyId":"12894","companyName":"중원건기","group":"기본그룹","km":0,"min":51,"operatingRate":2.1,"efficiencyRate":98.3,"eff":98.3,"shock":0,"fc":5.5,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21_224250450","model":"D70S-9","type":"엔진","companyId":"12894","companyName":"중원건기","group":"기본그룹","km":27,"min":8426,"operatingRate":125.4,"efficiencyRate":97.2,"eff":97.2,"shock":241,"fc":4.2,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21_224250307","model":"D70S-9","type":"엔진","companyId":"12894","companyName":"중원건기","group":"기본그룹","km":0,"min":32,"operatingRate":3.4,"efficiencyRate":84.5,"eff":84.5,"shock":0,"fc":6.7,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21_224250283","model":"D70S-9","type":"엔진","companyId":"12894","companyName":"중원건기","group":"기본그룹","km":0,"min":237,"operatingRate":6.2,"efficiencyRate":98.1,"eff":98.1,"shock":23,"fc":4.8,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21_225060005","model":"D70S-9","type":"엔진","companyId":"33767","companyName":"두산지게차 경남중부판매 주식회사","group":"기본그룹","km":3,"min":2066,"operatingRate":35.9,"efficiencyRate":99.4,"eff":99.4,"shock":3,"fc":3.1,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21_225060182","model":"D70S-9","type":"엔진","companyId":"12894","companyName":"중원건기","group":"기본그룹","km":4,"min":469,"operatingRate":13.9,"efficiencyRate":97,"eff":97,"shock":5,"fc":4.5,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21_225380045","model":"D70S-9","type":"엔진","companyId":"364","companyName":"온양지게차(호성건설중기)","group":"기본그룹","km":240,"min":600,"operatingRate":20.8,"efficiencyRate":99.7,"eff":99.7,"shock":83,"fc":7,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21_224250226","model":"D70S-9","type":"엔진","companyId":"12894","companyName":"중원건기","group":"테스트그룹","km":9,"min":1186,"operatingRate":19,"efficiencyRate":84.4,"eff":84.4,"shock":27,"fc":4.4,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21_224250363","model":"D70S-9","type":"엔진","companyId":"12894","companyName":"중원건기","group":"테스트그룹","km":1,"min":702,"operatingRate":11.3,"efficiencyRate":98.9,"eff":98.9,"shock":5,"fc":3.5,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21_224250428","model":"D70S-9","type":"엔진","companyId":"12894","companyName":"중원건기","group":"테스트그룹","km":5,"min":1297,"operatingRate":20.8,"efficiencyRate":97.3,"eff":97.3,"shock":5,"fc":4.6,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21_225060407","model":"D70S-9","type":"엔진","companyId":"12894","companyName":"중원건기","group":"테스트그룹","km":16,"min":8949,"operatingRate":133.2,"efficiencyRate":63.4,"eff":63.4,"shock":106,"fc":3.9,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21_224250305","model":"D70S-9","type":"엔진","companyId":"3703","companyName":"태형금속공업(주)","group":"테스트그룹","km":20,"min":2614,"operatingRate":34,"efficiencyRate":74.7,"eff":74.7,"shock":1,"fc":4,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21-001903","model":"D70S-9","type":"엔진","companyId":"33767","companyName":"두산지게차 경남중부판매 주식회사","group":"테스트그룹","km":37,"min":5934,"operatingRate":77.3,"efficiencyRate":94.7,"eff":94.7,"shock":196,"fc":4.3,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21_224250275","model":"D70S-9","type":"엔진","companyId":"12894","companyName":"중원건기","group":"테스트그룹","km":12,"min":2912,"operatingRate":67.4,"efficiencyRate":99.5,"eff":99.5,"shock":0,"fc":4.2,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21_225060095","model":"D70S-9","type":"엔진","companyId":"33767","companyName":"두산지게차 경남중부판매 주식회사","group":"테스트그룹","km":23,"min":7111,"operatingRate":87.1,"efficiencyRate":93.7,"eff":93.7,"shock":3,"fc":3.4,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21_224030182","model":"D70S-9","type":"엔진","companyId":"364","companyName":"온양지게차(호성건설중기)","group":"테스트그룹","km":2,"min":835,"operatingRate":43.5,"efficiencyRate":98,"eff":98,"shock":1,"fc":3.2,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FBA36_225380008","model":"B25SE-7","type":"납산","companyId":"364","companyName":"온양지게차(호성건설중기)","group":"테스트그룹","km":128,"min":28800,"operatingRate":300,"efficiencyRate":83.1,"eff":83.1,"shock":46,"fc":null,"bc":null,"soc":null,"energyRate":67,"conn":false,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FBA32-002415","model":"B30S-7","type":"리튬","companyId":"12894","companyName":"중원건기","group":"물류1팀","km":148,"min":8613,"operatingRate":119.6,"efficiencyRate":80.7,"eff":80.7,"shock":0,"fc":null,"bc":null,"soc":80,"energyRate":80,"conn":true,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FBA34-000619","model":"B35S-7","type":"리튬","companyId":"12894","companyName":"중원건기","group":"물류1팀","km":63,"min":2986,"operatingRate":41.5,"efficiencyRate":65.3,"eff":65.3,"shock":6,"fc":null,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21_224030076","model":"D70S-9","type":"엔진","companyId":"12894","companyName":"중원건기","group":"물류1팀","km":0,"min":6,"operatingRate":1.3,"efficiencyRate":98.9,"eff":98.9,"shock":0,"fc":4.8,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21-003185","model":"D70S-9","type":"엔진","companyId":"12894","companyName":"중원건기","group":"물류1팀","km":17,"min":5637,"operatingRate":78.3,"efficiencyRate":99.3,"eff":99.3,"shock":10,"fc":3.8,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21-002991","model":"D70S-9","type":"엔진","companyId":"12894","companyName":"중원건기","group":"물류1팀","km":22,"min":4906,"operatingRate":68.1,"efficiencyRate":97,"eff":97,"shock":3,"fc":5,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21-002888","model":"D70S-9","type":"엔진","companyId":"12894","companyName":"중원건기","group":"물류1팀","km":50,"min":15393,"operatingRate":229.1,"efficiencyRate":97.9,"eff":97.9,"shock":11,"fc":3.7,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21-002887","model":"D70S-9","type":"엔진","companyId":"12894","companyName":"중원건기","group":"물류1팀","km":63,"min":16797,"operatingRate":250,"efficiencyRate":98.5,"eff":98.5,"shock":16,"fc":3.8,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21_224030105","model":"D70S-9","type":"엔진","companyId":"12894","companyName":"중원건기","group":"물류1팀","km":3,"min":1120,"operatingRate":21.2,"efficiencyRate":89.7,"eff":89.7,"shock":11,"fc":5.9,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21-003358","model":"D70S-9","type":"엔진","companyId":"12894","companyName":"중원건기","group":"물류1팀","km":19,"min":3684,"operatingRate":69.8,"efficiencyRate":98.8,"eff":98.8,"shock":8,"fc":4.1,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"vin":"FDB21-002985","model":"D70S-9","type":"엔진","companyId":"12894","companyName":"중원건기","group":"물류1팀","km":20,"min":4822,"operatingRate":67,"efficiencyRate":97.2,"eff":97.2,"shock":1,"fc":4.5,"bc":null,"soc":null,"energyRate":null,"conn":null,"cumKm":null,"cumH":null,"catalogOnly":true},{"companyId":"1933","companyName":"(주)세종물류중부지점","catalogOnly":false,"demo":true,"group":"물류1팀","model":"B30S-7","vin":"FBA32_DEMO_CS01","type":"리튬","cumKm":12540,"cumH":3180,"conn":true,"soc":78,"km":84,"min":2160,"eff":88,"shock":2,"bc":2.8,"summaryDetail":{"workMinutes":1900,"idleMinutes":260,"supplyDueCount":0,"activeErrorCount":1}},{"companyId":"1933","companyName":"(주)세종물류중부지점","catalogOnly":false,"demo":true,"group":"물류1팀","model":"B18S-7","vin":"FBA18_DEMO_CS02","type":"납산","cumKm":7340,"cumH":1840,"conn":false,"soc":46,"km":36,"min":960,"eff":75,"shock":0,"bc":3.2,"summaryDetail":{"workMinutes":720,"idleMinutes":240,"supplyDueCount":0,"activeErrorCount":0}},{"companyId":"1933","companyName":"(주)세종물류중부지점","catalogOnly":false,"demo":true,"group":"물류1팀","model":"D30S-9","vin":"FBD30_DEMO_CS03","type":"엔진","cumKm":18520,"cumH":4260,"conn":true,"soc":null,"km":126,"min":2820,"eff":3.7,"efficiencyRate":81.9,"shock":1,"fc":3.7,"summaryDetail":{"workMinutes":2310,"idleMinutes":510,"supplyDueCount":0,"activeErrorCount":0}}]};
+root.MIQ_MOCK_DATA.observationProfiles={"schemaVersion":"1.0.0","kind":"demo-generation-profiles","measuredTelemetry":false,"timeZone":"Asia/Seoul","schedule":{"startHour":8,"endHour":18,"description":"Demo only: 10 hours per calendar day; not a production working calendar."},"provenance":"2026-09-24: explicitly calibrated from the 13 existing metric records using 22 demo operating days. The original undated snapshot is not measured daily telemetry. Missing catalog vehicles have no profile.","profiles":[{"vin":"FBA32_224250271","companyId":"1933","dailyRunningMinutes":21,"workingShare":0.9327548806941431,"kmPerRunningHour":2.0824295010845986,"dailyShockCount":0.09090909090909091,"fuelLitresPerHour":null,"batteryKwhPerHour":2.4,"batteryGaugeSource":"fleet.soc.fixed-demo"},{"vin":"FBD25_113920044","companyId":"1933","dailyRunningMinutes":262,"workingShare":0.77997227997228,"kmPerRunningHour":2.2037422037422036,"dailyShockCount":0.4090909090909091,"fuelLitresPerHour":3.8,"batteryKwhPerHour":null},{"vin":"FBA18_224250094","companyId":"1933","dailyRunningMinutes":45,"workingShare":0.644,"kmPerRunningHour":0.8999999999999999,"dailyShockCount":0.045454545454545456,"fuelLitresPerHour":null,"batteryKwhPerHour":1.9},{"vin":"FBA20_224250312","companyId":"1933","dailyRunningMinutes":58,"workingShare":0.8861660079051383,"kmPerRunningHour":1.6126482213438735,"dailyShockCount":0.13636363636363635,"fuelLitresPerHour":null,"batteryKwhPerHour":2.1,"batteryGaugeSource":"fleet.soc.fixed-demo"},{"vin":"FBA25_224250188","companyId":"1933","dailyRunningMinutes":118,"workingShare":0.9141647421093149,"kmPerRunningHour":1.3394919168591224,"dailyShockCount":0.22727272727272727,"fuelLitresPerHour":null,"batteryKwhPerHour":2.8,"batteryGaugeSource":"fleet.soc.fixed-demo"},{"vin":"FBD30_113920117","companyId":"1933","dailyRunningMinutes":241,"workingShare":0.7399660825325043,"kmPerRunningHour":2.114188807235726,"dailyShockCount":0.3181818181818182,"fuelLitresPerHour":4.1,"batteryKwhPerHour":null},{"vin":"FBA16_224250045","companyId":"1933","dailyRunningMinutes":27,"workingShare":0.9493243243243243,"kmPerRunningHour":1.2162162162162162,"dailyShockCount":0,"fuelLitresPerHour":null,"batteryKwhPerHour":1.6,"batteryGaugeSource":"fleet.soc.fixed-demo"},{"vin":"FBA35_224250403","companyId":"1933","dailyRunningMinutes":168,"workingShare":0.8971026265908475,"kmPerRunningHour":1.2347684809098294,"dailyShockCount":0.18181818181818182,"fuelLitresPerHour":null,"batteryKwhPerHour":3.2,"batteryGaugeSource":"fleet.soc.fixed-demo"},{"vin":"FBD18_113920062","companyId":"1933","dailyRunningMinutes":142,"workingShare":0.8200703100031959,"kmPerRunningHour":2.7420901246404603,"dailyShockCount":0.2727272727272727,"fuelLitresPerHour":3.5,"batteryKwhPerHour":null},{"vin":"FBA22_224250226","companyId":"1933","dailyRunningMinutes":50,"workingShare":0.7119565217391305,"kmPerRunningHour":1.1956521739130437,"dailyShockCount":0.09090909090909091,"fuelLitresPerHour":null,"batteryKwhPerHour":2},{"vin":"FBA32_DEMO_CS01","companyId":"1933","dailyRunningMinutes":98,"workingShare":0.8796296296296297,"kmPerRunningHour":2.3333333333333335,"dailyShockCount":0.09090909090909091,"fuelLitresPerHour":null,"batteryKwhPerHour":2.8,"batteryGaugeSource":"fleet.soc.fixed-demo"},{"vin":"FBA18_DEMO_CS02","companyId":"1933","dailyRunningMinutes":44,"workingShare":0.75,"kmPerRunningHour":2.25,"dailyShockCount":0,"fuelLitresPerHour":null,"batteryKwhPerHour":3.2,"batteryGaugeSource":"fleet.soc.fixed-demo"},{"vin":"FBD30_DEMO_CS03","companyId":"1933","dailyRunningMinutes":128,"workingShare":0.8191489361702128,"kmPerRunningHour":2.6808510638297873,"dailyShockCount":0.045454545454545456,"fuelLitresPerHour":3.7,"batteryKwhPerHour":null}],"batteryChargeScenario":{"kind":"fixed-demo-from-existing-master-soc","measuredHistory":false,"description":"Explicit constant demo charge levels across sample dates. Numeric source stays only in fleet.vehicles[].soc; not production historical readings. Real reports use server batteryRate derived from GAUGE_RATE. Missing/non-battery values remain unavailable; no energy conversion."}};
 /* DOM-free prototype rules. Keep business-specific forms and data in their pages.
    Classic-script + CommonJS entry points let the same rules run in browser/tests.
    Role policies below simulate QA visibility; they are NOT server authorization. */
 (function (root, factory) {
   var api = factory();
+  api.view = {
+    get: function (node, prop) { return root.MIQI18n ? root.MIQI18n.get(node, prop) : node[prop]; },
+    set: function (node, prop, value) { if (root.MIQI18n) return root.MIQI18n.set(node, prop, value); node[prop] = value; return value; },
+    call: function (node, method, args) { return root.MIQI18n ? root.MIQI18n.call(node, method, args) : node[method].apply(node, args); }
+  };
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.MIQCommon = api;
 }(typeof globalThis !== 'undefined' ? globalThis : this, function () {
@@ -211,8 +219,160 @@
   };
 }));
 
+(function(root){
+var messages = {
+    missing: ['페이지를 찾을 수 없습니다.', '주소가 변경되었거나 더 이상 제공되지 않는 페이지입니다. 주소를 확인하거나 로그인 화면으로 이동해 주세요.'],
+    server: ['잠시 서비스를 이용할 수 없습니다.', '일시적인 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.'],
+    session: ['다시 로그인이 필요합니다.', '로그인 상태가 만료되었습니다. 다시 로그인한 후 이용해 주세요.'],
+    forbidden: ['접근 권한이 없습니다.', '이 정보를 이용할 권한이 없습니다. 소속 업체의 관리자에게 확인해 주세요.'],
+    network: ['연결 상태를 확인해 주세요.', '서버에 연결하지 못했습니다. 인터넷 연결을 확인한 후 다시 시도해 주세요.'],
+    timeout: ['응답이 지연되고 있습니다.', '요청 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요.'],
+    busy: ['잠시 후 다시 시도해 주세요.', '요청이 많아 처리하지 못했습니다. 잠시 기다린 후 다시 시도해 주세요.'],
+    conflict: ['변경된 정보를 확인해 주세요.', '이미 처리되었거나 다른 사용자가 변경한 정보입니다. 최신 상태를 확인해 주세요.'],
+    validation: ['입력 내용을 확인해 주세요.', '필수 항목과 입력 형식을 확인한 후 다시 시도해 주세요.'],
+    invalid: ['정보를 불러오지 못했습니다.', '응답 정보를 확인할 수 없습니다. 잠시 후 다시 조회해 주세요.']
+  };
+  function kind(error) {
+    error = error || {};
+    if (error.name === 'AbortError') return 'cancelled';
+    if (error.code === 'TIMEOUT') return 'timeout';
+    if (error.code === 'INVALID_RESPONSE') return 'invalid';
+    if (error.code === 'NETWORK' || error.name === 'TypeError') return 'network';
+    var status = Number(error.status);
+    return ({401:'session',403:'forbidden',404:'missing',408:'timeout',409:'conflict',400:'validation',422:'validation',429:'busy'})[status] || 'server';
+  }
+  function describe(error) {
+    var type = typeof error === 'string' && messages[error] ? error : kind(error);
+    if (type === 'cancelled') return {type:type, silent:true};
+    return {type:type, title:messages[type][0], detail:messages[type][1], retry:['server','network','timeout','busy','invalid'].includes(type)};
+  }
+root.MIQErrors={describe:describe};
+})(window);
+/* Deterministic DEMO intervals, never measured telemetry.
+ * Profiles, vehicle master and UI translations are separate inputs. A query
+ * selects existing VIN/date/hour samples; it must never seed their values.
+ * Production must replace this provider with server-authorized interval data.
+ */
+(function(root, factory) {
+  var commonJS = typeof module === 'object' && module.exports;
+  var api = factory(commonJS ? require('../_mock-data/master/observation-profiles.json') : root.MIQ_MOCK_DATA.observationProfiles,
+    commonJS ? require('../_mock-data/master/fleet.json') : root.MIQ_MOCK_DATA.fleet);
+  if (commonJS) module.exports = api; else root.MIQObservations = api;
+})(typeof window === 'undefined' ? globalThis : window, function(source, fleet) {
+  'use strict';
+  var profiles = new Map((source.profiles || []).map(function(p) { return [p.vin, p]; }));
+  var catalog = fleet.vehicles || [];
+  var vehiclesByVin = new Map(catalog.map(function(v) { return [v.vin,v]; }));
+  var sampleCache = new Map();
+  function numeric(v) { return typeof v === 'number' && Number.isFinite(v) && v >= 0; }
+  function percent(v) { return numeric(v) && v <= 100; }
+  function date(v) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(v || '')) return null;
+    var d = new Date(v + 'T00:00:00Z');
+    return Number.isFinite(d.getTime()) && d.toISOString().slice(0,10) === v ? d : null;
+  }
+  function shift(v, days) { return new Date(date(v).getTime() + days * 86400000).toISOString().slice(0,10); }
+  function windowAt(now) {
+    var d = new Date((now || new Date()).getTime() + 9 * 3600000);
+    return { date:d.toISOString().slice(0,10), hours:d.getUTCHours(), timeZone:'Asia/Seoul' };
+  }
+  function cutoff(value) {
+    var current = windowAt();
+    if (typeof value === 'string') return value < current.date ? {date:value, hours:24} : current;
+    return value || current;
+  }
+  function random(key) {
+    var s = 2166136261;
+    for (var i=0; i<key.length; i++) { s ^= key.charCodeAt(i); s = Math.imul(s,16777619); }
+    return (s >>> 0) / 4294967296;
+  }
+  function part(total, hour) { return Math.floor(total / 10) + (hour < total % 10 ? 1 : 0); }
+  function sample(vehicle, day, hour, asOf) {
+    var p = vehicle && profiles.get(vehicle.vin), limit = cutoff(asOf);
+    if (!p || !date(day) || hour < 0 || hour > 23 || day > limit.date || day === limit.date && hour >= limit.hours) return null;
+    var key = p.vin + '|' + day;
+    var cacheKey=key+'|'+hour;
+    if(sampleCache.has(cacheKey))return sampleCache.get(cacheKey);
+    var running = Math.min(600, Math.round(p.dailyRunningMinutes * (.8 + random(key) * .4)));
+    var working = Math.round(running * p.workingShare);
+    var slot = hour - 8, scheduled = slot >= 0 && slot < 10;
+    var work = scheduled ? part(working,slot) : 0;
+    var idle = scheduled ? part(running-working,9-slot) : 0;
+    var minutes = work + idle;
+    var shocks = Math.floor(p.dailyShockCount) + (random(key+'|shock') < p.dailyShockCount % 1 ? 1 : 0);
+    // Explicit fixed DEMO scenario only: reuse the existing master charge level.
+    // This is not collected historical SOC and must not replace a server's
+    // period batteryRate response. No kWh-to-percent conversion is performed.
+    var masterVehicle=vehiclesByVin.get(p.vin), chargeSource=p.batteryGaugeSource;
+    var chargeValue=chargeSource==='fleet.soc.fixed-demo' && masterVehicle && masterVehicle.type!=='엔진' && percent(masterVehicle.soc) ? masterVehicle.soc : null;
+    var row={vin:p.vin, date:day, hour:hour, workMinutes:work, idleMinutes:idle,
+      capacityMinutes:scheduled ? 60 : 0,
+      distanceMetres:Math.round(minutes / 60 * p.kmPerRunningHour * 1000),
+      shockCount:scheduled ? part(shocks,slot) : 0,
+      fuelLitres:numeric(p.fuelLitresPerHour) ? minutes / 60 * p.fuelLitresPerHour : null,
+      batteryKwh:numeric(p.batteryKwhPerHour) ? minutes / 60 * p.batteryKwhPerHour : null,
+      batteryChargePercent:chargeValue, batteryChargeProvenance:chargeValue===null?null:'fixed-demo-from-existing-master-soc', mock:true};
+    if(sampleCache.size>=150000)sampleCache.clear();
+    sampleCache.set(cacheKey,row);return row;
+  }
+  function totals(samples) {
+    var rows = samples.filter(Boolean), work=0, idle=0, capacity=0, metres=0, shock=0;
+    var fuel=0, fuelMinutes=0, fuelKnown=0, battery=0, batteryMinutes=0, batteryKnown=0, charge=0, chargeKnown=0;
+    rows.forEach(function(r) {
+      work+=r.workMinutes; idle+=r.idleMinutes; capacity+=r.capacityMinutes; metres+=r.distanceMetres; shock+=r.shockCount;
+      if (numeric(r.fuelLitres)) { fuel+=r.fuelLitres; fuelMinutes+=r.workMinutes+r.idleMinutes; fuelKnown++; }
+      if (numeric(r.batteryKwh)) { battery+=r.batteryKwh; batteryMinutes+=r.workMinutes+r.idleMinutes; batteryKnown++; }
+      if (percent(r.batteryChargePercent)) { charge+=r.batteryChargePercent; chargeKnown++; }
+    });
+    var known=rows.length, running=work+idle;
+    return {known:known, workMinutes:known?work:null, idleMinutes:known?idle:null, runningMinutes:known?running:null,
+      capacityMinutes:known?capacity:null, distanceKm:known?metres/1000:null, shockCount:known?shock:null,
+      efficiency:running>0?work/running*100:null, utilization:capacity>0?running/capacity*100:null,
+      fuelLitres:fuelKnown?fuel:null, fuelRate:fuelMinutes>0?fuel/(fuelMinutes/60):null,
+      batteryKwh:batteryKnown?battery:null, batteryRate:batteryMinutes>0?battery/(batteryMinutes/60):null,
+      batteryChargePercent:chargeKnown?charge/chargeKnown:null};
+  }
+  function select(entity) {
+    if (!entity) return [];
+    if (Array.isArray(entity)) return unique(entity);
+    if (entity.vehicles) return unique(entity.vehicles);
+    if (entity.vin) return [entity];
+    if (typeof entity === 'string') {
+      var company = (fleet.dashboardCompanies || []).find(function(c) { return c.companyName===entity || String(c.companyId)===entity; });
+      if (!company) return []; // Group names need a company scope; never guess it.
+      entity={companyId:company.companyId};
+    }
+    var id=entity.companyId || entity.id;
+    if (!id && entity.name) return select(entity.name);
+    return catalog.filter(function(v) { return String(v.companyId)===String(id) && (!entity.group || v.group===entity.group); });
+  }
+  function unique(rows) { var seen=new Set(); return rows.filter(function(v) { if(seen.has(v.vin))return false; seen.add(v.vin); return true; }); }
+  function intervals(entity, from, to, asOf, hour) {
+    if (!date(from) || !date(to) || from>to || (date(to)-date(from))/86400000>365) return [];
+    var vehicles=select(entity).filter(function(v) { return profiles.has(v.vin); }), rows=[];
+    var limit=cutoff(asOf); if(to>limit.date)to=limit.date;
+    for(var day=from;day<=to;day=shift(day,1)) vehicles.forEach(function(v) {
+      for(var h=hour==null?0:hour;h<(hour==null?24:hour+1);h++) {var r=sample(v,day,h,limit);if(r)rows.push(r);}
+    });
+    return rows;
+  }
+  function aggregate(entity, from, to, asOf, hour) {
+    var selected=select(entity), data=totals(intervals(selected,from,to,asOf,hour));
+    data.vehicleCount=selected.length;
+    data.knownVehicleCount=data.known ? selected.filter(function(v){return profiles.has(v.vin);}).length : 0;
+    data.complete=data.knownVehicleCount===data.vehicleCount && data.vehicleCount>0;
+    return data;
+  }
+  function value(data,key) {
+    return {eff:data.efficiency,shock:data.shockCount,fuel:data.fuelRate,batt:data.batteryChargePercent,
+      dist:data.distanceKm,hour:data.runningMinutes===null?null:data.runningMinutes/60}[key];
+  }
+  return {sample:sample,totals:totals,select:select,unique:unique,intervals:intervals,aggregate:aggregate,value:value,
+    windowAt:windowAt,cutoff:cutoff,hasProfile:function(v){return !!v&&profiles.has(v.vin);},mock:true};
+});
+
 /* Pure prototype contracts. Values passed in by the caller; no server claims. */
-(function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory();else root.MIQMeeting=factory();})(typeof window==='undefined'?this:window,function(){
+(function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory(require('./vehicle-observations.js'));else root.MIQMeeting=factory(root.MIQObservations);})(typeof window==='undefined'?this:window,function(observations){
   'use strict';
   function pad(n){return String(n).padStart(2,'0');}
   function hourlyWindow(now,zone){
@@ -243,7 +403,7 @@
     refresh();
     return {refresh:refresh,stop:function(){stopped=true;(options.cancel||clearInterval)(timer);}};
   }
-  function dailyEnergy(vin,from,to){
+  function calendarDays(from,to){
     function parse(value){
       if(!/^\d{4}-\d{2}-\d{2}$/.test(value||''))return null;
       var d=new Date(value+'T00:00:00Z');
@@ -252,12 +412,20 @@
     var start=parse(from),end=parse(to),rows=[];
     if(!start||!end||start>end)return rows;
     for(var d=start;d<=end;d=new Date(d.getTime()+86400000)){
-      var date=d.toISOString().slice(0,10),key=vin+':energy-kwh-v2:'+date,seed=0;
-      for(var i=0;i<key.length;i++)seed=(seed*31+key.charCodeAt(i))>>>0;
-      function next(){seed=(seed*1103515245+12345)&0x7fffffff;return seed/0x7fffffff;}
-      rows.push({date:date,x:(d.getUTCMonth()+1)+'/'+d.getUTCDate(),chargeKwh:Math.round((18+next()*22)*10)/10,consumeKwh:Math.round((12+next()*24)*10)/10});
+      var date=d.toISOString().slice(0,10);
+      rows.push({date:date,x:(d.getUTCMonth()+1)+'/'+d.getUTCDate()});
     }
     return rows;
+  }
+  // Independent prototype kWh values, never converted from SOC.
+  // Production displays the server's daily chargeKwh/consumeKwh response.
+  function dailyEnergy(vin,from,to){
+    return calendarDays(from,to).map(function(day){
+      var key=vin+':energy-kwh-v2:'+day.date,seed=0;
+      for(var j=0;j<key.length;j++)seed=(seed*31+key.charCodeAt(j))>>>0;
+      function next(){seed=(seed*1103515245+12345)&0x7fffffff;return seed/0x7fffffff;}
+      return {date:day.date,x:day.x,chargeKwh:Math.round((18+next()*22)*10)/10,consumeKwh:Math.round((12+next()*24)*10)/10};
+    });
   }
   function temperatureHours(vin,date){
     var key=vin+':temperature:'+date,seed=0,rows=[];
@@ -271,8 +439,8 @@
     return rows;
   }
   function dailyTemperature(vin,from,to){
-    // Use the same validated calendar range as energy, and derive extrema from hourly temperature.
-    return dailyEnergy(vin,from,to).map(function(day){
+    // Derive prototype extrema from hourly temperature for the validated calendar range.
+    return calendarDays(from,to).map(function(day){
       var values=temperatureHours(vin,day.date).map(function(hour){return hour.v;});
       return {date:day.date,x:day.x,minC:Math.min.apply(null,values),maxC:Math.max.apply(null,values)};
     });
@@ -288,32 +456,25 @@
     return Array.isArray(value)?value.filter(function(id,i,a){return typeof id==='string'&&allowed.indexOf(id)>=0&&a.indexOf(id)===i;}):[];
   }
   function hourlyVehicle(v,window){
-    var known=v.conn===true||v.conn===false,connected=v.conn===true,total={minutes:0,km:0,fuel:0,battery:0};
+    var known=v.conn===true||v.conn===false,connected=v.conn===true;
     function random(key){var s=0;for(var i=0;i<key.length;i++)s=(s*31+key.charCodeAt(i))>>>0;return (s%1000)/1000;}
-    window.slots.forEach(function(slot,i){
-      var r=random(v.vin+window.date+':'+i),min=connected&&r>.25?Math.round(r*50):0;
-      total.minutes+=min;total.km+=min/60*(v.type==='엔진'?4:2);
-      if(v.type==='엔진')total.fuel+=min/60*3.8;else total.battery+=min/60*2.4;
-    });
-    var running=connected&&window.hours>0&&random(v.vin+window.date+':'+(window.hours-1))>.25;
+    var raw=observations.aggregate(v,window.date,window.date,window);
+    var last=window.hours?observations.sample(v,window.date,window.hours-1,window):null;
+    var running=connected&&!!last&&last.workMinutes+last.idleMinutes>0;
     var fault=connected&&random(v.vin+'fault')>.86?1:0;
     // Explicit demonstration vehicles share their current fault count with summary/dashboard.
     var activeError=v.summaryDetail&&v.summaryDetail.activeErrorCount;
     if(v.demo===true&&typeof activeError==='number'&&Number.isFinite(activeError)&&activeError>=0)fault=activeError;
-    return {known:known,connected:connected,running:running,idle:connected&&!running,fault:fault,runH:known?total.minutes/60:null,
-      km:known?total.km:null,fuel:known?total.fuel:null,battery:known?total.battery:null,
+    return {known:known,connected:connected,running:running,idle:connected&&!running,fault:fault,runH:known&&raw.known?raw.runningMinutes/60:null,workingMinutes:known?raw.workMinutes:null,idleMinutes:known?raw.idleMinutes:null,
+      km:known?raw.distanceKm:null,fuel:known?raw.fuelLitres:null,battery:known?raw.batteryKwh:null,
       dataTime:connected?window.date+' '+window.to:null,
       status:!known?'unknown':!connected?'off':fault?'bad':'ok'};
   }
   return {hourlyWindow:hourlyWindow,watchHourly:watchHourly,dailyEnergy:dailyEnergy,temperatureHours:temperatureHours,dailyTemperature:dailyTemperature,chargeWindow:chargeWindow,reportScope:reportScope,favoriteIds:favoriteIds,hourlyVehicle:hourlyVehicle};
 });
 
-(function (root) {
-  'use strict';
-  function escape(value) {
-    return String(value == null ? '' : value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-  }
-  function parse(value) {
+(function(root){
+function parse(value) {
     var match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value || ''));
     if (!match) return null;
     var date = new Date(Date.UTC(+match[1], +match[2] - 1, +match[3]));
@@ -332,81 +493,84 @@
     }
     return { labels: labels, dates: dates, detailLabels: detailLabels, n: count, bucket: 1, filled: count };
   }
-  function tickLabel(labels, index, width) {
-    var every = Math.max(1, Math.ceil(labels.length / Math.max(2, Math.floor((width || 800) / 38))));
-    return index === 0 || index === labels.length - 1 || /월/.test(labels[index]) || index % every === 0 ? labels[index] : '';
+root.MIQCharts={axis:axis};
+})(window);
+/* Shared synthetic observations for dashboard/status/comparison/heatmap.
+ * The same entity/date/metric is independent of the selected screen or range.
+ * Replace this fixture provider with collected daily data for production.
+ */
+(function (root) {
+  'use strict';
+  var charts = root.MIQCharts, observations = root.MIQObservations;
+  var metrics = [
+    { key:'eff', label:'운영효율', unit:'%', agg:'avg', dec:1, betterHigh:true },
+    { key:'shock', label:'충격횟수', unit:'건', agg:'sum', dec:0, betterHigh:false },
+    { key:'fuel', label:'연료소비량', rateLabel:'시간당 연료소비량', unit:'L/H', agg:'avg', dec:1, betterHigh:false },
+    { key:'batt', label:'배터리 충전량', unit:'%', agg:'avg', dec:1, betterHigh:true },
+    { key:'dist', label:'운행거리', unit:'Km', agg:'sum', dec:1, betterHigh:true },
+    { key:'hour', label:'운행시간', unit:'H', agg:'sum', dec:0, betterHigh:true }
+  ];
+  function metric(key) { return metrics.find(function (m) { return m.key === key; }); }
+  function round(value, dec) { var p = Math.pow(10, dec); return Math.round(value * p) / p; }
+  function iso(date) { return date.toISOString().slice(0, 10); }
+  function date(value) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return null;
+    var d = new Date(value + 'T00:00:00Z');
+    return isFinite(d.getTime()) && iso(d) === value ? d : null;
   }
-  /* Count metrics share a zero baseline, 10% headroom and integer 1/2/5 steps.
-     The caller supplies only visible series; null means uncollected, not zero. */
-  function countsAxis(values) {
-    var collected = (Array.isArray(values) ? values : []).filter(function (value) {
-      return typeof value === 'number' && isFinite(value) && value >= 0;
+  function shift(value, days) { return iso(new Date(date(value).getTime() + days * 86400000)); }
+  function cutoff() { return iso(new Date(Date.now() + 9 * 3600000 - 86400000)); }
+  function periods(params) {
+    var end = cutoff(), month = end.slice(0, 7) + '-01';
+    return {
+      d:{from:end, to:end, cur:'조회일', prev:'전일'},
+      w:{from:shift(end, -6), to:end, cur:'조회주', prev:'이전주'},
+      m:{from:month, to:end, cur:'조회월', prev:'이전월'},
+      c:{from:params.get('from') || month, to:params.get('to') || end, cur:'조회기간', prev:'이전기간'}
+    };
+  }
+  function query(entity, key, period, from, to, end) {
+    var m=metric(key), axis=charts.axis(period,from,to), limit=end || observations.windowAt();
+    var values=axis.dates.map(function(day,hour) {
+      return m ? observations.value(observations.aggregate(entity,day,day,limit,period==='d'?hour:null),key) : null;
     });
-    var peak = collected.reduce(function (maximum, value) { return Math.max(maximum, value); }, 0);
-    var target = peak > 0 ? peak * 1.1 : 1;
-    var rawStep = Math.max(1, target / 5);
-    var magnitude = Math.pow(10, Math.floor(Math.log(rawStep) / Math.LN10));
-    var normalized = rawStep / magnitude;
-    var step = (normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 5 ? 5 : 10) * magnitude;
-    var intervals = Math.max(1, Math.ceil(target / step));
-    var ticks = Array.from({ length: intervals + 1 }, function (_, index) { return index * step; });
-    return { min: 0, max: ticks[ticks.length - 1], step: step, ticks: ticks, hasData: collected.length > 0 };
+    var raw=observations.aggregate(entity,from,period==='d'?from:to,limit);
+    return {m:m,labels:axis.labels,detailLabels:axis.detailLabels,dates:axis.dates,series:values,
+      filled:values.filter(function(v){return v!==null;}).length,total:m?observations.value(raw,key):null,coverage:raw};
   }
-  function tipAttrs(text) {
-    return 'tabindex="0" role="img" aria-label="' + escape(text) + '" data-chart-tip="' + escape(text) + '"';
-  }
-  var tip, active;
-  function hide() {
-    if (tip) tip.hidden = true;
-    if (active) { active.removeAttribute('aria-describedby'); active.classList.remove('on'); }
-    active = null;
-  }
-  function show(target, text, event) {
-    if (!target || !text || !root.document) return;
-    if (!tip) {
-      tip = document.createElement('div'); tip.id = 'miqChartTip'; tip.className = 'miq-chart-tip'; tip.setAttribute('role', 'tooltip'); document.body.appendChild(tip);
+  function previous(period, from, to) {
+    if (!date(from) || !date(to)) return {from:from, to:to};
+    if (period === 'm') {
+      function priorMonth(value) {
+        var d = date(value), y = d.getUTCFullYear(), m = d.getUTCMonth();
+        return iso(new Date(Date.UTC(y, m - 1, Math.min(d.getUTCDate(), new Date(Date.UTC(y, m, 0)).getUTCDate()))));
+      }
+      return {from:priorMonth(from), to:priorMonth(to)};
     }
-    if (active !== target) hide();
-    active = target; target.classList.add('on'); target.setAttribute('aria-describedby', tip.id);
-    tip.textContent = text; tip.hidden = false;
-    var rect = target.getBoundingClientRect();
-    var x = event && typeof event.clientX === 'number' ? event.clientX : rect.left + rect.width / 2;
-    var y = event && typeof event.clientY === 'number' ? event.clientY : rect.top;
-    tip.style.left = Math.max(8, Math.min(x + 12, root.innerWidth - tip.offsetWidth - 8)) + 'px';
-    var top = y - tip.offsetHeight - 12;
-    tip.style.top = Math.max(8, Math.min(top < 8 ? y + 16 : top, root.innerHeight - tip.offsetHeight - 8)) + 'px';
+    var days = period === 'd' ? 1 : Math.round((date(to) - date(from)) / 86400000) + 1;
+    return {from:shift(from, -days), to:shift(period === 'd' ? from : to, -days)};
   }
-  function bind(host) {
-    if (!host || host.__miqChartsBound) return;
-    host.__miqChartsBound = true;
-    function target(event) { return event.target.closest && event.target.closest('[data-chart-tip]'); }
-    host.addEventListener('pointermove', function (event) { var node = target(event); if (node) show(node, node.getAttribute('data-chart-tip'), event); else hide(); });
-    host.addEventListener('pointerleave', hide);
-    host.addEventListener('focusin', function (event) { var node = target(event); if (node) show(node, node.getAttribute('data-chart-tip')); });
-    host.addEventListener('focusout', hide);
-    host.addEventListener('keydown', function (event) { if (event.key === 'Escape') hide(); });
-    if (root.MutationObserver) new MutationObserver(hide).observe(host, { childList: true, subtree: true });
+  function status(entity, key, period, from, to, end) {
+    var cur = query(entity, key, period, from, to, end), prior = previous(period, from, to);
+    var prev = query(entity, key, period, prior.from, prior.to, end);
+    return {m:cur.m, labels:cur.labels, detailLabels:cur.detailLabels,
+      cols:cur.series.map(function (v, i) { return {cur:v, prev:prev.series[i] == null ? null : prev.series[i]}; }),
+      filled:cur.filled, cur:cur.total, prev:prev.total, previous:prior};
   }
-  function observeSize(host, redraw) {
-    if (!host || host.__miqChartSizeObserver || !root.ResizeObserver) return;
-    var width = Math.round(host.getBoundingClientRect().width), frame = 0;
-    var observer = new root.ResizeObserver(function () {
-      var next = Math.round(host.getBoundingClientRect().width);
-      if (next <= 0 || next === width) return;
-      width = next;
-      if (frame) root.cancelAnimationFrame(frame);
-      frame = root.requestAnimationFrame(function () { frame = 0; hide(); redraw(); });
+  function aggregate(entities,key,from,to,end) {
+    var vehicles=observations.unique(entities.reduce(function(all,e){return all.concat(observations.select(e));},[]));
+    return observations.value(observations.aggregate(vehicles,from,to,end || observations.windowAt()),key);
+  }
+  function annual(entities, key, year, end) {
+    return Array.from({length:12}, function (_, i) {
+      var month = year + '-' + String(i + 1).padStart(2, '0');
+      return aggregate(entities, key, month + '-01', iso(new Date(Date.UTC(year, i + 1, 0))), end);
     });
-    host.__miqChartSizeObserver = observer;
-    observer.observe(host);
   }
-  root.MIQCharts = { axis: axis, countsAxis: countsAxis, tickLabel: tickLabel, escape: escape, tipAttrs: tipAttrs, bind: bind, show: show, hide: hide, observeSize: observeSize };
-  if (root.document) {
-    root.addEventListener('scroll', hide, true); root.addEventListener('resize', hide);
-    document.addEventListener('miq:period-change', hide); document.addEventListener('miq:target-change', hide);
-  }
-  if (typeof module === 'object' && module.exports) module.exports = root.MIQCharts;
-})(typeof window !== 'undefined' ? window : globalThis);
+  var api = {metrics:metrics, metric:metric, round:round, cutoff:cutoff, periods:periods, query:query, status:status, previous:previous, aggregate:aggregate, annual:annual};
+  root.MIQReportSeries = api;
+  if (typeof module === 'object' && module.exports) module.exports = api;
+})(typeof window === 'undefined' ? globalThis : window);
 
 (function (root) {
   'use strict';
@@ -433,11 +597,12 @@
     { vin: 'FBA32_DEMO_CS01', name: '감속기 오일', cycle: 500, used: 425 }
   ];
   function supplyStatus(cycle, used) {
+    if ([cycle,used].some(function(v){return v==null || typeof v==='boolean' || typeof v==='string' && !v.trim();})) return { state:'unknown', percent:null, rawPercent:null, width:0 };
     cycle = Number(cycle); used = Number(used);
     if (!Number.isFinite(cycle) || cycle <= 0 || !Number.isFinite(used) || used < 0) return { state: 'unknown', percent: null, rawPercent: null, width: 0 };
     var rawPercent = used / cycle * 100;
     var percent = Math.round(rawPercent * 100) / 100;
-    return { state: percent >= 90 ? 'need' : percent >= 80 ? 'soon' : 'ok', percent: percent, rawPercent: rawPercent, width: Math.min(100, percent) };
+    return { state: Math.round(rawPercent) >= 90 ? 'need' : Math.round(rawPercent) >= 80 ? 'soon' : 'ok', percent: percent, rawPercent: rawPercent, width: Math.min(100, percent) };
   }
   function supplyPreview(items, limit) {
     limit = limit === undefined ? 4 : Math.max(0, Math.floor(Number(limit) || 0));
@@ -637,40 +802,6 @@
     return rows;
   }
   return {create:create,createCurrent:createCurrent};
-});
-
-/* Shared summary row values. Dates are committed query dates; no DOM state is read. */
-(function(root, factory) {
-  var api = factory();
-  if (typeof module === 'object' && module.exports) module.exports = api;
-  else root.MIQSummaryRow = api;
-})(typeof window !== 'undefined' ? window : globalThis, function() {
-  'use strict';
-  function valid(value) { return typeof value === 'number' && Number.isFinite(value) && value >= 0; }
-  function times(vehicle, periodMinutes) {
-    var sample = vehicle.summaryDetail || {};
-    var running = valid(periodMinutes) ? Math.round(periodMinutes) : null;
-    var working = null, idle = null;
-    if (running !== null && valid(sample.workMinutes) && valid(sample.idleMinutes)
-      && valid(vehicle.min) && sample.workMinutes + sample.idleMinutes === vehicle.min) {
-      working = vehicle.min > 0 ? Math.round(running * sample.workMinutes / vehicle.min) : 0;
-      idle = running - working;
-    }
-    return {running: running, working: working, idle: idle};
-  }
-  // Communication has two UI states; only an explicit connection is shown as on.
-  function connection(value) { return value === true ? 'on' : 'off'; }
-  function historyCounts(service, vehicle, range) {
-    var unavailable = {repair: null, fault: null};
-    if (!service || typeof service.count !== 'function' || !Array.isArray(service.records)
-      || !vehicle.vin || !range || !range[0] || !range[1]) return unavailable;
-    var known = service.records.some(function(record) { return record.vin === vehicle.vin
-      && (!vehicle.companyId || String(record.companyId) === String(vehicle.companyId)); });
-    if (!known) return unavailable;
-    var filter = {vehicle: vehicle.vin, companyId: vehicle.companyId, from: range[0], to: range[1]};
-    return {repair: service.count('maintenance', filter), fault: service.count('error', filter)};
-  }
-  return {times: times, connection: connection, historyCounts: historyCounts};
 });
 
 (function(root){
@@ -1010,171 +1141,58 @@ window.MIQMapPositions = [
 ];
 
 const MIQCharts=root.MIQCharts;
-function efficiency(rows,period,from,to){var state={rows,period},PERIOD={[period]:{from,to}};function seeded(key) {
-      var seed = 0;
-      for (var index = 0; index < key.length; index++) seed = (seed * 31 + key.charCodeAt(index)) >>> 0;
-      return function () {
-        seed = (seed * 1103515245 + 12345) & 0x7fffffff;
-        return seed / 0x7fffffff;
-      };
-    }
-function build() {
-      var axis = MIQCharts.axis(state.period, PERIOD[state.period].from, PERIOD[state.period].to);
-      var labels = axis.labels, count = axis.n, bucket = axis.bucket, filled = axis.filled, index;
-
-      var columns = [];
-      var byVehicle = {};
-      var totalWork = 0;
-      var totalIdle = 0;
-      for (index = 0; index < count; index++) columns.push(index < filled ? { work: 0, idle: 0 } : null);
-
-      state.rows.forEach(function (vehicle) {
-        var random = seeded(vehicle.vin + state.period + PERIOD[state.period].from + PERIOD[state.period].to);
-        byVehicle[vehicle.vin] = { vehicle: vehicle, work: 0, idle: 0, capacity: 0 };
-        for (var columnIndex = 0; columnIndex < filled; columnIndex++) {
-          var work = 0;
-          var idle = 0;
-          for (var bucketIndex = 0; bucketIndex < bucket; bucketIndex++) {
-            var running = state.period === 'd'
-              ? (columnIndex >= 7 && columnIndex <= 18 ? .6 + random() * .4 : random() * .25)
-              : 6 + random() * 3.5;
-            var ratio = .6 + random() * .25;
-            work += running * ratio;
-            idle += running * (1 - ratio);
-          }
-          columns[columnIndex].work += work;
-          columns[columnIndex].idle += idle;
-          byVehicle[vehicle.vin].work += work;
-          byVehicle[vehicle.vin].idle += idle;
-          byVehicle[vehicle.vin].capacity += Math.max(state.period === 'd' ? 1 : 10 * bucket, work + idle);
-          totalWork += work;
-          totalIdle += idle;
-        }
+function efficiency(rows,period,from,to){var state={rows,period},PERIOD={[period]:{from,to}};function build() {
+      var range=PERIOD[state.period],axis=MIQCharts.axis(state.period,range.from,range.to);
+      var observations=window.MIQObservations,asOf=observations.windowAt(),totals=[];
+      var knownRows=state.rows.filter(observations.hasProfile),divisor=knownRows.length||1;
+      var columns=axis.dates.map(function(day,hour){
+        var value=observations.aggregate(knownRows,day,day,asOf,state.period==='d'?hour:null);
+        if(!value.known)return null;
+        totals.push(value);
+        return {work:value.workMinutes/60/divisor,idle:value.idleMinutes/60/divisor,capacity:value.capacityMinutes/60/divisor};
       });
-
-      var divisor = state.rows.length || 1;
-      columns.forEach(function (column) {
-        if (!column) return;
-        column.work /= divisor;
-        column.idle /= divisor;
+      var vehicles=state.rows.map(function(vehicle){
+        var value=observations.aggregate(vehicle,range.from,state.period==='d'?range.from:range.to,asOf);
+        return {vehicle:vehicle,work:value.workMinutes/60,idle:value.idleMinutes/60,capacity:value.capacityMinutes/60,known:!!value.known};
       });
-      var top = Object.keys(byVehicle).map(function (vin) { return byVehicle[vin]; })
-        .sort(function (left, right) { return right.work - left.work; }).slice(0, 5);
-      return {
-        labels: labels,
-        detailLabels: axis.detailLabels,
-        columns: columns,
-        top: top,
-        vehicles: Object.keys(byVehicle).map(function (vin) { return byVehicle[vin]; }),
-        filled: filled,
-        bucket: bucket,
-        average: {
-          work: filled ? totalWork / divisor / filled : 0,
-          idle: filled ? totalIdle / divisor / filled : 0
-        },
-        averageVehicleWorkTotal: totalWork / divisor
-      };
+      var totalWork=totals.reduce(function(s,v){return s+v.workMinutes/60;},0);
+      var totalIdle=totals.reduce(function(s,v){return s+v.idleMinutes/60;},0),filled=totals.length;
+      return {labels:axis.labels,detailLabels:axis.detailLabels,columns:columns,
+        top:vehicles.filter(function(v){return v.known;}).sort(function(a,b){return b.work-a.work;}).slice(0,5),vehicles:vehicles,
+        filled:filled,bucket:axis.bucket,knownVehicleCount:knownRows.length,
+        average:{work:filled?totalWork/divisor/filled:0,idle:filled?totalIdle/divisor/filled:0},
+        averageVehicleWorkTotal:totalWork/divisor};
     }
 return build();}
-function shocks(rows,period,from,to){var state={rows,period},PERIOD={[period]:{from,to}};function seeded(key) {
-    var s = 0;
-    for (var i = 0; i < key.length; i++) s = (s * 31 + key.charCodeAt(i)) >>> 0;
-    return function () { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; };
-  }
-function build() {
-    var p = state.period;
-    var axis = MIQCharts.axis(p, PERIOD[p].from, PERIOD[p].to);
-    var labels = axis.labels, n = axis.n, i, bucket = axis.bucket, filled = axis.filled;
-
-    var series = { s3: [], s4: [], s5: [] }, byVeh = {};
-    for (i = 0; i < n; i++) { series.s3.push(i < filled ? 0 : null); series.s4.push(i < filled ? 0 : null); series.s5.push(i < filled ? 0 : null); }
-
-    state.rows.forEach(function (v) {
-      var rnd = seeded(v.vin + p + PERIOD[p].from + PERIOD[p].to);
-      byVeh[v.vin] = { model: v.model, vin: v.vin, total: 0 };
-      for (i = 0; i < filled; i++) {
-        var work = p === 'd' ? (i >= 7 && i <= 18 ? 1 : 0.15) : 1;     /* 일 조회는 근무시간에 집중 */
-        for (var b = 0; b < bucket; b++) {                             /* 사용자설정은 7일치 합산 */
-          var s3 = Math.round((1 + rnd() * 8 + v.shock * 0.6) * work);
-          var s4 = Math.round(s3 * (0.45 + rnd() * 0.35));
-          var s5 = rnd() < 0.1 ? 1 + Math.round(rnd()) : 0;
-          series.s3[i] += s3; series.s4[i] += s4; series.s5[i] += s5;
-          byVeh[v.vin].total += s3 + s4 + s5;
-        }
-      }
+function shocks(rows,period,from,to){var state={rows,period},PERIOD={[period]:{from,to}};function build() {
+    var p=state.period,range=PERIOD[p],axis=MIQCharts.axis(p,range.from,range.to),obs=window.MIQObservations;
+    var series={s3:[],s4:[],s5:[]},byVeh={},filled=0;
+    axis.dates.forEach(function(day,hour){
+      var rows=obs.intervals(state.rows,day,day,null,p==='d'?hour:null),known=rows.length>0;
+      var levels={s3:0,s4:0,s5:0};
+      rows.forEach(function(row){
+        // Exclusive illustrative levels; every event belongs to one level.
+        var level=(row.hour+Number(row.date.slice(-2)))%10;
+        levels[level===0?'s5':level<4?'s4':'s3']+=row.shockCount;
+        if(!byVeh[row.vin]){var v=state.rows.find(function(v){return v.vin===row.vin;});byVeh[row.vin]={vin:row.vin,model:v.model,total:0};}
+        byVeh[row.vin].total+=row.shockCount;
+      });
+      ['s3','s4','s5'].forEach(function(key){series[key].push(known?levels[key]:null);});
+      if(known)filled++;
     });
-
-    var top = Object.keys(byVeh).map(function (k) { return byVeh[k]; })
-      .sort(function (a, b) { return b.total - a.total; }).slice(0, 5);
-    return { labels: labels, detailLabels: axis.detailLabels, series: series, top: top, filled: filled };
+    return {labels:axis.labels,detailLabels:axis.detailLabels,series:series,
+      top:Object.keys(byVeh).map(function(k){return byVeh[k];}).sort(function(a,b){return b.total-a.total;}).slice(0,5),filled:filled};
   }
 return build();}
-function summaryValue(vehicle,period,from,to){var PERIOD={
-    d:{label:'일',range:['2026-07-03','2026-07-03'],factor:1/22,eff:1.03},
-    w:{label:'주',range:['2026-06-29','2026-07-05'],factor:1/4.3,eff:.985},
-    m:{label:'월',range:['2026-07-01','2026-07-31'],factor:1,eff:1},
-    c:{label:'설정 기간',range:['2026-05-01','2026-07-31'],factor:3.05,eff:.96}
-  };
-var state={period};var a=root.MIQCommon.dates.parse(from),b=root.MIQCommon.dates.parse(to),days=a&&b?root.MIQCommon.dates.dayCount(a,b):0;if(period==='c'&&days>0&&days<=366)PERIOD.c.factor=days/30;function hasNumber(value){return value!==null&&value!==undefined&&value!==''&&!isNaN(Number(value))}
-function isBattery(v){return v.type==='리튬'||v.type==='납산';}function periodValue(vehicle){
-    var period=PERIOD[state.period];
-    var baseEfficiency=hasNumber(vehicle.efficiencyRate)
-      ? Number(vehicle.efficiencyRate)
-      : isBattery(vehicle)&&hasNumber(vehicle.eff)?Number(vehicle.eff):null;
-    return{
-      km:vehicle.km*period.factor,
-      min:vehicle.min*period.factor,
-      efficiency:baseEfficiency===null?null:Math.min(99.5,baseEfficiency*period.eff),
-      shock:Math.round(vehicle.shock*period.factor),
-      fuel:vehicle.fc?vehicle.fc*(2-period.eff):null,
-      battery:vehicle.bc?vehicle.bc*period.eff:null
-    }
+function summaryValue(vehicle,period,from,to){var MIQObservations=root.MIQObservations,state={period},PERIOD={[period]:{range:[from,to]}};function periodValue(vehicle){
+    var range=PERIOD[state.period].range;
+    var raw=MIQObservations.aggregate(vehicle,range[0],state.period==='d'?range[0]:range[1]);
+    return {km:raw.distanceKm,min:raw.runningMinutes,workMin:raw.workMinutes,idleMin:raw.idleMinutes,
+      eff:raw.efficiency,operatingEff:raw.efficiency,shock:raw.shockCount,fc:raw.fuelRate,bc:raw.batteryRate};
   }
-return periodValue(vehicle);}
-function reportValue(label,key,period,from,to){var state={co:label,period},PERIOD={[period]:{from,to}};var METRICS = [
-    { key: 'eff',   label: '운영효율',      unit: '%',   agg: 'avg', lo: 55,  hi: 88,  dec: 1, betterHigh: true },
-    { key: 'shock', label: '충격횟수',      unit: '건',  agg: 'sum', lo: 18,  hi: 120, dec: 0, betterHigh: false },
-    { key: 'fuel',  label: '연료소비량',    unit: 'L/H', agg: 'avg', lo: 3.1, hi: 4.7, dec: 1, betterHigh: false },
-    { key: 'batt',  label: '배터리 충전량', unit: '%',   agg: 'avg', lo: 17,  hi: 33,  dec: 1, betterHigh: true },
-    { key: 'dist',  label: '운행거리',      unit: 'Km',  agg: 'sum', lo: 70,  hi: 260, dec: 1, betterHigh: true },
-    { key: 'hour',  label: '운행시간',      unit: 'H',   agg: 'sum', lo: 150, hi: 700, dec: 0, betterHigh: true }
-  ];
-function seeded(key) {
-    var s = 0;
-    for (var i = 0; i < key.length; i++) s = (s * 31 + key.charCodeAt(i)) >>> 0;
-    return function () { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; };
-  }
-  function rd(n, d) { var p = Math.pow(10, d); return Math.round(n * p) / p; }
-  function fmt(n, m) {
-    return window.MIQCommon.numbers.integer(n, true) + m.unit;
-  }
-  function metric(key) { return METRICS.filter(function (m) { return m.key === key; })[0]; }
-
-  /* ── 구간 라벨 ── */
-  function buckets() {
-    return MIQCharts.axis(state.period, PERIOD[state.period].from, PERIOD[state.period].to);
-  }
-
-  /* ── 데모 데이터 : 업체 · 지표 · 기간 기준 ── */
-  function build(key) {
-    var m = metric(key), b = buckets();
-    function gen(seed, count) {
-      var rnd = seeded(state.co + key + state.period + PERIOD[state.period].from + PERIOD[state.period].to + seed), a = [];
-      for (var i = 0; i < count; i++) {
-        var v = 0;
-        for (var k = 0; k < b.bucket; k++) v += m.lo + rnd() * (m.hi - m.lo);
-        a.push(rd(m.agg === 'sum' ? v : v / b.bucket, m.dec));
-      }
-      return a;
-    }
-    var curA = gen('cur', b.filled), prevA = gen('prev', b.n);
-    var cols = [];
-    for (var i = 0; i < b.n; i++) cols.push({ prev: prevA[i], cur: i < b.filled ? curA[i] : null });
-    var sum = function (a) { return a.reduce(function (s, x) { return s + x; }, 0); };
-    var agg = function (a) { return rd(m.agg === 'sum' ? sum(a) : sum(a) / a.length, m.dec); };
-    return { m: m, labels: b.labels, detailLabels: b.detailLabels, cols: cols, filled: b.filled, cur: agg(curA), prev: agg(prevA) };
-  }
-return build(key);}
+  function periodTimes(value){return {running:value.min,working:value.workMin,idle:value.idleMin};}
+var value=periodValue(vehicle);return {...value,efficiency:value.eff,fuel:value.fc,battery:value.bc};}
+function reportValue(label,key,period,from,to){return root.MIQReportSeries.status(label,key,period,from,to);}
 const common=root.MIQCommon;
 var principals = {
       dealer_owner: 'dealer.park@sejonglog.co.kr', dealer_staff: 'staff.jung@sejonglog.co.kr',
@@ -1209,6 +1227,6 @@ function nowText() {
     function p(n) { return String(n).padStart(2, '0'); }
     return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
   }
-root.CustomerWebContracts={common:root.MIQCommon,meeting:root.MIQMeeting,charts:MIQCharts,service:root.MIQServiceRecords,demo:root.MIQServiceDemo,times:root.MIQSummaryRow.times,lithium:root.MIQLithiumListModel,positions:root.MIQMapPositions,efficiency,shocks,summaryValue,reportValue,approvalSeed:function(){return currentDemoRequests(seedUserRequests(),[1,2,3,4,10,16,22]);},existingUsers:["admin@sejonglog.co.kr","cs.lee@sejonglog.co.kr","dealer.park@sejonglog.co.kr","dealer.choi@sejonglog.co.kr","staff.jung@sejonglog.co.kr","staff.kang@sejonglog.co.kr","leader.yoon@customer.co.kr","leader.shin@customer.co.kr","user.oh@customer.co.kr","user.lim@customer.co.kr"],principals,get approvalReference(){return nowText();},legacy:[{"kind":"error","vin":"FBA32_224250271","companyId":"1933","code":"P0003","description":"연료량 조절 밸브 회로 이상","category":"차량","level":"a","spn":"523","fmi":"3","date":"2026-07-25","dateTime":"2026-07-25 08:12","completedAt":null,"errorState":"current","pdfKey":"p0003"},{"kind":"error","vin":"FBA32_032068","companyId":"1933","code":"P0191","description":"연료 레일 압력 센서 범위 이상","category":"차량","level":"b","spn":"157","fmi":"2","date":"2026-07-20","dateTime":"2026-07-20 13:40","completedAt":"2026-07-21 13:40","errorState":"past","pdfKey":null},{"kind":"error","vin":"FBA32_224250271","companyId":"1933","code":"A7","description":"주행 제어 시스템 경고","category":"차량","level":"b","spn":"-","fmi":"-","date":"2026-07-24","dateTime":"2026-07-24 10:30","completedAt":null,"errorState":"current","pdfKey":null},{"kind":"error","vin":"FBA32_032042","companyId":"1933","code":"51","description":"유압 온도 경고","category":"차량","level":"c","spn":"-","fmi":"-","date":"2026-07-15","dateTime":"2026-07-15 10:05","completedAt":"2026-07-16 10:05","errorState":"past","pdfKey":null},{"kind":"error","vin":"FBA32_032068","companyId":"1933","code":"A","description":"시트 안전벨트 미착용","category":"차량","level":"c","spn":"-","fmi":"-","date":"2026-07-12","dateTime":"2026-07-12 09:15","completedAt":"2026-07-13 09:15","errorState":"past","pdfKey":null},{"kind":"error","vin":"FBA32_224250383","companyId":"1933","code":"16","description":"셀 밸런싱 이상","category":"배터리","level":"a","spn":"-","fmi":"-","date":"2026-07-26","dateTime":"2026-07-26 09:30","completedAt":null,"errorState":"current","pdfKey":null},{"kind":"maintenance","vin":"FBA32_224250271","companyId":"1933","date":"2026-07-03","dateTime":"2026-07-03 09:20","part":"트랜스미션","symptom":"오일누유","detail":"변속기 오일 누유 발생, 실링 교체","completed":true},{"kind":"maintenance","vin":"FBA32_224250271","companyId":"1933","date":"2026-07-08","dateTime":"2026-07-08 13:45","part":"조향장치","symptom":"유격발생","detail":"스티어링 링크 조정 및 체결 토크 확인","completed":true},{"kind":"maintenance","vin":"FBA32_224250271","companyId":"1933","date":"2026-07-11","dateTime":"2026-07-11 16:10","part":"전장","symptom":"경고등","detail":"배선 커넥터 접촉 상태 점검","completed":false},{"kind":"maintenance","vin":"FBA32_224250383","companyId":"1933","date":"2026-07-14","dateTime":"2026-07-14 10:00","part":"냉각계통","symptom":"과열","detail":"냉각수 보충 및 호스 누수 점검","completed":true},{"kind":"maintenance","vin":"FBA32_032042","companyId":"1933","date":"2026-07-18","dateTime":"2026-07-18 14:30","part":"유압","symptom":"작동지연","detail":"유압 실린더 점검 및 작동유 보충","completed":false},{"kind":"maintenance","vin":"FBA32_032042","companyId":"1933","date":"2026-07-22","dateTime":"2026-07-22 11:20","part":"브레이크","symptom":"제동불량","detail":"브레이크 패드 마모 상태 확인 후 교체","completed":true}],sourceHashes:{"_shared/common-logic.js":"a6f64c8db74a20689cf109a5893881e42d48886fda80ea756e35db6373a41d52","_shared/meeting-model.js":"b9aef6dedaba7abbd5118fa9b90d903bb7149b000794b6250fbc0963010eaae5","_shared/chart-common.js":"15c74452f8053e50beb87992240eac4fef8547a4fab8fdb80282c43fc6e0bb1d","_shared/service-records.js":"4e2247047570df87d702fea2e11164e500e379592e60006858a849f3ce98372f","_shared/service-demo-data.js":"dcd01d3f4b3632d03a3fd4ff741a319008137185f5421a42b12885b693f2ed4d","_shared/summary-row-model.js":"8ec5759511a3cf6bc23319c79b3a71e76fbcaa3cd08819c1cae7b5fe089c5500","_shared/lithium-list-model.js":"7303031cad80131e220e3172e7e3d3f1ba0770a2923cc80fd92db1555545376a","_shared/map-positions.js":"f0538ed3d6b1d0ce5dd0ae424da3b0ca3ac2f9d446ca1e5fd614194110433d20","_shared/operation-metrics-enhancements.js":"c07771cadbf82364fe1297f04c09618a239a7df0e84420f0ab3e704e856aab4b","Shock/shock-tobe.html":"9a93d92c7ee0df8aff9541c64d6d6c9a57c54f5945f34b9ed339b85ee9ba9f31","_shared/vehicle-summary-option-c.js":"7b6e44d91c1d8ca108ce68b17a9de74199a0428601ad162a9882ce392e2d5cba","Report Status/report-status-tobe.html":"5b392d4b1601e1f14f5e059e4ec61ba0fa7b97f388e5e24a1161edf294e9212a","_shared/map-management-enhancements.js":"6d02a821f091bc01663fb46b4b712097f4d4121fb9ad8fcb527f40f8c48f8407","Mgmt User/mgmt-user-tobe.html":"42430c1e7d5b618b4c067ce397de90ca6c852b05971541bd467ef0a33c2efa6b","Service/service-error-tobe.html":"d80b254c3ad5f6c0f18fc3fe6289e34de01b28d19d39d20b70cf7fc53c4a1eeb","Service/service-maintenance-tobe.html":"14b3b440b76239c7df8799989d6f0edbf9b40e1687e11cb9c459ed63b75f8230"}};
+root.CustomerWebContracts={errors:root.MIQErrors,common:root.MIQCommon,meeting:root.MIQMeeting,charts:MIQCharts,service:root.MIQServiceRecords,demo:root.MIQServiceDemo,observations:root.MIQObservations,reportSeries:root.MIQReportSeries,lithium:root.MIQLithiumListModel,positions:root.MIQMapPositions,efficiency,shocks,summaryValue,reportValue,approvalSeed:function(){return currentDemoRequests(seedUserRequests(),[1,2,3,4,10,16,22]);},existingUsers:["admin@sejonglog.co.kr","cs.lee@sejonglog.co.kr","dealer.park@sejonglog.co.kr","dealer.choi@sejonglog.co.kr","staff.jung@sejonglog.co.kr","staff.kang@sejonglog.co.kr","leader.yoon@customer.co.kr","leader.shin@customer.co.kr","user.oh@customer.co.kr","user.lim@customer.co.kr"],principals,get approvalReference(){return nowText();},legacy:[{"kind":"error","vin":"FBA32_224250271","companyId":"1933","code":"P0003","description":"연료량 조절 밸브 회로 이상","category":"차량","level":"a","spn":"523","fmi":"3","date":"2026-07-25","dateTime":"2026-07-25 08:12","completedAt":null,"errorState":"current","pdfKey":"p0003"},{"kind":"error","vin":"FBA32_032068","companyId":"1933","code":"P0191","description":"연료 레일 압력 센서 범위 이상","category":"차량","level":"b","spn":"157","fmi":"2","date":"2026-07-20","dateTime":"2026-07-20 13:40","completedAt":"2026-07-21 13:40","errorState":"past","pdfKey":null},{"kind":"error","vin":"FBA32_224250271","companyId":"1933","code":"A7","description":"주행 제어 시스템 경고","category":"차량","level":"b","spn":"-","fmi":"-","date":"2026-07-24","dateTime":"2026-07-24 10:30","completedAt":null,"errorState":"current","pdfKey":null},{"kind":"error","vin":"FBA32_032042","companyId":"1933","code":"51","description":"유압 온도 경고","category":"차량","level":"c","spn":"-","fmi":"-","date":"2026-07-15","dateTime":"2026-07-15 10:05","completedAt":"2026-07-16 10:05","errorState":"past","pdfKey":null},{"kind":"error","vin":"FBA32_032068","companyId":"1933","code":"A","description":"시트 안전벨트 미착용","category":"차량","level":"c","spn":"-","fmi":"-","date":"2026-07-12","dateTime":"2026-07-12 09:15","completedAt":"2026-07-13 09:15","errorState":"past","pdfKey":null},{"kind":"error","vin":"FBA32_224250383","companyId":"1933","code":"16","description":"셀 밸런싱 이상","category":"배터리","level":"a","spn":"-","fmi":"-","date":"2026-07-26","dateTime":"2026-07-26 09:30","completedAt":null,"errorState":"current","pdfKey":null},{"kind":"maintenance","vin":"FBA32_224250271","companyId":"1933","date":"2026-07-03","dateTime":"2026-07-03 09:20","part":"트랜스미션","symptom":"오일누유","detail":"변속기 오일 누유 발생, 실링 교체","completed":true},{"kind":"maintenance","vin":"FBA32_224250271","companyId":"1933","date":"2026-07-08","dateTime":"2026-07-08 13:45","part":"조향장치","symptom":"유격발생","detail":"스티어링 링크 조정 및 체결 토크 확인","completed":true},{"kind":"maintenance","vin":"FBA32_224250271","companyId":"1933","date":"2026-07-11","dateTime":"2026-07-11 16:10","part":"전장","symptom":"경고등","detail":"배선 커넥터 접촉 상태 점검","completed":false},{"kind":"maintenance","vin":"FBA32_224250383","companyId":"1933","date":"2026-07-14","dateTime":"2026-07-14 10:00","part":"냉각계통","symptom":"과열","detail":"냉각수 보충 및 호스 누수 점검","completed":true},{"kind":"maintenance","vin":"FBA32_032042","companyId":"1933","date":"2026-07-18","dateTime":"2026-07-18 14:30","part":"유압","symptom":"작동지연","detail":"유압 실린더 점검 및 작동유 보충","completed":false},{"kind":"maintenance","vin":"FBA32_032042","companyId":"1933","date":"2026-07-22","dateTime":"2026-07-22 11:20","part":"브레이크","symptom":"제동불량","detail":"브레이크 패드 마모 상태 확인 후 교체","completed":true}],sourceHashes:{"_mock-data/master/fleet.json":"9448429490b45b7be2501cd867ebc0a62f0bb135bcd367e7c1e47e0dd52b59ba","_mock-data/master/observation-profiles.json":"c3184cf0f6fdca7e2e1c3e0c138ea07f50ecbf230b4a9bf669df9544695febbd","_shared/common-logic.js":"d77b1475070457497dde931fda9d4a83438b1cfc23f067fb716953bc2227cf87","_shared/common-errors.js":"a96dc7038427e571de0ee5dd07c16ee9d8d75c8c58781d4156405edb30eaf6d3","_shared/vehicle-observations.js":"aea30481fdb62f6c6b3252054c13c8f8f3564778be89951880c673ec03015cd1","_shared/meeting-model.js":"41cc03e0e4db87e38a1b60f3aed263647c29e4363bc87d2037402a2b8fbf488e","_shared/chart-common.js":"7a02484fc3816be104222d27c65f218ae71b42081605c7eb14bfc23175a1371c","_shared/report-series.js":"d1c19291fbce659ca0c38d4a9434f0084dd73b3dc9acf3a9ac56bc7097689855","_shared/service-records.js":"63ec0adead3eba3a4c99e9895a8c922725866a88f1a5ac4303c82de26f60d435","_shared/service-demo-data.js":"dcd01d3f4b3632d03a3fd4ff741a319008137185f5421a42b12885b693f2ed4d","_shared/lithium-list-model.js":"7303031cad80131e220e3172e7e3d3f1ba0770a2923cc80fd92db1555545376a","_shared/map-positions.js":"f0538ed3d6b1d0ce5dd0ae424da3b0ca3ac2f9d446ca1e5fd614194110433d20","_shared/operation-metrics-enhancements.js":"ab1a628c9c41cf4405b2b70b43230f33a2514ae131c0004fad3034e4b92551c3","Shock/shock-tobe.html":"00914c328cb53d9114d3be86a3058a6f3beb0e3c224395058b4e71bad97ccdef","_shared/vehicle-summary-options.js":"37b02e9b4f5519cde4d56203b02fd35f6cb050d8ea91ea4b44684978f7f165ee","_shared/map-management-enhancements.js":"796cf436894a06bbe4d8ce351ebc4bb3513d92cbf54d2b7ac839a99918dee873","Mgmt User/mgmt-user-tobe.html":"968d0c133d0859308c730176862ae6a605ace593f885032b39e458e96a29a019","Service/service-error-tobe.html":"03a01fe9393e7940c7da8d2931582993c48ca5f59afcc1797f5eb93bd0181057","Service/service-maintenance-tobe.html":"0f64facc9478fd170a82a1a827826309d1871ae7fc92492d904985ecab139242"}};
 })(typeof window==='undefined'?globalThis:window);
 if(typeof module==='object'&&module.exports)module.exports=globalThis.CustomerWebContracts;

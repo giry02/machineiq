@@ -6,11 +6,10 @@
   const toggle = document.querySelector('#password-toggle');
   const toast = document.querySelector('.login-toast');
   let toastTimer;
-  const role=new URLSearchParams(window.location.search).get('role')==='customer_staff'?'customer_staff':'customer_owner';
-  const key=name=>'linq-customer-prototype-'+name;
+  const auth=window.CustomerAuthCommon,role=auth.role(window.location.search),key=auth.key;
   const read=name=>sessionStorage.getItem(key(name));
   const remove=name=>sessionStorage.removeItem(key(name));
-  const passwordRule=/^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{12,}$/;
+  const passwordRule=auth.password;
   let attempts=Number(read('login-attempts')||0);
   const temporary=read('temporary-password');
   const tempValid=()=>temporary&&Number(read('temporary-expires'))>Date.now();
@@ -20,7 +19,7 @@
   document.querySelectorAll('a[href="./find-password.html"], a[href="./signup.html"]').forEach(link=>{link.href+='?role='+role;});
   const forced=document.querySelector('#forced-password-panel');
   const forcedForm=document.querySelector('#forced-password-form');
-  const goHome=()=>{sessionStorage.setItem(key('authenticated-role'),role);window.location.href='./index.html#home?role='+role;};
+  const goHome=()=>{const account=window.CustomerOnboarding?.login(idInput.value.trim());if(account===false)return showToast('로그인 상태를 저장하지 못했습니다. 다시 시도해 주세요.');const activeRole=account?.role||role;sessionStorage.setItem(key('authenticated-role'),activeRole);window.location.href='./index.html#'+(account?.approvedVehicleCount===0?'vehicleRequired':'home')+'?role='+activeRole;};
   function showForced(){form.hidden=true;document.querySelector('.login-card__head').hidden=true;forced.hidden=false;document.querySelector('#forced-password').focus();}
   forcedForm.addEventListener('submit',event=>{
     event.preventDefault();const next=document.querySelector('#forced-password'),confirm=document.querySelector('#forced-password-confirm');
@@ -54,9 +53,7 @@
   form.addEventListener('submit', event => {
     event.preventDefault();
     if(attempts>=5)return showToast('비밀번호를 5회 연속 잘못 입력하여 계정이 잠겼습니다.');
-    const id=idInput.value.trim();let pending;
-    try{pending=JSON.parse(read('pending-signup')||'null');}catch(error){}
-    if(pending&&[pending.userId,pending.email].some(value=>String(value).toLowerCase()===id.toLowerCase()))return showToast('가입 승인 대기 중입니다. 승인 완료 후 로그인할 수 있습니다.');
+    const id=idInput.value.trim();
     if(!form.reportValidity())return;
     if(!(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(id)||/^(?=.*[A-Za-z0-9])[A-Za-z0-9._-]{6,}$/.test(id)))return showToast('사용자 ID 또는 이메일을 확인해 주세요.');
     if(!passwordRule.test(passwordInput.value))return showToast('비밀번호는 영문·숫자·특수문자를 포함해 12자 이상 입력해 주세요.');

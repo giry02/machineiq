@@ -20,7 +20,7 @@
     resolved:{label:'처리완료',icon:'circle-check',tone:'neutral'},
     unknown:{label:'미수신',icon:'circle-help',tone:'neutral'}
   };
-  // Presentation only: round once at the final boundary; retain raw metric precision.
+  // DEMO display only. BE-001/002: production server supplies final numbers,\n  // rounding and unit conversion; do not port these fixture formatters as business rules.
   const wholeNumber = value => Math.round(value).toLocaleString('ko-KR', {maximumFractionDigits:0});
   const DISPLAY = {
     number:(value,unit='')=>Number.isFinite(value)?wholeNumber(value)+unit:'-',
@@ -92,8 +92,8 @@
       const status=valid?W.service.supplyStatus(item.cycleHours,item.usedHours):{state:'unknown',percent:null};
       // Dashboard handoff: ROUND(raw usage %, 0) determines the current state.
       // Keep the existing two-decimal usage display; do not round twice for classification.
-      const percent=status.percent,decisionPercent=valid?Math.round(item.usedHours/item.cycleHours*100):null;
-      const key=decisionPercent==null?'unknown':decisionPercent>=90?'due':decisionPercent>=80?'soon':'normal';
+      const percent=status.percent,decisionPercent=status.rawPercent==null?null:Math.round(status.rawPercent);
+      const key=status.state==='need'?'due':status.state==='soon'?'soon':status.state==='ok'?'normal':'unknown';
       return {...item,percent,decisionPercent,key,kind:'supplies',label:STATUS[key].label,count,id:v.equipmentId+'-supply-'+item.itemId,equipmentId:v.equipmentId,occurredAt:v.receivedAt||SNAPSHOT,resolved:false};
     });
   }
@@ -125,13 +125,21 @@
     const maintenance=today.maintenance.filter(r=>r.dateTime<SNAPSHOT);
     return W.legacy.concat(generated.maintenance,generated.error,current,maintenance);
   }
+  // Local status adapter: confirmed zero is idle; absent/invalid samples are unknown.
+  // Connection freshness belongs to the server; do not infer it from the page clock.
+  function currentVehicle(v,window=W.meeting.hourlyWindow(new Date(SNAPSHOT.replace(' ','T')+':00+09:00'))) {
+    const live=W.meeting.hourlyVehicle(v,window);
+    const last=window.hours?W.observations.sample(v,window.date,window.hours-1,window):null;
+    const operationKnown=v.conn===true&&Number.isFinite(last?.workMinutes)&&last.workMinutes>=0&&Number.isFinite(last?.idleMinutes)&&last.idleMinutes>=0;
+    return {...live,operationKnown,running:operationKnown?last.workMinutes+last.idleMinutes>0:null,idle:operationKnown?last.workMinutes+last.idleMinutes===0:null};
+  }
   function buildVehicles(fleet) {
     sourceFleet=fleetState(fleet).available?fleet.vehicles.filter(v=>!v.catalogOnly):[];
     const history=rawHistory(),window=W.meeting.hourlyWindow(new Date());
     return sourceFleet.filter(v=>v.companyId===COMPANY).map((v,i)=>{
-      const live=W.meeting.hourlyVehicle(v,window),supplies=sourceSupplies(v);
+      const live=currentVehicle(v,window),supplies=sourceSupplies(v);
       return {...v,equipmentId:`demo-equipment-${String(i+1).padStart(2,'0')}`,equipmentNumber:v.vin,equipmentName:v.model,codeName:v.model,fuelTypeCode:TYPES[v.type],
-        modelYear:v.modelYear??null,operating:live.connected?live.running:null,
+        modelYear:v.modelYear??null,operating:live.operationKnown?live.running:null,
         activeErrorCount:history.filter(r=>r.kind==='error'&&r.vin===v.vin&&r.errorState==='current').length,
         supplies,supplyDueCount:supplyItems({supplies}).filter(r=>r.key==='due').length,supplySoonCount:supplyItems({supplies}).filter(r=>r.key==='soon').length,
         receivedAt:live.dataTime,position:W.positions.find(p=>p.vin===v.vin)||null,batteryVoltage:v.batteryVoltage??null,batteryCapacity:v.batteryCapacity??null};
@@ -183,7 +191,7 @@
   function listed(rows, state) {
     const q = (state.q || '').toLowerCase().trim();
     return scope(rows,state).filter(v => !q || `${v.equipmentNumber} ${v.model} ${v.group}`.toLowerCase().includes(q))
-      .filter(v => !state.live || (state.live === 'connected' ? v.conn : state.live === 'offline' ? !v.conn : state.live === 'running' ? v.operating === true : state.live === 'idle' ? v.operating === false : state.live === 'error' ? v.activeErrorCount > 0 : state.live === 'due' ? v.supplyDueCount > 0 : state.live === 'soon' ? v.supplySoonCount > 0 : true));
+      .filter(v => !state.live || (state.live === 'connected' ? v.conn===true : state.live === 'offline' ? v.conn===false : state.live === 'connection_unknown' ? v.conn!==true&&v.conn!==false : state.live === 'operation_unknown' ? v.conn===true&&v.operating===null : state.live === 'running' ? v.conn===true&&v.operating === true : state.live === 'idle' ? v.conn===true&&v.operating === false : state.live === 'error' ? v.activeErrorCount > 0 : state.live === 'due' ? v.supplyDueCount > 0 : state.live === 'soon' ? v.supplySoonCount > 0 : true));
   }
   // Original web error/maintenance records restricted to accessible source VINs.
   function serviceHistory(rows) {
@@ -227,7 +235,7 @@
     error:{label:'실시간 차량 에러',icon:'triangle-alert',view:'error'},
     'battery-li':{label:'실시간 배터리 경고',icon:'battery',view:'battery'},
     'battery-la':{label:'실시간 배터리 경고',icon:'battery',view:'battery'},
-    supplies:{label:'소모품',icon:'refresh-cw',view:'supplies'},
+    supplies:{label:'소모품 교체 안내',icon:'refresh-cw',view:'supplies'},
     maintenance:{label:'정비',icon:'clipboard-list',view:'maintenance'},
     fuel:{label:'연료',icon:'fuel',view:'engine'},
     operation:{label:'운행정보',icon:'chart-no-axes-combined',view:'operation'}
@@ -255,6 +263,25 @@
     return records.filter(item=>typeof item.pushDatetime==='string'&&/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(item.pushDatetime)&&item.pushDatetime>range.from&&item.pushDatetime<=range.to)
       .slice().sort((a,b)=>b.pushDatetime.localeCompare(a.pushDatetime));
   }
+  // Explicit local received-message examples, NOT inferred from live item counts.
+  // Stable across a replacement/reset: the inbox is history, the detail is current.
+  // Production must supply authenticated notification records and durable item IDs.
+  const SUPPLY_PUSH_FIXTURES=[
+    {vin:'FBA32_224250271',itemId:'web-supply-0',name:'트랜스미션 오일',status:'due',time:'10:00'},
+    {vin:'FBA32_224250271',itemId:'web-supply-2',name:'감속기 오일',status:'soon',time:'09:00'},
+    {vin:'FBA32_DEMO_CS01',itemId:'web-supply-0',name:'작동유 필터',status:'due',time:'10:00'},
+    {vin:'FBA32_DEMO_CS01',itemId:'web-supply-1',name:'감속기 오일',status:'soon',time:'09:00'}
+  ];
+  function supplyPushFixtures(rows) {
+    const date=isoDay(shiftDay(calendarDate(TODAY),-1));
+    return SUPPLY_PUSH_FIXTURES.flatMap(item=>{
+      const v=rows.find(v=>v.vin===item.vin);
+      if(!v)return [];
+      return [{id:'push-supplies-'+item.vin+'-'+item.itemId+'-'+date,equipmentId:v.equipmentId,pushType:'supplies',
+        supplyRecordId:v.equipmentId+'-supply-'+item.itemId,supplyStatus:item.status,
+        message:v.vin+'\n'+item.name+' · '+STATUS[item.status].label+'\n'+(item.status==='due'?'소모품 교체가 필요합니다.':'소모품 교체 시기가 가까워졌습니다.'),pushDatetime:date+' '+item.time}];
+    });
+  }
   function pushHistory(rows,records) {
     if(!records){
       const errors=serviceHistory(rows).filter(r=>r.kind==='error').map(r=>({id:'push-'+r.id,equipmentId:r.equipmentId,pushType:'error',message:r.vin+ '\n'+r.code+' · '+r.description,pushDatetime:r.occurredAt,errorRecordId:r.id}));
@@ -268,7 +295,7 @@
           message:v.vin+'\n'+label+' '+info[key]+' 상태가 확인되었습니다.',pushDatetime:v.receivedAt,batteryStateKey:key,batteryState:info[key]
         }));
       });
-      records=errors.concat(shocks,batteries).sort((a,b)=>b.pushDatetime.localeCompare(a.pushDatetime));
+      records=errors.concat(shocks,batteries,supplyPushFixtures(rows)).sort((a,b)=>b.pushDatetime.localeCompare(a.pushDatetime));
     }
     
   // Preserve response order, as the source does; fixture order is newest first.
@@ -279,13 +306,14 @@
   // r50: the mobile bell uses the scoped inbox total, not this unread value.
   function unreadPushCount(role) { return ({customer_owner:3,customer_staff:2})[role]??null; }
   function counts(rows,options={}) {
-    const connected = rows.filter(v=>v.conn).length;
-    const running = rows.filter(v=>v.operating === true).length;
+    const connected=rows.filter(v=>v.conn===true).length,offline=rows.filter(v=>v.conn===false).length;
+    const running=rows.filter(v=>v.conn===true&&v.operating===true).length,idle=rows.filter(v=>v.conn===true&&v.operating===false).length;
+    const connectionUnknown=rows.length-connected-offline,operationUnknown=connected-running-idle;
     const supplies=supplySummary(rows);
-    return {total:rows.length,connected,offline:rows.length-connected,running,idle:connected-running,
+    return {total:rows.length,connected,offline,running,idle,connectionUnknown,operationUnknown,
       error:dashboardErrors(rows,options).length,due:supplies.due,
       soon:supplies.soon,attention:rows.filter(attention).length,
-      normal:rows.filter(v=>!attention(v)).length,operatingRate:connected ? Math.round(running/connected*100) : null};
+      normal:rows.filter(v=>!attention(v)).length,operatingRate:connected&&!operationUnknown ? Math.round(running/connected*100) : null};
   }
   function dates(period) {
     const date=calendarDate(TODAY);
@@ -315,84 +343,58 @@
     }
     return {period:mode,from:isoDay(from),to:isoDay(to)};
   }
-  function efficiencyAvailableRange(from,to) {
-    return {from:from<DATA_START?DATA_START:from,to:to>TODAY?TODAY:to};
+  // Local DEMO response adapter only. Production uses server-calculated values.
+  // DEMO raw.batteryRate is kWh/h (consumption), NOT the server batteryRate (% charge).
+  // Production report charge binds the existing server percentage without frontend aggregation.
+  function observationMetrics(v,raw,from,to,period,hour) {
+    const shock=W.shocks([v],period,from,to);
+    const shockBands=Object.fromEntries(Object.entries(shock.series).map(([key,values])=>[key,raw.known?(hour==null?values.reduce((a,b)=>a+(b??0),0):(values[hour]??0)):null]));
+    return {min:raw.runningMinutes,work:raw.workMinutes,idle:raw.idleMinutes,km:raw.distanceKm,
+      shock:raw.shockCount,shockBands,efficiency:raw.efficiency,fc:raw.fuelRate,bc:raw.batteryRate};
   }
-  function efficiencyPerformance(rows,from,to,options={}) {
-    const result=webPerformance(rows,from,to,options);
-    if(!result.web)return result;
-    const period=resolvePeriod(from,to,options.period),base=period==='d'?1:10*(result.web.bucket||1);
-    const capacity=result.web.columns.reduce((n,c)=>n+(c?Math.max(base,c.work+c.idle)*rows.length*60:0),0);
-    return {...result,capacity,unused:Math.max(0,capacity-result.work-result.idle),rate:percent(result.work,capacity)};
-  }
-  function efficiencyWindow(from,to) {
-    return {valid:Boolean(calendarDate(from)&&calendarDate(to)&&from<=to),from,to,through:to,label:'집계 '+from.slice(5).replace('-','.')+' 00:00~'+to.slice(5).replace('-','.')+' 24:00'};
-  }
-  function efficiencyCalendar(rows,period,from,to,options={}) {
-    if(!calendarDate(from)||!calendarDate(to)||from>to)return [];
-    const axis=W.charts.axis(period,from,to),whole=W.efficiency(rows,period,from,to),hourly=period==='d',base=hourly?60:600*(whole.bucket||1);
-    return whole.columns.map((column,i)=>{
-      const date=hourly?from:axis.dates[i],hour=hourly?String(i).padStart(2,'0')+'시':null;
-      const entries=rows.map(v=>{
-        const column=W.efficiency([v],period,from,to).columns[i],work=(column?.work||0)*60,idle=(column?.idle||0)*60;
-        const m={...metrics(v,date,date,period),work,idle,min:work+idle,efficiency:percent(work,work+idle)};
-        return {v,m,capacity:Math.max(base,work+idle),through:date,rate:percent(work,Math.max(base,work+idle)),idleRate:percent(idle,work+idle)};
-      });
-      const work=(column?.work||0)*rows.length*60,idle=(column?.idle||0)*rows.length*60,capacity=Math.max(rows.length*base,work+idle);
-      return {date,hour,total:rows.length,known:rows.length,unknown:0,entries,work,idle,capacity,unused:Math.max(0,capacity-work-idle),workShare:percent(work,work+idle),rate:percent(work,capacity)};
-    });
-  }
-  function resolvePeriod(from,to,period) {return ['d','w','m','c'].includes(period)?period:from===to?'d':'m';}
   function metrics(v,from,to,period) {
     if(!calendarDate(from)||!calendarDate(to)||from>to)return null;
     period=resolvePeriod(from,to,period);
-    const value=W.summaryValue(v,period,from,to),time=W.times(v,value.min),shock=W.shocks([v],period,from,to);
-    const shockBands=Object.fromEntries(Object.entries(shock.series).map(([key,values])=>[key,values.reduce((a,b)=>a+(b||0),0)]));
-    return {min:time.running,work:time.working,idle:time.idle,km:value.km,shock:Object.values(shockBands).reduce((a,b)=>a+b,0),shockBands,efficiency:value.efficiency,fc:value.fuel,bc:value.battery};
+    return observationMetrics(v,W.observations.aggregate(v,from,period==='d'?from:to),from,to,period);
+  }
+  function aggregatePerformance(rows,from,to,period,hour) {
+    const O=W.observations,raw=O.aggregate(rows,from,period==='d'?from:to,null,hour);
+    const entries=rows.flatMap(v=>{
+      const value=O.aggregate(v,from,period==='d'?from:to,null,hour);
+      if(!value.known)return [];
+      const m=observationMetrics(v,value,from,to,period,hour);
+      return [{v,m,through:periodWindow(from,to).through,capacity:value.capacityMinutes,rate:value.efficiency,
+        idleRate:percent(value.idleMinutes,value.runningMinutes)}];
+    });
+    return {total:rows.length,known:entries.length,unknown:rows.length-entries.length,entries,
+      work:raw.workMinutes,idle:raw.idleMinutes,capacity:raw.capacityMinutes,
+      unused:raw.known?Math.max(0,raw.capacityMinutes-raw.runningMinutes):null,
+      rate:raw.efficiency,workShare:raw.efficiency,utilization:raw.utilization,
+      complete:raw.complete,waiting:entries.filter(e=>e.idleRate>=30&&e.m.idle>=30)};
+  }
+  function resolvePeriod(from,to,period) {return ['d','w','m','c'].includes(period)?period:from===to?'d':'m';}
+  function efficiencyPerformance(rows,from,to,options={}) { return webPerformance(rows,from,to,options); }
+  function efficiencyWindow(from,to) { return periodWindow(from,to); }
+  function efficiencyCalendar(rows,period,from,to) {
+    if(!calendarDate(from)||!calendarDate(to)||from>to)return [];
+    const axis=W.charts.axis(period,from,to),hourly=period==='d';
+    return axis.dates.map((date,i)=>({...aggregatePerformance(rows,date,date,period,hourly?i:null),
+      date,hour:hourly?String(i).padStart(2,'0')+'시':null}));
   }
   function webPerformance(rows,from,to,options={}) {
     if(options.source==='dashboard')return dashboardPerformance(rows,from,to);
-    const period=resolvePeriod(from,to,options.period),days=W.charts.axis(period,from,to).n;
-    const result=W.efficiency(rows,period,from,to);
-    const entries=rows.map(v=>{
-      const values=W.efficiency([v],period,from,to),work=values.columns.reduce((n,c)=>n+(c?.work||0)*60,0),idle=values.columns.reduce((n,c)=>n+(c?.idle||0)*60,0);
-      const m={...metrics(v,from,to,period),work,idle,min:work+idle,efficiency:percent(work,work+idle)};
-      const capacity=Math.max(days*(period==='d'?60:600),m.min);
-      return {v,m,through:to,capacity,rate:percent(work,capacity),idleRate:percent(idle,m.min)};
-    });
-    const work=entries.reduce((n,e)=>n+e.m.work,0),idle=entries.reduce((n,e)=>n+e.m.idle,0),capacity=entries.reduce((n,e)=>n+e.capacity,0);
-    return {total:rows.length,known:entries.length,unknown:0,days,entries,work,idle,capacity,unused:Math.max(0,capacity-work-idle),rate:percent(work,capacity),workShare:percent(work,work+idle),waiting:entries.filter(e=>e.idleRate>=30&&e.m.idle>=30),web:result};
+    const period=resolvePeriod(from,to,options.period);
+    return {...aggregatePerformance(rows,from,to,period),days:W.charts.axis(period,from,to).n,web:W.efficiency(rows,period,from,to)};
   }
   function dashboardPerformance(rows,from,to) {
-    const window=W.meeting.hourlyWindow(new Date()),entries=rows.filter(v=>v.conn).map(v=>{
-      const live=W.meeting.hourlyVehicle(v,window),time=W.times(v,live.runH*60),m={...metrics(v,from,to,'d'),min:time.running,work:time.working,idle:time.idle,km:live.km};
-      m.efficiency=percent(m.work,m.min);
-      return {v,m,through:window.date,capacity:window.hours*60,rate:percent(m.work,window.hours*60),idleRate:percent(m.idle,m.min)};
-    }),work=entries.reduce((n,e)=>n+(e.m.work||0),0),idle=entries.reduce((n,e)=>n+(e.m.idle||0),0),capacity=entries.length*window.hours*60;
-    return {total:rows.length,known:entries.length,unknown:rows.length-entries.length,days:1,entries,work,idle,capacity,unused:Math.max(0,capacity-work-idle),rate:percent(work,capacity),workShare:percent(work,work+idle),waiting:entries.filter(e=>e.idleRate>=30&&e.m.idle>=30)};
+    const connected=rows.filter(v=>v.conn===true),result=aggregatePerformance(connected,from,to,'d');
+    return {...result,total:rows.length,unknown:rows.length-result.known,days:1};
   }
   function reportValues(rows,from,to,period) {
-    const groups=[...new Set(rows.map(v=>v.group))];
-    const keys=['eff','shock','fuel','batt','dist','hour'];
-    return Object.fromEntries(keys.map(key=>{
-      const values=groups.map(group=>W.reportValue(group,key,resolvePeriod(from,to,period),from,to));
-      return [key,values.length?(values[0].m.agg==='sum'?values.reduce((n,d)=>n+d.cur,0):values.reduce((n,d)=>n+d.cur,0)/values.length):null];
-    }));
+    const raw=W.observations.aggregate(rows,from,resolvePeriod(from,to,period)==='d'?from:to);
+    return Object.fromEntries(['eff','shock','fuel','batt','dist','hour'].map(key=>[key,W.observations.value(raw,key)]));
   }
-  
-  const percent=(part,total)=>total ? Math.round(part/total*1000)/10 : null;
+    const percent=(part,total)=>total ? Math.round(part/total*1000)/10 : null;
   function performance(rows,from,to,options={}) {return webPerformance(rows,from,to,options);}
-  function dailyEfficiency(rows,from,to,options={}) {
-    const report=performance(rows,from,to,options);
-    if(!report.days||report.days>366)return [];
-    return Array.from({length:report.days},(_,i)=>{
-      const date=isoDay(shiftDay(calendarDate(from),i));
-      return {date,...performance(rows,date,date,options)};
-    });
-  }
-  function requestContext(v,state) {
-    return {equipmentId:v.equipmentId,companyId:COMPANY,group:v.group,startDate:state.from,endDate:state.to,
-      periodType:state.period,date:state.from.replaceAll('-','')};
-  }
-  return {SNAPSHOT,TODAY,DATA_START,ENERGY_MONTH,STATUS,DISPLAY,SHOCK_LEVELS,shockLevel,chargeWindow,assignedGroup,reportValues,web:W,createApprovalStore,periodWindow,hourlyWindow,dashboardWindow,dashboardErrors,currentSupplies,supplySummary,fleetState,COMPANY,ROLE_LABELS,buildVehicles,scope,listed,attention,counts,dates,calendarDate,efficiencyRange,efficiencyPerformance,efficiencyWindow,efficiencyCalendar,metrics,performance,dailyEfficiency,serviceItems,supplyItems,resetSupplies,undoSupplyReset,serviceHistory,serviceRecords,pushHistory,pushPresentation,shockEvents,notificationWindow,recentNotifications,unreadPushCount,requestContext};
+  return {SNAPSHOT,TODAY,DATA_START,ENERGY_MONTH,STATUS,DISPLAY,SHOCK_LEVELS,shockLevel,chargeWindow,assignedGroup,reportValues,web:W,createApprovalStore,periodWindow,hourlyWindow,dashboardWindow,dashboardErrors,currentSupplies,supplySummary,fleetState,COMPANY,ROLE_LABELS,buildVehicles,currentVehicle,scope,listed,attention,counts,dates,calendarDate,efficiencyRange,efficiencyPerformance,efficiencyWindow,efficiencyCalendar,metrics,performance,serviceItems,supplyItems,resetSupplies,undoSupplyReset,serviceHistory,serviceRecords,pushHistory,pushPresentation,shockEvents,notificationWindow,recentNotifications,unreadPushCount};
 });

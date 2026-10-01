@@ -10,12 +10,14 @@ vm.runInContext(catalogSource,ctx);
 const M=ctx.window.CustomerPrototype,fleet=ctx.window.MIQ_MOCK_DATA.fleet;
 const rows=M.buildVehicles(fleet),records=M.serviceRecords(rows,{kind:'error',from:M.dates('m')[0],to:M.TODAY});
 const yesterday=M.web.common.dates.format(M.web.common.dates.yesterday(new Date()));
-const expectedRows=M.web.demo.create(rows,yesterday).error.concat(M.web.demo.create(rows,M.TODAY).error.filter(r=>r.dateTime<M.SNAPSHOT));
+// Yesterday's records belong to the previous month on its first day; the selected month excludes them.
+const expectedRows=M.web.demo.create(rows,yesterday).error.concat(M.web.demo.create(rows,M.TODAY).error.filter(r=>r.dateTime<M.SNAPSHOT))
+  .filter(r=>r.date>=M.dates('m')[0]&&r.date<=M.TODAY);
 assert.equal(records.length,expectedRows.length);assert(records.every(r=>r.code&&r.description));assert(records.some(r=>r.code==='DEMO-LI-01'));
 const reference=ctx.window.CustomerErrorDocuments.p0003;
 const bytes=Buffer.from(reference.base64,'base64');assert(bytes.subarray(0,5).toString()==='%PDF-');assert(bytes.subarray(-8).toString().includes('%%EOF'));
-const rawHarness=fs.readFileSync(path.join(__dirname,fs.existsSync(path.join(__dirname,'harness.js'))?'harness.js':'customer-mobile-prototype.cjs'),'utf8');
-const start=rawHarness.indexOf('function harness('),end=rawHarness.indexOf('\nconst h=harness()',start);
+const rawHarness=fs.readFileSync(path.join(__dirname,'helpers/customer-mobile-harness.js'),'utf8');
+const start=rawHarness.indexOf('function harness('),end=rawHarness.length;
 const read=f=>f==='customer.js'?catalogSource+'\n'+source:fs.readFileSync(path.join(app,f),'utf8');
 const harness=vm.runInNewContext('('+rawHarness.slice(start,end<0?undefined:end)+')',{vm,URL,URLSearchParams,M,fleet,read});
 const h=harness('#services?service=error');

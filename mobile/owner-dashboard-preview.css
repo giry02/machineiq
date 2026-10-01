@@ -32,23 +32,25 @@
 .owner-dashboard-preview .od-content .od-number { display:flex; align-items:baseline; gap:3px; color:var(--linq-color-brand); font-size:32px; line-height:42px; font-weight:700; }
 .owner-dashboard-preview .od-content .od-soon .od-number,.owner-dashboard-preview .od-content .od-soon .od-issue-label svg { color:var(--linq-color-warning); }
 .owner-dashboard-preview .od-content .od-zero .od-number { color:var(--od-muted); }
-.owner-dashboard-preview .od-content .od-fleet-body { display:grid; grid-template-columns:150px minmax(0,1fr); align-items:center; gap:24px; padding:2px 3px 16px; }
-.owner-dashboard-preview .od-content .od-ring { display:grid; place-items:center; width:150px; height:150px; border-radius:50%; background:conic-gradient(var(--linq-color-brand) 0 var(--od-running),var(--od-idle) var(--od-running) var(--od-connected),var(--od-offline) var(--od-connected) 100%); }
-.owner-dashboard-preview .od-content .od-ring-center { display:flex; flex-direction:column; align-items:center; justify-content:center; width:122px; height:122px; border-radius:50%; background:var(--linq-color-surface); color:var(--od-muted); line-height:21px; }
-.owner-dashboard-preview .od-content .od-ring-center strong { display:flex; align-items:baseline; gap:3px; color:var(--od-ink); font-size:36px; line-height:44px; font-weight:700; }
-.owner-dashboard-preview .od-content .od-states { min-width:0; }
-.owner-dashboard-preview .od-content .od-state { display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%; min-height:44px; padding:4px 0; border:0; background:none; }
-.owner-dashboard-preview .od-content .od-state > span { display:flex; align-items:center; gap:5px; white-space:nowrap; }
+.owner-dashboard-preview .od-content .od-fleet-body { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; gap:12px; padding:0; }
+.owner-dashboard-preview .od-content .od-ring { display:grid; place-items:center; width:104px; height:104px; margin:10px auto 4px; border-radius:50%; background:conic-gradient(var(--od-chart-color) 0 var(--od-ratio),var(--od-offline) var(--od-ratio) 100%); }
+.owner-dashboard-preview .od-content .od-ring-center { display:grid; place-items:center; width:82px; height:82px; border-radius:50%; background:var(--linq-color-surface); }
+.owner-dashboard-preview .od-content .od-ring-center strong { color:var(--od-ink); font-size:26px; line-height:36px; font-weight:700; }
+.owner-dashboard-preview .od-content .od-ratio { min-width:0; --od-chart-color:var(--linq-color-brand); }
+.owner-dashboard-preview .od-content .od-ratio + .od-ratio { border-left:1px solid var(--linq-color-border-subtle); padding-left:12px; }
+.owner-dashboard-preview .od-content .od-ratio-connection { --od-chart-color:var(--linq-color-success); }
+.owner-dashboard-preview .od-content .od-ratio h3 { margin:0; text-align:center; font-size:14px; }
+.owner-dashboard-preview .od-content .od-online { background:var(--linq-color-success); }
+.owner-dashboard-preview .od-content .od-states { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:0 6px; min-width:0; }
+.owner-dashboard-preview .od-content .od-state[data-live$="_unknown"] { flex-basis:100%; justify-content:center; }
+.owner-dashboard-preview .od-content .od-state { display:flex; align-items:center; justify-content:space-between; gap:4px; width:auto; min-height:44px; padding:4px 0; border:0; background:none; }
+.owner-dashboard-preview .od-content .od-state > span { display:flex; align-items:center; gap:2px; white-space:nowrap; }
 .owner-dashboard-preview .od-content .od-state b { font-size:20px; font-weight:600; }
 .owner-dashboard-preview .od-content .od-state svg { width:12px; color:var(--od-muted); }
 .owner-dashboard-preview .od-content .od-dot { display:inline-block; flex:none; width:7px; height:7px; border-radius:2px; }
 .owner-dashboard-preview .od-content .od-work { background:var(--linq-color-brand); }
 .owner-dashboard-preview .od-content .od-idle { background:var(--od-idle); }
 .owner-dashboard-preview .od-content .od-offline { background:var(--od-offline); }
-.owner-dashboard-preview .od-content .od-fleet-foot { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px; padding-top:9px; border-top:1px solid var(--linq-color-border-subtle); font-size:14px; }
-.owner-dashboard-preview .od-content .od-fleet-foot button { display:flex; align-items:center; gap:4px; min-height:36px; padding:0; border:0; background:none; }
-.owner-dashboard-preview .od-content .od-fleet-foot > span { color:var(--od-muted); }
-.owner-dashboard-preview .od-content .od-fleet-foot b { margin-left:4px; color:var(--od-ink); }
 .owner-dashboard-preview .od-content .od-work-kpis { display:grid; grid-template-columns:1.35fr 1fr; margin:2px 0 18px; }
 .owner-dashboard-preview .od-content .od-work-kpis button { display:flex; align-items:center; flex-direction:column; gap:4px; min-width:0; padding:0 4px; border:0; background:none; }
 .owner-dashboard-preview .od-content .od-work-kpis button + button { border-left:1px solid var(--linq-color-border-subtle); }
@@ -60,7 +62,8 @@
 .owner-dashboard-preview .od-content .od-work-breakdown b { color:var(--od-ink); font-weight:500; }
 .owner-dashboard-preview .od-content .od-footnote { margin:12px 0 0; color:var(--od-muted); font-size:14px; line-height:21px; }
 .owner-dashboard-preview .od-content .od-sort { display:flex; border:1px solid var(--linq-color-border); border-radius:var(--linq-radius-control); overflow:hidden; }
-.owner-dashboard-preview .od-content .od-sort button { flex:1; min-height:40px; padding:5px; border:0; background:var(--linq-color-surface); }
+.owner-dashboard-preview .od-content .od-sort button { display:flex; align-items:center; justify-content:center; gap:4px; flex:1; min-height:40px; padding:5px; border:0; background:var(--linq-color-surface); }
+.owner-dashboard-preview .od-content .od-sort button svg { width:14px; height:14px; flex:none; }
 .owner-dashboard-preview .od-content .od-sort button + button { border-left:1px solid var(--linq-color-border); }
 .owner-dashboard-preview .od-content .od-sort button[aria-pressed="true"] { color:var(--linq-color-surface); background:var(--od-ink); font-weight:700; }
 .owner-dashboard-preview .od-content .od-chart-caption { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px 12px; margin-top:12px; color:var(--od-muted); }
@@ -100,10 +103,6 @@
 @media(max-width:380px) {
   .owner-dashboard-preview .od-content .dashboard-panel { padding:12px; }
   .owner-dashboard-preview .od-content .od-priority { padding:0; }
-  .owner-dashboard-preview .od-content .od-fleet-body { grid-template-columns:120px minmax(0,1fr); gap:14px; padding-inline:0; }
-  .owner-dashboard-preview .od-content .od-ring { width:120px; height:120px; }
-  .owner-dashboard-preview .od-content .od-ring-center { width:96px; height:96px; }
-  .owner-dashboard-preview .od-content .od-ring-center strong { font-size:30px; line-height:36px; }
   .owner-dashboard-preview .od-content .od-state { gap:3px; }
   .owner-dashboard-preview .od-content .od-state > span { gap:3px; }
   .owner-dashboard-preview .od-content .od-work-kpis strong { font-size:24px; }
@@ -115,3 +114,5 @@
 }
 /* Only the missing-data notice needs inset space; normal dashboard layout is unchanged. */
 .owner-dashboard-preview .od-priority > .od-missing-data { margin:0 12px 12px; }
+
+/* Fold cover screens keep both rings in the same row. Legends may wrap inside each column. */
