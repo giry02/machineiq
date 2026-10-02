@@ -1,5 +1,5 @@
 {
-  "revision": "2026-10-02-r122",
+  "revision": "2026-10-02-r123",
   "entry": "login.html",
   "includeArchives": false,
   "mapMode": "embedded-google",
@@ -7,7 +7,7 @@
   "files": [
     {
       "path": "index.html",
-      "sha256": "cb437accf0ea27083f0b519de48276408a7e97e76a3a03499f28dbe90de60acc"
+      "sha256": "acf269303f3bbb439b45d109c221b1a337f3d846c48973176759e0163bddc9f2"
     },
     {
       "path": "customer.js",
@@ -15,7 +15,7 @@
     },
     {
       "path": "customer.css",
-      "sha256": "38c44b38963bd39b984143b0b1e751dd82a10f53fb5508ccd0e3717c0bc92ad5"
+      "sha256": "53788a20d5f793d4acaf09291f71948825e48c291d4ff676bfd07ff950e9156e"
     },
     {
       "path": "auth-common.js",
@@ -31,7 +31,7 @@
     },
     {
       "path": "release.json",
-      "sha256": "cb888b1db6a7edb17d590620dd6354b70ec269ca1acf476c23f9fee99203a156"
+      "sha256": "abc0a67c1be03b0c9f17a02eb40d36346d0814ecb3c63f3aa568a59bf9c37328"
     },
     {
       "path": "error-documents.js",
@@ -39,7 +39,7 @@
     },
     {
       "path": "model.js",
-      "sha256": "6a6901d89cf278314a0b67b8296b52eeb575ac730bb6b7ec4a72184f8732085c"
+      "sha256": "541315c46d9cf5876c13d3061d2bff3fc526350206747204145919890a827316"
     },
     {
       "path": "login.html",
@@ -75,7 +75,7 @@
     },
     {
       "path": "demo-data.generated.js",
-      "sha256": "c39ff65e507bf19f5b99d321c43bf552752a57db417cd9d4011f8507f4f833f7"
+      "sha256": "8edac30560fc2ae18a6112dc8a7ef74364a3d26df6b1e7c4002796b72baac2c7"
     },
     {
       "path": "web-guide-colors.css",
@@ -783,11 +783,11 @@
     },
     {
       "path": "docs/screen-registry.json",
-      "sha256": "24e452fbc1992cad64971c9b9efc6f38e58a9d374802e1313bc2fdb1e5deb96c"
+      "sha256": "fe68921d5f5f2384691ffece1427d508f09c4bbe5670d61a0534281381f2568e"
     },
     {
       "path": "docs/menu-page-registry.json",
-      "sha256": "ce4ce8cf6d7ab8189f1e1fe84ca7d8f5fad62b9b2ce0e8189bd37357ba3d55e5"
+      "sha256": "554f8771614369d9d9f924a74ebbae51f1fac8a78f3559d2c98b2e511eed581e"
     },
     {
       "path": "docs/figjam-detail-r46.json",
@@ -815,7 +815,7 @@
     },
     {
       "path": "tests/next-week-demo.cjs",
-      "sha256": "8dd572318c2cb41272ccee007ca434777838ed28d08b414902d5e7d981ce82a6"
+      "sha256": "f20c868183c48913c02420a2f1a0889f6a1239051688eb1ac14f0c7ecf1b117e"
     },
     {
       "path": "tests/summary-map.cjs",

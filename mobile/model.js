@@ -129,7 +129,7 @@
     const current=today.error.filter(r=>r.dateTime<SNAPSHOT);
     const maintenance=today.maintenance.filter(r=>r.dateTime<SNAPSHOT);
     const allowed=new Set(sourceFleet.map(v=>v.vin));
-    const review=(demoData?.history||[]).filter(r=>allowed.has(r.vin)&&r.dateTime<SNAPSHOT).map(r=>r.completedAt&&r.completedAt>=SNAPSHOT?{...r,errorState:'current',completedAt:null}:r);
+    const review=(demoData?.history||[]).filter(r=>allowed.has(r.vin)&&r.dateTime<SNAPSHOT).map(r=>r.completedAt&&r.completedAt>=SNAPSHOT?{...r,...(r.kind==='maintenance'?{completed:false}:{errorState:'current'}),completedAt:null}:r);
     return W.legacy.concat(generated.maintenance,generated.error,current,maintenance,review);
   }
   // Local status adapter: confirmed zero is idle; absent/invalid samples are unknown.
@@ -250,15 +250,16 @@
   function pushPresentation(item) {
     return Object.hasOwn(PUSH_TYPES,item.pushType)?PUSH_TYPES[item.pushType]:{label:'알림',icon:'bell',view:''};
   }
-  // A warning notification represents the first nonzero warning bucket per VIN.
+  // A warning notification represents the first nonzero warning bucket per VIN/day.
   // Its count already exists in the web series; never add it to the totals again.
   function shockEvents(rows) {
-    const date=W.common.dates.format(W.common.dates.yesterday(new Date()));
-    return rows.flatMap(v=>{
+    const prepared=demoData&&TODAY>=demoData.from;
+    const dates=prepared?[...new Set(demoData.days.filter(d=>d.date<=TODAY).map(d=>d.date))]:[W.common.dates.format(W.common.dates.yesterday(new Date()))];
+    return dates.flatMap(date=>rows.flatMap(v=>{
       const d=W.shocks([v],'d',date,date);
       const hour=d.series.s5.findIndex(n=>n>0);
       return hour<0?[]:[{id:'web-shock-'+v.vin+'-'+date,equipmentId:v.equipmentId,occurredAt:date+' '+String(hour).padStart(2,'0')+':00',g:2.5,count:d.series.s5[hour]}];
-    });
+    }));
   }
   function notificationWindow(now=SNAPSHOT) {
     const end=new Date(String(now).replace(' ','T')+':00Z');

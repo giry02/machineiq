@@ -1,4 +1,11 @@
 {
+  "customerMobileServiceSamples20261002": {
+    "revision": "2026-10-02-r123",
+    "screenIdsPreserved": ["LQ-REF-003-T02", "LQ-SVC-001", "LQ-SVC-002", "LQ-COM-004", "LQ-OPS-005"],
+    "flow": "서비스 수리이력 → 선택 이력 상세; 서비스 에러 → 기존 코드/PDF 목록; 충격 알림 → 같은 차량/발생일 충격 화면 → 알림 복귀. 기존 메뉴·권한 유지.",
+    "scope": "새 메뉴/화면 없음. 10.11까지 준비하되 실제 시각 이전 기록만 표시. 원격 FigJam 미변경.",
+    "report": "docs/handoff/CUSTOMER_MOBILE_SERVICE_SAMPLES_20261002.json"
+  },
   "customerMobileCompleteMap20261002": {
     "revision": "2026-10-02-r122",
     "screenIdsPreserved": ["LQ-OPS-001", "LQ-OPS-002", "LQ-OPS-002-P01"],

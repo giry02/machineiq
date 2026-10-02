@@ -1,4 +1,13 @@
 {
+  "customerMobileServiceSamples20261002": {
+    "revision": "2026-10-02-r123",
+    "screenIdsPreserved": ["LQ-REF-003-T02", "LQ-SVC-001", "LQ-SVC-002", "LQ-COM-004", "LQ-OPS-005"],
+    "input": "기존 차량/권한/조회 기간 유지. 10.01~10.11 각 차량에 수리 완료·진행중 및 에러 해제·미해제 시연 이력 준비.",
+    "output": "차량별 효율 시간만 작업16px/대기15px. 수리·에러 총572건 준비, 미래 발생/완료는 표시 금지. 경고 강도 충격 시연 데이터를 기존 충격 집계와 알림에 일관되게 연결.",
+    "scope": "모바일 정적 HTML·시연 모델·GitHub mobile/만. 기존 메뉴/상세 이동/디자인/로고 유지. 실제 서버·API·Vue·APK·iOS·푸쉬 발송 변경 없음.",
+    "figjam": "원격 미변경, 누적 반영 대기",
+    "report": "docs/handoff/CUSTOMER_MOBILE_SERVICE_SAMPLES_20261002.json"
+  },
   "customerMobileCompleteMap20261002": {
     "revision": "2026-10-02-r122",
     "screenIdsPreserved": ["LQ-OPS-001", "LQ-OPS-002", "LQ-OPS-002-P01"],
