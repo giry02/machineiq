@@ -1,0 +1,9 @@
+/* Shared input focus. Reference: management > user search.
+   Only focus styling is shared; each screen keeps its field size and layout.
+   The important declarations prevent page keyboard rules drawing a second frame.
+   Checkbox/radio/file/range controls and GNB navigation retain their own states. */
+body :is(input:not([type]),input[type="text"],input[type="search"],input[type="email"],input[type="password"],input[type="tel"],input[type="url"],input[type="number"],input[type="date"],input[type="datetime-local"],input[type="month"],input[type="week"],input[type="time"],select,textarea):not(.gnb *):focus{
+  border:1px solid #ff3600!important;
+  outline:none!important;
+  box-shadow:none!important;
+}
