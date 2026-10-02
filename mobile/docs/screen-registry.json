@@ -1,4 +1,12 @@
 {
+  "customerMobileCompleteMap20261002": {
+    "revision": "2026-10-02-r122",
+    "screenIdsPreserved": ["LQ-OPS-001", "LQ-OPS-002", "LQ-OPS-002-P01"],
+    "input": "기존 차량·권한·그룹·기간 유지. 원본 위치4대 보존, 위치 없는9대만 명시적 모바일 시연 위치 적용.",
+    "output": "전체13대 지도/주소/좌표/기준 시각 확인 가능. 시연 위치는 기존 팝업 하단 문구로 구분. 실제 결측/비정상 좌표 오류 처리는 유지.",
+    "scope": "정적 HTML 시연 데이터와 지도 팝업 문구, GitHub mobile/만. 실제 API/DB/네이티브 앱/WEB/로고 불변. FigJam 반영 대기.",
+    "report": "docs/handoff/CUSTOMER_MOBILE_COMPLETE_MAP_20261002.json"
+  },
   "customerMobileReview20261002": {
     "revision": "2026-10-02-r121",
     "screenIds": ["LQ-DASH-001", "LQ-OPS-001", "LQ-OPS-002-P01", "LQ-RPT-001", "LQ-MGT-008", "LQ-MGT-001-T01"],

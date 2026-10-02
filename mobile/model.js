@@ -149,7 +149,7 @@
         modelYear:v.modelYear??null,operating:live.operationKnown?live.running:null,
         activeErrorCount:history.filter(r=>r.kind==='error'&&r.vin===v.vin&&r.errorState==='current').length,
         supplies,supplyDueCount:supplyItems({supplies}).filter(r=>r.key==='due').length,supplySoonCount:supplyItems({supplies}).filter(r=>r.key==='soon').length,
-        receivedAt:live.dataTime,position:W.positions.find(p=>p.vin===v.vin)||null,batteryVoltage:v.batteryVoltage??null,batteryCapacity:v.batteryCapacity??null};
+        receivedAt:live.dataTime,position:W.positions.find(p=>p.vin===v.vin)||(demoData&&TODAY>=demoData.from?demoData.positions?.find(p=>p.vin===v.vin):null)||null,batteryVoltage:v.batteryVoltage??null,batteryCapacity:v.batteryCapacity??null};
     });
   }
   function scope(rows,state) {

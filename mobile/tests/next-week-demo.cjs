@@ -15,6 +15,9 @@ function load(date,hour,withDemo=true){
 const seed=load('2026-10-02',8),demo=seed.context.window.CustomerDemoData;
 assert.equal(demo.measuredTelemetry,false);assert.equal(demo.to,'2026-10-11');assert.equal(demo.days.length,143);assert.equal(demo.history.length,286);
 assert.equal(new Set(demo.days.map(r=>r.vin+'|'+r.date)).size,143);
+assert.equal(demo.positions.length,9);assert.equal(new Set(demo.positions.map(p=>p.vin)).size,9);
+const sourcePositions=JSON.stringify(seed.M.web.positions);
+for(const p of demo.positions){assert.equal(p.demo,true);assert.equal(p.measuredTelemetry,false);assert(!seed.M.web.positions.some(original=>original.vin===p.vin),'Captured WEB locations are never overwritten');}
 for(const row of demo.days){
   const vehicle=seed.rows.find(v=>v.vin===row.vin);assert(vehicle);
   const total=seed.M.web.observations.aggregate(vehicle,row.date,row.date,{date:row.date,hours:24});
@@ -25,6 +28,13 @@ for(let day=2;day<=11;day++)for(const hour of [0,1,7,8,14,23]){
   const date='2026-10-'+String(day).padStart(2,'0'),{M,rows,home,harness}=load(date,hour);
   assert.equal(M.SNAPSHOT,date+' '+String(hour).padStart(2,'0')+':00');
   assert.equal(M.demoReferenceHours(date,date),'00:00~24:00');
+  assert.equal(rows.length,13);
+  for(const v of rows){
+    const p=v.position;assert(p,'Every review vehicle has a map position');
+    assert(Number.isFinite(p.lat)&&Math.abs(p.lat)<=90&&Number.isFinite(p.lng)&&Math.abs(p.lng)<=180);
+    assert(p.address?.trim());assert(p.lastDatetime&&p.lastDatetime<=M.SNAPSHOT+':00','No future position timestamp');
+    const original=M.web.positions.find(p=>p.vin===v.vin);if(original)assert.deepEqual(JSON.parse(JSON.stringify(p)),JSON.parse(JSON.stringify(original)));
+  }
   for(const role of ['customer_owner','customer_staff']){
     const data=home.build(M,rows,role),c=data.all,scoped=M.scope(rows,{role}),connected=scoped.filter(v=>v.conn===true);
     const total=M.web.observations.aggregate(connected,date,date);
@@ -37,6 +47,17 @@ for(let day=2;day<=11;day++)for(const hour of [0,1,7,8,14,23]){
     const block=html.match(/<div class="od-work-kpis[^\n]*?<\/div>/)?.[0];assert(block);
     assert.equal((block.match(/<button /g)||[]).length,3);assert(block.indexOf('총 가동시간')<block.indexOf('총 작업시간'));assert(block.includes('대당 '+M.DISPLAY.duration(c.runPer,true)));
     const screen=harness('#summary?role='+role+'&period=d&from='+date+'&to='+date);
+    assert(!screen.html().includes('위치 정보 없음'));
+    for(const v of scoped){
+      screen.click({map:v.equipmentId},'data-map');assert(screen.node('#location-dialog').open);
+      const opened=screen.mapCalls.filter(([kind])=>kind==='open').at(-1)?.[1];assert.equal(opened?.equipmentNumber,v.equipmentNumber);
+      assert.equal(opened.lat,v.position.lat);assert.equal(opened.lng,v.position.lng);
+      assert.equal(screen.node('#location-dialog-address').textContent,v.position.address);
+      assert.equal(screen.node('#location-map').hidden,false);
+      assert(screen.node('#location-dialog-info').innerHTML.includes(v.position.lastDatetime));
+      assert.equal(screen.node('#location-dialog-note').textContent.includes('시연 위치'),Boolean(v.position.demo));
+      screen.click({},'data-close-map');
+    }
     for(const card of screen.html().matchAll(/<article class="vehicle-mobile-row[^>]*>[\s\S]*?<\/article>/g)){
       if(card[0].includes(' · 엔진 · ')){
         const slot=card[0].match(/<button[^>]*data-slot="engine"[^>]*>[\s\S]*?<\/button>/)?.[0];assert(slot);assert(slot.includes('L/H'));assert(!slot.includes('data-lucide'));assert(!slot.includes('battery'));
@@ -53,8 +74,10 @@ for(let day=2;day<=11;day++)for(const hour of [0,1,7,8,14,23]){
 const {M,rows,harness}=seed,engine=rows.find(v=>v.type==='엔진'),screen=harness('#summary?period=d&from=2026-10-02&to=2026-10-02');
 screen.click({serviceVehicle:engine.equipmentId,kind:'engine'});assert(screen.url().includes('#engine?'));
 const baseline=load('2026-09-30',14,false),configured=load('2026-09-30',14,true);
+assert.equal(JSON.stringify(seed.M.web.positions),sourcePositions,'Mobile review does not mutate captured WEB locations');
+assert.deepEqual(JSON.parse(JSON.stringify(configured.rows.map(v=>v.position))),JSON.parse(JSON.stringify(baseline.rows.map(v=>v.position))),'Prepared position examples are not displayed before the demo start date');
 assert.deepEqual(JSON.parse(JSON.stringify(configured.M.metrics(configured.rows[0],'2026-09-30','2026-09-30','d'))),JSON.parse(JSON.stringify(baseline.M.metrics(baseline.rows[0],'2026-09-30','2026-09-30','d'))),'Outside prepared dates original WEB observations stay unchanged');
 const saved=seed.M.web.approvalSeed();saved.push({id:'saved-row',name:'보존',email:'saved@example.invalid',role:'고객 직원',companyId:'1933',registered:'2026-10-01 09:00',status:'REQ',approverId:seed.M.web.principals.customer_owner});
 seed.context.sessionStorage.getItem=()=>JSON.stringify(saved);
 const store=seed.M.createApprovalStore(rows);assert(store.find('saved-row','customer_owner'));assert.equal(store.list('customer_owner').filter(r=>r.id==='MOBILE-DEMO-REJECTED').length,1);assert.equal(store.list('customer_owner').filter(r=>r.id==='MOBILE-DEMO-REJECTED').length,1);
-console.log('PASS prepared mobile demo: '+cases+' day/hour/role cases through Oct 11; original totals, 3 KPIs, engine L/H, missing/future cutoff and rejected customer example.');
+console.log('PASS prepared mobile demo: '+cases+' day/hour/role cases through Oct 11; all 13 map positions with complete addresses/timestamps, role/filter scope, labeled demo locations, original WEB positions preserved, original totals, 3 KPIs, engine L/H, future cutoff and rejected customer example.');

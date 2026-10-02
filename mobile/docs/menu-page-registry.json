@@ -1,4 +1,11 @@
 {
+  "customerMobileCompleteMap20261002": {
+    "revision": "2026-10-02-r122",
+    "screenIdsPreserved": ["LQ-OPS-001", "LQ-OPS-002", "LQ-OPS-002-P01"],
+    "flow": "요약정보 또는 차량 상세 지도 보기 → 기존 지도 팝업. 전체13대 위치 제공, 기존 역할·필터·닫기 복귀 유지.",
+    "scope": "같은 메뉴/같은 팝업, 새 화면 없음. 기존 원본 위치+명시적 모바일 시연 위치. FigJam 누적 반영 대기.",
+    "report": "docs/handoff/CUSTOMER_MOBILE_COMPLETE_MAP_20261002.json"
+  },
   "customerMobileReview20261002": {
     "revision": "2026-10-02-r121",
     "screenIdsPreserved": ["LQ-DASH-001", "LQ-OPS-001", "LQ-OPS-002-P01", "LQ-RPT-001", "LQ-MGT-008", "LQ-MGT-001-T01"],

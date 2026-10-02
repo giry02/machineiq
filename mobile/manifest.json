@@ -1,45 +1,17 @@
 {
-  "revision": "2026-10-02-r121",
+  "revision": "2026-10-02-r122",
   "entry": "login.html",
   "includeArchives": false,
   "mapMode": "embedded-google",
   "containsBrowserMapKey": true,
   "files": [
     {
-        "path": "docs/android-github.md",
-        "sha256": "dad8aa4d10194d833c9798f9369d29090c024fe1fde4f6bdb1c0870635330156"
-    },
-    {
-        "path": "downloads/MACHINE_IQ_MOBILE_HTML_20260913.zip",
-        "sha256": "802a8b41a8123b2bf4ca19da1c88585a93e7cdcfedfb71984e2426d234b787ec"
-    },
-    {
-        "path": "downloads/MACHINE_IQ_MOBILE_HTML_20260913_r44.zip",
-        "sha256": "f8ce4703deb2708ccbfdfdcb42ff75b0ee7e8113e85ac25a22a6f0a3f21b8de7"
-    },
-    {
-        "path": "downloads/MACHINE_IQ_MOBILE_HTML_20260913_r45.zip",
-        "sha256": "a3f0db4e7c3f274620e8307a526263f1f55cb44e547eded55a0310996518b8e6"
-    },
-    {
-        "path": "downloads/MACHINE_IQ_MOBILE_HTML_20260913_r46.zip",
-        "sha256": "2f567cd0eab0e1e11e766aa33ff70c100550683781d2d297875c5342041a7566"
-    },
-    {
-        "path": "downloads/Machine-IQ-Customer-GitHub-v0.2.0-20260921-debug.apk",
-        "sha256": "71feff53754e9d38fdc4c4dd9df47b40052dc6dfe90e6cc42f1c541c8f1b9f40"
-    },
-    {
-        "path": "downloads/Machine-IQ-Customer-Location-Notifications-QR-v0.1.3-20260920-r87-debug.apk",
-        "sha256": "16fa7106db105d6f20efa3b48beede66507bb1e4767b9f224930d47b1da0865c"
-    },
-    {
       "path": "index.html",
-      "sha256": "452c4efa7e2fa6111cf5fa4c2ddee58631fb8522e5a1b86af03a2bd4a93d72df"
+      "sha256": "cb437accf0ea27083f0b519de48276408a7e97e76a3a03499f28dbe90de60acc"
     },
     {
       "path": "customer.js",
-      "sha256": "99d18be750ce54def2de5ae1f7199047fab4852537a994069e4fb32ee71f8101"
+      "sha256": "c5b23df0ac08ac5abd2ecd9116d7fea685fd8defb33ea498f3b0d530766a8611"
     },
     {
       "path": "customer.css",
@@ -59,7 +31,7 @@
     },
     {
       "path": "release.json",
-      "sha256": "a6eaadd8115f4d00ddde565e2c964d97225f972088fc0ff9d6606aad89c2f372"
+      "sha256": "cb888b1db6a7edb17d590620dd6354b70ec269ca1acf476c23f9fee99203a156"
     },
     {
       "path": "error-documents.js",
@@ -67,7 +39,7 @@
     },
     {
       "path": "model.js",
-      "sha256": "eb7cc8824a6c195cd83bb143ccdcd39894e92835409b2e6a797dc68e43554c6e"
+      "sha256": "6a6901d89cf278314a0b67b8296b52eeb575ac730bb6b7ec4a72184f8732085c"
     },
     {
       "path": "login.html",
@@ -103,7 +75,7 @@
     },
     {
       "path": "demo-data.generated.js",
-      "sha256": "b6f62274ff6972f21db48f3a1108572374465db5707727c3d232610f88c018d9"
+      "sha256": "c39ff65e507bf19f5b99d321c43bf552752a57db417cd9d4011f8507f4f833f7"
     },
     {
       "path": "web-guide-colors.css",
@@ -811,11 +783,11 @@
     },
     {
       "path": "docs/screen-registry.json",
-      "sha256": "2d02e99ec5888f674881b27960123b265c4dbafc0184e0f0de43a9d1173ccb9d"
+      "sha256": "24e452fbc1992cad64971c9b9efc6f38e58a9d374802e1313bc2fdb1e5deb96c"
     },
     {
       "path": "docs/menu-page-registry.json",
-      "sha256": "7a538b17549655f58f7de4390a7c5f7ef22a1ba35bf742722b1ccabd8389b9dc"
+      "sha256": "ce4ce8cf6d7ab8189f1e1fe84ca7d8f5fad62b9b2ce0e8189bd37357ba3d55e5"
     },
     {
       "path": "docs/figjam-detail-r46.json",
@@ -843,7 +815,7 @@
     },
     {
       "path": "tests/next-week-demo.cjs",
-      "sha256": "6ea69171e1b501ab3c138c8eb003078022dd5144f5383a4f12e706dd04d68fc0"
+      "sha256": "8dd572318c2cb41272ccee007ca434777838ed28d08b414902d5e7d981ce82a6"
     },
     {
       "path": "tests/summary-map.cjs",
@@ -864,6 +836,34 @@
     {
       "path": "docs/html-delivery.md",
       "sha256": "4302bef563947521a390f1f6fd6f1a907699ffa4dd6a1942cb238b227480aece"
+    },
+    {
+      "path": "docs/android-github.md",
+      "sha256": "dad8aa4d10194d833c9798f9369d29090c024fe1fde4f6bdb1c0870635330156"
+    },
+    {
+      "path": "downloads/MACHINE_IQ_MOBILE_HTML_20260913.zip",
+      "sha256": "802a8b41a8123b2bf4ca19da1c88585a93e7cdcfedfb71984e2426d234b787ec"
+    },
+    {
+      "path": "downloads/MACHINE_IQ_MOBILE_HTML_20260913_r44.zip",
+      "sha256": "f8ce4703deb2708ccbfdfdcb42ff75b0ee7e8113e85ac25a22a6f0a3f21b8de7"
+    },
+    {
+      "path": "downloads/MACHINE_IQ_MOBILE_HTML_20260913_r45.zip",
+      "sha256": "a3f0db4e7c3f274620e8307a526263f1f55cb44e547eded55a0310996518b8e6"
+    },
+    {
+      "path": "downloads/MACHINE_IQ_MOBILE_HTML_20260913_r46.zip",
+      "sha256": "2f567cd0eab0e1e11e766aa33ff70c100550683781d2d297875c5342041a7566"
+    },
+    {
+      "path": "downloads/Machine-IQ-Customer-GitHub-v0.2.0-20260921-debug.apk",
+      "sha256": "71feff53754e9d38fdc4c4dd9df47b40052dc6dfe90e6cc42f1c541c8f1b9f40"
+    },
+    {
+      "path": "downloads/Machine-IQ-Customer-Location-Notifications-QR-v0.1.3-20260920-r87-debug.apk",
+      "sha256": "16fa7106db105d6f20efa3b48beede66507bb1e4767b9f224930d47b1da0865c"
     }
   ]
 }

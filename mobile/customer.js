@@ -669,6 +669,7 @@
       +cell('자료일 가동시간',m?hours(m.min)+' ('+state.from+' ~ '+state.to+')':'정보 없음')
       +cell('위치 기준 시간',positioned?p.lastDatetime:null,true);
     $('#location-dialog-coordinate').textContent=positioned?'('+p.lat.toFixed(6)+', '+p.lng.toFixed(6)+')':'';
+    $('#location-dialog-note').textContent=positioned&&p.demo?'화면 검토용 시연 위치입니다. 실제 차량 위치가 아닙니다.':'저장된 최종 수신 데이터입니다. 실시간 위치가 아니며, 원본에 없는 정보는 ‘정보 없음’으로 표시합니다.';
     $('#location-map').hidden=!positioned;
     $('#location-map-expand').hidden=!positioned;
     $('#location-dialog').showModal();
