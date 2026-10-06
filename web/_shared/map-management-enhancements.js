@@ -583,7 +583,7 @@
       if ((name === '고객 대표' || name === '고객 직원') && companyName !== '(주)세종물류중부지점') {
         return { count: null, basis: '조회 가능한 차량 정보가 없습니다.' };
       }
-      if (name === '고객 직원') return { count: customerVehicleGroupTotals[group] || 0, basis: '소속 그룹' };
+      if (name === '고객 직원') return { count: group === '전체' ? 42 : (customerVehicleGroupTotals[group] || 0), basis: group === '전체' ? '내 업체 전체 그룹' : '소속 그룹' };
       if (name === '딜러 직원') return { count: 11, basis: '담당 업체' };
       if (name === '딜러 대표') return { count: 22, basis: '관리 업체' };
       return { count: 42, basis: name === '고객 대표' ? '내 업체' : '전체 지원 범위' };
@@ -605,9 +605,13 @@
         select.value = '전체';
         if (view) MIQCommon.view.set(view,"textContent",'전체');
       } else if (roleName === '고객 직원') {
-        Array.prototype.slice.call(select.options).forEach(function (option) {
-          if (option.value === '전체') option.remove();
-        });
+        var savedGroup = select.value;
+        if (!Array.prototype.some.call(select.options, function (option) { return option.value === '전체'; })) {
+          var staffAllOption = document.createElement('option');
+          MIQCommon.view.set(staffAllOption,"textContent",'전체');
+          select.insertBefore(staffAllOption, select.firstChild);
+        }
+        select.value = savedGroup;
         if (!select.value && select.options.length) select.selectedIndex = 0;
         if (view) MIQCommon.view.set(view,"textContent",select.value);
       }
@@ -642,7 +646,10 @@
       if (info.count == null) return;
       var userScope = userScopeByRoleName[MIQCommon.view.get(row.children[2],"textContent").trim()] || currentRole;
       var values = { userScope: userScope };
-      if (MIQCommon.view.get(row.children[2],"textContent").trim() === '고객 직원' && group && group !== '전체') values.group = group;
+      if (MIQCommon.view.get(row.children[2],"textContent").trim() === '고객 직원' && group) {
+        if (group === '전체') values.userGroup = group;
+        else values.group = group;
+      }
       location.href = managementHeader.withRole('../Mgmt%20Vehicle/mgmt-vehicle-tobe.html', values);
     });
     var explicitCompany = query.get('company') || '';
@@ -911,7 +918,7 @@
       if (!record || rowsNow().some(function (row) { return row.dataset.owner === record.email; })) return;
       var group = record.role === '고객 직원' ? record.group : '전체';
       var groupOptions = '<option' + (group === '기본그룹' ? ' selected' : '') + '>기본그룹</option><option' + (group === '테스트그룹' ? ' selected' : '') + '>테스트그룹</option><option' + (group === '물류1팀' ? ' selected' : '') + '>물류1팀</option>';
-      if (record.role !== '고객 직원') groupOptions += '<option selected>전체</option>';
+      groupOptions = '<option' + (group === '전체' ? ' selected' : '') + '>전체</option>' + groupOptions;
       var tr = document.createElement('tr');
       tr.dataset.owner = record.email; tr.dataset.company = record.company; tr.dataset.managedBy = record.approverId;
       MIQCommon.view.set(tr,"innerHTML",'<td class="strong">' + esc(record.email) + '</td><td>' + esc(record.name) + '</td><td>' + esc(record.role) + '</td><td>' + esc(record.company) + '</td>' +
@@ -1846,7 +1853,7 @@
     if (onboarding) tbody.replaceChildren();
     // Staff viewing their own list remain in their assigned scope. Authorized
     // managers following a user shortcut must use that user's saved group.
-    var vehicleScopeGroup = role === 'customer_staff' ? '물류1팀' : (query.get('group') || '물류1팀');
+    var vehicleScopeGroup = role === 'customer_staff' ? '물류1팀' : (query.get('userGroup') === '전체' ? '전체' : (query.get('group') || '물류1팀'));
     var baseRoleTotals = {
       internal: 42,
       dealer_owner: 22,
@@ -1914,7 +1921,9 @@
       if (vehicleScopeRole === 'internal') return true;
       if (vehicleScopeRole === 'dealer_owner') return MIQCommon.view.get(row.children[0],"textContent").trim() === '밥캣코리아 중부딜러';
       if (vehicleScopeRole === 'dealer_staff') return MIQCommon.view.get(row.children[0],"textContent").trim() === '밥캣코리아 중부딜러' && row.dataset.dealerStaffScope === '1';
-      if (vehicleScopeRole === 'customer_staff') return MIQCommon.view.get(row.children[2],"textContent").trim() === vehicleScopeGroup;
+      if (vehicleScopeRole === 'customer_staff') return vehicleScopeGroup === '전체'
+        ? MIQCommon.view.get(row.children[1],"textContent").trim() === (company || '(주)세종물류중부지점')
+        : MIQCommon.view.get(row.children[2],"textContent").trim() === vehicleScopeGroup;
       return true;
     }
     function searchableVehicleText(row) {
