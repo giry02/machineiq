@@ -1,5 +1,5 @@
 {
-  "revision": "2026-10-02-r129",
+  "revision": "2026-10-06-r130",
   "entry": "login.html",
   "includeArchives": false,
   "mapMode": "embedded-google",
@@ -7,11 +7,11 @@
   "files": [
     {
       "path": "index.html",
-      "sha256": "06e41f9f65a853b2575bdf2708a9830eb6cf0661234156af742cfe31616f908a"
+      "sha256": "007caf9863c769c8958946e42fad794eb0a36cd76846c0f5c9e9122cd90bfaa3"
     },
     {
       "path": "customer.js",
-      "sha256": "63c4ae063d990adb001fa88068c85d82eb5450112d16580c16f729113b89b0ad"
+      "sha256": "ac1ee1134a27c0d6f5b2162042ef984d3d331658c375ac913c9ac647aca7a790"
     },
     {
       "path": "customer.css",
@@ -31,7 +31,7 @@
     },
     {
       "path": "release.json",
-      "sha256": "4b01dd56b9fe806f9f97be15e98ed6fc9e9a3e88db5e4bb53cb7d32445e2deae"
+      "sha256": "ec55f726d5d8f0303a2a6c17cff6b388e6a3375c7aebed79cb74ee302f86fee5"
     },
     {
       "path": "error-documents.js",
@@ -876,6 +876,10 @@
     {
       "path": "licenses/GoogleMaps-MarkerClusterer-2.6.2-THIRD-PARTY.txt",
       "sha256": "535b9e3bae9230b1669d5e7f067e978455e802465fe2f41c91a928a71c488d98"
+    },
+    {
+      "path": "tests/summary-default.cjs",
+      "sha256": "5057b508005f0a70247b5a0c8cd0b199c2fd45ed4e26a1ad678962db359bbb6f"
     }
   ]
 }
