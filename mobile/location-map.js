@@ -3,12 +3,13 @@
   'use strict';
   const $=selector=>document.querySelector(selector);
   const canvas=$('#location-map'),dialog=$('#location-dialog');
-  let map,marker,sdkPromise,active=null,epoch=0,authFailed=false;
+  let map,sdkPromise,clusterPromise,clusterer,active=null,epoch=0,authFailed=false;
+  let markers=[],listeners=[];
   const valid=p=>p&&Number.isFinite(p.lat)&&Number.isFinite(p.lng)&&Math.abs(p.lat)<=90&&Math.abs(p.lng)<=180;
   function status(message,error=false) {
     $('#location-map-status-text').textContent=message;
     $('#location-map-status').hidden=!message;
-    $('#location-map-external').hidden=!error;
+    $('#location-map-external').hidden=!error||active?.fleet===true;
     canvas.setAttribute('aria-busy',String(Boolean(message)&&!error));
   }
   function fail() {
@@ -65,16 +66,40 @@
     if(truck)symbol.appendChild(window.lucide.createElement(truck,{'aria-hidden':'true','stroke-width':2}));
     content.append(title,symbol);return content;
   }
-  async function open(vehicle) {
-    if(!valid(vehicle))return;
-    const ticket=++epoch;active={...vehicle};
-    $('#location-map-external').href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(vehicle.lat+','+vehicle.lng);
+  function loadClusters() {
+    if(window.markerClusterer?.MarkerClusterer)return Promise.resolve(window.markerClusterer);
+    if(clusterPromise)return clusterPromise;
+    clusterPromise=new Promise((resolve,reject)=>{
+      const script=document.createElement('script');let done=false;
+      const timer=setTimeout(()=>finish(false),6000);
+      function finish(ok){
+        if(done)return;done=true;clearTimeout(timer);
+        if(ok&&window.markerClusterer?.MarkerClusterer)resolve(window.markerClusterer);
+        else {script.remove();clusterPromise=null;reject(new Error('Marker clustering unavailable'));}
+      }
+      script.src='./vendor/markerclusterer-2.6.2.min.js';script.onload=()=>finish(true);script.onerror=()=>finish(false);
+      document.head.appendChild(script);
+    });
+    return clusterPromise;
+  }
+  function clearMarkers() {
+    if(clusterer){clusterer.setMap(null);clusterer=null;}
+    for(const listener of listeners)listener?.remove();listeners=[];
+    for(const marker of markers)marker.map=null;markers=[];
+  }
+  function open(vehicle) {return valid(vehicle)?openMap([vehicle],false):Promise.resolve();}
+  function openFleet(vehicles,{onSelect}={}) {return openMap(Array.isArray(vehicles)?vehicles.filter(valid):[],true,onSelect);}
+  async function openMap(vehicles,fleet,onSelect) {
+    if(!vehicles.length){close();return;}
+    clearMarkers();const ticket=++epoch;active={vehicles:vehicles.map(v=>({...v})),fleet,onSelect};
+    const first=vehicles[0];
+    $('#location-map-external').href=fleet?'':'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(first.lat+','+first.lng);
     status('지도를 불러오는 중입니다.');
     if(authFailed){fail();return;}
     try {
       const sdk=await loadSdk();
       if(ticket!==epoch||!dialog.open||authFailed)return;
-      const center={lat:vehicle.lat,lng:vehicle.lng};
+      const center={lat:first.lat,lng:first.lng};
       if(!map) {
         map=new sdk.Map(canvas,{
           center,zoom:16,minZoom:3,maxZoom:21,mapId:sdk.config.mapId,
@@ -83,21 +108,49 @@
           gestureHandling:'greedy',scrollwheel:true,tilt:0,heading:0
         });
       } else {map.setCenter(center);map.setZoom(16);}
-      if(marker)marker.map=null;
-      marker=new sdk.AdvancedMarkerElement({map,position:center,title:vehicle.equipmentNumber,content:markerContent(vehicle)});
+      markers=vehicles.map(vehicle=>{
+        const content=markerContent(vehicle);
+        if(fleet){content.classList.add('is-fleet');content.setAttribute('data-map-vehicle-status',vehicle.mapState||'unknown');}
+        const marker=new sdk.AdvancedMarkerElement({map,position:{lat:vehicle.lat,lng:vehicle.lng},title:vehicle.equipmentNumber,content});
+        if(fleet)listeners.push(marker.addListener('click',()=>{if(ticket===epoch&&dialog.open)active.onSelect?.(vehicle.equipmentId);}));
+        return marker;
+      });
+      if(fleet&&vehicles.length>1){
+        const bounds=new sdk.maps.LatLngBounds();vehicles.forEach(v=>bounds.extend({lat:v.lat,lng:v.lng}));
+        map.fitBounds(bounds,52);
+        try {
+          const clusters=await loadClusters();
+          if(ticket!==epoch||!dialog.open||authFailed)return;
+          clusterer=new clusters.MarkerClusterer({map,markers,algorithm:new clusters.SuperClusterAlgorithm({radius:80,maxZoom:20}),renderer:{render({count,position}){
+            const content=document.createElement('div');content.className='customer-map-cluster';
+            const number=document.createElement('strong');number.textContent=count+'대';content.appendChild(number);
+            return new sdk.AdvancedMarkerElement({position,content,zIndex:1000000+count,title:'가까운 차량 '+count+'대 · 확대해서 보기'});
+          }}});
+        }catch{
+          if(ticket!==epoch||!dialog.open)return;
+          const note=$('#location-dialog-address');note.textContent+=' 가까운 차량 묶음을 불러오지 못해 개별 위치로 표시합니다.';
+        }
+      }
       status('');resize();
     } catch {if(ticket===epoch)fail();}
   }
-  function resize() {
+  function focus(equipmentId) {
+    const vehicle=active?.vehicles.find(v=>v.equipmentId===equipmentId);if(!vehicle||!map)return;
+    map.setCenter({lat:vehicle.lat,lng:vehicle.lng});map.setZoom(Math.max(map.getZoom(),18));
+  }
+  function resize({fitFleet=false}={}) {
     if(!map||!active)return;
     const ticket=epoch,center=map.getCenter();
     requestAnimationFrame(()=>{
       if(ticket!==epoch||!dialog.open)return;
-      window.google.maps.event.trigger(map,'resize');map.setCenter(center);
+      window.google.maps.event.trigger(map,'resize');
+      if(fitFleet&&active.fleet&&active.vehicles.length>1){
+        const bounds=new window.google.maps.LatLngBounds();active.vehicles.forEach(v=>bounds.extend({lat:v.lat,lng:v.lng}));map.fitBounds(bounds,52);
+      }else map.setCenter(center);
     });
   }
   function close() {
-    ++epoch;active=null;if(marker)marker.map=null;
+    ++epoch;active=null;clearMarkers();
   }
-  window.CustomerLocationMap={open,close,resize};
+  window.CustomerLocationMap={open,openFleet,focus,close,resize};
 })();

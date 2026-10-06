@@ -11,9 +11,9 @@
   <link rel="stylesheet" href="./shared/mobile.css?v=20260907-20">
   <link rel="stylesheet" href="./shared/mobile-type-compact.css?v=20260907-1">
   <link rel="stylesheet" href="./shared/home-tone-c.css?v=20260907-2">
-  <link rel="stylesheet" href="./customer.css?v=20261002-r123">
+  <link rel="stylesheet" href="./customer.css?v=20261002-r129">
   <link rel="stylesheet" href="./web-guide-colors.css?v=20260923-r91">
-  <link rel="stylesheet" href="./owner-dashboard-preview.css?v=20261002-r123">
+  <link rel="stylesheet" href="./owner-dashboard-preview.css?v=20261002-r125">
 </head>
 <body class="mobile-type-compact mobile-tone-c customer-prototype owner-dashboard-preview" data-dashboard-mode="main">
   <div class="mobile-app">
@@ -42,7 +42,7 @@
       <div class="location-map-status" id="location-map-status" role="status"><span id="location-map-status-text">지도를 불러오는 중입니다.</span><a id="location-map-external" target="_blank" rel="noopener noreferrer" hidden>Google 지도에서 보기</a></div>
       <button class="location-map-expand" id="location-map-expand" data-expand-map type="button" aria-label="지도 전체보기" aria-expanded="false" aria-controls="location-map" title="지도 전체보기"><i class="map-expand-icon" data-lucide="maximize" aria-hidden="true"></i><i class="map-collapse-icon" data-lucide="minimize" aria-hidden="true"></i><span id="location-map-expand-label">전체보기</span></button>
     </div>
-    <section class="location-dialog-info" aria-labelledby="location-info-title"><div class="location-info-heading"><h3 id="location-info-title">차량 정보</h3><span id="location-dialog-coordinate"></span></div><dl class="detail-definition" id="location-dialog-info"></dl><p id="location-dialog-note">저장된 최종 수신 데이터입니다. 실시간 위치가 아니며, 원본에 없는 정보는 ‘정보 없음’으로 표시합니다.</p></section>
+    <section class="location-dialog-info" id="location-dialog-info-section" aria-labelledby="location-info-title"><div class="location-info-heading"><h3 id="location-info-title">차량 정보</h3><span id="location-dialog-coordinate"></span></div><dl class="detail-definition" id="location-dialog-info"></dl></section>
     </div>
   </dialog>
   <dialog class="supply-reset-dialog" id="supply-reset-dialog" aria-labelledby="supply-reset-title" aria-describedby="supply-reset-description" data-screen-id="LQ-SVC-003-P02">
@@ -63,15 +63,15 @@
   </dialog>
   <script src="./shared/layouts/vendor/lucide.min.js"></script>
   <script src="./error-documents.js?v=20260913-r60"></script>
-  <script src="./web-contracts.generated.js?v=20261002-r123"></script>
-  <script src="./demo-data.generated.js?v=20261002-r123"></script>
-  <script src="./model.js?v=20261002-r123"></script>
-  <script src="./location-map.js?v=20260923-r97"></script>
-  <script src="./home-view.js?v=20261002-r123"></script>
+  <script src="./web-contracts.generated.js?v=20261002-r125"></script>
+  <script src="./demo-data.generated.js?v=20261002-r125"></script>
+  <script src="./model.js?v=20261002-r125"></script>
+  <script src="./location-map.js?v=20261002-r129"></script>
+  <script src="./home-view.js?v=20261002-r129"></script>
   <script src="./onboarding.js?v=20260923-r104"></script>
-  <script src="./vehicle-registration.js?v=20261002-r123"></script>
+  <script src="./vehicle-registration.js?v=20261002-r125"></script>
 
   <script src="./query-controls.js?v=20260924-r111"></script>
-  <script src="./customer.js?v=20261002-r123"></script>
+  <script src="./customer.js?v=20261002-r129"></script>
 </body>
 </html>

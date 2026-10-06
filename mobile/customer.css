@@ -88,6 +88,9 @@ body.mobile-type-compact.customer-prototype {
 .customer-prototype .summary-status-actions { display:inline-flex; flex:none; align-items:center; gap:2px; height:24px; }
 .customer-prototype .summary-map-button { display:inline-flex; flex:none; align-items:center; justify-content:flex-end; width:44px; height:44px; padding:0; border:0; background:transparent; color:var(--linq-color-text-muted); }
 .customer-prototype .summary-map-button svg { width:20px; height:20px; }
+.customer-prototype .summary-title-with-map { display:flex; align-items:center; gap:8px; height:32px; }
+.customer-prototype .summary-fleet-map-button { display:inline-flex; align-items:center; justify-content:center; gap:4px; min-height:44px; padding:0; border:0; background:transparent; color:var(--linq-color-primary-fill); font:inherit; font-size:14px; white-space:nowrap; }
+.customer-prototype .summary-fleet-map-button svg { width:16px; height:16px; }
 .customer-prototype .vehicle-action-row { display:flex; flex-wrap:wrap; align-items:center; gap:4px 10px; padding-top:6px; margin-top:8px; border-top:1px solid var(--linq-color-border-subtle); }
 .customer-prototype .vehicle-action-row button { display:inline-flex; align-items:center; gap:4px; min-height:36px; padding:3px 0; border:0; background:transparent; color:var(--linq-color-primary-fill); font:inherit; font-size:14px; }
 .customer-prototype .vehicle-action-row svg { width:15px; height:15px; flex:none; }
@@ -454,9 +457,17 @@ body.customer-prototype:has(.supply-reset-dialog[open]) { overflow:hidden; }
 .customer-prototype .vehicle-compact-shortcut .vehicle-shortcut-alert { display:flex; background:var(--linq-color-brand); }
 /* Customer location uses the existing bottom-dialog geometry, not a centered popup. */
 .customer-prototype .location-dialog:not(.is-map-expanded) { position:fixed; inset:auto 0 0; box-sizing:border-box; width:min(100%,480px); max-width:100%; max-height:88dvh; margin:0 auto; padding-bottom:env(safe-area-inset-bottom); overflow:hidden; border-radius:16px 16px 0 0; box-shadow:0 -12px 28px rgba(0,0,0,.2); }
-.customer-prototype .location-dialog[open]:not(.is-map-expanded) { display:flex; flex-direction:column; }
+.customer-prototype .location-dialog[open]:not(.is-map-expanded) { display:flex; flex-direction:column; height:88dvh; }
 .customer-prototype .location-dialog > header { flex:none; }
-.customer-prototype .location-dialog-body { min-height:0; flex:1 1 auto; overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; }
+.customer-prototype .location-dialog-body { display:flex; flex-direction:column; min-height:0; flex:1 1 auto; overflow:hidden; overscroll-behavior:contain; }
+.customer-prototype .location-dialog:not(.is-map-expanded) .location-dialog-body > p,
+.customer-prototype .location-dialog:not(.is-map-expanded) .location-dialog-info { flex:none; }
+.customer-prototype .location-dialog:not(.is-map-expanded) .location-map-frame { flex:1 1 0; min-height:0; }
+.customer-prototype .location-dialog:not(.is-map-expanded) .customer-location-map { height:100%; }
+.customer-prototype .location-dialog.is-location-missing:not(.is-map-expanded) { height:auto; }
+.customer-prototype .location-dialog.is-location-missing .location-map-frame { flex:none; }
+.customer-prototype .location-info-heading { flex-wrap:wrap; }
+.customer-prototype .location-dialog-info .detail-definition > div { padding-block:6px; }
 .customer-prototype .location-dialog-body > p { margin:0; padding:0 16px 12px; color:#555; font-size:14px; line-height:1.45; }
 .customer-prototype .location-dialog.is-map-expanded > .location-dialog-body { display:block; height:100%; overflow:hidden; }
 .customer-prototype .location-dialog.is-map-expanded .location-dialog-body > :not(.location-map-frame) { display:none; }
@@ -550,6 +561,10 @@ body.customer-prototype:has(.location-dialog[open]) { overflow:hidden; }
 .customer-prototype .customer-map-marker > strong { padding:5px 8px; border:1px solid var(--linq-color-border); border-radius:var(--linq-radius-control); background:var(--linq-color-surface); color:var(--linq-color-text); font-size:14px; white-space:nowrap; box-shadow:0 2px 6px rgba(0,0,0,.16); }
 .customer-prototype .customer-map-marker > span { display:grid; place-items:center; width:38px; height:38px; border:3px solid white; border-radius:50%; background:var(--linq-color-brand); color:white; box-shadow:0 2px 8px rgba(0,0,0,.25); }
 .customer-prototype .customer-map-marker svg { width:21px; height:21px; }
+.customer-prototype .customer-map-marker.is-fleet[data-map-vehicle-status="ok"] > span { background:var(--linq-color-success); }
+.customer-prototype .customer-map-marker.is-fleet[data-map-vehicle-status="off"] > span,
+.customer-prototype .customer-map-marker.is-fleet[data-map-vehicle-status="unknown"] > span { background:var(--linq-color-text-muted); }
+.customer-prototype .customer-map-cluster { display:grid; place-items:center; width:48px; height:48px; border:3px solid #fff; border-radius:50%; background:var(--linq-color-brand); color:#fff; box-shadow:0 2px 8px rgba(0,0,0,.25); font-size:14px; }
 
 /* Registration extends only the existing mobile settings row/form/card tokens. */
 .customer-prototype .registration-entry-button { width:100%; border:0; background:transparent; text-align:left; }

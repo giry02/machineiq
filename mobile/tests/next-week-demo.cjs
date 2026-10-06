@@ -60,7 +60,7 @@ for(let day=2;day<=11;day++)for(const hour of [0,1,7,8,14,23]){
       assert.equal(screen.node('#location-dialog-address').textContent,v.position.address);
       assert.equal(screen.node('#location-map').hidden,false);
       assert(screen.node('#location-dialog-info').innerHTML.includes(v.position.lastDatetime));
-      assert.equal(screen.node('#location-dialog-note').textContent.includes('시연 위치'),Boolean(v.position.demo));
+      assert(!screen.node('#location-dialog-info').innerHTML.includes('시연 위치'),'r129 removes the popup notice, not GPS coordinates or source timestamps');
       screen.click({},'data-close-map');
     }
     for(const card of screen.html().matchAll(/<article class="vehicle-mobile-row[^>]*>[\s\S]*?<\/article>/g)){

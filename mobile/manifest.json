@@ -1,5 +1,5 @@
 {
-  "revision": "2026-10-02-r123",
+  "revision": "2026-10-02-r129",
   "entry": "login.html",
   "includeArchives": false,
   "mapMode": "embedded-google",
@@ -7,15 +7,15 @@
   "files": [
     {
       "path": "index.html",
-      "sha256": "acf269303f3bbb439b45d109c221b1a337f3d846c48973176759e0163bddc9f2"
+      "sha256": "06e41f9f65a853b2575bdf2708a9830eb6cf0661234156af742cfe31616f908a"
     },
     {
       "path": "customer.js",
-      "sha256": "c5b23df0ac08ac5abd2ecd9116d7fea685fd8defb33ea498f3b0d530766a8611"
+      "sha256": "63c4ae063d990adb001fa88068c85d82eb5450112d16580c16f729113b89b0ad"
     },
     {
       "path": "customer.css",
-      "sha256": "53788a20d5f793d4acaf09291f71948825e48c291d4ff676bfd07ff950e9156e"
+      "sha256": "6f3a9971968d6904d383ccdd798391416cf40677db722843e5e825112b1f7e33"
     },
     {
       "path": "auth-common.js",
@@ -27,11 +27,11 @@
     },
     {
       "path": "home-view.js",
-      "sha256": "5938fbbedb1a254a59d2ef678df2924dea425dd6b881bdd13de6ef1ec7054e10"
+      "sha256": "bbc5c75a2de92023afb67822b062729cc0442456f86a755e04a5ad9ee3380ac8"
     },
     {
       "path": "release.json",
-      "sha256": "abc0a67c1be03b0c9f17a02eb40d36346d0814ecb3c63f3aa568a59bf9c37328"
+      "sha256": "4b01dd56b9fe806f9f97be15e98ed6fc9e9a3e88db5e4bb53cb7d32445e2deae"
     },
     {
       "path": "error-documents.js",
@@ -95,7 +95,7 @@
     },
     {
       "path": "location-map.js",
-      "sha256": "073dde74d6b275ee899bd3f048dd27435ece9dbd255f2f5f340c35d0a21bb979"
+      "sha256": "adf43adce8b0076866eabadc107b4a18fd6976bf1c08af1a421231941b2b478d"
     },
     {
       "path": "map-config.local.js",
@@ -811,15 +811,15 @@
     },
     {
       "path": "tests/helpers/customer-mobile-harness.js",
-      "sha256": "a7d50b48ab24e631270e0709813e51440164665b4afcec0d7f8e6f03852d9ed8"
+      "sha256": "aa542e1c3f6b035b4e1a604d26d48a5d26b62b4ef4e0156b74e3488f629e016e"
     },
     {
       "path": "tests/next-week-demo.cjs",
-      "sha256": "f20c868183c48913c02420a2f1a0889f6a1239051688eb1ac14f0c7ecf1b117e"
+      "sha256": "77c7a1acdaecd29f6af2ccd75b154a25c6d9234d881be68563742bb12c7d573e"
     },
     {
       "path": "tests/summary-map.cjs",
-      "sha256": "addf34c4d2eedf0e6918c57d8d9735cf93d9b00c12ee4aeca5b9d3146965ae7a"
+      "sha256": "8d70f196a39038e8c0a873974a4ef6f09ece6236bd2882418f2515b767bdc1ec"
     },
     {
       "path": "tests/soc.cjs",
@@ -864,6 +864,18 @@
     {
       "path": "downloads/Machine-IQ-Customer-Location-Notifications-QR-v0.1.3-20260920-r87-debug.apk",
       "sha256": "16fa7106db105d6f20efa3b48beede66507bb1e4767b9f224930d47b1da0865c"
+    },
+    {
+      "path": "vendor/markerclusterer-2.6.2.min.js",
+      "sha256": "be2e870ae3c790bf24c3ec2bed3d0aad2dccdfab4071365527ee10baaac2b1f4"
+    },
+    {
+      "path": "licenses/GoogleMaps-MarkerClusterer-2.6.2-LICENSE.txt",
+      "sha256": "50e6751797c50dedd75ef1b8a0d9e42f5f8472e9fbce91f34718e9f97b0c780a"
+    },
+    {
+      "path": "licenses/GoogleMaps-MarkerClusterer-2.6.2-THIRD-PARTY.txt",
+      "sha256": "535b9e3bae9230b1669d5e7f067e978455e802465fe2f41c91a928a71c488d98"
     }
   ]
 }

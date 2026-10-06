@@ -14,6 +14,26 @@
   var catalog = fleet.vehicles || [];
   var vehiclesByVin = new Map(catalog.map(function(v) { return [v.vin,v]; }));
   var sampleCache = new Map();
+  // Optional explicit prototype days. WEB callers keep the original 08~18 profile.
+  // Install once before mobile rendering; never change the clock or query cutoff.
+  var demoDays = new Map();
+  function configureDemoDays(rows) {
+    if (!Array.isArray(rows)) throw new Error('Demo days must be an array');
+    var next = new Map();
+    rows.forEach(function(r) {
+      if (!r || !profiles.has(r.vin) || !date(r.date) ||
+          !Number.isInteger(r.workMinutes) || r.workMinutes < 0 ||
+          !Number.isInteger(r.idleMinutes) || r.idleMinutes < 0 ||
+          !Number.isInteger(r.shockCount) || r.shockCount < 0 ||
+          !Array.isArray(r.idleHours) || r.idleHours.some(function(h){return !Number.isInteger(h)||h<0||h>23;}) ||
+          new Set(r.idleHours).size !== r.idleHours.length || r.idleHours.length >= 24 ||
+          r.workMinutes+r.idleMinutes > (24-r.idleHours.length)*60) throw new Error('Invalid demo day');
+      var key=r.vin+'|'+r.date;
+      if(next.has(key))throw new Error('Duplicate demo day');
+      next.set(key,Object.assign({},r,{idleHours:r.idleHours.slice()}));
+    });
+    demoDays=next;sampleCache.clear();
+  }
   function numeric(v) { return typeof v === 'number' && Number.isFinite(v) && v >= 0; }
   function percent(v) { return numeric(v) && v <= 100; }
   function date(v) {
@@ -36,29 +56,31 @@
     for (var i=0; i<key.length; i++) { s ^= key.charCodeAt(i); s = Math.imul(s,16777619); }
     return (s >>> 0) / 4294967296;
   }
-  function part(total, hour) { return Math.floor(total / 10) + (hour < total % 10 ? 1 : 0); }
+  function part(total, hour, slots) { slots=slots||10;return Math.floor(total / slots) + (hour < total % slots ? 1 : 0); }
   function sample(vehicle, day, hour, asOf) {
     var p = vehicle && profiles.get(vehicle.vin), limit = cutoff(asOf);
     if (!p || !date(day) || hour < 0 || hour > 23 || day > limit.date || day === limit.date && hour >= limit.hours) return null;
     var key = p.vin + '|' + day;
     var cacheKey=key+'|'+hour;
     if(sampleCache.has(cacheKey))return sampleCache.get(cacheKey);
-    var running = Math.min(600, Math.round(p.dailyRunningMinutes * (.8 + random(key) * .4)));
-    var working = Math.round(running * p.workingShare);
-    var slot = hour - 8, scheduled = slot >= 0 && slot < 10;
-    var work = scheduled ? part(working,slot) : 0;
-    var idle = scheduled ? part(running-working,9-slot) : 0;
+    var fixture=demoDays.get(key), slots=fixture?24-fixture.idleHours.length:10;
+    var running = fixture?fixture.workMinutes+fixture.idleMinutes:Math.min(600, Math.round(p.dailyRunningMinutes * (.8 + random(key) * .4)));
+    var working = fixture?fixture.workMinutes:Math.round(running * p.workingShare);
+    var slot = fixture?hour-fixture.idleHours.filter(function(h){return h<hour;}).length:hour - 8;
+    var scheduled = fixture?!fixture.idleHours.includes(hour):slot >= 0 && slot < 10;
+    var work = scheduled ? part(working,slot,slots) : 0;
+    var idle = scheduled ? part(running-working,slots-1-slot,slots) : 0;
     var minutes = work + idle;
-    var shocks = Math.floor(p.dailyShockCount) + (random(key+'|shock') < p.dailyShockCount % 1 ? 1 : 0);
+    var shocks = fixture?fixture.shockCount:Math.floor(p.dailyShockCount) + (random(key+'|shock') < p.dailyShockCount % 1 ? 1 : 0);
     // Explicit fixed DEMO scenario only: reuse the existing master charge level.
     // This is not collected historical SOC and must not replace a server's
     // period batteryRate response. No kWh-to-percent conversion is performed.
     var masterVehicle=vehiclesByVin.get(p.vin), chargeSource=p.batteryGaugeSource;
     var chargeValue=chargeSource==='fleet.soc.fixed-demo' && masterVehicle && masterVehicle.type!=='엔진' && percent(masterVehicle.soc) ? masterVehicle.soc : null;
     var row={vin:p.vin, date:day, hour:hour, workMinutes:work, idleMinutes:idle,
-      capacityMinutes:scheduled ? 60 : 0,
+      capacityMinutes:fixture?60:scheduled ? 60 : 0,
       distanceMetres:Math.round(minutes / 60 * p.kmPerRunningHour * 1000),
-      shockCount:scheduled ? part(shocks,slot) : 0,
+      shockCount:scheduled ? part(shocks,slot,slots) : 0,
       fuelLitres:numeric(p.fuelLitresPerHour) ? minutes / 60 * p.fuelLitresPerHour : null,
       batteryKwh:numeric(p.batteryKwhPerHour) ? minutes / 60 * p.batteryKwhPerHour : null,
       batteryChargePercent:chargeValue, batteryChargeProvenance:chargeValue===null?null:'fixed-demo-from-existing-master-soc', mock:true};
@@ -118,5 +140,5 @@
       dist:data.distanceKm,hour:data.runningMinutes===null?null:data.runningMinutes/60}[key];
   }
   return {sample:sample,totals:totals,select:select,unique:unique,intervals:intervals,aggregate:aggregate,value:value,
-    windowAt:windowAt,cutoff:cutoff,hasProfile:function(v){return !!v&&profiles.has(v.vin);},mock:true};
+    windowAt:windowAt,cutoff:cutoff,configureDemoDays:configureDemoDays,hasProfile:function(v){return !!v&&profiles.has(v.vin);},mock:true};
 });

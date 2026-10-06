@@ -9,7 +9,7 @@ const harness=vm.runInNewContext('('+harnessSource.slice(harnessSource.indexOf('
 let checks=0;
 for(const role of ['customer_owner','customer_staff']){
   const screen=harness('#summary?role='+role),beforeUrl=screen.url(),beforeHtml=screen.html();
-  const buttons=[...beforeHtml.matchAll(/<button\b[^>]*class="summary-map-button"[^>]*>/g)];
+  const buttons=[...beforeHtml.matchAll(/<button\b[^>]*class="summary-map-button"[^>]*data-map="[^"]+"[^>]*>/g)];
   const ids=buttons.map(([tag])=>tag.match(/data-map="([^"]+)"/)[1]);
   assert(ids.length>0);assert.equal(ids.length,new Set(ids).size);
   let depth=0;for(const tag of beforeHtml.match(/<\/?button\b[^>]*>/g)||[]){if(tag.startsWith('</'))depth--;else{assert.equal(depth,0,'No nested map/detail buttons');depth++;}}assert.equal(depth,0);
