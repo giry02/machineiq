@@ -13,7 +13,11 @@ function load(date,hour,withDemo=true){
   return {context,M,rows:M.buildVehicles(fleet),home:context.window.CustomerHomeView,harness};
 }
 const seed=load('2026-10-02',8),demo=seed.context.window.CustomerDemoData;
-assert.equal(demo.measuredTelemetry,false);assert.equal(demo.to,'2026-10-11');assert.equal(demo.days.length,143);assert.equal(demo.history.length,572);
+assert.equal(demo.measuredTelemetry,false);assert.equal(demo.to,'2026-10-11');assert.equal(demo.days.length,143);assert.equal(demo.history.length,297);
+assert.equal(demo.history.filter(r=>r.kind==='error').length,11);
+assert.equal(demo.days.filter(r=>r.shockCount>0).length,4);
+assert(demo.history.some(r=>r.errorState==='past')&&demo.history.some(r=>r.errorState==='current'));
+for(const date of new Set(demo.days.map(r=>r.date)))assert.equal(demo.history.filter(r=>r.kind==='error'&&r.date===date).length,1,'Only one scheduled error per day, not per vehicle');
 assert.equal(new Set(demo.days.map(r=>r.vin+'|'+r.date)).size,143);
 assert.equal(demo.positions.length,9);assert.equal(new Set(demo.positions.map(p=>p.vin)).size,9);
 const sourcePositions=JSON.stringify(seed.M.web.positions);
@@ -23,9 +27,8 @@ for(const row of demo.days){
   const total=seed.M.web.observations.aggregate(vehicle,row.date,row.date,{date:row.date,hours:24});
   assert.equal(total.workMinutes,row.workMinutes);assert.equal(total.idleMinutes,row.idleMinutes);assert.equal(total.capacityMinutes,1440);
   const service=demo.history.filter(r=>r.vin===row.vin&&r.date===row.date);
-  assert.equal(service.length,4);assert.equal(service.filter(r=>r.kind==='maintenance').length,2);assert.equal(service.filter(r=>r.kind==='error').length,2);
+  assert(service.length>=2&&service.length<=3);assert.equal(service.filter(r=>r.kind==='maintenance').length,2);assert(service.filter(r=>r.kind==='error').length<=1);
   assert(service.some(r=>r.kind==='maintenance'&&r.completed));assert(service.some(r=>r.kind==='maintenance'&&!r.completed));
-  assert(service.some(r=>r.errorState==='past'));assert(service.some(r=>r.errorState==='current'));
   assert(service.every(r=>r.demo&&r.measuredTelemetry===false&&r.dateTime&&r.vin));
 }
 let cases=0;
@@ -72,13 +75,19 @@ for(let day=2;day<=11;day++)for(const hour of [0,1,7,8,14,23]){
     assert.equal(M.metrics(scoped[0],future,future,'d').min,null);assert.equal(M.efficiencyPerformance(scoped,future,future,{period:'d'}).known,0);
     assert(M.serviceHistory(scoped).every(r=>!r.occurredAt||r.occurredAt<M.SNAPSHOT));
     const history=M.serviceHistory(scoped),push=M.recentNotifications(M.pushHistory(scoped));
+    assert(push.length<=22,'Sparse inbox stays readable through the prepared range');
+    assert.equal(M.dashboardErrors(scoped).length,history.filter(r=>r.kind==='error'&&r.code.startsWith('DEMO-')&&r.occurredAt.startsWith(date)&&r.occurredAt<M.SNAPSHOT).length,'Dashboard counts real fixture occurrences, not a display cap');
+    assert(scoped.some(v=>v.activeErrorCount===0),'Normal vehicles coexist with current errors');
+    assert(rows.every(v=>v.activeErrorCount<=3),'No daily unresolved error pile-up on every vehicle');
+    assert.equal(push.filter(p=>p.pushType==='error').length,history.filter(r=>r.kind==='error'&&r.occurredAt>M.notificationWindow().from&&r.occurredAt<=M.SNAPSHOT).length);
     assert(history.every(r=>!r.resolvedAt||r.resolvedAt<M.SNAPSHOT),'No future completion shown');
     const previous='2026-10-'+String(day-1).padStart(2,'0');
     for(const v of scoped){
       const repairs=M.serviceRecords([v],{kind:'maintenance',from:previous,to:previous}),errors=M.serviceRecords([v],{kind:'error',from:previous,to:previous});
       assert.equal(repairs.length,2);assert(repairs.some(r=>r.resolved)&&repairs.some(r=>!r.resolved));
-      assert.equal(errors.length,2);assert(errors.some(r=>r.resolved)&&errors.some(r=>!r.resolved));
-      assert(push.some(p=>p.pushType==='shock'&&p.equipmentId===v.equipmentId&&p.pushDatetime.startsWith(previous)),'Every accessible vehicle has a completed-day shock notification');
+      assert.equal(errors.length,demo.history.filter(r=>r.kind==='error'&&r.vin===v.vin&&r.date===previous).length);
+      const fixture=demo.days.find(r=>r.vin===v.vin&&r.date===previous);
+      assert.equal(push.some(p=>p.pushType==='shock'&&p.equipmentId===v.equipmentId&&p.pushDatetime.startsWith(previous)),fixture.shockCount>0,'Only selected warning scenarios produce a received shock notification');
     }
     for(const p of push.filter(p=>p.pushType==='shock')){
       const date=p.pushDatetime.slice(0,10),hour=Number(p.pushDatetime.slice(11,13)),v=scoped.find(v=>v.equipmentId===p.equipmentId);
@@ -87,12 +96,16 @@ for(let day=2;day<=11;day++)for(const hour of [0,1,7,8,14,23]){
     }
     for(const kind of ['maintenance','error']){
       const list=harness('#services?role='+role+'&service='+kind+'&servicePeriod=d&serviceFrom='+previous+'&serviceTo='+previous);
-      assert.equal((list.html().match(kind==='error'?/data-error-record=/g:/data-kind="maintenance" data-entry=/g)||[]).length,scoped.length*2);
+      const records=M.serviceRecords(scoped,{kind,from:previous,to:previous});
+      assert.equal((list.html().match(kind==='error'?/data-error-record=/g:/data-kind="maintenance" data-entry=/g)||[]).length,records.length);
+      if(kind==='error')for(const error of records)assert(list.html().includes('data-error-record="'+error.id+'"'),'Every sparse error is visible; no hidden list truncation');
     }
     const inbox=harness('#notifications?role='+role+'&notificationCategory=shock');
     const shockPush=push.find(p=>p.pushType==='shock');assert(inbox.html().includes('data-push-category="shock"'));
     inbox.click({notificationEntry:shockPush.id});assert(inbox.url().includes('#shock?'));assert(inbox.url().includes('equipmentId='+shockPush.equipmentId));
     assert(inbox.url().includes('from='+shockPush.pushDatetime.slice(0,10)));inbox.click({},'data-return');assert(inbox.url().includes('#notifications?'));
+    const errorPush=push.find(p=>p.pushType==='error');
+    if(errorPush){inbox.click({notificationEntry:errorPush.id});assert(inbox.url().includes('#services?'));assert(inbox.html().includes('data-error-record="'+errorPush.errorRecordId+'"'),'Received error navigates to its real scoped occurrence');}
     cases++;
   }
   const rejected=M.createApprovalStore(rows).find('MOBILE-DEMO-REJECTED','customer_owner');assert.equal(rejected.status,'rejected');assert(rejected.reason);assert(rejected.processedAt<M.SNAPSHOT);
@@ -107,4 +120,4 @@ assert.deepEqual(JSON.parse(JSON.stringify(configured.M.metrics(configured.rows[
 const saved=seed.M.web.approvalSeed();saved.push({id:'saved-row',name:'보존',email:'saved@example.invalid',role:'고객 직원',companyId:'1933',registered:'2026-10-01 09:00',status:'REQ',approverId:seed.M.web.principals.customer_owner});
 seed.context.sessionStorage.getItem=()=>JSON.stringify(saved);
 const store=seed.M.createApprovalStore(rows);assert(store.find('saved-row','customer_owner'));assert.equal(store.list('customer_owner').filter(r=>r.id==='MOBILE-DEMO-REJECTED').length,1);assert.equal(store.list('customer_owner').filter(r=>r.id==='MOBILE-DEMO-REJECTED').length,1);
-console.log('PASS prepared mobile demo: '+cases+' day/hour/role cases through Oct 11; 572 repair/error examples, all-vehicle shock notifications and detail return, status/time cutoff, complete map positions, original work/idle totals, 3 KPIs, engine L/H and rejected customer example.');
+console.log('PASS prepared mobile demo: '+cases+' day/hour/role cases through Oct 11; 11 sparse errors/4 warning-shock days, <=22 received notifications, unchanged 286 repair examples, count/list parity, status/time cutoff, map positions, work/idle totals, 3 KPIs, engine L/H and rejected customer example.');
