@@ -65,15 +65,18 @@
     const efficiencyLayout=p.get('efficiencyLayout')==='inline'?'inline':'menu';
     const efficiencyMode=p.get('efficiencyMode')==='vehicle'?'vehicle':'daily';
     const reportMetricMode=p.get('reportMetricMode')==='average'?'average':'total';
-    const efficiencySortMetric=p.get('efficiencySortMetric')==='running'?'running':'work';
+    // A fresh page starts on the first sort tab, even with an old bookmarked
+    // default in the URL. In-page navigation retains deliberate selections.
+    const efficiencySortMetric=state&&['running','work'].includes(p.get('efficiencySortMetric'))?p.get('efficiencySortMetric'):'running';
+    const summarySelected=!!state&&summarySortFields.some(([key])=>key===p.get('summarySort'));
     const selection=periodViews.has(view)?linkedPeriodSelection(p.get('period')||'m',p.get('from'),p.get('to')):null;
     const serviceSelection=view==='services'?linkedPeriodSelection(p.get('servicePeriod')||'m',p.get('serviceFrom'),p.get('serviceTo')):null;
     const period = selection?.period||(['d','w','m','c'].includes(p.get('period')) ? p.get('period') : 'm');
     const [from,to] = M.dates(period);
-    return {efficiencyLayout,efficiencyMode,reportMetricMode,efficiencySortMetric,efficiencyDirection:['asc','desc'].includes(p.get('efficiencyDirection'))?p.get('efficiencyDirection'):efficiencyMode==='vehicle'?'desc':'',view:Object.hasOwn(labels,view) ? view : 'home',role:Object.hasOwn(M.ROLE_LABELS,p.get('role')) ? p.get('role') : p.has('role')?'customer_staff':'customer_owner',serviceOrigin:p.get('serviceOrigin')==='dashboard'?'dashboard':'',serviceThrough:p.get('serviceThrough')||'',notificationCategory:notificationCategories.some(([key])=>key===p.get('notificationCategory'))?p.get('notificationCategory'):'all',serviceEquipmentId:view==='home'?'':p.get('serviceEquipmentId')||'',
+    return {efficiencyLayout,efficiencyMode,reportMetricMode,efficiencySortMetric,efficiencyDirection:state&&['asc','desc'].includes(p.get('efficiencyDirection'))?p.get('efficiencyDirection'):efficiencyMode==='vehicle'?'desc':'',view:Object.hasOwn(labels,view) ? view : 'home',role:Object.hasOwn(M.ROLE_LABELS,p.get('role')) ? p.get('role') : p.has('role')?'customer_staff':'customer_owner',serviceOrigin:p.get('serviceOrigin')==='dashboard'?'dashboard':'',serviceThrough:p.get('serviceThrough')||'',notificationCategory:notificationCategories.some(([key])=>key===p.get('notificationCategory'))?p.get('notificationCategory'):'all',serviceEquipmentId:view==='home'?'':p.get('serviceEquipmentId')||'',
       group:view==='home'?'':p.get('group')||'',type:'',q:['home','summary'].includes(view)?'':p.get('q')||'',listVehicle:view==='home'?'':p.get('listVehicle')||'',status:'all',live:view==='home'?'':p.get('live')||'',
       summarySearch:view==='home'?'':p.get('summarySearch')||'',reportSearch:view==='home'?'':p.get('reportSearch')||'',serviceSearch:view==='home'?'':p.get('serviceSearch')||'',
-      summarySort:summarySortFields.some(([key])=>key===p.get('summarySort'))?p.get('summarySort'):summarySortFields[0][0],summaryDirection:summarySortFields.some(([key])=>key===p.get('summarySort'))&&p.get('summaryDirection')==='asc'?'asc':'desc',
+      summarySort:summarySelected?p.get('summarySort'):summarySortFields[0][0],summaryDirection:summarySelected&&p.get('summaryDirection')==='asc'?'asc':'desc',
       service:['maintenance','supplies','error'].includes(p.get('service'))?p.get('service'):'maintenance',serviceEntry:p.get('serviceEntry')||'',servicePeriod:serviceSelection?.period||p.get('servicePeriod')||'m',serviceFrom:serviceSelection?.from||p.get('serviceFrom')||M.dates('m')[0],serviceTo:serviceSelection?.to||p.get('serviceTo')||M.dates('m')[1],serviceFocus:['error','due','soon'].includes(p.get('serviceFocus'))?p.get('serviceFocus'):'',reportFocus:['all','waiting','unknown'].includes(p.get('reportFocus'))?p.get('reportFocus'):'all',equipmentId:p.get('equipmentId')||'',returnView:['summary','services','detail','notifications'].includes(p.get('returnView'))?p.get('returnView'):'detail',reportVehicle:view==='home'?'':p.get('reportVehicle')||'',period,from:selection?.from||p.get('from')||from,to:selection?.to||p.get('to')||to};
   }
   function go(view,patch={},replace=false) {
@@ -190,7 +193,7 @@
     const positioned=validPosition(v.position),mapLabel=fieldText(v.equipmentNumber)+(positioned?' 지도 보기':' 위치 정보 없음');
 return `<article class="vehicle-mobile-row ${M.attention(v)?'is-attention':''}"><div class="vehicle-mobile-row__head"><button type="button" class="vehicle-card-main summary-heading-link" data-vehicle="${esc(v.equipmentId)}"><strong>${escField(v.equipmentNumber)}</strong><small>${escField(v.model)} · ${esc(v.type)} · ${esc(v.group)}</small></button><div class="summary-status-actions"><button type="button" class="summary-map-button" data-map="${esc(v.equipmentId)}" aria-label="${esc(mapLabel)}" title="${positioned?'지도 보기':'위치 정보 없음'}">${icon('map-pin')}</button>${communicationStatus(v)}</div></div><button type="button" class="vehicle-card-main" data-vehicle="${esc(v.equipmentId)}"><div class="vehicle-mobile-row__meta"><span>가동시간<b>${metric?hours(metric.min):'-'}</b></span><span>작업시간<b>${metric?hours(metric.work):'-'}</b></span><span>운영효율<b>${rate(metric?.efficiency)}</b></span><span>운행거리<b>${metric?fmt(metric.km,' km'):'-'}</b></span></div><div class="row-status"><span>${!v.conn?'마지막 수신 '+(v.receivedAt?.slice(5)||'정보 미제공'):'기간 실적 · 현재 상태는 별도'}</span><span>차량 상세 ›</span></div></button>${vehicleActions(v)}</article>`;
   }
-  let homeSort='work',homeSortDirection='desc';
+  let homeSort='running',homeSortDirection='desc';
   function home() {
     const dashboard=window.CustomerHomeView;
     if(!dashboard)return dataUnavailable();
@@ -633,6 +636,8 @@ return `<div data-screen-id="LQ-OPS-001"><div class="snapshot"><div class="summa
     if(periodViews.has(state.view)||state.view==='services'){
       const query=new URLSearchParams(location.hash.split('?')[1]||'');
       const keys=state.view==='services'?['servicePeriod','serviceFrom','serviceTo']:['period','from','to'];
+      if(state.view==='summary')keys.push('summarySort','summaryDirection');
+      if(state.view==='efficiency'&&state.efficiencyMode==='vehicle')keys.push('efficiencySortMetric','efficiencyDirection');
       if(keys.some(key=>query.get(key)!==state[key])){
         keys.forEach(key=>query.set(key,state[key]));
         history.replaceState({},'',location.pathname+location.search+'#'+state.view+'?'+query);

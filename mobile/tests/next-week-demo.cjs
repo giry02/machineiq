@@ -13,7 +13,9 @@ function load(date,hour,withDemo=true){
   return {context,M,rows:M.buildVehicles(fleet),home:context.window.CustomerHomeView,harness};
 }
 const seed=load('2026-10-02',8),demo=seed.context.window.CustomerDemoData;
-assert.equal(demo.measuredTelemetry,false);assert.equal(demo.to,'2026-10-11');assert.equal(demo.days.length,143);assert.equal(demo.history.length,297);
+assert.equal(demo.measuredTelemetry,false);assert.equal(demo.to,'2026-10-11');assert.equal(demo.days.length,143);assert.equal(demo.history.length,303);
+assert.equal(demo.history.filter(r=>r.kind==='maintenance'&&r.date.startsWith('2026-09')).length,6);
+assert.equal(demo.days.filter(r=>r.fixture==='customer-long-waiting-review-20261006').length,22);
 assert.equal(demo.history.filter(r=>r.kind==='error').length,11);
 assert.equal(demo.days.filter(r=>r.shockCount>0).length,4);
 assert(demo.history.some(r=>r.errorState==='past')&&demo.history.some(r=>r.errorState==='current'));
@@ -46,6 +48,11 @@ for(let day=2;day<=11;day++)for(const hour of [0,1,7,8,14,23]){
   for(const role of ['customer_owner','customer_staff']){
     const data=home.build(M,rows,role),c=data.all,scoped=M.scope(rows,{role}),connected=scoped.filter(v=>v.conn===true);
     const total=M.web.observations.aggregate(connected,date,date);
+    const performance=M.efficiencyPerformance(scoped,date,date,{period:'d'});
+    if(hour>=8){assert.equal(performance.waiting.length,role==='customer_owner'?2:1,'Long waiting examples remain available today, tomorrow and through Oct 11');}
+    if(hour===0)assert.equal(performance.waiting.length,0,'No future long-waiting results at midnight');
+    const report=harness('#reports?role='+role+'&period=d&from='+date+'&to='+date+'&reportFocus=waiting');
+    assert.equal(Number(report.html().match(/data-report-focus="waiting"[^>]*><span>긴 대기<\/span><strong>(\d+)<\/strong>/)?.[1]),performance.waiting.length,'Long-waiting tab count matches the actual query');
     assert.equal(c.runTotal,c.metricKnown?c.work+c.idle:null);
     assert.equal(c.runPer,c.metricKnown?c.runTotal/c.metricKnown:null);
     assert.equal(c.work,total.workMinutes);assert.equal(c.idle,total.idleMinutes);
@@ -114,10 +121,18 @@ for(let day=2;day<=11;day++)for(const hour of [0,1,7,8,14,23]){
 const {M,rows,harness}=seed,engine=rows.find(v=>v.type==='엔진'),screen=harness('#summary?period=d&from=2026-10-02&to=2026-10-02');
 screen.click({serviceVehicle:engine.equipmentId,kind:'engine'});assert(screen.url().includes('#engine?'));
 const baseline=load('2026-09-30',14,false),configured=load('2026-09-30',14,true);
+for(const role of ['customer_owner','customer_staff']){
+ const scoped=seed.M.scope(seed.rows,{role}),records=seed.M.serviceRecords(scoped,{kind:'maintenance',from:'2026-09-01',to:'2026-09-30'});
+ assert.equal(records.length,role==='customer_owner'?6:3,'September repairs obey role scope');
+ if(role==='customer_owner')assert(records.some(r=>r.resolved)&&records.some(r=>!r.resolved));
+ else assert(records.every(r=>r.resolved),'Staff sees only the three completed repairs in the assigned group');
+ const list=seed.harness('#services?role='+role+'&service=maintenance&servicePeriod=m&serviceFrom=2026-09-01&serviceTo=2026-09-30');
+ assert.equal((list.html().match(/data-kind="maintenance" data-entry=/g)||[]).length,records.length);
+}
 assert.equal(JSON.stringify(seed.M.web.positions),sourcePositions,'Mobile review does not mutate captured WEB locations');
 assert.deepEqual(JSON.parse(JSON.stringify(configured.rows.map(v=>v.position))),JSON.parse(JSON.stringify(baseline.rows.map(v=>v.position))),'Prepared position examples are not displayed before the demo start date');
 assert.deepEqual(JSON.parse(JSON.stringify(configured.M.metrics(configured.rows[0],'2026-09-30','2026-09-30','d'))),JSON.parse(JSON.stringify(baseline.M.metrics(baseline.rows[0],'2026-09-30','2026-09-30','d'))),'Outside prepared dates original WEB observations stay unchanged');
 const saved=seed.M.web.approvalSeed();saved.push({id:'saved-row',name:'보존',email:'saved@example.invalid',role:'고객 직원',companyId:'1933',registered:'2026-10-01 09:00',status:'REQ',approverId:seed.M.web.principals.customer_owner});
 seed.context.sessionStorage.getItem=()=>JSON.stringify(saved);
 const store=seed.M.createApprovalStore(rows);assert(store.find('saved-row','customer_owner'));assert.equal(store.list('customer_owner').filter(r=>r.id==='MOBILE-DEMO-REJECTED').length,1);assert.equal(store.list('customer_owner').filter(r=>r.id==='MOBILE-DEMO-REJECTED').length,1);
-console.log('PASS prepared mobile demo: '+cases+' day/hour/role cases through Oct 11; 11 sparse errors/4 warning-shock days, <=22 received notifications, unchanged 286 repair examples, count/list parity, status/time cutoff, map positions, work/idle totals, 3 KPIs, engine L/H and rejected customer example.');
+console.log('PASS prepared mobile demo: '+cases+' day/hour/role cases through Oct 11; September 6 repairs + October 286, 2 daily long-waiting cases, 11 sparse errors/4 warning-shock days, <=22 notifications, count/list parity, scope/time cutoff, map positions, work/idle totals, 3 KPIs, engine L/H and rejected customer example.');

@@ -19,13 +19,37 @@ for(const role of ['customer_owner','customer_staff'])for(const period of ['d','
  }
  for(const sort of ['min','work','efficiency','km'])for(const direction of ['asc','desc']){
   const h=harness('#summary?'+new URLSearchParams({...base,summarySort:sort,summaryDirection:direction}));
+  assert.equal(selected(h),'min','Old bookmarked sort is reset on fresh entry');
+  assert.equal(params(h).get('summarySort'),'min');assert.equal(params(h).get('summaryDirection'),'desc');
+  if(sort!=='min'||direction!=='desc')h.click({summarySort:sort});
+  if(sort!=='min'&&direction==='asc')h.click({summarySort:sort});
   assert.equal(selected(h),sort);
   const before=h.html();h.click({route:'home'});h.click({route:'summary'});
   assert.equal(selected(h),sort);assert.equal(params(h).get('summaryDirection'),direction);
   assert.equal(h.html(),before,'Home reentry preserves the chosen summary and query');
-  const restored=harness(new URL(h.url()).hash);assert.equal(restored.html(),before,'Reload preserves explicit sort');checks++;
+  const restored=harness(new URL(h.url()).hash);assert.equal(selected(restored),'min','Reload starts at first tab');
+  assert.equal(params(restored).get('summaryDirection'),'desc');
+  for(const key of ['role','period','from','to'])assert.equal(params(restored).get(key),params(h).get(key));checks++;
  }
  const fresh=harness('#home?role='+role);fresh.click({route:'summary'});
  assert.equal(selected(fresh),'min');assert.equal(params(fresh).get('summaryDirection'),'desc');checks++;
 }
-console.log('PASS summary default: '+checks+' role/period/default/invalid/explicit-sort cases; first-tab running descending and preserved navigation/reload choices.');
+for(const role of ['customer_owner','customer_staff']){
+ const h=harness('#home?role='+role);
+ if(role==='customer_owner'){
+  assert(h.html().includes('data-owner-sort="running" aria-pressed="true"'));
+  h.click({ownerSort:'work'});assert(h.html().includes('data-owner-sort="work" aria-pressed="true"'));
+  h.click({route:'summary'});h.click({route:'home'});assert(h.html().includes('data-owner-sort="work" aria-pressed="true"'));
+ }
+ for(const metric of ['work','running'])for(const direction of ['asc','desc']){
+  const fresh=harness('#efficiency?'+new URLSearchParams({role,efficiencyMode:'vehicle',efficiencySortMetric:metric,efficiencyDirection:direction,period:'d',from:'2026-10-02',to:'2026-10-02'}));
+  assert(fresh.html().includes('data-efficiency-sort-metric="running" data-direction="desc" aria-pressed="true"'));
+  assert.equal(params(fresh).get('efficiencySortMetric'),'running');assert.equal(params(fresh).get('efficiencyDirection'),'desc');
+  fresh.click({efficiencySortMetric:'work'},'data-efficiency-sort');assert.equal(params(fresh).get('efficiencySortMetric'),'work');
+  fresh.click({efficiencySortMetric:'work'},'data-efficiency-sort');assert.equal(params(fresh).get('efficiencyDirection'),'asc');
+  checks++;
+ }
+}
+const oldSearch=harness('?summarySort=work&summaryDirection=asc#summary?period=d&from=2026-10-02&to=2026-10-02');
+assert.equal(selected(oldSearch),'min');assert.equal(params(oldSearch).get('summaryDirection'),'desc');
+console.log('PASS first-tab defaults: '+checks+' role/period/stale-URL/manual-sort cases; home, summary and vehicle efficiency running descending, in-page selections retained, fresh reload reset.');

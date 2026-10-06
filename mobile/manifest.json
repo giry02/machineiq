@@ -1,5 +1,5 @@
 {
-  "revision": "2026-10-06-r131",
+  "revision": "2026-10-06-r132",
   "entry": "login.html",
   "includeArchives": false,
   "mapMode": "embedded-google",
@@ -7,11 +7,11 @@
   "files": [
     {
       "path": "index.html",
-      "sha256": "95545bf6318181668de0e1c924cc53c33827f3b57f42aeadaa3abeafd76d4b78"
+      "sha256": "04ac69eed4c38538a62c3c8d3f64ba4e65e117eb201397eaefb933f6b469b050"
     },
     {
       "path": "customer.js",
-      "sha256": "ac1ee1134a27c0d6f5b2162042ef984d3d331658c375ac913c9ac647aca7a790"
+      "sha256": "128dae94c228aea7b3f031f4c5da93765ffb517f453ba9b0485e782dcd1bacf6"
     },
     {
       "path": "customer.css",
@@ -27,11 +27,11 @@
     },
     {
       "path": "home-view.js",
-      "sha256": "bbc5c75a2de92023afb67822b062729cc0442456f86a755e04a5ad9ee3380ac8"
+      "sha256": "1a4e5236d1ba26da25f0a5337d389c5b98619a50cdeecec65b834f55950ea0b4"
     },
     {
       "path": "release.json",
-      "sha256": "2ce24fd2451656faac6092d55802cf0d8fe10015c96192dc7ce7362b4ddd1139"
+      "sha256": "18d82405cf980dedd16a572e849e4991a40b72f542b0569f155c3ceaacef675a"
     },
     {
       "path": "error-documents.js",
@@ -75,7 +75,7 @@
     },
     {
       "path": "demo-data.generated.js",
-      "sha256": "15b27cdd798265b754b102691fd48b686e67aca747035afa328effa08fed9642"
+      "sha256": "80ecda059ba61a3b794008f67cdac5e7768505356c2e3374f577d186b8870667"
     },
     {
       "path": "web-guide-colors.css",
@@ -815,7 +815,7 @@
     },
     {
       "path": "tests/next-week-demo.cjs",
-      "sha256": "cb713324e97727bdca75c4b5773f14383fa1adfcb29bb72beb9dde52f8daa86d"
+      "sha256": "aca7f092999777298b2c9ce2a95202afa294ed463df1e2fe52b8048f484414f0"
     },
     {
       "path": "tests/summary-map.cjs",
@@ -879,7 +879,7 @@
     },
     {
       "path": "tests/summary-default.cjs",
-      "sha256": "5057b508005f0a70247b5a0c8cd0b199c2fd45ed4e26a1ad678962db359bbb6f"
+      "sha256": "8d6193fb6e0b0cab6bc50eb9f93f552f8eee9fa3deb5bfeaa85fb880102c1500"
     }
   ]
 }

@@ -51,7 +51,7 @@
       return (ak?(a[key]-b[key])*(direction==='asc'?1:-1):0)||a.group.localeCompare(b.group,'ko');
     });
   }
-  function render(M,data,sort='work',mode='preview',direction='desc'){
+  function render(M,data,sort='running',mode='preview',direction='desc'){
     const {all:c,groups,trend}=data,n=M.DISPLAY.number,h=v=>M.DISPLAY.duration(v,true),pct=v=>M.DISPLAY.efficiency(v);
     const staff=data.role==='customer_staff';
     const icon=name=>`<i data-lucide="${name}" aria-hidden="true"></i>`;
