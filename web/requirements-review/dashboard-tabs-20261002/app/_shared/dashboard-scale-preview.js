@@ -63,7 +63,7 @@
     var el=document.createElement('article');el.className='dc-card dc-span-'+width+' '+(kind||'');el.id=id;
     MIQCommon.view.set(el,"innerHTML",'<header class="dc-head"><h2>'+icon(({dcFleet:'connection',dcAttention:'need',dcLive:'group',dcToday:'efficiency',dcSummary:'summary',dcEfficiency:'efficiency',dcFuel:'fuel',dcBattery:'battery',dcDistance:'distance',dcHours:'time',dcShock:'fault',dcPeriod:'group'})[id])+title+'</h2><span class="dc-card-meta"></span></header><div class="dc-body"></div><footer class="dc-foot"></footer>');return el;
   }
-  function setHTML(node,html){if(MIQCommon.view.get(node,"innerHTML")!==html)MIQCommon.view.set(node,"innerHTML",html);}
+  function setHTML(node,html){if(MIQCommon.view.get(node,"innerHTML")!==html){MIQCommon.view.set(node,"innerHTML",html);if(window.MIQDashboardMotion)MIQDashboardMotion.refresh();}}
   function write(el,html,meta,foot){setHTML(q('.dc-body',el),html);setHTML(q('.dc-card-meta',el),meta||'');setHTML(q('.dc-foot',el),foot||'');}
   function overviewLink(el,href,label){
     var link=q('.dc-head-link',el);
@@ -198,7 +198,7 @@
     var known=result.known>0,share=result.efficiency;
     function hours(n){return known?n.toLocaleString('ko-KR',{minimumFractionDigits:1,maximumFractionDigits:1}):'—';}
     var percent=share===null?'—':Math.round(share),paint=share===null?'#eaf0f3':'conic-gradient(from 270deg,#ff3600 0 '+share+'%,#eaf0f3 '+share+'% 100%)';
-    var chart='<div class="dwi-ring" style="background:'+paint+'" role="img" aria-label="운영효율 '+percent+'%"><div class="dwi-ring-center"><div><strong>'+percent+'</strong><small>%</small></div><span>가동시간 대비</span></div></div>';
+    var chart='<div class="dwi-ring" style="background:'+paint+';--dm-share:'+(share===null?0:share)+'%" role="img" aria-label="운영효율 '+percent+'%"><div class="dwi-ring-center"><div><strong>'+percent+'</strong><small>%</small></div><span>가동시간 대비</span></div></div>';
     var details='<div class="dwi-metrics"><div class="dwi-row"><span class="dwi-label">'+icon('work')+'작업시간</span><span class="dwi-value"><strong>'+hours(result.work)+'</strong><small>H</small></span></div><div class="dwi-row"><span class="dwi-label">'+icon('time')+'대기시간</span><span class="dwi-value"><strong>'+hours(result.idle)+'</strong><small>H</small></span></div><div class="dwi-row dwi-total"><span class="dwi-label">'+icon('time')+'전체 가동시간</span><span class="dwi-value"><strong>'+hours(result.work+result.idle)+'</strong><small>H</small></span></div></div>';
     var href=pageLink('../Operational%20Efficiency/operational-efficiency-tobe-option-b.html',{period:'d',from:w.date,to:w.date});
     write(cards.today,'<div class="dwi-layout">'+chart+details+'</div>',pill('현재 · '+w.to,'is-current'));
@@ -350,6 +350,7 @@
     querySlots[key].appendChild(queryHeading);
     MIQCommon.view.set(q('#periodHeading'),"innerHTML",icon('calendar')+(key==='dashboard'?'기간 실적 조회':dimension+'별 사용량 조회'));
     if(document.body.classList.contains('dc-ready'))paintTrends();
+    if(window.MIQDashboardMotion)MIQDashboardMotion.replay();
     var url=new URL(location.href);url.searchParams.set('tab',key);url.searchParams.delete('groups');history.replaceState(null,'',url);
   }
   tablist.addEventListener('click',function(event){var button=event.target.closest('[data-tab]');if(button)activateTab(button.dataset.tab,false);});
