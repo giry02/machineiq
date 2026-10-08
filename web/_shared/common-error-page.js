@@ -8,6 +8,11 @@
   login.searchParams.set('lang','ko');
   document.getElementById('errorLogin').href=login.href;
   var target=MIQErrors.safeReturn(params.get('returnTo') || document.referrer,base.href);
+  if (info.type === 'unavailable') {
+    document.getElementById('errorLogin').href=target || location.href;
+    MIQCommon.view.set(document.getElementById('errorLogin'),'textContent','다시 시도');
+    return;
+  }
   if (target && !['session','forbidden'].includes(info.type)) {
     var back=document.getElementById('errorReturn');back.href=target;back.hidden=false;back.classList.remove('aae-hidden');
     MIQCommon.view.set(back,'textContent',info.retry?'다시 시도':'이전 화면으로 이동');
