@@ -17,7 +17,6 @@
       login(identifier){const data=read();if(!data)return null;const id=String(identifier).trim().toLowerCase();data.active=[data.profile.userId,data.profile.email].some(value=>String(value||'').toLowerCase()===id);if(!write(data))return false;return data.active?copy(data.profile):null;},
       logout(){const data=read();return !data||write({...data,active:false});},
       requiresVehicle(){return this.current()?.approvedVehicleCount===0;},
-      requests(){const data=read();return data?.active?copy((Array.isArray(data.requests)?data.requests:[]).filter(r=>r&&typeof r.id==='string'&&typeof r.vehicle==='string'&&typeof r.terminal==='string'&&['REQ','APRV','RJCT'].includes(r.status))):null;},
       addRequest(record){const data=read();if(!data?.active||data.profile.role!=='customer_owner')return false;return write({...data,requests:[{...record,role:data.profile.role,requestedBy:data.profile.name,company:data.profile.company,status:'REQ'},...(Array.isArray(data.requests)?data.requests:[])]});}
     };
   }
