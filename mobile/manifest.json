@@ -1,5 +1,5 @@
 {
-  "revision": "2026-10-08-r135",
+  "revision": "2026-10-08-r136",
   "entry": "login.html",
   "includeArchives": false,
   "mapMode": "embedded-google",
@@ -31,7 +31,7 @@
     },
     {
       "path": "release.json",
-      "sha256": "054d8cd03626f64633e9c3a415a0f0a81afedaf66e24e2c5c662bb509eeaced6"
+      "sha256": "a5d6d0f86703430aa9c927ed28e959c4c01c74dc12c627d15cfaec11bcc49fdf"
     },
     {
       "path": "error-documents.js",
@@ -880,6 +880,26 @@
     {
       "path": "tests/summary-default.cjs",
       "sha256": "8d6193fb6e0b0cab6bc50eb9f93f552f8eee9fa3deb5bfeaa85fb880102c1500"
+    },
+    {
+      "path": "Common/400.html",
+      "sha256": "caa5e5c40acc91950425ce2c805a21d553bb3cbbbaff1d558c31a06e5a89697e"
+    },
+    {
+      "path": "Common/401.html",
+      "sha256": "7e6d2b3979960aaea166aa63c57977065892a11fcfa5ae2ef1d35d6e2a8a17ab"
+    },
+    {
+      "path": "Common/403.html",
+      "sha256": "156ab7702b766b5bc1b903c2c1c8f9bae961ee3cde6c070cf727ec66e5776a60"
+    },
+    {
+      "path": "Common/500.html",
+      "sha256": "74de7a115763f9930b0897b5285e12e9e87f6bb50a5e0f2b69273980dd9da639"
+    },
+    {
+      "path": "Common/http-error-page.js",
+      "sha256": "3826cc393bd3c51b598747b6cb318ead59980889e98f94ec7c8db6bab09c4c9b"
     }
   ]
 }
