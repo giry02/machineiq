@@ -1,4 +1,5 @@
 /* Fourth proposal only. Keep the existing order, gaps, colors and navigation. */
+.dr-scale-preview{--ds-chart-height:164px}
 .dr-scale-preview .dashboard-titlebar h1{font-size:28px!important;line-height:38px}
 .dr-scale-preview .dr-tablist button{font-size:17px}
 .dr-scale-preview .dc-head h2,.dr-scale-preview .dc-trends-head h2,.dr-scale-preview .period-heading h2{font-size:18px;line-height:27px;font-weight:700}
@@ -24,7 +25,7 @@
 .dr-scale-preview .dc-trends .dc-head{min-height:43px}
 .dr-scale-preview .dc-trends .dc-card{height:auto;min-height:264px}
 .dr-scale-preview .dc-trends .dc-body{flex:none}
-.dr-scale-preview .dc-trends .dc-chart{height:164px}
+.dr-scale-preview .dc-trends .dc-chart{height:var(--ds-chart-height)}
 .dr-scale-preview .dc-chart text{font-size:12.5px}
 .dr-scale-preview .dc-chart-stat>span,.dr-scale-preview .dc-chart-stat>small{font-size:13px}
 .dr-scale-preview .dc-chart-stat>div{line-height:39px}

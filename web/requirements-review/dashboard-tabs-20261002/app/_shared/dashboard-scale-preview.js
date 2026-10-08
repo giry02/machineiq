@@ -98,7 +98,7 @@
     if(!valid.length)return '<div class="dc-empty">표시할 월별 기록이 없습니다.</div>';
     var base=0,peak=options.percent?100:Math.max.apply(null,valid)*1.12||1;
     if(!options.percent){var magnitude=Math.pow(10,Math.floor(Math.log10(peak)));peak=Math.ceil(peak/magnitude)*magnitude;}
-    var W=Math.max(240,options.width||280),H=144,L=Math.max(32,Math.min(76,fmt(peak).length*7+13)),R=W-9,T=27,B=H-25;
+    var W=Math.max(240,options.width||280),H=parseFloat(getComputedStyle(document.body).getPropertyValue('--ds-chart-height'))||144,L=Math.max(32,Math.min(76,fmt(peak).length*7+13)),R=W-9,T=27,B=H-25;
     var x=function(i){return L+(R-L)/12*(i+.5);},y=function(v){return B-(v-base)/(peak-base)*(B-T);};
     var s='<svg class="dc-chart dc-chart-'+type+'" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(state.year+'년 '+label+' 월별 추이. 단위 '+unit)+'"><title>'+esc(label+' · '+unit)+'</title>';
     var currentIndex=values.findIndex(function(v,i){return v!==null&&partialMonth(i);});
