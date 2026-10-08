@@ -33,7 +33,13 @@
 .owner-dashboard-preview .od-content .od-soon .od-number,.owner-dashboard-preview .od-content .od-soon .od-issue-label svg { color:var(--linq-color-warning); }
 .owner-dashboard-preview .od-content .od-zero .od-number { color:var(--od-muted); }
 .owner-dashboard-preview .od-content .od-fleet-body { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; gap:12px; padding:0; }
-.owner-dashboard-preview .od-content .od-ring { display:grid; place-items:center; width:104px; height:104px; margin:10px auto 4px; border-radius:50%; background:conic-gradient(var(--od-chart-color) 0 var(--od-ratio),var(--od-offline) var(--od-ratio) 100%); }
+/* Animate only the filled share; the 9 o'clock origin and upright number never rotate. */
+@property --od-ring-progress { syntax:'<number>'; inherits:false; initial-value:1; }
+@keyframes od-ring-fill { from { --od-ring-progress:0; } to { --od-ring-progress:1; } }
+.owner-dashboard-preview .od-content .od-ring { display:grid; place-items:center; width:104px; height:104px; margin:10px auto 4px; border-radius:50%; background:conic-gradient(from 270deg,var(--od-chart-color) 0 calc(var(--od-ratio)*var(--od-ring-progress)),var(--od-offline) calc(var(--od-ratio)*var(--od-ring-progress)) 100%); animation:od-ring-fill 550ms cubic-bezier(.22,.61,.36,1) both; }
+@media (prefers-reduced-motion:reduce) {
+  .owner-dashboard-preview .od-content .od-ring { animation:none; --od-ring-progress:1; }
+}
 .owner-dashboard-preview .od-content .od-ring-center { display:grid; place-items:center; width:82px; height:82px; border-radius:50%; background:var(--linq-color-surface); }
 .owner-dashboard-preview .od-content .od-ring-center strong { color:var(--od-ink); font-size:26px; line-height:36px; font-weight:700; }
 .owner-dashboard-preview .od-content .od-ratio { min-width:0; --od-chart-color:var(--linq-color-brand); }

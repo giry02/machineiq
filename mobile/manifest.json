@@ -1,5 +1,5 @@
 {
-  "revision": "2026-10-08-r134",
+  "revision": "2026-10-08-r135",
   "entry": "login.html",
   "includeArchives": false,
   "mapMode": "embedded-google",
@@ -7,15 +7,15 @@
   "files": [
     {
       "path": "index.html",
-      "sha256": "9b55c454489c7559e859d46c2cc747669624e4917b150f7205fe47c0f44e6c3b"
+      "sha256": "48571fc46a009eff9ef2af2eaadf2df655f8bd738e513c31286a31cd741c1b5c"
     },
     {
       "path": "customer.js",
-      "sha256": "73ec8b9e0865fcafc0c566e139a40cd7cf1086bc3a56fd12457f58d3bd9c4253"
+      "sha256": "d02899ae56b1c6609427aea47b527f1be4a717a3feff7c0921949bee7ac1c85e"
     },
     {
       "path": "customer.css",
-      "sha256": "1fd16a8fd0a7469879da9c7b7ad3f9532d9b980dda69ba682663ee69e069a64c"
+      "sha256": "2dc6cffad9646a254477d101a95f1824b4f45350a80ad30859961cdd1379b17f"
     },
     {
       "path": "auth-common.js",
@@ -31,7 +31,7 @@
     },
     {
       "path": "release.json",
-      "sha256": "99c99f5aabd306ed386fdcfe137d7491462cb5e26ffea5b7c8b58b1f21684aa0"
+      "sha256": "054d8cd03626f64633e9c3a415a0f0a81afedaf66e24e2c5c662bb509eeaced6"
     },
     {
       "path": "error-documents.js",
@@ -39,7 +39,7 @@
     },
     {
       "path": "model.js",
-      "sha256": "541315c46d9cf5876c13d3061d2bff3fc526350206747204145919890a827316"
+      "sha256": "468698ab62e1085b5b6f5b2e2e7f98e9756392f3cd5a1ff25f39bfd349596443"
     },
     {
       "path": "login.html",
@@ -75,7 +75,7 @@
     },
     {
       "path": "demo-data.generated.js",
-      "sha256": "80ecda059ba61a3b794008f67cdac5e7768505356c2e3374f577d186b8870667"
+      "sha256": "2db8717e839bc526f647ceb18882b8f689a3d352017f83d4abd1510b1ec537f3"
     },
     {
       "path": "web-guide-colors.css",
@@ -83,7 +83,7 @@
     },
     {
       "path": "owner-dashboard-preview.css",
-      "sha256": "a87bd3ce49b075057b446d421a2688c0cb55888cd5bacd3982d219d36224e81b"
+      "sha256": "2d8421730242033b07300eb9b61cd0eafac915900d46fd4f30fc2526736ebb56"
     },
     {
       "path": "vehicle-registration.js",

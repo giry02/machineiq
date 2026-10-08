@@ -152,6 +152,12 @@
         receivedAt:live.dataTime,position:W.positions.find(p=>p.vin===v.vin)||(demoData&&TODAY>=demoData.from?demoData.positions?.find(p=>p.vin===v.vin):null)||null,batteryVoltage:v.batteryVoltage??null,batteryCapacity:v.batteryCapacity??null};
     });
   }
+  function serviceCenter(v) {
+    if(!v?.vin)return null;
+    const assignment=demoData?.serviceCenterAssignments?.find(r=>r.vin===v.vin);
+    const center=assignment&&demoData?.serviceCenters?.find(r=>r.id===assignment.centerId);
+    return center?{id:center.id,name:center.name,address:center.address,phone:center.phone,demo:true}:null;
+  }
   function scope(rows,state) {
     if(!Object.hasOwn(ROLE_LABELS,state.role))return [];
     return W.common.roles.filterVehicles(state.role,rows)
@@ -409,5 +415,5 @@
   }
     const percent=(part,total)=>total ? Math.round(part/total*1000)/10 : null;
   function performance(rows,from,to,options={}) {return webPerformance(rows,from,to,options);}
-  return {SNAPSHOT,TODAY,DATA_START,ENERGY_MONTH,STATUS,DISPLAY,SHOCK_LEVELS,shockLevel,chargeWindow,assignedGroup,reportValues,web:W,createApprovalStore,periodWindow,hourlyWindow,dashboardWindow,dashboardErrors,currentSupplies,supplySummary,fleetState,COMPANY,ROLE_LABELS,buildVehicles,currentVehicle,scope,listed,attention,counts,dates,calendarDate,demoReferenceHours,efficiencyRange,efficiencyPerformance,efficiencyWindow,efficiencyCalendar,metrics,performance,serviceItems,supplyItems,resetSupplies,undoSupplyReset,serviceHistory,serviceRecords,pushHistory,pushPresentation,shockEvents,notificationWindow,recentNotifications,unreadPushCount};
+  return {SNAPSHOT,TODAY,DATA_START,ENERGY_MONTH,STATUS,DISPLAY,SHOCK_LEVELS,shockLevel,chargeWindow,assignedGroup,reportValues,web:W,createApprovalStore,periodWindow,hourlyWindow,dashboardWindow,dashboardErrors,currentSupplies,supplySummary,fleetState,COMPANY,ROLE_LABELS,buildVehicles,currentVehicle,serviceCenter,scope,listed,attention,counts,dates,calendarDate,demoReferenceHours,efficiencyRange,efficiencyPerformance,efficiencyWindow,efficiencyCalendar,metrics,performance,serviceItems,supplyItems,resetSupplies,undoSupplyReset,serviceHistory,serviceRecords,pushHistory,pushPresentation,shockEvents,notificationWindow,recentNotifications,unreadPushCount};
 });

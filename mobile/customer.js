@@ -27,6 +27,22 @@
     return summary.hasUnknown?'<div role="status"><p class="source-note">'+(summary.knownItems?'일부 소모품 정보 미수신 · 확인된 항목만 표시':'소모품 정보 미수신 · 상태 확인 불가')+'</p>'+retryData()+'</div>':'';
   }
   const icon = name => `<i data-lucide="${name}" aria-hidden="true"></i>`;
+  let serviceCenterTrigger=null;
+  function serviceCenterButton(v) {
+    return `<button type="button" class="service-center-button" data-service-center="${esc(v.equipmentId)}" aria-label="${esc(v.equipmentNumber)} 담당 서비스센터" aria-haspopup="dialog" aria-controls="service-center-dialog">서비스센터${icon('chevron-right')}</button>`;
+  }
+  function openServiceCenter(id,trigger) {
+    // Only currently visible vehicles in the current permission/query scope.
+    const vehicle=state.view==='supplies'?selected():state.view==='services'&&['supplies','error'].includes(state.service)?serviceData().vehicles.find(v=>v.equipmentId===id):null;
+    if(!vehicle||vehicle.equipmentId!==id)return;
+    const center=M.serviceCenter(vehicle),phone=String(center?.phone||'').trim();
+    const dial=/^\+?[\d ()-]+$/.test(phone)?phone.replace(/[ ()-]/g,''):'';
+    $('#service-center-vehicle').textContent=fieldText(vehicle.equipmentNumber);
+    $('#service-center-info').innerHTML=center?`<h3>${escField(center.name)}</h3><p>${escField(center.address)}</p>${/^\+?\d{7,15}$/.test(dial)?`<a href="tel:${esc(dial)}" aria-label="서비스센터 전화 ${esc(phone)}">${esc(phone)}</a>`:`<p>${escField(phone)}</p>`}`:'<p class="source-note">담당 서비스센터 정보가 없습니다.</p>';
+    serviceCenterTrigger=trigger;
+    $('#service-center-dialog').showModal();
+    $('[data-close-service-center]')?.focus({preventScroll:true});
+  }
   const fmt = M.DISPLAY.number;
   const hours = min => M.DISPLAY.duration(min);
   const shortHours = min => M.DISPLAY.duration(min,true);
@@ -299,7 +315,7 @@ return `<article class="vehicle-mobile-row ${M.attention(v)?'is-attention':''}">
 return `<div data-screen-id="LQ-OPS-001"><div class="snapshot"><div class="summary-title-with-map"><h1>요약정보</h1><button type="button" class="summary-fleet-map-button" data-fleet-map aria-label="전체 차량 지도 보기" title="전체 차량 지도 보기">${icon('map-pin')}지도보기</button></div>${periodCutoff()}</div>${periodControls({group:true,vehicle:'listVehicle'})}${summarySortControls()}${state.live?`<button class="clear-filter" type="button" data-clear-live>${esc(liveLabels[state.live]||state.live)} 차량${icon('x')}</button>`:''}<div class="vehicle-mobile-list">${summaryCards()}</div>${dataNote('작업·대기·거리·운영효율·충격은 조회 기간 실적입니다. 운영효율은 웹 요약정보의 기간 보정값이며, 작업·대기는 웹의 원장 비율로 나눕니다. 웹 운영효율 메뉴의 별도 분석값과 구분합니다. 업무 현황의 작업 활용률과는 다른 지표입니다. 통신·가동·잔량·에러·교체 알림은 마지막 수신 기준이며, 미연결 차량의 현재 가동 여부는 확인할 수 없으며, 선택 기간에 수집된 실적은 표시합니다. 소모품 숫자는 전체 조회 품목 수입니다. ! 표시는 교체주기 사용률 90% 이상인 교체 필요 품목이 있다는 뜻이며, 임박만 있으면 80% 이상~90% 미만 기준의 주의 색상으로 구분합니다. 품목별 상태는 소모품을 눌러 확인할 수 있습니다. 합계와 비교는 업무 현황에서 확인할 수 있습니다.')}</div>`;
   }
   function selected() { return M.scope(rows,{...state,group:'',type:''}).find(v=>v.equipmentId===state.equipmentId); }
-  function vehicleHeader(v) { return `<section class="detail-hero"><div class="detail-icon">${icon('truck')}</div><div><small>${esc(v.group)} · ${esc(v.type)}</small><h1>${escField(v.equipmentNumber)}</h1><p>${escField(v.model)} · ${escField(v.companyName)}</p></div>${status(v)}</section>`; }
+  function vehicleHeader(v,withServiceCenter=false) { return `<section class="detail-hero"><div class="detail-icon">${icon('truck')}</div><div><small>${esc(v.group)} · ${esc(v.type)}</small><h1>${escField(v.equipmentNumber)}</h1><p>${escField(v.model)} · ${escField(v.companyName)}</p></div>${withServiceCenter?serviceCenterButton(v):status(v)}</section>`; }
   function shockBreakdown(m,inlineHelp=false) {
     return `<div class="shock-breakdown" aria-label="충격 강도별 건수">${M.SHOCK_LEVELS.map(level=>`<div class="shock-band is-${level.key}"><span>${level.label}</span><strong>${fmt(m?.shockBands?.[level.key],'건')}</strong><small>${level.level} · ${level.min}g 이상</small></div>`).join('')}</div>${inlineHelp?'':criteriaHeading('충격 분류 기준','shock-level-help','h3')}${criteriaPanel('shock-level-help',M.SHOCK_LEVELS.map(level=>`<p class="source-note"><strong>${level.label}</strong> ${level.min}g 이상${level.max?' ~ '+level.max+'g 미만':''} · ${level.description}</p>`).join('')+'<p class="source-note">충격은 가장 높은 해당 단계에 한 번만 집계합니다.</p>')}`;
   }
@@ -369,7 +385,7 @@ return `<div data-screen-id="LQ-OPS-001"><div class="snapshot"><div class="summa
       if(!entry) content='<p class="empty-state">조회할 수 없는 내역입니다.</p>';
       else content=definition([['그룹',v.group],['기종',v.model],['호기',v.equipmentNumber],...maintenanceFields(entry)]);
     }
-    return `<div data-screen-id="${ids[kind]}">${vehicleHeader(v)}<div class="section-heading"><h2>${labels[kind]}</h2>${['operation','shock'].includes(kind)?periodCutoff():`<small>${kind==='battery'&&!v.conn?'마지막 수신 정보':kind==='error'&&state.serviceEntry?'발생 이력':['battery','supplies','error'].includes(kind)?'현재 수신 상태':kind==='engine'?M.ENERGY_MONTH+' 월간':'기간별 정보'}</small>`}</div>${['operation','shock'].includes(kind)?periodControls():''}<section class="detail-card">${content}</section>${dataNote('운행·충격은 선택 기간 기준, 연료·전력소비량은 '+M.ENERGY_MONTH+' 현재 집계 기준입니다. 잔량·점검 알림은 마지막 수신 기준이며 수신되지 않은 숫자는 -로 표시합니다.')}<button class="detail-secondary-button" type="button" data-return>${state.returnView==='notifications'?'알림 목록으로 돌아가기':state.returnView==='summary'?'요약정보로 돌아가기':state.returnView==='services'?'서비스 목록으로 돌아가기':'차량 상세로 돌아가기'}</button></div>`;
+    return `<div data-screen-id="${ids[kind]}">${vehicleHeader(v,kind==='supplies')}<div class="section-heading"><h2>${labels[kind]}</h2>${['operation','shock'].includes(kind)?periodCutoff():`<small>${kind==='battery'&&!v.conn?'마지막 수신 정보':kind==='error'&&state.serviceEntry?'발생 이력':['battery','supplies','error'].includes(kind)?'현재 수신 상태':kind==='engine'?M.ENERGY_MONTH+' 월간':'기간별 정보'}</small>`}</div>${['operation','shock'].includes(kind)?periodControls():''}<section class="detail-card">${content}</section>${dataNote('운행·충격은 선택 기간 기준, 연료·전력소비량은 '+M.ENERGY_MONTH+' 현재 집계 기준입니다. 잔량·점검 알림은 마지막 수신 기준이며 수신되지 않은 숫자는 -로 표시합니다.')}<button class="detail-secondary-button" type="button" data-return>${state.returnView==='notifications'?'알림 목록으로 돌아가기':state.returnView==='summary'?'요약정보로 돌아가기':state.returnView==='services'?'서비스 목록으로 돌아가기':'차량 상세로 돌아가기'}</button></div>`;
   }
   function supplyUsage(r) {
     const valid=r.percent!=null;
@@ -462,7 +478,7 @@ return `<div data-screen-id="LQ-OPS-001"><div class="snapshot"><div class="summa
     return `${current?supplyToolbar():''}
       ${['due','soon'].includes(state.serviceFocus)?`<button type="button" class="clear-filter" data-clear-service-focus aria-label="서비스 조회 조건 해제">${esc(liveLabels[state.serviceFocus])}${icon('x')}</button>`:''}
       ${current&&supplyStatus.hasUnknown?supplyNotice(supplyStatus):`<p class="source-note service-scope-note">${current?'현재':activeErrors?'현재 미해제':'기간 내'} ${vehicles.length}대 · ${filtered.reduce((n,r)=>n+r.count,0)}${current?'개':'건'}${state.service==='error'?' · 미해제 '+open+'건':current?' · 교체 필요 '+filtered.filter(r=>r.key==='due').reduce((n,r)=>n+r.count,0)+'개 · 임박 '+filtered.filter(r=>r.key==='soon').reduce((n,r)=>n+r.count,0)+'개':''}</p>`}
-      <div class="vehicle-mobile-list">${vehicles.map(v=>`<article class="service-mobile-row" data-service-card="${esc(v.equipmentId)}"><div class="service-mobile-row__head"><button type="button" class="vehicle-card-main" data-vehicle="${esc(v.equipmentId)}"><strong>${escField(v.equipmentNumber)}</strong><small>${escField(v.model)} · ${esc(v.group)}</small></button>${current?status(v):''}</div>${filtered.filter(r=>r.equipmentId===v.equipmentId).map(itemRow).join('')}</article>`).join('')||'<p class="empty-state">'+(current&&supplyStatus.hasUnknown?'확인 가능한 소모품 항목이 없습니다.':'해당 내역이 없습니다.')+'</p>'}</div>
+      <div class="vehicle-mobile-list">${vehicles.map(v=>`<article class="service-mobile-row" data-service-card="${esc(v.equipmentId)}"><div class="service-mobile-row__head"><button type="button" class="vehicle-card-main" data-vehicle="${esc(v.equipmentId)}"><strong>${escField(v.equipmentNumber)}</strong><small>${escField(v.model)} · ${esc(v.group)}</small></button>${['supplies','error'].includes(state.service)?serviceCenterButton(v):''}</div>${filtered.filter(r=>r.equipmentId===v.equipmentId).map(itemRow).join('')}</article>`).join('')||'<p class="empty-state">'+(current&&supplyStatus.hasUnknown?'확인 가능한 소모품 항목이 없습니다.':'해당 내역이 없습니다.')+'</p>'}</div>
       ${dataNote(current?'소모품은 차량별 마지막 수신 시점의 상태입니다. 미연결 차량은 최신 상태가 아닐 수 있습니다.':'발생 건수와 해당 이력의 현재 처리 상태를 구분합니다. '+reportNote())}`;
   }
   function services() {
@@ -623,6 +639,7 @@ return `<div data-screen-id="LQ-OPS-001"><div class="snapshot"><div class="summa
     if(supplyContext!==nextSupplyContext){supplySelection.clear();supplyPending=[];supplyUndo=[];supplyMessage='';supplyContext=nextSupplyContext;if($('#supply-reset-dialog')?.open)$('#supply-reset-dialog').close();}
   }
   function render() {
+    if($('#service-center-dialog')?.open)$('#service-center-dialog').close();
     window.CustomerVehicleRegistration?.leave();
     state=readState();
     const onboarding=window.CustomerOnboarding,profile=onboarding?.current();
@@ -747,10 +764,13 @@ return `<div data-screen-id="LQ-OPS-001"><div class="snapshot"><div class="summa
   document.addEventListener('click',e=>{
     if(vehicleLookupOpen&&!e.target.closest('.vehicle-combobox'))closeVehicleLookup();
     if(e.target.id==='vehicle-lookup-input')return;
+    if(e.target===$('#service-center-dialog')){$('#service-center-dialog').close();return;}
     if(e.target===$('#customer-approval-dialog')){closeCustomerApproval();return;}
     if(e.target===$('#supply-reset-dialog')){$('#supply-reset-dialog').close();return;}
     if(e.target===$('#location-dialog')){ $('#location-dialog').close();return; }
     const b=e.target.closest('button'); if(!b)return;
+    if(b.hasAttribute('data-service-center')){openServiceCenter(b.dataset.serviceCenter,b);return;}
+    if(b.hasAttribute('data-close-service-center')){$('#service-center-dialog').close();return;}
     if(b.hasAttribute('data-toggle-vehicle-lookup')){if(vehicleLookupOpen){closeVehicleLookup();$('#vehicle-lookup-input').focus();}else openVehicleLookup();return;}
     if(b.hasAttribute('data-clear-vehicle-lookup')){chooseLookupVehicle('');return;}
     if(b.hasAttribute('data-select-vehicle-lookup')){chooseLookupVehicle(b.dataset.selectVehicleLookup);return;}
@@ -913,6 +933,7 @@ return `<div data-screen-id="LQ-OPS-001"><div class="snapshot"><div class="summa
     }
   },true);
   document.addEventListener('close',event=>{
+    if(event.target===$('#service-center-dialog')){if(serviceCenterTrigger?.isConnected)serviceCenterTrigger.focus({preventScroll:true});serviceCenterTrigger=null;$('#service-center-vehicle').textContent='';$('#service-center-info').innerHTML='';}
     if(event.target===$('#customer-approval-dialog')&&approvalPending)closeCustomerApproval();
     if(event.target===$('#supply-reset-dialog')){supplyPending=[];$('[data-open-supply-reset]')?.focus();}
     if(event.target===$('#location-dialog')){window.CustomerLocationMap.close();setLocationMapExpanded(false);locationFleetVehicles=[];if(locationMapTrigger?.isConnected)locationMapTrigger.focus({preventScroll:true});locationMapTrigger=null;}

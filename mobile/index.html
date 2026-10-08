@@ -11,9 +11,9 @@
   <link rel="stylesheet" href="./shared/mobile.css?v=20260907-20">
   <link rel="stylesheet" href="./shared/mobile-type-compact.css?v=20260907-1">
   <link rel="stylesheet" href="./shared/home-tone-c.css?v=20260907-2">
-  <link rel="stylesheet" href="./customer.css?v=20261008-r134">
+  <link rel="stylesheet" href="./customer.css?v=20261008-r134-service-center-link">
   <link rel="stylesheet" href="./web-guide-colors.css?v=20260923-r91">
-  <link rel="stylesheet" href="./owner-dashboard-preview.css?v=20261002-r125">
+  <link rel="stylesheet" href="./owner-dashboard-preview.css?v=20261008-r134-ring-motion">
 </head>
 <body class="mobile-type-compact mobile-tone-c customer-prototype owner-dashboard-preview" data-dashboard-mode="main">
   <div class="mobile-app">
@@ -45,6 +45,10 @@
     <section class="location-dialog-info" id="location-dialog-info-section" aria-labelledby="location-info-title"><div class="location-info-heading"><h3 id="location-info-title">차량 정보</h3><span id="location-dialog-coordinate"></span></div><dl class="detail-definition" id="location-dialog-info"></dl></section>
     </div>
   </dialog>
+  <dialog class="supply-reset-dialog service-center-dialog" id="service-center-dialog" aria-labelledby="service-center-title" data-screen-id="LQ-SVC-001-P01">
+    <header><h2 id="service-center-title">담당 서비스센터</h2><button type="button" data-close-service-center aria-label="서비스센터 닫기"><i data-lucide="x"></i></button></header>
+    <div class="supply-reset-body"><p id="service-center-vehicle"></p><div id="service-center-info"></div></div>
+  </dialog>
   <dialog class="supply-reset-dialog" id="supply-reset-dialog" aria-labelledby="supply-reset-title" aria-describedby="supply-reset-description" data-screen-id="LQ-SVC-003-P02">
     <header><h2 id="supply-reset-title">선택 항목 교체 완료</h2><button type="button" data-close-supply-reset aria-label="교체 완료 창 닫기"><i data-lucide="x"></i></button></header>
     <div class="supply-reset-body"><strong id="supply-reset-count"></strong><ul id="supply-reset-items"></ul><p id="supply-reset-description">처리하면 사용시간이 0H로 초기화되고 상태가 정상으로 변경됩니다.</p></div>
@@ -64,14 +68,14 @@
   <script src="./shared/layouts/vendor/lucide.min.js"></script>
   <script src="./error-documents.js?v=20260913-r60"></script>
   <script src="./web-contracts.generated.js?v=20261002-r125"></script>
-  <script src="./demo-data.generated.js?v=20261006-r132"></script>
-  <script src="./model.js?v=20261002-r125"></script>
+  <script src="./demo-data.generated.js?v=20261008-r133"></script>
+  <script src="./model.js?v=20261008-r133"></script>
   <script src="./location-map.js?v=20261002-r129"></script>
   <script src="./home-view.js?v=20261006-r132"></script>
   <script src="./onboarding.js?v=20261008-r134"></script>
   <script src="./vehicle-registration.js?v=20261008-r134"></script>
 
   <script src="./query-controls.js?v=20260924-r111"></script>
-  <script src="./customer.js?v=20261008-r134"></script>
+  <script src="./customer.js?v=20261008-r134-service-center-link"></script>
 </body>
 </html>
