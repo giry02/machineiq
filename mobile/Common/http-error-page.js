@@ -3,7 +3,7 @@
 (() => {
   'use strict';
   const status=Number(document.body.dataset.httpError);
-  if(![400,401,403,500].includes(status))return;
+  if(![400,401,403,500,503].includes(status))return;
   const description=window.CustomerWebContracts?.errors?.describe({status});
   if(description){
     document.querySelector('#http-error-title').textContent=description.title;
@@ -19,7 +19,7 @@
   }
   document.addEventListener('click',event=>{
     const retry=event.target.closest('[data-http-error-retry]');
-    if(retry&&status===500){window.location.reload();return;}
+    if(retry&&[500,503].includes(status)){window.location.reload();return;}
     const button=event.target.closest('[data-http-error-go]');
     if(!button||!routes.has(button.dataset.httpErrorGo))return;
     window.location.assign(status===401?'../login.html':'../index.html#'+button.dataset.httpErrorGo);

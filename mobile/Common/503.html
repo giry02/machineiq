@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#ff3600">
-  <title>403 접근 권한 없음 · MACHINE IQ</title>
+  <title>503 서비스 일시 중단 · MACHINE IQ</title>
   <link rel="icon" href="../assets/favicon.ico">
   <link rel="stylesheet" href="../assets/local-fonts.css">
   <link rel="stylesheet" href="../shared/mobile-guide-tokens.css?v=20260904-4">
@@ -15,17 +15,18 @@
   <link rel="stylesheet" href="../web-guide-colors.css?v=20260923-r91">
   <link rel="stylesheet" href="../owner-dashboard-preview.css?v=20261008-r134-ring-motion">
 </head>
-<body class="mobile-type-compact mobile-tone-c customer-prototype owner-dashboard-preview" data-http-error="403">
+<body class="mobile-type-compact mobile-tone-c customer-prototype owner-dashboard-preview" data-http-error="503">
   <div class="mobile-app">
     <header class="app-header">
       <button class="header-back" type="button" data-http-error-go="home" aria-label="홈으로 이동"><i data-lucide="chevron-left" aria-hidden="true"></i></button>
-      <strong class="header-title">403 접근 권한 없음</strong>
+      <strong class="header-title">503 서비스 일시 중단</strong>
       <button class="header-button" type="button" data-http-error-go="notifications" aria-label="알림 내역 열기"><i data-lucide="bell" aria-hidden="true"></i></button>
     </header>
     <main id="main" class="app-view is-active" tabindex="-1">
-      <section class="detail-card" data-screen-id="MHMIQ-COM-011" role="alert" aria-labelledby="http-error-title">
+      <section class="detail-card" data-screen-id="MHMIQ-COM-013" role="alert" aria-labelledby="http-error-title">
         <div class="dashboard-panel__head"><h2 id="http-error-title">오류 안내</h2></div>
         <p class="source-note" id="http-error-detail">요청을 처리하지 못했습니다. 아래 버튼으로 이동해 주세요.</p>
+        <button class="detail-secondary-button" type="button" data-http-error-retry>다시 시도</button>
         <a class="detail-secondary-button" href="../index.html#home">홈으로 이동</a>
       </section>
     </main>
