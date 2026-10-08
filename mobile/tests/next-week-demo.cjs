@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const app=path.resolve(process.argv[2]||path.join(__dirname,'..'));
 const read=file=>fs.readFileSync(path.join(app,file),'utf8');
-const harnessSource=fs.readFileSync(path.join(__dirname,'helpers/customer-mobile-harness.js'),'utf8');
+const harnessSource=fs.readFileSync(path.join(__dirname,'harness.js'),'utf8');
 function load(date,hour,withDemo=true){
   const stamp=date+'T'+String(hour).padStart(2,'0')+':37:00+09:00';
   class Clock extends Date{constructor(...args){super(...(args.length?args:[stamp]));}static now(){return new Date(stamp).getTime();}}
@@ -13,8 +13,13 @@ function load(date,hour,withDemo=true){
   return {context,M,rows:M.buildVehicles(fleet),home:context.window.CustomerHomeView,harness};
 }
 const seed=load('2026-10-02',8),demo=seed.context.window.CustomerDemoData;
-assert.equal(demo.measuredTelemetry,false);assert.equal(demo.to,'2026-10-11');assert.equal(demo.days.length,143);assert.equal(demo.history.length,303);
+assert.equal(demo.measuredTelemetry,false);assert.equal(demo.to,'2026-10-11');assert.equal(demo.days.length,143);assert.equal(demo.history.length,28);
 assert.equal(demo.history.filter(r=>r.kind==='maintenance'&&r.date.startsWith('2026-09')).length,6);
+const octoberRepairs=demo.history.filter(r=>r.kind==='maintenance'&&r.date.startsWith('2026-10'));
+assert.equal(octoberRepairs.length,11,'One October repair per day across all 13 vehicles');
+assert.equal(new Set(octoberRepairs.map(r=>r.vin)).size,11,'Spread repairs across VINs instead of repeating every vehicle');
+assert(octoberRepairs.some(r=>r.completed)&&octoberRepairs.some(r=>!r.completed));
+for(const date of new Set(demo.days.map(r=>r.date)))assert.equal(octoberRepairs.filter(r=>r.date===date).length,1);
 assert.equal(demo.days.filter(r=>r.fixture==='customer-long-waiting-review-20261006').length,22);
 assert.equal(demo.history.filter(r=>r.kind==='error').length,11);
 assert.equal(demo.days.filter(r=>r.shockCount>0).length,4);
@@ -29,8 +34,7 @@ for(const row of demo.days){
   const total=seed.M.web.observations.aggregate(vehicle,row.date,row.date,{date:row.date,hours:24});
   assert.equal(total.workMinutes,row.workMinutes);assert.equal(total.idleMinutes,row.idleMinutes);assert.equal(total.capacityMinutes,1440);
   const service=demo.history.filter(r=>r.vin===row.vin&&r.date===row.date);
-  assert(service.length>=2&&service.length<=3);assert.equal(service.filter(r=>r.kind==='maintenance').length,2);assert(service.filter(r=>r.kind==='error').length<=1);
-  assert(service.some(r=>r.kind==='maintenance'&&r.completed));assert(service.some(r=>r.kind==='maintenance'&&!r.completed));
+  assert(service.length<=2);assert(service.filter(r=>r.kind==='maintenance').length<=1);assert(service.filter(r=>r.kind==='error').length<=1);
   assert(service.every(r=>r.demo&&r.measuredTelemetry===false&&r.dateTime&&r.vin));
 }
 let cases=0;
@@ -91,7 +95,7 @@ for(let day=2;day<=11;day++)for(const hour of [0,1,7,8,14,23]){
     const previous='2026-10-'+String(day-1).padStart(2,'0');
     for(const v of scoped){
       const repairs=M.serviceRecords([v],{kind:'maintenance',from:previous,to:previous}),errors=M.serviceRecords([v],{kind:'error',from:previous,to:previous});
-      assert.equal(repairs.length,2);assert(repairs.some(r=>r.resolved)&&repairs.some(r=>!r.resolved));
+      assert.equal(repairs.length,demo.history.filter(r=>r.kind==='maintenance'&&r.vin===v.vin&&r.date===previous).length);
       assert.equal(errors.length,demo.history.filter(r=>r.kind==='error'&&r.vin===v.vin&&r.date===previous).length);
       const fixture=demo.days.find(r=>r.vin===v.vin&&r.date===previous);
       assert.equal(push.some(p=>p.pushType==='shock'&&p.equipmentId===v.equipmentId&&p.pushDatetime.startsWith(previous)),fixture.shockCount>0,'Only selected warning scenarios produce a received shock notification');
@@ -135,4 +139,16 @@ assert.deepEqual(JSON.parse(JSON.stringify(configured.M.metrics(configured.rows[
 const saved=seed.M.web.approvalSeed();saved.push({id:'saved-row',name:'보존',email:'saved@example.invalid',role:'고객 직원',companyId:'1933',registered:'2026-10-01 09:00',status:'REQ',approverId:seed.M.web.principals.customer_owner});
 seed.context.sessionStorage.getItem=()=>JSON.stringify(saved);
 const store=seed.M.createApprovalStore(rows);assert(store.find('saved-row','customer_owner'));assert.equal(store.list('customer_owner').filter(r=>r.id==='MOBILE-DEMO-REJECTED').length,1);assert.equal(store.list('customer_owner').filter(r=>r.id==='MOBILE-DEMO-REJECTED').length,1);
-console.log('PASS prepared mobile demo: '+cases+' day/hour/role cases through Oct 11; September 6 repairs + October 286, 2 daily long-waiting cases, 11 sparse errors/4 warning-shock days, <=22 notifications, count/list parity, scope/time cutoff, map positions, work/idle totals, 3 KPIs, engine L/H and rejected customer example.');
+const october8=load('2026-10-08',16),monthRows=october8.M.scope(october8.rows,{role:'customer_owner'});
+const monthRepairs=october8.M.serviceRecords(monthRows,{kind:'maintenance',from:'2026-10-01',to:'2026-10-31'});
+assert.equal(monthRepairs.length,8,'October 8 month query has eight repairs, not 208');
+assert(monthRepairs.some(r=>r.resolved)&&monthRepairs.some(r=>!r.resolved));
+const monthScreen=october8.harness('#services?role=customer_owner&service=maintenance&servicePeriod=m&serviceFrom=2026-10-01&serviceTo=2026-10-31');
+assert.equal((monthScreen.html().match(/data-kind="maintenance" data-entry=/g)||[]).length,8);
+assert(monthScreen.html().includes('<span>수리이력</span><strong>8</strong>'));
+for(const entry of monthRepairs){
+  const vehicle=monthRows.find(v=>v.equipmentId===entry.equipmentId);
+  monthScreen.click({serviceVehicle:vehicle.equipmentId,kind:'maintenance',entry:entry.id});
+  assert(monthScreen.url().includes('#maintenance?'));assert(monthScreen.html().includes(entry.label),'Remaining repair detail is accessible');
+}
+console.log('PASS prepared mobile demo: '+cases+' day/hour/role cases through Oct 11; September 6 repairs + October 11, Oct 8 month count/list/detail 8, 2 daily long-waiting cases, 11 sparse errors/4 warning-shock days, <=22 notifications, scope/time cutoff, map positions, work/idle totals, 3 KPIs, engine L/H and rejected customer example.');
