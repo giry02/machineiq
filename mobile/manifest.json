@@ -1,5 +1,5 @@
 {
-  "revision": "2026-10-08-r138",
+  "revision": "2026-10-12-r139",
   "entry": "login.html",
   "includeArchives": false,
   "mapMode": "embedded-google",
@@ -7,7 +7,7 @@
   "files": [
     {
       "path": "index.html",
-      "sha256": "28d1e4498f93efac4981a6ec6eafbd49390d9788c2af8a23a581b90524b92316"
+      "sha256": "0e2178278f637ae4977483221378d47cdd0135adbaf32ecf8a66b5ae4550db98"
     },
     {
       "path": "customer.js",
@@ -15,7 +15,7 @@
     },
     {
       "path": "customer.css",
-      "sha256": "2dc6cffad9646a254477d101a95f1824b4f45350a80ad30859961cdd1379b17f"
+      "sha256": "268246deba5b9a710a2188959f9340faa4d529a3add05f87950068b204954ae0"
     },
     {
       "path": "auth-common.js",
@@ -31,7 +31,7 @@
     },
     {
       "path": "release.json",
-      "sha256": "769d6c78f7c88f8dd631f40a1266b54d50b292f46dfd0f30937980e1b15bfc76"
+      "sha256": "fd00e987e07d7558c543aa769b87879868bb2430aaadb363338f48bc349ecf04"
     },
     {
       "path": "error-documents.js",
@@ -43,7 +43,7 @@
     },
     {
       "path": "login.html",
-      "sha256": "4396c873b8d73317445eba2bc7156ecdc4950bdd72dc587a68c51a519ac61bc9"
+      "sha256": "d41da3030e73bbfde7fe1143cb0211cd82fb988124c8f4bcbb8dad3ee116df9c"
     },
     {
       "path": "login.js",
@@ -51,7 +51,7 @@
     },
     {
       "path": "signup.html",
-      "sha256": "82429da88ed1f8c82568edd73c7389db7ce5a25a2ba2c07855f02955154570ba"
+      "sha256": "52f80f67779dfd28c38c2d9b009a7be8bebea722ed0350df7fbd157fa10b1fcb"
     },
     {
       "path": "signup.js",
@@ -63,7 +63,7 @@
     },
     {
       "path": "find-password.html",
-      "sha256": "81b0ca4e4475a850b31e9da84d6cbcec1f9af9238dc605bdc3bca40c1b6fff29"
+      "sha256": "fe9083eda15220cc21257d183208210819905346496e0f699ba10c51bbb4e586"
     },
     {
       "path": "find-password.js",
@@ -79,7 +79,7 @@
     },
     {
       "path": "web-guide-colors.css",
-      "sha256": "311e03f1c1a75fcd6f5fa00611d1e60b97bf4b999f55392893ed366dde10ec00"
+      "sha256": "9a63387ebef2c9168db082d181fbb93179c6f85c4d2de849ed4be981777caeb4"
     },
     {
       "path": "owner-dashboard-preview.css",
@@ -883,19 +883,19 @@
     },
     {
       "path": "Common/400.html",
-      "sha256": "cb6df3c8c1da0bdd4b3d90e7890e819e9f305306e6a780d7adb0af7b4a68e214"
+      "sha256": "f97c22e93f0022ed7716627afd248badf8638641e320c953ee34971b01715c97"
     },
     {
       "path": "Common/401.html",
-      "sha256": "1e93115e5df6046b562e8267af91c64a2bd96c09bae7dcbf61134868c2495aba"
+      "sha256": "dbaf311ec8cc1498c0da4f2db54af47d02d7a754518cf2002e8a07b687a5e608"
     },
     {
       "path": "Common/403.html",
-      "sha256": "ac4361a0a616f86e70ccba9c9ae6662f7b35e96a45a3d94844ba93632dffb1ad"
+      "sha256": "917b7dc216b3ae7a12907b4e050492e70e2fcc269b43b6ddba4106717215bef2"
     },
     {
       "path": "Common/500.html",
-      "sha256": "6f1a1de449335c674286a2b52d8a4c05aca75ee0ecd02e1e6a63b0aa6bd84e01"
+      "sha256": "3d65e78aab65f0c458611496f2428c79ce9f5e139341e9739eccadc7fdc2d670"
     },
     {
       "path": "Common/http-error-page.js",
@@ -903,7 +903,11 @@
     },
     {
       "path": "Common/503.html",
-      "sha256": "c3ecfb9d91604c41a822ef871a1a4f412600545e3e575349be549626c82e79ea"
+      "sha256": "ceec711a06bcecc6aaf5f84bd2774202320a3f70ef7726e32b2760aca3f5df5c"
+    },
+    {
+      "path": "tests/black-text.cjs",
+      "sha256": "bdf660cee31d52567609f2ae4c545c09c547a07df63b9968feed1e663b7beb57"
     }
   ]
 }

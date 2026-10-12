@@ -4,8 +4,8 @@
   --linq-color-brand:#ff3600;
   --linq-color-primary-fill:#d92e00;
   --linq-color-primary-pressed:#cc2b00;
-  --linq-color-text:#333333;
-  --linq-color-text-strong:#333333;
+  --linq-color-text:#000000;
+  --linq-color-text-strong:#000000;
   --linq-color-text-muted:#777777;
   --linq-color-surface:#ffffff;
   --linq-color-surface-muted:#f7f7f7;
@@ -33,7 +33,7 @@ body.customer-prototype {
   --customer-button-pressed-border:#bf2900;
 }
 .customer-prototype .period-tabs button.is-active { background-color:#111111; }
-.customer-prototype .mobile-status-tabs { --tone-line:#d5dee3; --tone-charcoal:#333333; }
+.customer-prototype .mobile-status-tabs { --tone-line:#d5dee3; --tone-charcoal:#000000; }
 .customer-prototype .push-history-item[data-push-category="other"] > svg { color:var(--linq-color-info); }
 .customer-prototype .push-history-item[data-push-category="shock"] > svg { color:var(--linq-color-warning); }
 /* The web guide retains brand orange for authentication primary actions. */
@@ -68,4 +68,21 @@ body.customer-prototype {
 .customer-prototype .error-service-item.is-state-danger .error-service-heading svg,
 .customer-prototype .push-history-item[data-push-category="error"] > svg {
   color:var(--customer-error-icon);
+}
+
+/* 2026-10-12: mobile main text and actual field values are black.
+   Preserve the former charcoal only where it is a fill or lookup placeholder;
+   muted descriptions, status/brand colors and white-on-dark text are unchanged. */
+body {
+  --customer-control-dark-fill:#333333;
+  --customer-lookup-placeholder:#333333;
+}
+body.mobile-type-compact :is(input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"]),textarea,select) {
+  color:var(--linq-color-text);
+}
+body.mobile-type-compact .login-field input::placeholder {
+  color:var(--customer-lookup-placeholder);
+}
+.customer-prototype .detail-secondary-button:not(:disabled):not([aria-disabled="true"]) {
+  color:var(--linq-color-text);
 }
