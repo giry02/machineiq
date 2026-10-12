@@ -3,7 +3,7 @@
    사용법:
      <body data-gnb="anlz" data-sub="usage" data-variant="tobe" data-base="../">
      <div id="gnb"></div>            ← GNB 자동 주입
-     <script src="../_shared/nav.js"></script>  (body 끝)
+     <script src="../_shared/nav.js?rev=font-black-20261012"></script>  (body 끝)
 
    MVP 메뉴 정책 (2026-08-05 확정 · 2026-08-13 보강)
      · asisOnly:true    → 현행(AS-IS)에만 존재. TO-BE GNB에서는 숨김.
@@ -322,7 +322,7 @@
     if (!document.querySelector('link[data-current-shell]')) {
       var shellCss = document.createElement('link');
       shellCss.rel = 'stylesheet';
-      shellCss.href = BASE + '_shared/current-shell.css?v=fc90bc42e4ac';
+      shellCss.href = BASE + '_shared/current-shell.css?v=fc90bc42e4ac&rev=font-black-20261012';
       MIQCommon.view.call(shellCss,"setAttribute",['data-current-shell','']);
       document.head.appendChild(shellCss);
     }
@@ -484,7 +484,7 @@
         if (accountModalLoading) return;
         accountModalLoading = true;
         var component = document.createElement('script');
-        component.src = BASE + '_shared/account-modal-component.js?rev=3ac6c198e198';
+        component.src = BASE + '_shared/account-modal-component.js?rev=font-black-20261012';
         component.dataset.base = BASE;
         component.addEventListener('load', function () {
           accountModalLoading = false;

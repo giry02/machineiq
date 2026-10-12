@@ -8,7 +8,7 @@
   --aae-brand: #ff3600;
   --aae-brand-dark: #c02801;
   --aae-brand-soft: #fff5f3;
-  --aae-ink: #333;
+  --aae-ink: #000000;
   --aae-muted: #767676;
   --aae-line: #dfdfdf;
   --aae-line-soft: #eaeaea;
@@ -481,7 +481,7 @@ body[data-account-page] *,
 .aae-app-header h1 { margin: 0; color: #fff; text-align: center; font-size: 19px; line-height: 26px; }
 .aae-app-back { width: 40px; height: 40px; border: 0; background: transparent; color: #fff; font-size: 24px; cursor: pointer; }
 .aae-app-language { width: 88px; height: 34px; padding: 0 8px; border: 1px solid rgba(255,255,255,.65); border-radius: 4px; background: #ff360d; color: #fff; font-size: 12px; font-weight: 700; }
-.aae-app-language option { color: #111; background: #fff; }
+.aae-app-language option { color: #000000; background: #fff; }
 
 body[data-registration-mode="app"] { background: #eef0f2; }
 body[data-registration-mode="app"] .aae-shell {

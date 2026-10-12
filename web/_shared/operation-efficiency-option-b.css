@@ -178,7 +178,7 @@ body.miq-operation-efficiency-b .efficiency-daily-summary__label {
 body.miq-operation-efficiency-b .efficiency-daily-summary__value {
   display: block;
   overflow: hidden;
-  color: var(--metrics-charcoal);
+  color: #000000;
   font-size: 19px;
   line-height: 26px;
   text-overflow: ellipsis;
@@ -236,7 +236,7 @@ body.miq-operation-efficiency-b .efficiency-daily-row:focus-visible {
 
 body.miq-operation-efficiency-b .efficiency-daily-row__date,
 body.miq-operation-efficiency-b .efficiency-daily-row__actual {
-  color: var(--metrics-charcoal);
+  color: #000000;
   font-size: 13px;
   line-height: 20px;
 }
@@ -301,7 +301,7 @@ body.miq-operation-efficiency-b .efficiency-daily-row__metrics em {
 }
 
 body.miq-operation-efficiency-b .efficiency-daily-row__metrics strong {
-  color: var(--metrics-charcoal);
+  color: #000000;
 }
 
 body.miq-operation-efficiency-b .efficiency-daily-row.is-empty .efficiency-daily-row__metrics {

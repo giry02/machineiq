@@ -12,7 +12,7 @@
     if (document.querySelector('link[data-miq-account-styles]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = base + '_shared/auth-account-enhancements.css?v=20260911-account-overlay';
+    link.href = base + '_shared/auth-account-enhancements.css?v=20260911-account-overlay&rev=font-black-20261012';
     link.dataset.miqAccountStyles = '';
     document.head.appendChild(link);
   }

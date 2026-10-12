@@ -322,7 +322,7 @@
     if (!document.querySelector('link[data-current-shell]')) {
       var shellCss = document.createElement('link');
       shellCss.rel = 'stylesheet';
-      shellCss.href = BASE + '_shared/current-shell.css?v=fc90bc42e4ac';
+      shellCss.href = BASE + '_shared/current-shell.css?v=fc90bc42e4ac&rev=font-black-20261012';
       MIQCommon.view.call(shellCss,"setAttribute",['data-current-shell','']);
       document.head.appendChild(shellCss);
     }
@@ -484,7 +484,7 @@
         if (accountModalLoading) return;
         accountModalLoading = true;
         var component = document.createElement('script');
-        component.src = BASE + '_shared/account-modal-component.js?rev=7e7885ee657c';
+        component.src = BASE + '_shared/account-modal-component.js?rev=font-black-20261012';
         component.dataset.base = BASE;
         component.addEventListener('load', function () {
           accountModalLoading = false;

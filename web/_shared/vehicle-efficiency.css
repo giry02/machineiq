@@ -10,7 +10,7 @@ body[data-efficiency-view="vehicle-rows"] .efficiency-daily-row {
   list-style: none;
 }
 body[data-efficiency-view="vehicle-rows"] summary::-webkit-details-marker { display: none; }
-.efficiency-vehicle-label { min-width: 0; color: var(--metrics-charcoal); }
+.efficiency-vehicle-label { min-width: 0; color: #000000; }
 .efficiency-vehicle-label strong { display: block; overflow-wrap: anywhere; font-size: 13px; line-height: 20px; }
 .efficiency-vehicle-label small { display: block; font-size: 11px; color: var(--metrics-muted); line-height: 18px; }
 body[data-efficiency-view="vehicle-rows"] .efficiency-daily-row__metrics { font-size: 13px; }
@@ -23,7 +23,7 @@ body[data-efficiency-view="vehicle-rows"] .efficiency-daily-row__metrics { font-
   gap: 12px; margin: 0; padding: 16px; background: #f7f8f9;
 }
 .efficiency-vehicle-detail dt { color: var(--metrics-muted); font-size: 11px; margin-bottom: 6px; }
-.efficiency-vehicle-detail dd { color: var(--metrics-charcoal); font-size: 13px; font-weight: 600; margin: 0; }
+.efficiency-vehicle-detail dd { color: #000000; font-size: 13px; font-weight: 600; margin: 0; }
 .efficiency-vehicle-empty { padding: 28px 16px; color: var(--metrics-muted); text-align: center; }
 @media (max-width: 1450px) {
   body[data-efficiency-view="vehicle-rows"] .efficiency-daily-axis,

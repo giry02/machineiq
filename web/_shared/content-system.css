@@ -10,10 +10,10 @@
 body.miq-content-system {
   --miq-content-brand: #ff3600;
   --miq-content-navy: #003263;
-  --miq-content-slate: #273247;
+  --miq-content-slate: #000000;
   --miq-content-slate-muted: #5a6579;
-  --miq-content-text-strong: #333;
-  --miq-content-text: #333;
+  --miq-content-text-strong: #000000;
+  --miq-content-text: #000000;
   --miq-content-muted: #767676;
   --miq-content-disabled: #999;
   --miq-content-line: var(--miq-line, #eaeaea);
@@ -276,7 +276,7 @@ body.miq-content-system .miq-status {
 }
 
 body.miq-content-system .miq-status.is-success { color: var(--miq-content-success); background: var(--miq-content-surface-soft); }
-body.miq-content-system .miq-status.is-warning { color: #333; background: var(--miq-content-surface-soft); }
+body.miq-content-system .miq-status.is-warning { color: #000000; background: var(--miq-content-surface-soft); }
 body.miq-content-system .miq-status.is-danger { color: var(--miq-content-danger); background: var(--miq-content-surface-soft); }
 body.miq-content-system .miq-status.is-muted { color: var(--miq-content-muted); background: var(--miq-content-surface-soft); }
 

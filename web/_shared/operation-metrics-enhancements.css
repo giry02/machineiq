@@ -42,7 +42,7 @@ body.miq-operation-metrics {
   --miq-content-slate: var(--metrics-charcoal);
   --miq-content-muted: var(--metrics-muted);
   --miq-content-control-line: var(--metrics-line);
-  color: var(--metrics-charcoal);
+  color: #000000;
   background: #fff;
   font-variant-numeric: tabular-nums;
 }
@@ -53,7 +53,7 @@ body.miq-operation-metrics .main {
 
 body.miq-operation-metrics .page-head__title {
   margin: 0;
-  color: var(--metrics-charcoal);
+  color: #000000;
   font-size: 24px;
   line-height: 32px;
 }
@@ -91,7 +91,7 @@ body.miq-operation-metrics .filter-bar input[readonly] {
 }
 
 body.miq-operation-metrics .filter-bar input:not([readonly]) {
-  color: var(--metrics-charcoal);
+  color: #000000;
   background: #fff;
   cursor: pointer;
 }
@@ -166,7 +166,7 @@ body.miq-operation-metrics .box__name,
 body.miq-operation-metrics .top5__t,
 body.miq-operation-metrics .chart-head__name,
 body.miq-operation-metrics .sub-head {
-  color: var(--metrics-charcoal);
+  color: #000000;
 }
 
 body.miq-operation-metrics .box__name::before,
@@ -249,12 +249,12 @@ body.miq-operation-metrics .tbl-wrap {
 }
 
 body.miq-operation-metrics .tbl th {
-  color: var(--metrics-charcoal);
+  color: #000000;
   background: #f1f1f1;
 }
 
 body.miq-operation-metrics .tbl td {
-  color: var(--metrics-charcoal);
+  color: #000000;
 }
 
 body.miq-operation-metrics .metrics-tip {
@@ -310,7 +310,7 @@ body.miq-operation-efficiency .metrics-section-head {
 
 body.miq-operation-efficiency .metrics-section-head h2 {
   margin: 0;
-  color: var(--metrics-charcoal);
+  color: #000000;
   font-size: 16px;
   line-height: 22px;
 }
@@ -333,7 +333,7 @@ body.miq-operation-efficiency .metrics-section-head p {
 }
 
 body.miq-operation-efficiency .efficiency-total {
-  color: var(--metrics-charcoal);
+  color: #000000;
   font-size: 18px;
   white-space: nowrap;
 }
@@ -406,7 +406,7 @@ body.miq-operation-efficiency .top5 li {
 }
 
 body.miq-operation-efficiency .top5 a {
-  color: var(--metrics-charcoal);
+  color: #000000;
   text-decoration: none;
 }
 
@@ -502,7 +502,7 @@ body.miq-usage-time .wt-bar {
 }
 
 body.miq-usage-time .wt-bar b {
-  color: var(--metrics-charcoal);
+  color: #000000;
 }
 
 body.miq-usage-time .wt-bar .seg {
@@ -511,7 +511,7 @@ body.miq-usage-time .wt-bar .seg {
 
 body.miq-usage-time .wt-bar .seg button {
   min-height: 32px;
-  color: var(--metrics-charcoal);
+  color: #000000;
   border-color: var(--metrics-line);
 }
 
@@ -521,12 +521,12 @@ body.miq-usage-time .wt-bar .seg button.active {
 }
 
 body.miq-usage-time .month-nav {
-  color: var(--metrics-charcoal);
+  color: #000000;
   font-size: 16px;
 }
 
 body.miq-usage-time .month-nav button {
-  color: var(--metrics-charcoal);
+  color: #000000;
   border-color: var(--metrics-line);
 }
 
@@ -559,7 +559,7 @@ body.miq-usage-time .stat-cells.c6 .cell.hl {
 }
 
 body.miq-usage-time .stat-cells .cell__v {
-  color: var(--metrics-charcoal) !important;
+  color: #000000 !important;
   font-size: 21px;
 }
 
@@ -671,7 +671,7 @@ body.miq-usage-time .stack-chart.is-animating .stk__seg {
 }
 
 body.miq-usage-time .cal__rate {
-  color: var(--metrics-charcoal) !important;
+  color: #000000 !important;
   font-size: 15px;
 }
 
@@ -707,7 +707,7 @@ body.miq-usage-time .dow-row {
 
 body.miq-usage-time .dow-row .k,
 body.miq-usage-time .dow-row .v {
-  color: var(--metrics-charcoal) !important;
+  color: #000000 !important;
 }
 
 body.miq-usage-time .dow-row .track {
@@ -747,7 +747,7 @@ body.miq-usage-time .usage-table-pane .box__tools {
 }
 
 body.miq-usage-time .modal .stat-cells .cell__v {
-  color: var(--metrics-charcoal) !important;
+  color: #000000 !important;
 }
 
 body.miq-usage-time .modal .stat-cells .cell:first-child .cell__v,
@@ -769,7 +769,7 @@ body.miq-usage-time .tip:focus-within .tip__box {
 }
 
 body.miq-usage-time .metrics-vehicle-link {
-  color: var(--metrics-charcoal);
+  color: #000000;
   text-decoration: none;
 }
 

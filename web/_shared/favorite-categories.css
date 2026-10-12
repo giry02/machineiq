@@ -13,7 +13,7 @@
 .favorite-move{display:flex;align-items:center;gap:8px;padding:12px;border-top:1px solid #eee;flex-wrap:wrap;margin-top:auto;font-size:12px}
 .favorite-move select{flex:1;min-width:130px}
 .favorite-category-name{font-size:12px;font-weight:400;color:#687586}
-#favoriteCategoryDialog,#favoriteCategoryEditor{--service-ink:#1a1a1a;--service-line:#dfdfdf;--service-brand:#ff3600;--service-brand-dark:#d92e00;--service-soft:#f8f9fa;width:480px}
+#favoriteCategoryDialog,#favoriteCategoryEditor{--service-ink:#000000;--service-line:#dfdfdf;--service-brand:#ff3600;--service-brand-dark:#d92e00;--service-soft:#f8f9fa;width:480px}
 #categoryFormStatus:empty{display:none}
 body.miq-current-shell[data-favorite-summary="true"] .miq-target-selector.is-hierarchy .miq-target-selector__row>.miq-target-selector__control{flex:1 1 0;min-width:0}
 body.miq-current-shell[data-favorite-summary="true"] .miq-target-selector.is-hierarchy .miq-target-selector__control>select{flex:1 1 0;width:100%;min-width:0}

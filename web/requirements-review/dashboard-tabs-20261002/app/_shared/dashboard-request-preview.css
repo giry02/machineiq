@@ -23,7 +23,7 @@
 .dr-preview .dc-entity-submit,.dr-preview #dcYearForm button{display:inline-flex;align-items:center;justify-content:center;gap:5px}
 .dr-preview .dc-state-labels .is-running .dr-icon{color:#ff3600}
 .dr-preview .dc-state-labels .is-idle .dr-icon,.dr-preview .dc-state-labels .is-offline .dr-icon{color:#7e8c96}
-.dr-tablist button[aria-selected=true]{color:#27343f;font-weight:700}
+.dr-tablist button[aria-selected=true]{color:#000000;font-weight:700}
 .dr-tablist button[aria-selected=true]::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:3px;border-radius:2px;background:#ff3600}
 .dr-panel{grid-column:1/-1;min-width:0;display:grid;grid-template-columns:minmax(0,1fr);gap:28px}
 .dr-panel[hidden]{display:none!important}

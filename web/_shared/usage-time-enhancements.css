@@ -28,7 +28,7 @@ body.miq-usage-time .usage-month-value {
   height: 38px;
   font-size: 16px;
   font-weight: 700;
-  color: var(--metrics-charcoal);
+  color: #000000;
   cursor: pointer;
 }
 
@@ -87,7 +87,7 @@ body.miq-usage-time .stat-cells.c3 .cell.hl {
 }
 
 body.miq-usage-time .stat-cells.c3 .cell__v {
-  color: var(--metrics-charcoal) !important;
+  color: #000000 !important;
   font-size: 24px;
   line-height: 30px;
 }
@@ -97,7 +97,7 @@ body.miq-usage-time .stat-cells.c3 .cell:first-child .cell__v {
 }
 
 body.miq-usage-time .stat-cells.c3 .cell.hl .cell__v {
-  color: var(--metrics-charcoal) !important;
+  color: #000000 !important;
 }
 
 body.miq-usage-time .stat-cells.c3 .cell__v small {
@@ -132,7 +132,7 @@ body.miq-usage-time .cal__dow.sat {
 
 body.miq-usage-time .cal__d.sun,
 body.miq-usage-time .cal__d.sat {
-  color: var(--metrics-charcoal);
+  color: #000000;
 }
 
 body.miq-usage-time .cal__day .empty {
@@ -169,7 +169,7 @@ body.miq-usage-time .ct__k {
 
 body.miq-usage-time .ct__v {
   margin-left: auto;
-  color: var(--metrics-charcoal);
+  color: #000000;
   font-size: 18px;
   font-weight: 700;
   letter-spacing: -.3px;

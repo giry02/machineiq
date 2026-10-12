@@ -149,7 +149,7 @@
       var list = node('div'); applyStyles(list, { maxHeight: '200px', overflowY: 'auto' });
       group.forEach(function (row) {
         var item = node('button', 'map-pop__r', present(row.model) + ' · ' + present(row.vin)); item.type = 'button';
-        applyStyles(item, { width: '100%', border: '0', background: 'transparent', textAlign: 'left', padding: '8px 0', cursor: 'pointer', color: '#333', fontFamily: 'inherit' });
+        applyStyles(item, { width: '100%', border: '0', background: 'transparent', textAlign: 'left', padding: '8px 0', cursor: 'pointer', color: '#000000', fontFamily: 'inherit' });
         item.addEventListener('click', function () { clearPopup(); if (typeof options.onSelect === 'function') options.onSelect(row.vin); });
         list.appendChild(item);
       });
@@ -206,7 +206,7 @@
           if (activeRoutePoint === marker && pointTip) return;
           clearPointTip(); var content = node('div', 'map-pop', pointDescription(point, index, points.length));
           MIQCommon.view.call(content,"setAttribute",['role','tooltip']);
-          applyStyles(content, { position: 'relative', whiteSpace: 'pre-line', fontFamily: "'Noto Sans KR', sans-serif", fontSize: '11px', lineHeight: '1.7', color: '#333', pointerEvents: 'none' });
+          applyStyles(content, { position: 'relative', whiteSpace: 'pre-line', fontFamily: "'Noto Sans KR', sans-serif", fontSize: '11px', lineHeight: '1.7', color: '#000000', pointerEvents: 'none' });
           pointTip = new DomOverlay(point, content, true); activeRoutePoint = marker;
         }
         marker.addEventListener('mouseenter', show); marker.addEventListener('focus', show); marker.addEventListener('click', show);

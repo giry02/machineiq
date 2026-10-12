@@ -10,7 +10,7 @@
 <script src="../_shared/customer-access.js?v=e12eedbcb072&amp;rev=e12eedbcb072"></script>
 <link rel="icon" type="image/x-icon" href="../_shared/favicon.ico"/>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
-<link rel="stylesheet" href="../_shared/mockup.css?v=bed1f0069135&amp;rev=bed1f0069135"/>
+<link rel="stylesheet" href="../_shared/mockup.css?v=bed1f0069135&amp;rev=1b84f0f6030b"/>
 <style>
 /* ── 페이지 전용 : 지표 카드 6종 · 지표 전환 · 일자별 막대(hover) ── */
 .filter-bar .inp--sm{width:116px;flex:0 0 auto;text-align:center}
@@ -21,7 +21,7 @@
 /* 지표 카드 : 값이 서로 겹치지 않도록 막대와 수치 영역을 분리한다 */
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px;margin-bottom:14px}
 .kpi{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:16px 16px 14px;text-align:center}
-.kpi__t{font-size:13px;font-weight:700;color:#333}
+.kpi__t{font-size:13px;font-weight:700;color:#000000}
 .kpi__d{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;border-radius:20px;padding:2px 9px;margin-top:8px}
 .kpi__d.up{background:#ffe8e3;color:#e03131}
 .kpi__d.down{background:#e7f0ff;color:#1c7ed6}
@@ -36,14 +36,14 @@
 .kpi__row{display:flex;align-items:baseline;gap:8px;font-size:12px}
 .kpi__row .k{display:inline-flex;align-items:center;gap:5px;color:#999}
 .kpi__row .k i{width:8px;height:8px;border-radius:2px;flex-shrink:0}
-.kpi__row .v{margin-left:auto;font-weight:700;color:#333;white-space:nowrap}
+.kpi__row .v{margin-left:auto;font-weight:700;color:#000000;white-space:nowrap}
 .kpi__row.prev .v{color:#999;font-weight:600}
 
 /* 지표 전환 */
 .metric-tabs{display:flex;border:1px solid #e0e0e0;border-radius:8px 8px 0 0;overflow:hidden;background:#fff;border-bottom:none}
 .metric-tabs button{flex:1;border:none;background:#fff;padding:13px 8px;font-size:13px;font-weight:600;color:#666;cursor:pointer;border-right:1px solid #eef0f2}
 .metric-tabs button:last-child{border-right:none}
-.metric-tabs button:hover{background:#fafbfc;color:#333}
+.metric-tabs button:hover{background:#fafbfc;color:#000000}
 .metric-tabs button.active{background:#1a1a1a;color:#fff}
 .chart-box{background:#fff;border:1px solid #e0e0e0;border-radius:0 0 8px 8px;padding:18px 20px;margin-bottom:14px}
 .chart-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
@@ -71,12 +71,12 @@
 .tip-box .r i{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
 .tip-box .r span{margin-left:auto;font-weight:700}
 </style>
-<link rel="stylesheet" href="../_shared/content-system.css?v=d8f94e7e5049&amp;rev=d8f94e7e5049"/>
-<link rel="stylesheet" href="../_shared/report-enhancements.css?v=dceeccfe9513&amp;rev=dceeccfe9513"/>
+<link rel="stylesheet" href="../_shared/content-system.css?v=d8f94e7e5049&amp;rev=ae90e4581dc8"/>
+<link rel="stylesheet" href="../_shared/report-enhancements.css?v=dceeccfe9513&amp;rev=f569bba7510c"/>
 <link rel="stylesheet" href="../_shared/chart-common.css?v=fc1c23dcf6af&amp;rev=fc1c23dcf6af"/>
-<link rel="stylesheet" href="../_shared/form-controls.css?v=6fda272acdcc&amp;rev=6fda272acdcc"/>
+<link rel="stylesheet" href="../_shared/form-controls.css?v=6fda272acdcc&amp;rev=9debe1b59fae"/>
 <link rel="stylesheet" href="../_shared/list-pagination.css?v=0069e48c1009&amp;rev=0069e48c1009">
-<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?v=eabe5a26bfe9&amp;rev=eabe5a26bfe9"/>
+<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?v=eabe5a26bfe9&amp;rev=0e55e64ed211"/>
 <link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?v=1cffa21a9777&amp;rev=1cffa21a9777"/>
 <style>body.miq-current-shell>#gnb{min-height:64px}</style>
 <script defer blocking="render" src="../_mock-data/generated/fleet.generated.js?v=52fa65a2dce1&amp;rev=52fa65a2dce1"></script>
@@ -87,7 +87,7 @@
 <script defer blocking="render" src="../_shared/report-series.js?v=c676889771d9&amp;rev=c676889771d9"></script>
 <script defer blocking="render" src="../_shared/list-pagination.js?v=4b500130528b&amp;rev=4b500130528b"></script>
 <script defer blocking="render" src="../_shared/fleet.js?v=b0f68e558a52&amp;rev=b0f68e558a52"></script>
-<script defer blocking="render" src="../_shared/nav.js?v=f5f9b1d00606&amp;rev=f3f3bc9b429c"></script>
+<script defer blocking="render" src="../_shared/nav.js?v=f5f9b1d00606&amp;rev=5ae862e16c37"></script>
 <script defer blocking="render" src="../_shared/report-scope.js?v=32a98349891b&amp;rev=32a98349891b"></script>
 <script type="module" blocking="render">
 /* ══════════════════════════════════════════════════════════════

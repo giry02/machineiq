@@ -10,9 +10,9 @@
 <script src="../_shared/customer-access.js?v=e12eedbcb072&amp;rev=e12eedbcb072"></script>
 <link rel="icon" type="image/x-icon" href="../_shared/favicon.ico"/>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
-<link rel="stylesheet" href="../_shared/mockup.css?v=bed1f0069135&amp;rev=bed1f0069135"/>
+<link rel="stylesheet" href="../_shared/mockup.css?v=bed1f0069135&amp;rev=1b84f0f6030b"/>
 <link rel="stylesheet" href="../_shared/list-controls.css?v=bbb25360b177&amp;rev=bbb25360b177"/>
-<link rel="stylesheet" href="../_shared/map-management-enhancements.css?v=04d0c0eb8994&amp;rev=04d0c0eb8994"/>
+<link rel="stylesheet" href="../_shared/map-management-enhancements.css?v=04d0c0eb8994&amp;rev=752e0eff1bd2"/>
 <style>
 .sort-o{color:#bbb;font-size:10px;margin-left:3px;cursor:pointer}
 .sort-o.on{color:#ff3600}
@@ -48,7 +48,7 @@
 .toast .bad{color:#ff8787;font-weight:700}
 .rj-reason{width:100%;min-height:74px;resize:vertical}
 .veh-target{display:flex;flex-wrap:wrap;gap:8px 18px;background:#f8fafc;border:1px solid #eceff3;border-radius:6px;padding:11px 14px;font-size:12px;color:#666}
-.veh-target b{color:#1a1a1a}
+.veh-target b{color:#000000}
 .veh-readonly-label{margin-left:auto;color:#7a838d;font-weight:600}
 #vehModal.is-readonly .shock-mode-choice{cursor:default}
 #vehModal.is-readonly .shock-mode-choice:hover{border-color:#dfe3e8}
@@ -61,7 +61,7 @@
 .shock-mode-choice.is-selected{border-color:#ff3600;background:#fff7f4;box-shadow:inset 0 0 0 1px #ff3600}
 .shock-mode-choice input{width:16px;height:16px;margin:2px 0 0;accent-color:#ff3600;cursor:pointer}
 .shock-mode-choice__body{display:flex;flex-direction:column;gap:3px;min-width:0;padding-right:42px}
-.shock-mode-choice__body strong{font-size:13px;color:#1f2933}
+.shock-mode-choice__body strong{font-size:13px;color:#000000}
 .shock-mode-choice__value{font-size:12px;font-weight:600;color:#4f5965;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .shock-mode-choice__body small{font-size:11px;line-height:1.45;color:#7a838d}
 .shock-mode-choice__state{visibility:hidden;position:absolute;top:12px;right:12px;color:#e9360b;font-size:11px;font-weight:700;white-space:nowrap}
@@ -69,7 +69,7 @@
 .shock-mode-help{display:block;margin-top:7px;font-size:11px;line-height:1.45;color:#6f7780}
 .shock-editor-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:17px 0 0;padding:0 1px}
 .shock-editor-head__title{display:flex;align-items:center;gap:8px;min-width:0}
-.shock-editor-head__title strong{font-size:12px;color:#333}
+.shock-editor-head__title strong{font-size:12px;color:#000000}
 .shock-editor-head__title span{font-size:11px;color:#7a838d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .shock-editor-state{display:inline-flex;align-items:center;height:22px;padding:0 8px;border:1px solid #d9dde2;border-radius:11px;background:#f7f8f9;color:#6f7780;font-size:10px;font-weight:700;white-space:nowrap}
 .shock-editor-state.is-editable{border-color:#ffb7a6;background:#fff5f2;color:#e9360b}
@@ -77,14 +77,14 @@
 #vehModal #vmRng.is-ro .rng__bar{filter:saturate(.55);opacity:.78}
 #vehModal #vmRng.is-ro .rng__h{box-shadow:none}
 .shock-save-summary{margin-top:10px!important;padding:9px 11px!important;border-left:3px solid #ff3600!important;background:#fff7f4!important;color:#525b65!important;line-height:1.5!important}
-.shock-save-summary b{color:#1f2933}
+.shock-save-summary b{color:#000000}
 .shock-apply-note{display:flex;align-items:flex-start;gap:8px;margin-top:9px;padding-top:9px;border-top:1px solid #eceff2;color:#777;font-size:11px;line-height:1.5}
 .shock-apply-note strong{flex:0 0 auto;color:#555}
 @media(max-width:720px){.shock-mode-grid{grid-template-columns:1fr}.shock-mode-choice{min-height:68px}.shock-editor-head__title span{display:none}}
 </style>
-<link rel="stylesheet" href="../_shared/form-controls.css?v=6fda272acdcc&amp;rev=6fda272acdcc"/>
+<link rel="stylesheet" href="../_shared/form-controls.css?v=6fda272acdcc&amp;rev=9debe1b59fae"/>
 <link rel="stylesheet" href="../_shared/list-pagination.css?v=0069e48c1009&amp;rev=0069e48c1009">
-<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?v=eabe5a26bfe9&amp;rev=eabe5a26bfe9"/>
+<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?v=eabe5a26bfe9&amp;rev=0e55e64ed211"/>
 <link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?v=1cffa21a9777&amp;rev=1cffa21a9777"/>
 <style>body.miq-current-shell>#gnb{min-height:64px}</style>
 <script defer blocking="render" src="../_mock-data/generated/fleet.generated.js?v=52fa65a2dce1&amp;rev=52fa65a2dce1"></script>
@@ -92,7 +92,7 @@
 <script defer blocking="render" src="../_shared/vehicle-observations.js?v=550edc6b3b85&amp;rev=b5e24277418e"></script>
 <script defer blocking="render" src="../_shared/meeting-model.js?v=48be9a58ad27&amp;rev=48be9a58ad27"></script>
 <script defer blocking="render" src="../_shared/list-pagination.js?v=4b500130528b&amp;rev=4b500130528b"></script>
-<script defer blocking="render" src="../_shared/nav.js?v=f5f9b1d00606&amp;rev=f3f3bc9b429c"></script>
+<script defer blocking="render" src="../_shared/nav.js?v=f5f9b1d00606&amp;rev=5ae862e16c37"></script>
 <script defer blocking="render" src="../_shared/management-list-header.js?v=e7b38983fee6&amp;rev=e7b38983fee6"></script>
 <script defer blocking="render" src="../_shared/shock-range.js?v=116d60080401&amp;rev=116d60080401"></script>
 <script type="module" blocking="render">

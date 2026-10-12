@@ -10,13 +10,13 @@
 <script src="../_shared/customer-access.js?v=e12eedbcb072&amp;rev=e12eedbcb072"></script>
 <link rel="icon" type="image/x-icon" href="../_shared/favicon.ico"/>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
-<link rel="stylesheet" href="../_shared/gnb.css?v=b9f0ddfcf14c&amp;rev=b9f0ddfcf14c"/>
+<link rel="stylesheet" href="../_shared/gnb.css?v=b9f0ddfcf14c&amp;rev=d6e9d1b776a5"/>
 <style>
 /* Wait for the current dashboard renderer before the first paint. */
 body:not(.dc-ready) #dashboardContent{visibility:hidden!important}
-:root{--bobcat-red:#ff3600;--bobcat-red-hover:#d92e00;--bobcat-red-active:#cc2b00;--bobcat-black:#1e1e1e;--bobcat-dark:#333;--bobcat-muted:#777;--bobcat-gray:#ccc;--bobcat-steel:#d5dee3;--bobcat-light:#f1f1f1;--bobcat-positive:#158737;--bobcat-success:#0aa656;--bobcat-warning:#ff9f0a;--bobcat-danger:#992100;--bobcat-info:#17a2b8}
+:root{--bobcat-red:#ff3600;--bobcat-red-hover:#d92e00;--bobcat-red-active:#cc2b00;--bobcat-black:#1e1e1e;--bobcat-dark:#000000;--bobcat-muted:#777;--bobcat-gray:#ccc;--bobcat-steel:#d5dee3;--bobcat-light:#f1f1f1;--bobcat-positive:#158737;--bobcat-success:#0aa656;--bobcat-warning:#ff9f0a;--bobcat-danger:#992100;--bobcat-info:#17a2b8}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Noto Sans KR',sans-serif;font-size:14px;background:var(--bobcat-light);color:var(--bobcat-dark)}
+body{font-family:'Noto Sans KR',sans-serif;font-size:14px;background:var(--bobcat-light);color:#000000}
 button,input,select{font:inherit}
 button{cursor:pointer}
 
@@ -34,14 +34,14 @@ body.miq-content-dashboard[data-gnb="dash"][data-sub="group"]>.miq-target-select
 .dashboard-stack{display:grid;gap:22px}
 .dashboard-section{display:grid;gap:12px;min-width:0}
 .section-heading{display:flex;align-items:center;gap:12px;min-height:30px}
-.section-heading h2{display:flex;align-items:center;gap:8px;color:var(--bobcat-dark);font-size:18px;line-height:26px}
+.section-heading h2{display:flex;align-items:center;gap:8px;color:#000000;font-size:18px;line-height:26px}
 .section-heading h2::before{content:'';width:3px;height:18px;flex:0 0 3px;border-radius:2px;background:var(--bobcat-red)}
 .section-heading p{color:var(--bobcat-muted);font-size:12px;line-height:18px}
 .section-heading__actions{margin-left:auto}
 
 .dashboard-panel{overflow:hidden;background:#fff;border:1px solid var(--bobcat-steel);border-radius:8px}
 .panel-heading{display:flex;align-items:center;min-height:42px;padding:0 18px;border-bottom:1px solid var(--bobcat-steel);background:var(--bobcat-light)}
-.panel-heading h3{color:var(--bobcat-dark);font-size:15px;line-height:22px}
+.panel-heading h3{color:#000000;font-size:15px;line-height:22px}
 .panel-heading p{margin-left:10px;color:var(--bobcat-muted);font-size:12px;line-height:18px}
 .panel-heading__meta{margin-left:auto;color:var(--bobcat-muted);font-size:12px;line-height:18px}
 
@@ -51,10 +51,10 @@ body.miq-content-dashboard[data-gnb="dash"][data-sub="group"]>.miq-target-select
 .period-tabs{display:flex;overflow:hidden;border:1px solid var(--bobcat-steel);border-radius:4px;background:#fff}
 .period-tabs button{height:40px;padding:0 16px;border:0;border-right:1px solid var(--bobcat-steel);background:#fff;color:var(--bobcat-muted);font-size:13px}
 .period-tabs button:last-child{border-right:0}
-.period-tabs button:hover{background:var(--bobcat-light);color:var(--bobcat-dark)}
+.period-tabs button:hover{background:var(--bobcat-light);color:#000000}
 .period-tabs button.active{background:var(--bobcat-black);color:#fff;font-weight:700}
 .date-range{display:flex;align-items:center;gap:5px;height:40px;padding:0 12px;border:1px solid var(--bobcat-steel);border-radius:4px;background:#fff;color:var(--bobcat-muted);font-size:13px;white-space:nowrap}
-.date-range input{width:130px;height:34px;padding:0 5px;border:0;background:transparent;color:var(--bobcat-dark);font-size:13px;outline:0}
+.date-range input{width:130px;height:34px;padding:0 5px;border:0;background:transparent;color:#000000;font-size:13px;outline:0}
 .dashboard-period .btn-search{height:40px!important;min-height:40px!important;padding:0 18px!important;border:1px solid var(--bobcat-red-hover)!important;border-radius:4px;background:var(--bobcat-red-hover)!important;color:#fff;font-size:14px;font-weight:700}
 .dashboard-period .btn-search:hover{border-color:var(--bobcat-red-active)!important;background:var(--bobcat-red-active)!important}
 .dashboard-period .btn-search:active{border-color:#bf2900!important;background:#bf2900!important}
@@ -74,15 +74,15 @@ body.miq-content-dashboard[data-gnb="dash"][data-sub="group"]>.miq-target-select
 }
 .live-chip[hidden],.dashboard-updated[hidden]{display:none}
 </style>
-<link rel="stylesheet" href="../_shared/content-system.css?v=d8f94e7e5049&amp;rev=d8f94e7e5049"/>
+<link rel="stylesheet" href="../_shared/content-system.css?v=d8f94e7e5049&amp;rev=ae90e4581dc8"/>
 <link rel="stylesheet" href="../_shared/dashboard-deeplinks.css?v=b1960113c8ea&amp;rev=b1960113c8ea"/>
 <link rel="stylesheet" href="../_shared/chart-common.css?v=fc1c23dcf6af&amp;rev=fc1c23dcf6af"/>
-<link rel="stylesheet" href="../_shared/form-controls.css?v=6fda272acdcc&amp;rev=6fda272acdcc"/>
-<link rel="stylesheet" href="../_shared/dashboard-canvas-preview.css?v=37514fa526ff&amp;rev=37514fa526ff"/>
+<link rel="stylesheet" href="../_shared/form-controls.css?v=6fda272acdcc&amp;rev=9debe1b59fae"/>
+<link rel="stylesheet" href="../_shared/dashboard-canvas-preview.css?v=37514fa526ff&amp;rev=01276470b128"/>
 <link rel="stylesheet" href="../_shared/dashboard-usage-variants-preview.css?v=3388b490a09b&amp;rev=3388b490a09b"/>
 <link rel="stylesheet" href="../_shared/dashboard-work-idle-compact.css?v=55ec63c18d2f&amp;rev=55ec63c18d2f"/>
 <link rel="stylesheet" href="../_shared/list-pagination.css?v=0069e48c1009&amp;rev=0069e48c1009">
-<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?v=eabe5a26bfe9&amp;rev=eabe5a26bfe9"/>
+<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?v=eabe5a26bfe9&amp;rev=0e55e64ed211"/>
 <link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?v=1cffa21a9777&amp;rev=1cffa21a9777"/>
 <style>body.miq-current-shell>#gnb{min-height:64px}</style>
 <script defer blocking="render" src="../_mock-data/generated/fleet.generated.js?v=52fa65a2dce1&amp;rev=52fa65a2dce1"></script>
@@ -91,7 +91,7 @@ body.miq-content-dashboard[data-gnb="dash"][data-sub="group"]>.miq-target-select
 <script defer blocking="render" src="../_shared/meeting-model.js?v=48be9a58ad27&amp;rev=48be9a58ad27"></script>
 <script defer blocking="render" src="../_shared/chart-common.js?v=28a8b1161c0e&amp;rev=28a8b1161c0e"></script>
 <script defer blocking="render" src="../_shared/list-pagination.js?v=4b500130528b&amp;rev=4b500130528b"></script>
-<script defer blocking="render" src="../_shared/nav.js?v=f5f9b1d00606&amp;rev=8dff5d1a10e2"></script>
+<script defer blocking="render" src="../_shared/nav.js?v=f5f9b1d00606&amp;rev=5ae862e16c37"></script>
 <script defer blocking="render" src="../_shared/dashboard-company-model.js?v=1600590975b7&amp;rev=1600590975b7"></script>
 <script defer blocking="render" src="../_shared/service-demo-data.js?v=dcd01d3f4b36&amp;rev=dcd01d3f4b36"></script>
 <script defer blocking="render" src="../_shared/service-records.js?v=057b92280fec&amp;rev=057b92280fec"></script>

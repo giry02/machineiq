@@ -1,5 +1,5 @@
 /* Standalone dashboard preview. Shared navigation and source controllers stay intact. */
-.dc-canvas{--dc-ink:#27343f;--dc-muted:#667785;--dc-line:#e8ecf0;--dc-orange:#ff3600;--dc-green:#0aa656;--dc-radius:10px;--dc-fault:#df3b43;--dc-need:#ed5427;--dc-soon:#bd8508;background:#f5f6f8}
+.dc-canvas{--dc-ink:#000000;--dc-muted:#667785;--dc-line:#e8ecf0;--dc-orange:#ff3600;--dc-green:#0aa656;--dc-radius:10px;--dc-fault:#df3b43;--dc-need:#ed5427;--dc-soon:#bd8508;background:#f5f6f8}
 .dc-canvas .main.dashboard-main{padding:18px 20px 30px!important;min-width:0;background:#f5f6f8!important;color:var(--dc-ink)}
 .dc-canvas .dashboard-content{padding:0!important;max-width:none!important;container-name:dashboard-content;container-type:inline-size;font-variant-numeric:tabular-nums}
 .dc-canvas .dc-source{display:none!important}.dc-canvas .dashboard-stack,.dc-canvas .dashboard-period{display:contents}

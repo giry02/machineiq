@@ -13,13 +13,13 @@ body.miq-report-enhanced {
   --report-warning: #ff9f0a;
   --report-danger: #992100;
   --report-info: #17a2b8;
-  color: var(--report-charcoal);
+  color: #000000;
   font-variant-numeric: tabular-nums;
 }
 
 body.miq-report-enhanced .page-head { margin-bottom: 14px; }
 body.miq-report-enhanced .page-head__title {
-  color: var(--report-charcoal);
+  color: #000000;
   font-size: 24px;
   font-weight: 700;
   line-height: 32px;
@@ -29,7 +29,7 @@ body.miq-report-enhanced .filter-bar .co-k { color: #5f6670; font-size: 13px; fo
 body.miq-report-enhanced .filter-bar .co-hint { color: #767676; font-size: 12px; }
 body.miq-report-enhanced .filter-bar .inp--sm {
   min-height: 40px;
-  color: var(--report-charcoal);
+  color: #000000;
   font-size: 13px;
 }
 
@@ -72,7 +72,7 @@ body.miq-report-enhanced .miq-report-company-controls .co-item { display: inline
 body.miq-report-enhanced .miq-report-company-controls select {
   min-height: 34px;
   border-color: var(--report-line);
-  color: var(--report-charcoal);
+  color: #000000;
   font-size: 13px;
 }
 body.miq-report-enhanced .miq-report-company-controls.is-single select {
@@ -137,8 +137,8 @@ body.miq-report-enhanced .kpi__vals {
 }
 body.miq-report-enhanced .kpi__row { min-width: 0; color: #767676; font-size: 12px; line-height: 18px; }
 body.miq-report-enhanced .kpi__row .k { min-width: 0; color: #767676; }
-body.miq-report-enhanced .kpi__row .v { overflow: hidden; color: var(--report-charcoal); font-size: 14px; text-overflow: ellipsis; }
-body.miq-report-enhanced .kpi__row.cur .v { color: var(--report-charcoal); font-size: 15px; }
+body.miq-report-enhanced .kpi__row .v { overflow: hidden; color: #000000; font-size: 14px; text-overflow: ellipsis; }
+body.miq-report-enhanced .kpi__row.cur .v { color: #000000; font-size: 15px; }
 body.miq-report-enhanced .kpi__row.cur .k i { background: var(--report-brand) !important; }
 
 /* 업체별 현황 6열은 유지하되 1280px에서도 지표명을 자르지 않는다. */
@@ -183,7 +183,7 @@ body.miq-report-enhanced .hm-box {
   padding: 16px 18px;
 }
 body.miq-report-enhanced .chart-head__name,
-body.miq-report-enhanced .hm-head__name { color: var(--report-charcoal); font-size: 15px; line-height: 22px; }
+body.miq-report-enhanced .hm-head__name { color: #000000; font-size: 15px; line-height: 22px; }
 body.miq-report-enhanced .lg,
 body.miq-report-enhanced .hm-lg,
 body.miq-report-enhanced .chart-hint,
@@ -203,7 +203,7 @@ body.miq-report-enhanced .line-chart text { fill: #767676; font-size: 12px; }
 body.miq-report-enhanced .bar-chart,
 body.miq-report-enhanced .line-chart { height: 310px; }
 
-body.miq-report-enhanced .cmp-tbl { color: var(--report-charcoal); font-size: 14px; }
+body.miq-report-enhanced .cmp-tbl { color: #000000; font-size: 14px; }
 body.miq-report-enhanced .cmp-tbl th {
   height: 44px;
   padding-top: 0;
@@ -214,7 +214,7 @@ body.miq-report-enhanced .cmp-tbl th {
 }
 body.miq-report-enhanced .cmp-tbl td { height: 48px; padding-top: 0; padding-bottom: 0; font-size: 14px; }
 body.miq-report-enhanced .cmp-tbl td.best {
-  color: var(--report-charcoal);
+  color: #000000;
   background: var(--report-tint);
   font-weight: 800;
   box-shadow: inset 0 -2px 0 var(--report-brand);
@@ -258,11 +258,11 @@ body.miq-report-enhanced .hm__c {
 body.miq-report-enhanced .hm__c.b0 { background: #fff1ed; color: #6f4a40; }
 body.miq-report-enhanced .hm__c.b1 { background: #ffd4c9; color: #56362f; }
 body.miq-report-enhanced .hm__c.b2 { background: #ff8f73; color: #2b211f; }
-body.miq-report-enhanced .hm__c.b3 { background: var(--report-brand); color: #1a1a1a; }
+body.miq-report-enhanced .hm__c.b3 { background: var(--report-brand); color: #000000; }
 body.miq-report-enhanced .hm__c.na { background: var(--report-soft); color: #767676; }
 body.miq-report-enhanced .hm__c.on,
 body.miq-report-enhanced .hm__c:focus-visible { outline: 2px solid var(--report-charcoal); outline-offset: -2px; }
-body.miq-report-enhanced .hm__rh { color: var(--report-charcoal); font-size: 12px; }
+body.miq-report-enhanced .hm__rh { color: #000000; font-size: 12px; }
 body.miq-report-enhanced .hm__x { color: #767676; font-size: 11px; }
 
 body.miq-report-enhanced .tip-box { font-size: 12px; line-height: 1.65; }

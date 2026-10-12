@@ -1,6 +1,6 @@
 .vehicle-errors .sec-head{justify-content:space-between}
 .vehicle-errors-count{font-size:13px;color:#768396}
-.vehicle-errors-count b{color:#111}
+.vehicle-errors-count b{color:#000000}
 .vehicle-errors .table-wrap{margin:18px 22px 24px;border:1px solid #dfdfdf;border-radius:8px;overflow:auto}
 .vehicle-errors table{width:100%;min-width:760px;border-collapse:collapse;table-layout:fixed;font-size:13px}
 .vehicle-errors th{background:#f3f4f5;color:#687586;font-size:12px;font-weight:600;padding:11px 8px;border-bottom:1px solid #dfdfdf;text-align:center;white-space:nowrap}
@@ -24,5 +24,5 @@
 .vehicle-errors .pdf{border:1px solid #ffd8cf;background:#fff;color:#ff3600;border-radius:4px;padding:5px 10px;font-size:11px;cursor:pointer}
 .vehicle-errors .pdf:hover{background:#fff5f3;border-color:#ff3600}
 .vehicle-errors td.vehicle-errors-empty{height:120px;color:#768396}
-#vehicleErrorDocument{--service-ink:#1a1a1a;--service-line:#dfdfdf;--service-brand:#ff3600;--service-brand-dark:#d92e00;--service-soft:#f8f9fa}
+#vehicleErrorDocument{--service-ink:#000000;--service-line:#dfdfdf;--service-brand:#ff3600;--service-brand-dark:#d92e00;--service-soft:#f8f9fa}
 @media print{body.is-printing-vehicle-error>*:not(#vehicleErrorDocument){display:none!important}body.is-printing-vehicle-error #vehicleErrorDocument{position:static;display:block;width:100%;max-height:none;border:0;box-shadow:none}body.is-printing-vehicle-error .service-dialog__foot,body.is-printing-vehicle-error .service-dialog__close{display:none}}

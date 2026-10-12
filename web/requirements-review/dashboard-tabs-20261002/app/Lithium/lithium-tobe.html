@@ -10,7 +10,7 @@
 <script src="../_shared/customer-access.js?v=e12eedbcb072&amp;rev=e12eedbcb072"></script>
 <link rel="icon" type="image/x-icon" href="../_shared/favicon.ico"/>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
-<link rel="stylesheet" href="../_shared/mockup.css?v=bed1f0069135&amp;rev=bed1f0069135"/>
+<link rel="stylesheet" href="../_shared/mockup.css?v=bed1f0069135&amp;rev=1b84f0f6030b"/>
 <style>
 /* ── 페이지 전용 : 차량 1대 상세 레이아웃 (차량 상세 → 에너지 상세 정보에서 진입) ── */
 .veh-pick{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px;color:#888}
@@ -37,13 +37,13 @@
 .st-item__v.bad{color:#e03131}
 .li-est{display:flex;gap:14px;flex-wrap:wrap}
 .est{flex:1;min-width:280px;background:#f8f9fa;border:1px solid #edeef0;border-radius:8px;padding:12px 16px}
-.est__t{font-size:14px;font-weight:600;color:#333;margin-bottom:6px}
+.est__t{font-size:14px;font-weight:600;color:#000000;margin-bottom:6px}
 .est__t b{color:#ff3600}
 .est__kv{display:flex;gap:16px;flex-wrap:wrap;font-size:11px;color:#888}
-.est__kv b{color:#333;font-size:12px}
+.est__kv b{color:#000000;font-size:12px}
 .li-foot{font-size:11px;color:#aaa}
 .soh-side{width:120px;flex-shrink:0;border-left:1px solid #f1f3f5;padding-left:18px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
-.soh-side__t{font-size:13px;font-weight:700;color:#333;line-height:1.4}
+.soh-side__t{font-size:13px;font-weight:700;color:#000000;line-height:1.4}
 .soh-cell{position:relative;width:52px;height:104px;border:2px solid #333;border-radius:6px;padding:4px;display:flex;flex-direction:column-reverse}
 .soh-cell::after{content:'';position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:20px;height:5px;background:#333;border-radius:3px 3px 0 0}
 .soh-cell__fill{width:100%;border-radius:3px;background:linear-gradient(#37b24d,#69db7c);display:flex;align-items:center;justify-content:center}
@@ -82,11 +82,11 @@
 .line-chart .thr-max{stroke:#e03131;stroke-width:1;stroke-dasharray:4 3}
 .empty-cell{color:#e03131;font-weight:700}
 </style>
-<link rel="stylesheet" href="../_shared/smart-charge.css?v=9cb9c65ed2fc&amp;rev=9cb9c65ed2fc"/>
+<link rel="stylesheet" href="../_shared/smart-charge.css?v=9cb9c65ed2fc&amp;rev=c4d0d04bed5a"/>
 <link rel="stylesheet" href="../_shared/chart-common.css?v=fc1c23dcf6af&amp;rev=fc1c23dcf6af"/>
-<link rel="stylesheet" href="../_shared/form-controls.css?v=6fda272acdcc&amp;rev=6fda272acdcc"/>
+<link rel="stylesheet" href="../_shared/form-controls.css?v=6fda272acdcc&amp;rev=9debe1b59fae"/>
 <link rel="stylesheet" href="../_shared/list-pagination.css?v=0069e48c1009&amp;rev=0069e48c1009">
-<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?v=eabe5a26bfe9&amp;rev=eabe5a26bfe9"/>
+<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?v=eabe5a26bfe9&amp;rev=0e55e64ed211"/>
 <link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?v=1cffa21a9777&amp;rev=1cffa21a9777"/>
 <style>body.miq-current-shell>#gnb{min-height:64px}</style>
 <script defer blocking="render" src="../_mock-data/generated/fleet.generated.js?v=52fa65a2dce1&amp;rev=52fa65a2dce1"></script>
@@ -96,7 +96,7 @@
 <script defer blocking="render" src="../_shared/chart-common.js?v=28a8b1161c0e&amp;rev=28a8b1161c0e"></script>
 <script defer blocking="render" src="../_shared/list-pagination.js?v=4b500130528b&amp;rev=4b500130528b"></script>
 <script defer blocking="render" src="../_shared/fleet.js?v=b0f68e558a52&amp;rev=b0f68e558a52"></script>
-<script defer blocking="render" src="../_shared/nav.js?v=f5f9b1d00606&amp;rev=f3f3bc9b429c"></script>
+<script defer blocking="render" src="../_shared/nav.js?v=f5f9b1d00606&amp;rev=5ae862e16c37"></script>
 <script defer blocking="render" src="../_shared/lnb-tree.js?v=92f5ceffdd3b&amp;rev=92f5ceffdd3b"></script>
 <script defer blocking="render" src="../_shared/lithium-list-model.js?v=ad33389c02d5&amp;rev=ad33389c02d5"></script>
 <script type="module" blocking="render">

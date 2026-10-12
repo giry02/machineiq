@@ -155,7 +155,7 @@
         if (cell) cell.hidden = true;
         if (value) {
           MIQCommon.view.set(value,"textContent",hasNumber(energyValue) ? number(energyValue, 1) + 'ℓ/H' : '수집 전');
-          value.style.color = hasNumber(energyValue) ? '#333' : '#767676';
+          value.style.color = hasNumber(energyValue) ? '#000000' : '#767676';
         }
       } else if (!hasNumber(energyValue)) {
         if (cell) cell.hidden = false;
