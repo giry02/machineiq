@@ -127,10 +127,15 @@
     // Keep the existing history; add today's completed occurrences using the same web fixture rules.
     const today=prepared(TODAY)?{maintenance:[],error:[]}:W.demo.create(sourceFleet,TODAY);
     const current=today.error.filter(r=>r.dateTime<SNAPSHOT);
-    const maintenance=today.maintenance.filter(r=>r.dateTime<SNAPSHOT);
+    // Explicit MOBILE repairs remain the only repair examples after the review
+    // window ends. Do not recreate one repair per VIN for yesterday/today.
+    // Error fixtures, pre-review history and the shared WEB source stay intact.
+    const explicitRepairs=demoData?.kind==='explicit-mobile-demo'&&TODAY>=demoData.from;
+    const previousMaintenance=explicitRepairs?[]:generated.maintenance;
+    const maintenance=explicitRepairs?[]:today.maintenance.filter(r=>r.dateTime<SNAPSHOT);
     const allowed=new Set(sourceFleet.map(v=>v.vin));
     const review=(demoData?.history||[]).filter(r=>allowed.has(r.vin)&&r.dateTime<SNAPSHOT).map(r=>r.completedAt&&r.completedAt>=SNAPSHOT?{...r,...(r.kind==='maintenance'?{completed:false}:{errorState:'current'}),completedAt:null}:r);
-    return W.legacy.concat(generated.maintenance,generated.error,current,maintenance,review);
+    return W.legacy.concat(previousMaintenance,generated.error,current,maintenance,review);
   }
   // Local status adapter: confirmed zero is idle; absent/invalid samples are unknown.
   // Connection freshness belongs to the server; do not infer it from the page clock.

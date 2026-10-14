@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const app=path.resolve(process.argv[2]||path.join(__dirname,'..'));
 const read=file=>fs.readFileSync(path.join(app,file),'utf8');
-const harnessSource=fs.readFileSync(path.join(__dirname,'harness.js'),'utf8');
+const harnessSource=fs.readFileSync(path.join(__dirname,'helpers/customer-mobile-harness.js'),'utf8');
 function load(date,hour,withDemo=true){
   const stamp=date+'T'+String(hour).padStart(2,'0')+':37:00+09:00';
   class Clock extends Date{constructor(...args){super(...(args.length?args:[stamp]));}static now(){return new Date(stamp).getTime();}}
@@ -13,13 +13,18 @@ function load(date,hour,withDemo=true){
   return {context,M,rows:M.buildVehicles(fleet),home:context.window.CustomerHomeView,harness};
 }
 const seed=load('2026-10-02',8),demo=seed.context.window.CustomerDemoData;
-assert.equal(demo.measuredTelemetry,false);assert.equal(demo.to,'2026-10-11');assert.equal(demo.days.length,143);assert.equal(demo.history.length,28);
-assert.equal(demo.history.filter(r=>r.kind==='maintenance'&&r.date.startsWith('2026-09')).length,6);
+assert.equal(demo.measuredTelemetry,false);assert.equal(demo.to,'2026-10-11');assert.equal(demo.days.length,143);assert.equal(demo.history.length,19);
+const septemberRepairs=demo.history.filter(r=>r.kind==='maintenance'&&r.date.startsWith('2026-09'));
+assert.equal(septemberRepairs.length,3);
+assert.deepEqual(Array.from(septemberRepairs,r=>r.date),['2026-09-05','2026-09-16','2026-09-29']);
 const octoberRepairs=demo.history.filter(r=>r.kind==='maintenance'&&r.date.startsWith('2026-10'));
-assert.equal(octoberRepairs.length,11,'One October repair per day across all 13 vehicles');
-assert.equal(new Set(octoberRepairs.map(r=>r.vin)).size,11,'Spread repairs across VINs instead of repeating every vehicle');
+const repairDays=['2026-10-01','2026-10-04','2026-10-07','2026-10-09','2026-10-11'];
+assert.equal(octoberRepairs.length,5,'Five explicitly scheduled October repairs, not one repair per day or per VIN');
+assert.deepEqual(Array.from(octoberRepairs,r=>r.date),repairDays);
+assert.equal(new Set(octoberRepairs.map(r=>r.vin)).size,5,'Spread the five repairs across VINs instead of repeating every vehicle');
 assert(octoberRepairs.some(r=>r.completed)&&octoberRepairs.some(r=>!r.completed));
-for(const date of new Set(demo.days.map(r=>r.date)))assert.equal(octoberRepairs.filter(r=>r.date===date).length,1);
+assert.deepEqual(Array.from(octoberRepairs.filter(r=>!r.completed),r=>r.date),['2026-10-04','2026-10-11']);
+for(const date of new Set(demo.days.map(r=>r.date)))assert.equal(octoberRepairs.filter(r=>r.date===date).length,repairDays.includes(date)?1:0);
 assert.equal(demo.days.filter(r=>r.fixture==='customer-long-waiting-review-20261006').length,22);
 assert.equal(demo.history.filter(r=>r.kind==='error').length,11);
 assert.equal(demo.days.filter(r=>r.shockCount>0).length,4);
@@ -127,9 +132,9 @@ screen.click({serviceVehicle:engine.equipmentId,kind:'engine'});assert(screen.ur
 const baseline=load('2026-09-30',14,false),configured=load('2026-09-30',14,true);
 for(const role of ['customer_owner','customer_staff']){
  const scoped=seed.M.scope(seed.rows,{role}),records=seed.M.serviceRecords(scoped,{kind:'maintenance',from:'2026-09-01',to:'2026-09-30'});
- assert.equal(records.length,role==='customer_owner'?6:3,'September repairs obey role scope');
+ assert.equal(records.length,role==='customer_owner'?3:1,'September repairs obey role scope');
  if(role==='customer_owner')assert(records.some(r=>r.resolved)&&records.some(r=>!r.resolved));
- else assert(records.every(r=>r.resolved),'Staff sees only the three completed repairs in the assigned group');
+ else assert(records.every(r=>r.resolved),'Staff sees only the one retained completed repair in the assigned group');
  const list=seed.harness('#services?role='+role+'&service=maintenance&servicePeriod=m&serviceFrom=2026-09-01&serviceTo=2026-09-30');
  assert.equal((list.html().match(/data-kind="maintenance" data-entry=/g)||[]).length,records.length);
 }
@@ -141,14 +146,61 @@ seed.context.sessionStorage.getItem=()=>JSON.stringify(saved);
 const store=seed.M.createApprovalStore(rows);assert(store.find('saved-row','customer_owner'));assert.equal(store.list('customer_owner').filter(r=>r.id==='MOBILE-DEMO-REJECTED').length,1);assert.equal(store.list('customer_owner').filter(r=>r.id==='MOBILE-DEMO-REJECTED').length,1);
 const october8=load('2026-10-08',16),monthRows=october8.M.scope(october8.rows,{role:'customer_owner'});
 const monthRepairs=october8.M.serviceRecords(monthRows,{kind:'maintenance',from:'2026-10-01',to:'2026-10-31'});
-assert.equal(monthRepairs.length,8,'October 8 month query has eight repairs, not 208');
+assert.equal(monthRepairs.length,3,'October 8 month query has only the three repairs that have occurred');
 assert(monthRepairs.some(r=>r.resolved)&&monthRepairs.some(r=>!r.resolved));
 const monthScreen=october8.harness('#services?role=customer_owner&service=maintenance&servicePeriod=m&serviceFrom=2026-10-01&serviceTo=2026-10-31');
-assert.equal((monthScreen.html().match(/data-kind="maintenance" data-entry=/g)||[]).length,8);
-assert(monthScreen.html().includes('<span>수리이력</span><strong>8</strong>'));
+assert.equal((monthScreen.html().match(/data-kind="maintenance" data-entry=/g)||[]).length,3);
+assert(monthScreen.html().includes('<span>수리이력</span><strong>3</strong>'));
 for(const entry of monthRepairs){
   const vehicle=monthRows.find(v=>v.equipmentId===entry.equipmentId);
   monthScreen.click({serviceVehicle:vehicle.equipmentId,kind:'maintenance',entry:entry.id});
   assert(monthScreen.url().includes('#maintenance?'));assert(monthScreen.html().includes(entry.label),'Remaining repair detail is accessible');
 }
-console.log('PASS prepared mobile demo: '+cases+' day/hour/role cases through Oct 11; September 6 repairs + October 11, Oct 8 month count/list/detail 8, 2 daily long-waiting cases, 11 sparse errors/4 warning-shock days, <=22 notifications, scope/time cutoff, map positions, work/idle totals, 3 KPIs, engine L/H and rejected customer example.');
+// The explicit review period ending must never re-enable one repair on every
+// vehicle yesterday/today. Check both the historical October query and current
+// month, including tomorrow, month-end and the following month.
+let fallbackCases=0;
+for(const date of ['2026-10-12','2026-10-13','2026-10-14','2026-10-15','2026-10-31','2026-11-01','2026-11-30'])for(const hour of [0,16]){
+  const sample=load(date,hour),{M,rows,harness}=sample;
+  const currentFrom=date.slice(0,8)+'01';
+  const currentTo=new Date(Date.UTC(Number(date.slice(0,4)),Number(date.slice(5,7)),0)).toISOString().slice(0,10);
+  for(const role of ['customer_owner','customer_staff']){
+    const scoped=M.scope(rows,{role}),allowed=new Set(scoped.map(v=>v.equipmentId)),expectedOctober=role==='customer_owner'?5:2;
+    const allRepairs=M.serviceHistory(scoped).filter(r=>r.kind==='maintenance');
+    assert(allRepairs.every(r=>r.occurredAt.slice(0,10)<=demo.to),'After the prepared window there are no synthesized current/yesterday repairs');
+    assert(allRepairs.every(r=>allowed.has(r.equipmentId)),'Repair history remains inside the role scope');
+    assert.equal(M.serviceRecords(scoped,{kind:'maintenance',from:date,to:date}).length,0,'A later day does not manufacture repairs on the fleet');
+    for(const [from,to,expected] of [
+      ['2026-10-01','2026-10-31',expectedOctober],
+      [currentFrom,currentTo,date.startsWith('2026-10')?expectedOctober:0]
+    ]){
+      const records=M.serviceRecords(scoped,{kind:'maintenance',from,to});
+      assert.equal(records.length,expected,date+' '+hour+' '+role+' '+from+': stable sparse history');
+      const list=harness('#services?role='+role+'&service=maintenance&servicePeriod=m&serviceFrom='+from+'&serviceTo='+to);
+      assert.equal((list.html().match(/data-kind="maintenance" data-entry=/g)||[]).length,expected,'Badge and rendered repair rows agree without a list cap');
+      assert(list.html().includes('<span>수리이력</span><strong>'+expected+'</strong>'),'Repair tab count is the actual filtered count');
+      if(!expected)assert(list.html().includes('해당 내역이 없습니다.'),'A later empty month stays an empty state');
+      for(const entry of records){
+        const vehicle=scoped.find(v=>v.equipmentId===entry.equipmentId);
+        list.click({serviceVehicle:vehicle.equipmentId,kind:'maintenance',entry:entry.id});
+        assert(list.url().includes('#maintenance?'));
+        assert(list.html().includes(entry.label),'Every retained historical repair still opens its own detail');
+      }
+    }
+    // Error fallback is intentionally unchanged. Only compare dates outside
+    // the prepared review range, where the original shared generator applies.
+    const previous=new Date(Date.parse(date+'T00:00:00Z')-86400000).toISOString().slice(0,10);
+    for(const day of [previous,date])if(day>demo.to){
+      const errors=M.serviceRecords(scoped,{kind:'error',from:day,to:day});
+      const expectedErrors=M.web.demo.create(scoped,day).error.filter(r=>r.dateTime<M.SNAPSHOT);
+      assert.equal(errors.length,expectedErrors.length,'Reducing repair fixtures does not remove existing error occurrences');
+    }
+    fallbackCases++;
+  }
+}
+const originalFallback=load('2026-10-14',16,false);
+for(const role of ['customer_owner','customer_staff']){
+  const scoped=originalFallback.M.scope(originalFallback.rows,{role});
+  assert.equal(originalFallback.M.serviceRecords(scoped,{kind:'maintenance',from:'2026-10-14',to:'2026-10-14'}).length,scoped.length,'Without explicit MOBILE demo, original shared fallback remains unchanged');
+}
+console.log('PASS prepared mobile demo: '+cases+' day/hour/role cases through Oct 11 + '+fallbackCases+' post-window recurrence cases; September 3 repairs + October 5, Oct 8 month count/list/detail 3, no repair fallback on Oct 12-15/month-end/November, 2 daily long-waiting cases, unchanged 11 sparse errors/4 warning-shock days, <=22 notifications, scope/time cutoff, map positions, work/idle totals, 3 KPIs, engine L/H and rejected customer example.');
