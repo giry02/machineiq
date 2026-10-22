@@ -13,17 +13,17 @@ function load(date,hour,withDemo=true){
   return {context,M,rows:M.buildVehicles(fleet),home:context.window.CustomerHomeView,harness};
 }
 const seed=load('2026-10-02',8),demo=seed.context.window.CustomerDemoData;
-assert.equal(demo.measuredTelemetry,false);assert.equal(demo.to,'2026-10-11');assert.equal(demo.days.length,143);assert.equal(demo.history.length,19);
+assert.equal(demo.measuredTelemetry,false);assert.equal(demo.to,'2026-10-11');assert.equal(demo.days.length,143);assert.equal(demo.history.length,17);
 const septemberRepairs=demo.history.filter(r=>r.kind==='maintenance'&&r.date.startsWith('2026-09'));
 assert.equal(septemberRepairs.length,3);
 assert.deepEqual(Array.from(septemberRepairs,r=>r.date),['2026-09-05','2026-09-16','2026-09-29']);
 const octoberRepairs=demo.history.filter(r=>r.kind==='maintenance'&&r.date.startsWith('2026-10'));
-const repairDays=['2026-10-01','2026-10-04','2026-10-07','2026-10-09','2026-10-11'];
-assert.equal(octoberRepairs.length,5,'Five explicitly scheduled October repairs, not one repair per day or per VIN');
+const repairDays=['2026-10-01','2026-10-04','2026-10-09'];
+assert.equal(octoberRepairs.length,3,'Three explicitly scheduled October repairs, not one repair per day or per VIN');
 assert.deepEqual(Array.from(octoberRepairs,r=>r.date),repairDays);
-assert.equal(new Set(octoberRepairs.map(r=>r.vin)).size,5,'Spread the five repairs across VINs instead of repeating every vehicle');
+assert.equal(new Set(octoberRepairs.map(r=>r.vin)).size,3,'Spread the three repairs across VINs instead of repeating every vehicle');
 assert(octoberRepairs.some(r=>r.completed)&&octoberRepairs.some(r=>!r.completed));
-assert.deepEqual(Array.from(octoberRepairs.filter(r=>!r.completed),r=>r.date),['2026-10-04','2026-10-11']);
+assert.deepEqual(Array.from(octoberRepairs.filter(r=>!r.completed),r=>r.date),['2026-10-04']);
 for(const date of new Set(demo.days.map(r=>r.date)))assert.equal(octoberRepairs.filter(r=>r.date===date).length,repairDays.includes(date)?1:0);
 assert.equal(demo.days.filter(r=>r.fixture==='customer-long-waiting-review-20261006').length,22);
 assert.equal(demo.history.filter(r=>r.kind==='error').length,11);
@@ -146,11 +146,11 @@ seed.context.sessionStorage.getItem=()=>JSON.stringify(saved);
 const store=seed.M.createApprovalStore(rows);assert(store.find('saved-row','customer_owner'));assert.equal(store.list('customer_owner').filter(r=>r.id==='MOBILE-DEMO-REJECTED').length,1);assert.equal(store.list('customer_owner').filter(r=>r.id==='MOBILE-DEMO-REJECTED').length,1);
 const october8=load('2026-10-08',16),monthRows=october8.M.scope(october8.rows,{role:'customer_owner'});
 const monthRepairs=october8.M.serviceRecords(monthRows,{kind:'maintenance',from:'2026-10-01',to:'2026-10-31'});
-assert.equal(monthRepairs.length,3,'October 8 month query has only the three repairs that have occurred');
+assert.equal(monthRepairs.length,2,'October 8 month query has only the two repairs that have occurred');
 assert(monthRepairs.some(r=>r.resolved)&&monthRepairs.some(r=>!r.resolved));
 const monthScreen=october8.harness('#services?role=customer_owner&service=maintenance&servicePeriod=m&serviceFrom=2026-10-01&serviceTo=2026-10-31');
-assert.equal((monthScreen.html().match(/data-kind="maintenance" data-entry=/g)||[]).length,3);
-assert(monthScreen.html().includes('<span>수리이력</span><strong>3</strong>'));
+assert.equal((monthScreen.html().match(/data-kind="maintenance" data-entry=/g)||[]).length,2);
+assert(monthScreen.html().includes('<span>수리이력</span><strong>2</strong>'));
 for(const entry of monthRepairs){
   const vehicle=monthRows.find(v=>v.equipmentId===entry.equipmentId);
   monthScreen.click({serviceVehicle:vehicle.equipmentId,kind:'maintenance',entry:entry.id});
@@ -160,12 +160,12 @@ for(const entry of monthRepairs){
 // vehicle yesterday/today. Check both the historical October query and current
 // month, including tomorrow, month-end and the following month.
 let fallbackCases=0;
-for(const date of ['2026-10-12','2026-10-13','2026-10-14','2026-10-15','2026-10-31','2026-11-01','2026-11-30'])for(const hour of [0,16]){
+for(const date of ['2026-10-12','2026-10-13','2026-10-14','2026-10-15','2026-10-22','2026-10-23','2026-10-31','2026-11-01','2026-11-30'])for(const hour of [0,16]){
   const sample=load(date,hour),{M,rows,harness}=sample;
   const currentFrom=date.slice(0,8)+'01';
   const currentTo=new Date(Date.UTC(Number(date.slice(0,4)),Number(date.slice(5,7)),0)).toISOString().slice(0,10);
   for(const role of ['customer_owner','customer_staff']){
-    const scoped=M.scope(rows,{role}),allowed=new Set(scoped.map(v=>v.equipmentId)),expectedOctober=role==='customer_owner'?5:2;
+    const scoped=M.scope(rows,{role}),allowed=new Set(scoped.map(v=>v.equipmentId)),expectedOctober=role==='customer_owner'?3:2;
     const allRepairs=M.serviceHistory(scoped).filter(r=>r.kind==='maintenance');
     assert(allRepairs.every(r=>r.occurredAt.slice(0,10)<=demo.to),'After the prepared window there are no synthesized current/yesterday repairs');
     assert(allRepairs.every(r=>allowed.has(r.equipmentId)),'Repair history remains inside the role scope');
@@ -203,4 +203,4 @@ for(const role of ['customer_owner','customer_staff']){
   const scoped=originalFallback.M.scope(originalFallback.rows,{role});
   assert.equal(originalFallback.M.serviceRecords(scoped,{kind:'maintenance',from:'2026-10-14',to:'2026-10-14'}).length,scoped.length,'Without explicit MOBILE demo, original shared fallback remains unchanged');
 }
-console.log('PASS prepared mobile demo: '+cases+' day/hour/role cases through Oct 11 + '+fallbackCases+' post-window recurrence cases; September 3 repairs + October 5, Oct 8 month count/list/detail 3, no repair fallback on Oct 12-15/month-end/November, 2 daily long-waiting cases, unchanged 11 sparse errors/4 warning-shock days, <=22 notifications, scope/time cutoff, map positions, work/idle totals, 3 KPIs, engine L/H and rejected customer example.');
+console.log('PASS prepared mobile demo: '+cases+' day/hour/role cases through Oct 11 + '+fallbackCases+' post-window recurrence cases; September 3 repairs + October 3, Oct 8 month count/list/detail 2, no repair fallback on Oct 12-15/22-23/month-end/November, 2 daily long-waiting cases, unchanged 11 sparse errors/4 warning-shock days, <=22 notifications, scope/time cutoff, map positions, work/idle totals, 3 KPIs, engine L/H and rejected customer example.');

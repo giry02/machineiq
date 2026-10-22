@@ -1,5 +1,5 @@
 {
-  "revision": "2026-10-14-r140",
+  "revision": "2026-10-22-r143",
   "entry": "login.html",
   "includeArchives": false,
   "mapMode": "embedded-google",
@@ -7,7 +7,7 @@
   "files": [
     {
       "path": "index.html",
-      "sha256": "bc1b79b050c07fe56a0d6c6c2a652d0322c41d5448ea624f32a020f1a16ad0bb"
+      "sha256": "938b1691bb0df26e96ef932c5c9550d46e899fd8397bc721844a44339315eedf"
     },
     {
       "path": "customer.js",
@@ -31,7 +31,7 @@
     },
     {
       "path": "release.json",
-      "sha256": "00585ae117f4175a369b6676841d6d82788a34e6ee5573a9a023b0ecfddd2638"
+      "sha256": "a81e24014fdae1d99d4e91cfa544470943a3e38245de0c9d39d9f00753a1e4aa"
     },
     {
       "path": "error-documents.js",
@@ -75,7 +75,7 @@
     },
     {
       "path": "demo-data.generated.js",
-      "sha256": "419a3e4c9f12bba50c74e9e06e050f7ce17577fd6bc24810e51b34712065a35d"
+      "sha256": "922388582ac19ecaeb5faf699cd87157f85dbb81096a69f60b2cc4f5f27cfc5c"
     },
     {
       "path": "web-guide-colors.css",
@@ -815,7 +815,7 @@
     },
     {
       "path": "tests/next-week-demo.cjs",
-      "sha256": "749cdabd31973bee426a7296bac8acde6ccd87763e78e9a0a1f6b636697595cf"
+      "sha256": "327162298dc1fe5c0c7b2808d3b6fb9c1013fb4d65be1630f9cdb0559158293a"
     },
     {
       "path": "tests/summary-map.cjs",
