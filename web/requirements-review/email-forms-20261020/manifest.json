@@ -1,76 +1,76 @@
 {
   "version": "email-forms-20261020",
   "status": "static-design-review",
-  "mailTypes": 10,
-  "categories": 6,
-  "previews": 51,
-  "localePolicy": "Existing account email publication stays Korean; monthly report keeps 8 languages; dormant/internal mail drafts use Korean/English.",
+  "mailTypes": 12,
+  "categories": 8,
+  "previews": 67,
+  "localePolicy": "Existing account email publication stays Korean; monthly report and new dormant-advance/terms-change notices use 8 languages; existing dormant-recovery/internal mail drafts use Korean/English.",
   "files": [
     {
       "source": "email-templates-20260926/preview/ko/signup.html",
       "path": "preview/ko/signup.html",
-      "sourceSha256": "733fb9f87c5ce02e00e74b25cbc4e4e8e6ba7843dc7fe46c2c9e908602ddc7a9",
-      "sha256": "7a237425ac1a14768692e440647d1c4596ea6e5714a5b03f2ddba593091d0681"
+      "sourceSha256": "66c7ada7b1a5f36105686df18c00d220850a97cebcde982a25fbbcae479bcd8e",
+      "sha256": "ae94a53e663255b03330892f608f71d00273e7bf73a4074d61cd8dc71ff6ec73"
     },
     {
       "source": "email-templates-20260926/preview/ko/signup-customer-employee.html",
       "path": "preview/ko/signup-customer-employee.html",
-      "sourceSha256": "4a6bc554a6c2c68f5336a8351d072f79da65e0f8d65b29ece761faf7596b6848",
-      "sha256": "0c492a21057174ab0a531bc2b426cb135ec27eddae53c17026ea1006fa8e0b78"
+      "sourceSha256": "0bff5c920a929ae24e2bca27cbdea80563d48436ad0c39df88a57b55d5adf721",
+      "sha256": "984dfacbeb6a00db1a066435eadb9659cc5f6a3dcc183ef0f99515d4754cb637"
     },
     {
       "source": "email-templates-20260926/preview/ko/signup-dealer-owner.html",
       "path": "preview/ko/signup-dealer-owner.html",
-      "sourceSha256": "333296ac9016bbb42eb3d399b73c3e704f00a010ebafb3cdba9bffb59834e67f",
-      "sha256": "2d565872e88d0694f70581be8f9ba0438d438caa64a99c7e91d7ab5b9b45148f"
+      "sourceSha256": "9b73da13c6611fc1a5d738e1277bcfd2d42b01e0a6338b67a55bad87088f330a",
+      "sha256": "1ee574e79a4af28d5ecb5fbe03c97f4b587ba0c790485f27b9e00da4387e994f"
     },
     {
       "source": "email-templates-20260926/preview/ko/signup-dealer-employee.html",
       "path": "preview/ko/signup-dealer-employee.html",
-      "sourceSha256": "492c147d9e8b632fab35b178c1c726cf1b7f6b246c2cd9890b81e3e1bb0a6527",
-      "sha256": "aa8b7c8cfec245aaaca4e67c9a5b0a47cace44fb9248cb89bd3ca2db8268eb82"
+      "sourceSha256": "81d93bf5d97437786d52811a96003f84a47622f34e78db4fa4d9084252bbc568",
+      "sha256": "4cb9d762cd57986bd218e6b41afc64059df849dcdf71e674eaa67bfd9ec5be6c"
     },
     {
       "source": "email-templates-20260926/preview/ko/signup-internal.html",
       "path": "preview/ko/signup-internal.html",
-      "sourceSha256": "75338f02584e92414e3b96d3a49996ee782e04b796f9168934205633eab95fbe",
-      "sha256": "ca8c319cdaddb0c6581c49d656471a6c11ea17e44ba574df6ce3df8413ade000"
+      "sourceSha256": "19721272ab34c0120fd2d5f33a879665932aacc8c52afb160bcf51895419d65a",
+      "sha256": "4f6c5a88aa7ec1a1d9858e0fe12595944ab74c127de301372c80bdd5e957eeac"
     },
     {
       "source": "email-templates-20260926/preview/ko/verification.html",
       "path": "preview/ko/verification.html",
-      "sourceSha256": "c9353217ef22f25e91531bf195c23f9d157f8b7f254f79a682a0e85ae631f05b",
-      "sha256": "c9353217ef22f25e91531bf195c23f9d157f8b7f254f79a682a0e85ae631f05b"
+      "sourceSha256": "b1a407b387c9432b44c3096d9395d74cf0f766f1f8acaeb925d70fd30e519348",
+      "sha256": "b1a407b387c9432b44c3096d9395d74cf0f766f1f8acaeb925d70fd30e519348"
     },
     {
       "source": "email-templates-20260926/preview/ko/password.html",
       "path": "preview/ko/password.html",
-      "sourceSha256": "89aba1cd21ad3cfd5d3fb42aaafcf9ec2ba34c1b396b16b990eaec8a72f5a79f",
-      "sha256": "f0efa6cd30d1d796d2f689c44cef56581af72cb57d5ec07cd9bc9f6db866d0da"
+      "sourceSha256": "cd6b7c7296ce4dd805149cce278b202bb55c9447d8809d1927d1a25d518d1246",
+      "sha256": "e0272f38aa9c5452ba2181823618ca4fc877833c2ed12f09056b269d33c5a2e2"
     },
     {
       "source": "dormant-auth-20261014/email/preview/ko/dormant-password.html",
       "path": "preview/ko/dormant-password.html",
-      "sourceSha256": "9ad95bf027e7f0f115d138792969e0888f30b932ae6418c72ddc77f902c2a315",
-      "sha256": "3de53e9652dbf236718de8b787a8c21170d37c865d780a71c1213da5b319df9a"
+      "sourceSha256": "dca6dc7de79f62e95ed7cfb740dfba00306b99d8a809372d5c42cfb001e96209",
+      "sha256": "3c630113c32561600e50d81a403fb7b812cf734ef1fa5b630809ba43a92bdade"
     },
     {
       "source": "dormant-auth-20261014/email/preview/en/dormant-password.html",
       "path": "preview/en/dormant-password.html",
-      "sourceSha256": "00bc45ee099e71b3c825e07878163fe4559d027a9c82af3001069a2870f74163",
-      "sha256": "342f1c0706a271a8ca18e245f2b03d5ceeb1b5615ba9fae0248e0e12ce26b26d"
+      "sourceSha256": "fae8031bae4fe2cb7256a86b983d71c4541ab7c517d6f913f8869835a45e3474",
+      "sha256": "cc29afeb2a8ad02e57fd75a83d01a3de5c7e55201bb32c777e1b80c9ff45dcd7"
     },
     {
       "source": "dormant-auth-20261014/email/preview/ko/internal-login-verification.html",
       "path": "preview/ko/internal-login-verification.html",
-      "sourceSha256": "9a3bf20c78af0c65efcddee78da9d699ae25781fb684722436c49e889a5acf7f",
-      "sha256": "9a3bf20c78af0c65efcddee78da9d699ae25781fb684722436c49e889a5acf7f"
+      "sourceSha256": "9b7ca8484353198243c35ea1d4958647004873bc1c52ca72bd50e5108d846044",
+      "sha256": "9b7ca8484353198243c35ea1d4958647004873bc1c52ca72bd50e5108d846044"
     },
     {
       "source": "dormant-auth-20261014/email/preview/en/internal-login-verification.html",
       "path": "preview/en/internal-login-verification.html",
-      "sourceSha256": "ae11963c43911bec4011481cab639dd2d39e0349013e9c2e552aa728b02ee6ee",
-      "sha256": "ae11963c43911bec4011481cab639dd2d39e0349013e9c2e552aa728b02ee6ee"
+      "sourceSha256": "c0b472ad5a2a7aa28d9b31ce058c52374ac992e88d42feac9b4c19ce08f620c7",
+      "sha256": "c0b472ad5a2a7aa28d9b31ce058c52374ac992e88d42feac9b4c19ce08f620c7"
     },
     {
       "source": "monthly-email-20260928/preview/ko/normal.html",
@@ -311,6 +311,102 @@
       "path": "preview/ja/monthly-no_prior.html",
       "sourceSha256": "850bbcbf68897c37999f76ab0244b38014138fc1563290d8ef5bf366b3731042",
       "sha256": "850bbcbf68897c37999f76ab0244b38014138fc1563290d8ef5bf366b3731042"
+    },
+    {
+      "source": "email-templates-20260926/notices/preview/ko/dormant-notice.html",
+      "path": "preview/ko/dormant-notice.html",
+      "sourceSha256": "0e0e75a90f9a41dc29bad513486e717232f5b32d756f3d605eb8436bdc73d1c8",
+      "sha256": "0e0e75a90f9a41dc29bad513486e717232f5b32d756f3d605eb8436bdc73d1c8"
+    },
+    {
+      "source": "email-templates-20260926/notices/preview/en/dormant-notice.html",
+      "path": "preview/en/dormant-notice.html",
+      "sourceSha256": "1c26a55c912ec7e1e871b4fe0b67455a498e7f80c3d5ef4e9e624036a458f153",
+      "sha256": "1c26a55c912ec7e1e871b4fe0b67455a498e7f80c3d5ef4e9e624036a458f153"
+    },
+    {
+      "source": "email-templates-20260926/notices/preview/de/dormant-notice.html",
+      "path": "preview/de/dormant-notice.html",
+      "sourceSha256": "88bdb5e0a8de681d0724fe3657f9039ac34d47e2e5aa349dfccf7bfcadbb7496",
+      "sha256": "88bdb5e0a8de681d0724fe3657f9039ac34d47e2e5aa349dfccf7bfcadbb7496"
+    },
+    {
+      "source": "email-templates-20260926/notices/preview/ar/dormant-notice.html",
+      "path": "preview/ar/dormant-notice.html",
+      "sourceSha256": "d07029ceda981dc4ad77d02b75b920d8a2a5a5731790b03cb773047944f969a0",
+      "sha256": "d07029ceda981dc4ad77d02b75b920d8a2a5a5731790b03cb773047944f969a0"
+    },
+    {
+      "source": "email-templates-20260926/notices/preview/es/dormant-notice.html",
+      "path": "preview/es/dormant-notice.html",
+      "sourceSha256": "5868cc96b99d1710e494e6cdbf490dc7bd53d989c580d41635529f395e72caf0",
+      "sha256": "5868cc96b99d1710e494e6cdbf490dc7bd53d989c580d41635529f395e72caf0"
+    },
+    {
+      "source": "email-templates-20260926/notices/preview/fr/dormant-notice.html",
+      "path": "preview/fr/dormant-notice.html",
+      "sourceSha256": "e8a05eb7af721fa9ff20623178926ce8e56635b8daf3351e5c0fa41851077d1c",
+      "sha256": "e8a05eb7af721fa9ff20623178926ce8e56635b8daf3351e5c0fa41851077d1c"
+    },
+    {
+      "source": "email-templates-20260926/notices/preview/it/dormant-notice.html",
+      "path": "preview/it/dormant-notice.html",
+      "sourceSha256": "bdf4b3b97b0c641b55dd8ca9de8f8d7ae3e133c4ffb486feaa7d0bdc8d12e9b6",
+      "sha256": "bdf4b3b97b0c641b55dd8ca9de8f8d7ae3e133c4ffb486feaa7d0bdc8d12e9b6"
+    },
+    {
+      "source": "email-templates-20260926/notices/preview/ja/dormant-notice.html",
+      "path": "preview/ja/dormant-notice.html",
+      "sourceSha256": "d35643ab69297c1bcd8ed273e5c5c4d1456aa3b5d7ab936a61585c33df028f58",
+      "sha256": "d35643ab69297c1bcd8ed273e5c5c4d1456aa3b5d7ab936a61585c33df028f58"
+    },
+    {
+      "source": "email-templates-20260926/notices/preview/ko/terms-change.html",
+      "path": "preview/ko/terms-change.html",
+      "sourceSha256": "5bfa8d2bd0c70477cc2ddc7bb1094c08bcb8fdc79f018c198058847291e901e0",
+      "sha256": "5bfa8d2bd0c70477cc2ddc7bb1094c08bcb8fdc79f018c198058847291e901e0"
+    },
+    {
+      "source": "email-templates-20260926/notices/preview/en/terms-change.html",
+      "path": "preview/en/terms-change.html",
+      "sourceSha256": "1cd544f4a33f90594b4ea37841b00cb2b56a2ca919c738152b4f84b1fb35fab5",
+      "sha256": "1cd544f4a33f90594b4ea37841b00cb2b56a2ca919c738152b4f84b1fb35fab5"
+    },
+    {
+      "source": "email-templates-20260926/notices/preview/de/terms-change.html",
+      "path": "preview/de/terms-change.html",
+      "sourceSha256": "24d5ba372eb3de27d7786524ca8c2bce8a28a9f1960e3da900ab68c38c91be6a",
+      "sha256": "24d5ba372eb3de27d7786524ca8c2bce8a28a9f1960e3da900ab68c38c91be6a"
+    },
+    {
+      "source": "email-templates-20260926/notices/preview/ar/terms-change.html",
+      "path": "preview/ar/terms-change.html",
+      "sourceSha256": "73811a254dcf2adf27330c001006e5918998c8a2fbb30b97cca33cfaf73fab6f",
+      "sha256": "73811a254dcf2adf27330c001006e5918998c8a2fbb30b97cca33cfaf73fab6f"
+    },
+    {
+      "source": "email-templates-20260926/notices/preview/es/terms-change.html",
+      "path": "preview/es/terms-change.html",
+      "sourceSha256": "2ea0f89c05630389379b9f6f9a530300cbe251caf2cb581d54667296c97ae84d",
+      "sha256": "2ea0f89c05630389379b9f6f9a530300cbe251caf2cb581d54667296c97ae84d"
+    },
+    {
+      "source": "email-templates-20260926/notices/preview/fr/terms-change.html",
+      "path": "preview/fr/terms-change.html",
+      "sourceSha256": "69b7ae1a8ccff24af2e24beb26457abe148f01b9083e6a31b7743fef8d3d6aab",
+      "sha256": "69b7ae1a8ccff24af2e24beb26457abe148f01b9083e6a31b7743fef8d3d6aab"
+    },
+    {
+      "source": "email-templates-20260926/notices/preview/it/terms-change.html",
+      "path": "preview/it/terms-change.html",
+      "sourceSha256": "b59f2276b89f193118cf14848e0579761124e6268cca38bd99438ad655c492c5",
+      "sha256": "b59f2276b89f193118cf14848e0579761124e6268cca38bd99438ad655c492c5"
+    },
+    {
+      "source": "email-templates-20260926/notices/preview/ja/terms-change.html",
+      "path": "preview/ja/terms-change.html",
+      "sourceSha256": "b5a3892f0afb180c5517dcafea7f5ca94a360d668ccba8abe557e8bc67de401f",
+      "sha256": "b5a3892f0afb180c5517dcafea7f5ca94a360d668ccba8abe557e8bc67de401f"
     }
   ]
 }
