@@ -204,34 +204,40 @@
 
   function noticeSeed() {
     var titles = ['시스템 정기 점검 안내','차량 데이터 조회 기능 안내','서비스 운영시간 안내','배터리 관리 안내','운행 리포트 확인 안내','계정 보안 점검 안내','그룹별 차량 조회 안내','장비 연결 상태 확인 안내'];
-    return Array.from({ length: 23 }, function (_, i) { return { id: 'NOTICE-' + String(i + 1).padStart(3, '0'), title: titles[i % titles.length] + (i > 7 ? ' (' + (Math.floor(i / 8) + 1) + ')' : ''), target: ['ALL','INTERNAL','DEALER','CUSTOMER'][i % 4], state: i % 7 === 0 ? 'DRAFT' : i % 6 === 0 ? 'STOPPED' : 'PUBLISHED', from: day(i === 2 ? 2 : -i - 1), to: day(i === 3 ? -1 : 30 - i), pinned: i < 2, body: titles[i % titles.length] + '\n\n안내 내용을 확인해 주세요.\n상세 문의는 담당 서비스 창구로 연락해 주시기 바랍니다.', author: '운영 담당자', updated: day(-i) }; });
+    return Array.from({ length: 23 }, function (_, i) { return { id: 'NOTICE-' + String(i + 1).padStart(3, '0'), title: titles[i % titles.length] + (i > 7 ? ' (' + (Math.floor(i / 8) + 1) + ')' : ''), kind: /점검|서비스 운영시간|장비 연결/.test(titles[i % titles.length]) ? 'SERVICE' : 'GENERAL', target: ['ALL','INTERNAL','DEALER','CUSTOMER'][i % 4], state: i % 7 === 0 ? 'DRAFT' : i % 6 === 0 ? 'STOPPED' : 'PUBLISHED', from: day(i === 2 ? 2 : -i - 1), to: day(i === 3 ? -1 : 30 - i), pinned: i < 2, body: titles[i % titles.length] + '\n\n안내 내용을 확인해 주세요.\n상세 문의는 담당 서비스 창구로 연락해 주시기 바랍니다.', author: '운영 담당자', updated: day(-i) }; });
   }
   var noticeTargets = [['ALL','전체'],['INTERNAL','내부 사용자'],['DEALER','딜러'],['CUSTOMER','고객']];
   function noticeStatus(row) { if (row.state === 'DRAFT') return '작성 중'; if (row.state === 'STOPPED') return '게시 중지'; if (row.from > day(0)) return '게시 예정'; if (row.to && row.to < day(0)) return '게시 종료'; return '게시 중'; }
   api.register('notices', function (ctx) {
-    var data = read('notices', noticeSeed()), state = { query: '', target: '', status: '' };
+    var noticeKinds = window.MIQNoticeKinds;
+    if (!noticeKinds) throw new Error('공지 종류 설정을 불러오지 못했습니다.');
+    var kindOptions = Object.keys(noticeKinds).map(function (key) { return [key, noticeKinds[key]]; });
+    var data = read('notices', noticeSeed()), state = { query: '', kind: '', target: '', status: '' };
+    function noticeKind(row) { return Object.prototype.hasOwnProperty.call(noticeKinds, row.kind) ? row.kind : 'GENERAL'; }
     function edit(existing) {
-      var item = existing || { title: '', target: 'ALL', from: day(0), to: day(30), pinned: false, body: '', state: 'DRAFT' };
-      api.modal({ title: existing ? '공지 수정' : '공지 등록', wide: true, body: '<div class="form-grid">' + field('제목', input('title', item.title, 'required maxlength="150"'), true) + field('게시 대상', select('target', noticeTargets, item.target)) + field('상단 고정', select('pinned', [['N','일반'],['Y','고정']], item.pinned ? 'Y' : 'N')) + field('게시 시작일', input('from', item.from, 'type="date" required')) + field('게시 종료일', input('to', item.to, 'type="date" required')) + field('게시 상태', select('state', [['DRAFT','작성 중'],['PUBLISHED','게시'],['STOPPED','게시 중지']], item.state)) + field('내용', '<textarea class="inp" name="body" rows="8" maxlength="10000" required>' + esc(item.body) + '</textarea>', true) + '</div>', submitLabel: '저장', onSubmit: function (form, close) {
+      var item = existing || { title: '', kind: 'GENERAL', target: 'ALL', from: day(0), to: day(30), pinned: false, body: '', state: 'DRAFT' };
+      api.modal({ title: existing ? '공지 수정' : '공지 등록', wide: true, body: '<div class="form-grid">' + field('제목', input('title', item.title, 'required maxlength="150"'), true) + field('공지 종류', select('kind', kindOptions, noticeKind(item))) + field('게시 대상', select('target', noticeTargets, item.target)) + field('상단 고정', select('pinned', [['N','일반'],['Y','고정']], item.pinned ? 'Y' : 'N')) + field('게시 시작일', input('from', item.from, 'type="date" required')) + field('게시 종료일', input('to', item.to, 'type="date" required')) + field('게시 상태', select('state', [['DRAFT','작성 중'],['PUBLISHED','게시'],['STOPPED','게시 중지']], item.state)) + field('내용', '<textarea class="inp" name="body" rows="8" maxlength="10000" required>' + esc(item.body) + '</textarea>', true) + '</div>', submitLabel: '저장', onSubmit: function (form, close) {
         var from = value(form, 'from'), to = value(form, 'to'); if (!validRange(from, to)) return api.notify('게시 종료일은 시작일 이후로 선택해 주세요.');
-        var next = { id: existing ? existing.id : uid('NOTICE'), title: requiredText(form, 'title', '제목'), target: value(form, 'target'), from: from, to: to, pinned: value(form, 'pinned') === 'Y', state: value(form, 'state'), body: requiredText(form, 'body', '내용'), author: '운영 담당자', updated: day(0) };
+        var kind = value(form, 'kind'); if (!Object.prototype.hasOwnProperty.call(noticeKinds, kind)) throw new Error('공지 종류를 선택해 주세요.');
+        var next = { id: existing ? existing.id : uid('NOTICE'), title: requiredText(form, 'title', '제목'), kind: kind, target: value(form, 'target'), from: from, to: to, pinned: value(form, 'pinned') === 'Y', state: value(form, 'state'), body: requiredText(form, 'body', '내용'), author: '운영 담당자', updated: day(0) };
         if (existing) Object.assign(existing, next); else data.unshift(next);
         save('notices', data, existing ? '수정' : '등록', '공지 ' + next.title); close(); render(); api.notify('저장했습니다.');
       } });
     }
     function detail(row) {
       api.modal({ title: '공지 상세', body: '<article class="ops-notice-detail"><h3 class="box__name">' + esc(row.title) + '</h3><div class="mm-request-detail"><dl>' +
+        '<div><dt>공지 종류</dt><dd>' + esc(noticeKinds[noticeKind(row)]) + '</dd></div>' +
         '<div><dt>게시 대상</dt><dd>' + esc(noticeTargets.find(function (t) { return t[0] === row.target; })[1]) + '</dd></div>' +
         '<div><dt>상태</dt><dd>' + esc(noticeStatus(row)) + '</dd></div>' +
         '<div class="col-2"><dt>게시 기간</dt><dd>' + esc(row.from + ' ~ ' + row.to) + '</dd></div>' +
         '</dl></div><section class="ops-notice-content" aria-label="공지 내용"><div class="ops-pre">' + esc(row.body) + '</div></section></article>', submitLabel: '닫기', onSubmit: function (form, close) { close(); } });
     }
     function render() {
-      MIQCommon.view.set(ctx.el,"innerHTML",filters(field('게시 대상', select('target', [['','전체 대상']].concat(noticeTargets), state.target)) + field('게시 상태', select('status', [['','전체 상태'],['작성 중','작성 중'],['게시 중','게시 중'],['게시 예정','게시 예정'],['게시 종료','게시 종료'],['게시 중지','게시 중지']], state.status)) + field('검색', input('query', state.query, 'type="search" placeholder="제목·내용"'))) + '<div class="list-head"><span class="list-head__count">공지 목록</span><div class="ops-actions">' + tool('add','공지 등록',true) + '</div></div><div data-grid></div>');
-      bindFilters(ctx.el, function (form) { state = { target: value(form, 'target'), status: value(form, 'status'), query: value(form, 'query') }; render(); });
+      MIQCommon.view.set(ctx.el,"innerHTML",filters(field('공지 종류', select('kind', [['','전체 종류']].concat(kindOptions), state.kind)) + field('게시 대상', select('target', [['','전체 대상']].concat(noticeTargets), state.target)) + field('게시 상태', select('status', [['','전체 상태'],['작성 중','작성 중'],['게시 중','게시 중'],['게시 예정','게시 예정'],['게시 종료','게시 종료'],['게시 중지','게시 중지']], state.status)) + field('검색', input('query', state.query, 'type="search" placeholder="제목·내용"'))) + '<div class="list-head"><span class="list-head__count">공지 목록</span><div class="ops-actions">' + tool('add','공지 등록',true) + '</div></div><div data-grid></div>');
+      bindFilters(ctx.el, function (form) { state = { kind: value(form, 'kind'), target: value(form, 'target'), status: value(form, 'status'), query: value(form, 'query') }; render(); });
       actionHost(ctx.el.querySelector('.list-head'), function () { edit(); });
-      grid(ctx.el.querySelector('[data-grid]'), { rows: data.filter(function (r) { return (!state.target || r.target === state.target) && (!state.status || noticeStatus(r) === state.status) && matches(r.title + ' ' + r.body, state.query); }), defaultSort: { key: 'updated', dir: 'desc' }, columns: [
-        { key: 'pinned', label: '구분', render: function (r) { return r.pinned ? '고정' : '일반'; }, exportValue: function (r) { return r.pinned ? '고정' : '일반'; } }, { key: 'title', label: '제목', render: function (r) { return '<button type="button" class="ops-text-button" data-action="detail">' + esc(r.title) + '</button>'; } },
+      grid(ctx.el.querySelector('[data-grid]'), { rows: data.filter(function (r) { return (!state.kind || noticeKind(r) === state.kind) && (!state.target || r.target === state.target) && (!state.status || noticeStatus(r) === state.status) && matches(r.title + ' ' + r.body, state.query); }), defaultSort: { key: 'updated', dir: 'desc' }, columns: [
+        { key: 'kind', label: '공지 종류', render: function (r) { return esc(noticeKinds[noticeKind(r)]); }, sortValue: function (r) { return noticeKinds[noticeKind(r)]; }, exportValue: function (r) { return noticeKinds[noticeKind(r)]; } }, { key: 'pinned', label: '상단 고정', render: function (r) { return r.pinned ? '고정' : '일반'; }, exportValue: function (r) { return r.pinned ? '고정' : '일반'; } }, { key: 'title', label: '제목', render: function (r) { return '<button type="button" class="ops-text-button" data-action="detail">' + esc(r.title) + '</button>'; } },
         { key: 'target', label: '게시 대상', render: function (r) { return esc(noticeTargets.find(function (t) { return t[0] === r.target; })[1]); }, exportValue: function (r) { return noticeTargets.find(function (t) { return t[0] === r.target; })[1]; } }, { key: 'state', label: '상태', render: noticeStatus, sortValue: noticeStatus, exportValue: noticeStatus }, { key: 'from', label: '게시 시작' }, { key: 'to', label: '게시 종료' }, { key: 'updated', label: '수정일' },
         { key: 'actions', label: '관리', render: function (r) { return actions([rowButton('edit','수정'), rowButton('toggle', r.state === 'PUBLISHED' ? '중지' : '게시'), rowButton('delete','삭제')]); } }
       ], onAction: function (action, row) {

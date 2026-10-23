@@ -4,6 +4,12 @@
   "mailTypes": 12,
   "categories": 8,
   "previews": 67,
+  "noticeReview": {
+    "list": "notices.html",
+    "detail": "notice.html",
+    "reviewOnly": true,
+    "serverConnected": false
+  },
   "localePolicy": "Existing account email publication stays Korean; monthly report and new dormant-advance/terms-change notices use 8 languages; existing dormant-recovery/internal mail drafts use Korean/English.",
   "files": [
     {
@@ -363,50 +369,50 @@
     {
       "source": "email-templates-20260926/notices/preview/ko/terms-change.html",
       "path": "preview/ko/terms-change.html",
-      "sourceSha256": "5bfa8d2bd0c70477cc2ddc7bb1094c08bcb8fdc79f018c198058847291e901e0",
-      "sha256": "5bfa8d2bd0c70477cc2ddc7bb1094c08bcb8fdc79f018c198058847291e901e0"
+      "sourceSha256": "528dba2c56e80620ee05dc112389f972ad49058b7ea45fdeebcd7657a26deaa3",
+      "sha256": "495791ace0a4e08a4e6c0c22ae0e694bc277de0d16a5f19f5afa357b69239fcc"
     },
     {
       "source": "email-templates-20260926/notices/preview/en/terms-change.html",
       "path": "preview/en/terms-change.html",
-      "sourceSha256": "1cd544f4a33f90594b4ea37841b00cb2b56a2ca919c738152b4f84b1fb35fab5",
-      "sha256": "1cd544f4a33f90594b4ea37841b00cb2b56a2ca919c738152b4f84b1fb35fab5"
+      "sourceSha256": "0a409cacce45cd9e155a4857f91fd8cacc6a553577df705e5495c679305c7294",
+      "sha256": "bd7cadad06c773336d69b744f63cb4a8f6c47c2f51deac94e9d837f7a29582ac"
     },
     {
       "source": "email-templates-20260926/notices/preview/de/terms-change.html",
       "path": "preview/de/terms-change.html",
-      "sourceSha256": "24d5ba372eb3de27d7786524ca8c2bce8a28a9f1960e3da900ab68c38c91be6a",
-      "sha256": "24d5ba372eb3de27d7786524ca8c2bce8a28a9f1960e3da900ab68c38c91be6a"
+      "sourceSha256": "273443d0973986d00b090c1b6af3b34c208f51a15d651c4b564a298e790c92e2",
+      "sha256": "7bd661ce1fd96866d533bc599428af22860b53531623edd6432550b49f73ea97"
     },
     {
       "source": "email-templates-20260926/notices/preview/ar/terms-change.html",
       "path": "preview/ar/terms-change.html",
-      "sourceSha256": "73811a254dcf2adf27330c001006e5918998c8a2fbb30b97cca33cfaf73fab6f",
-      "sha256": "73811a254dcf2adf27330c001006e5918998c8a2fbb30b97cca33cfaf73fab6f"
+      "sourceSha256": "c4214f269565c3360a7ef3e6c0f8bc844f5e7f15b77f535c70c27aab61af9574",
+      "sha256": "4819767bf260aee9848879b19bef3431361c62e74e74fa07ed7b8c43232c77e0"
     },
     {
       "source": "email-templates-20260926/notices/preview/es/terms-change.html",
       "path": "preview/es/terms-change.html",
-      "sourceSha256": "2ea0f89c05630389379b9f6f9a530300cbe251caf2cb581d54667296c97ae84d",
-      "sha256": "2ea0f89c05630389379b9f6f9a530300cbe251caf2cb581d54667296c97ae84d"
+      "sourceSha256": "c12a026b78b3f918ff2320e906276c9fe1f8d54b33ed973d6d400745e19f6b52",
+      "sha256": "4e80961a595b759629279cd8e90bbd7ff64efe922a6846f1a0e5da6613c24693"
     },
     {
       "source": "email-templates-20260926/notices/preview/fr/terms-change.html",
       "path": "preview/fr/terms-change.html",
-      "sourceSha256": "69b7ae1a8ccff24af2e24beb26457abe148f01b9083e6a31b7743fef8d3d6aab",
-      "sha256": "69b7ae1a8ccff24af2e24beb26457abe148f01b9083e6a31b7743fef8d3d6aab"
+      "sourceSha256": "6359e2748fb3cbadbafe3e57c01fd1bd072f3d3bd5ec807b9a57c17998419252",
+      "sha256": "60cb579817ecd1a927375193676377d4fb4669e788ca4c96e7a900c8f1e309e1"
     },
     {
       "source": "email-templates-20260926/notices/preview/it/terms-change.html",
       "path": "preview/it/terms-change.html",
-      "sourceSha256": "b59f2276b89f193118cf14848e0579761124e6268cca38bd99438ad655c492c5",
-      "sha256": "b59f2276b89f193118cf14848e0579761124e6268cca38bd99438ad655c492c5"
+      "sourceSha256": "01dec518fa4b2b596f39ef97d5e3ab39239cd8f4e38fe2c46112f9643f043a3a",
+      "sha256": "26384c3c66c720893cecd34bc10304d43db1334e66ee4f1c046618b672c20629"
     },
     {
       "source": "email-templates-20260926/notices/preview/ja/terms-change.html",
       "path": "preview/ja/terms-change.html",
-      "sourceSha256": "b5a3892f0afb180c5517dcafea7f5ca94a360d668ccba8abe557e8bc67de401f",
-      "sha256": "b5a3892f0afb180c5517dcafea7f5ca94a360d668ccba8abe557e8bc67de401f"
+      "sourceSha256": "6e792f71f2a7c8534e7d4c1acc3ccc3aa510b8a6dce062c14aaeb322a06d9819",
+      "sha256": "91f419329ef791054ec88c8954186a25963f50b1e13a471d4ffa98d476024a1f"
     }
   ]
 }
