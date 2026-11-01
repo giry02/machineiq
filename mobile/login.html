@@ -12,6 +12,8 @@
   <link rel="stylesheet" href="./shared/login.css?v=20260905-5">
   <link rel="stylesheet" href="./shared/mobile-type-compact.css?v=20260907-1">
   <link rel="stylesheet" href="./web-guide-colors.css?v=20261012-r139">
+  <link rel="stylesheet" href="./login-dormant.css?v=20261014-r141">
+  <link rel="stylesheet" href="./auth-layout.css?v=20261030-r145">
 </head>
 <body data-screen-id="LQ-AUTH-003" class="mobile-type-compact mobile-tone-c" data-mobile-home="./index.html" data-mobile-login="./login.html">
   <main class="login-page">
@@ -47,11 +49,22 @@
 
     <footer class="login-footer">©2024 Bobcat Company. ALL RIGHTS RESERVED.</footer>
   </main>
+  <dialog id="dormant-login-dialog" class="customer-dormant-dialog" data-screen-id="MHMIQ-AUTH-003-P02" data-state="closed" aria-labelledby="dormant-login-title" aria-describedby="dormant-login-description dormant-login-email dormant-login-note">
+    <header><h2 id="dormant-login-title">휴면계정 안내</h2></header>
+    <div class="customer-dormant-dialog__body">
+      <p id="dormant-login-description"></p>
+      <p id="dormant-login-email" class="customer-dormant-dialog__email"></p>
+      <p id="dormant-login-status" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+      <p id="dormant-login-note" class="customer-dormant-dialog__note">화면 시연용입니다. 실제 이메일은 발송되지 않습니다.</p>
+    </div>
+    <footer><button id="dormant-login-cancel" type="button">취소</button><button id="dormant-login-primary" type="button">임시 비밀번호 받기</button></footer>
+  </dialog>
   <div class="login-toast" role="status" aria-live="polite" hidden></div>
   <script src="./shared/layouts/vendor/lucide.min.js"></script>
   <script src="./signup-header.js?v=20260921-r88"></script>
-  <script src="./onboarding.js?v=20261008-r134"></script>
-  <script src="./auth-common.js?v=20260924-r111"></script>
-  <script src="./login.js?v=20260924-r111"></script>
+  <script src="./onboarding.js?v=20261019-r142"></script>
+  <script src="./auth-common.js?v=20261014-r141"></script>
+  <script src="./dormant-login.js?v=20261014-r141"></script>
+  <script src="./login.js?v=20261014-r141"></script>
 </body>
 </html>

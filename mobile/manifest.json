@@ -1,5 +1,5 @@
 {
-  "revision": "2026-10-22-r143",
+  "revision": "2026-10-30-r147",
   "entry": "login.html",
   "includeArchives": false,
   "mapMode": "embedded-google",
@@ -7,31 +7,31 @@
   "files": [
     {
       "path": "index.html",
-      "sha256": "938b1691bb0df26e96ef932c5c9550d46e899fd8397bc721844a44339315eedf"
+      "sha256": "262c760f7912bf118eba073b5bceb26ec476bceae0eefd89bec0f3620221662c"
     },
     {
       "path": "customer.js",
-      "sha256": "d02899ae56b1c6609427aea47b527f1be4a717a3feff7c0921949bee7ac1c85e"
+      "sha256": "8460218f63c9c4e1eace2a1e136202d8e8b97478ba25a5454166d83371389239"
     },
     {
       "path": "customer.css",
-      "sha256": "268246deba5b9a710a2188959f9340faa4d529a3add05f87950068b204954ae0"
+      "sha256": "a9308fcd82c985ef10dcfdcbd28a50c758d8044278069ecd23301d48dfb36a39"
     },
     {
       "path": "auth-common.js",
-      "sha256": "489f973c40e063e098dc545aabcece0c623b2d15ecd97e19bb4f26b886ebaef4"
+      "sha256": "9e80604df5effa5a3120333f7ee60a9920506c86d2af14f9e2c6a408434503a0"
     },
     {
       "path": "query-controls.js",
-      "sha256": "cafd66dd756a4b6a6a83bedb2192e938c3a1517788768c6f6a07ada1807f74c2"
+      "sha256": "d77697295687e0d5a9e9119d1e26244fb78337c7dc4f0e2b656cc827a1c8a3e9"
     },
     {
       "path": "home-view.js",
-      "sha256": "1a4e5236d1ba26da25f0a5337d389c5b98619a50cdeecec65b834f55950ea0b4"
+      "sha256": "c9ced9d8bcbff96db72727e770aceccbe90885cb60625e732bc43fe91f2e5674"
     },
     {
       "path": "release.json",
-      "sha256": "a81e24014fdae1d99d4e91cfa544470943a3e38245de0c9d39d9f00753a1e4aa"
+      "sha256": "a8f33f7faa4e9769c36f8b225939dea419833abdec8f083ad78b4bb6b3974f46"
     },
     {
       "path": "error-documents.js",
@@ -43,15 +43,15 @@
     },
     {
       "path": "login.html",
-      "sha256": "d41da3030e73bbfde7fe1143cb0211cd82fb988124c8f4bcbb8dad3ee116df9c"
+      "sha256": "3038a27cabc51a09d1e83d0da000b3a802dc977c6a6efa78080ae1bcefc2b110"
     },
     {
       "path": "login.js",
-      "sha256": "7dc2f7920731732bc9175040dda9f1efbef5d3db78209482b0db055262d8ebb2"
+      "sha256": "156c297945cb2582e88446da4c8e22bab8480f966be389b9df764c60674f2c3c"
     },
     {
       "path": "signup.html",
-      "sha256": "52f80f67779dfd28c38c2d9b009a7be8bebea722ed0350df7fbd157fa10b1fcb"
+      "sha256": "54713a00357a7f4caf85c1e512c63393eedc483df831655813213eb34f2a4981"
     },
     {
       "path": "signup.js",
@@ -63,11 +63,11 @@
     },
     {
       "path": "find-password.html",
-      "sha256": "fe9083eda15220cc21257d183208210819905346496e0f699ba10c51bbb4e586"
+      "sha256": "f16ed6be11349b790c42ec20e78e4a43def2e6e6d89c9276e5e269b7b7666a91"
     },
     {
       "path": "find-password.js",
-      "sha256": "042a3c60bc899b0dd1497a462a727f0fc75abccdc70b6d6ecbc8c3cf5c948b16"
+      "sha256": "1bd0b6e3e9f6a45da40d701b449f814436bcb082bae08518375ffc8e567509a5"
     },
     {
       "path": "web-contracts.generated.js",
@@ -83,15 +83,15 @@
     },
     {
       "path": "owner-dashboard-preview.css",
-      "sha256": "2d8421730242033b07300eb9b61cd0eafac915900d46fd4f30fc2526736ebb56"
+      "sha256": "07dbd747aba5043cf28082601506eadc1f4e49c8225e212b5de5863b92bbc27a"
     },
     {
       "path": "vehicle-registration.js",
-      "sha256": "2090d1650a68586f67726e1c22bdab992a8f4b6aaf766ed07f60a42900915d0e"
+      "sha256": "ddd951c76f49b9904e645dc27a7d4bbf45211c34b99ff2955320995ec8cf995d"
     },
     {
       "path": "onboarding.js",
-      "sha256": "7f277dce368c5bab4dc2e881cb2bd719fb76d223feefbfd74275952fc449fde1"
+      "sha256": "015b069dc9e1c8298263d411d1034d33d14245ec52411b483233199a2c133aa5"
     },
     {
       "path": "location-map.js",
@@ -908,6 +908,18 @@
     {
       "path": "tests/black-text.cjs",
       "sha256": "bdf660cee31d52567609f2ae4c545c09c547a07df63b9968feed1e663b7beb57"
+    },
+    {
+      "path": "auth-layout.css",
+      "sha256": "2b136c84c315a8464c35a42434d05462e18819bec6de0014de5cff46805a1ecd"
+    },
+    {
+      "path": "login-dormant.css",
+      "sha256": "6c1d801072ec8d3d02582bcae7f5e31d77098c4295e06ba1fab0f93049130fcd"
+    },
+    {
+      "path": "dormant-login.js",
+      "sha256": "84f44b3e64a90539b8bda5682303cc9ebc41a23fb05eba731d8a3264c3a4632c"
     }
   ]
 }

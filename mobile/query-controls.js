@@ -23,7 +23,7 @@
 
   function periodControls({group=false,vehicle=false}={}) {
     const state=getState();
-    const s=periodState(),linked=s.period!=='c',dayOnly=s.period==='d';
+    const s=periodState(),dayOnly=s.from===s.to;
     const hasGroup=group&&state.role==='customer_owner';
     const shortDate=value=>/^\d{4}-\d{2}-\d{2}$/.test(value)?value.slice(5).replace('-','.'):value;
     const lookup=vehicle?vehicleControl(vehicle===true?'reportVehicle':vehicle):'';
@@ -31,7 +31,7 @@
       ${hasGroup?'<div class="compact-filter-top">'+scopeControls()+lookup+'</div>':lookup}
       <button class="compact-range-toggle" type="button" data-toggle-range aria-expanded="${getRangeOpen()}" aria-controls="range-form" aria-label="조회 기간 ${esc(s.from)} ~ ${esc(s.to)}, 날짜 변경">${icon('calendar-days')}<span>${esc(shortDate(s.from))}${dayOnly?'':' ~ '+esc(shortDate(s.to))}</span>${icon('chevron-down')}</button>
       <div class="period-tabs" role="group" aria-label="조회 기간">${[['d','일'],['w','주'],['m','월']].map(([key,text])=>`<button type="button" data-period="${key}" aria-pressed="${s.period===key}" class="${s.period===key?'is-active':''}">${text}</button>`).join('')}</div>
-      <form class="date-range" id="range-form" ${getRangeOpen()?'':'hidden'}${linked?' data-linked-period="'+s.period+'"':''}><input name="from" type="date" value="${esc(s.from)}" aria-label="${dayOnly?'조회일':'조회 시작일'}" required><span ${dayOnly?'hidden':''}>~</span><input name="to" type="${dayOnly?'hidden':'date'}" value="${esc(s.to)}" aria-label="조회 종료일" required><button type="submit">조회</button></form></section>`;
+      <form class="date-range" id="range-form" ${getRangeOpen()?'':'hidden'}><input name="from" type="date" value="${esc(s.from)}" aria-label="조회 시작일" required><span>~</span><input name="to" type="date" value="${esc(s.to)}" aria-label="조회 종료일" required><button type="submit">조회</button></form></section>`;
   }
 
   function vehicleQueryControl() {

@@ -3,8 +3,8 @@
   const $$ = selector => [...document.querySelectorAll(selector)];
   // Existing dealer UI, customer-only local authentication state.
   const auth=window.CustomerAuthCommon,role=auth.role(window.location.search),key=auth.key;
+  ['temporary-password','temporary-expires','temporary-identifier','force-password-change'].forEach(name=>{try{sessionStorage.removeItem(key(name));}catch{}});
   let reached=1;
-  let verifiedEmail='';
   let sentEmail='';
   let identifier='';
   document.querySelectorAll('a[href="./login.html"], a[href="./signup.html"]').forEach(link=>{link.href+='?role='+role;});
@@ -59,27 +59,25 @@
   $('#recovery-send').addEventListener('click', () => {
     const email=$('#recovery-email').value.trim();
     if(!$('#recovery-name').value.trim()||!auth.email.test(email))return showToast('이름과 등록 이메일을 확인해 주세요.');
-    sentEmail=email;verifiedEmail='';$('#recovery-code').value='';startTimer();showToast('인증 코드를 발송했습니다.');
+    sentEmail=email;$('#recovery-code').value='';startTimer();showToast('인증 코드 발송 시연입니다. 실제 이메일은 발송되지 않습니다.');
   });
   $('#recovery-email').addEventListener('input',()=>{sentEmail='';remaining=0;if(timerId)window.clearInterval(timerId);drawTimer();});
   $('#recovery-verify-form').addEventListener('submit', event => {
     event.preventDefault();
     if(!sentEmail||remaining<=0||sentEmail!==$('#recovery-email').value.trim())return showToast('인증 코드를 발송한 뒤 유효시간 내에 확인해 주세요.');
     if($('#recovery-code').value.trim()!=='123456')return showToast('인증 코드가 일치하지 않습니다.');
-    verifiedEmail=sentEmail;
-    const password='MIQ-'+Math.floor(10000000+Math.random()*90000000)+'!a';
-    $('#temporary-password').textContent=password;
-    sessionStorage.setItem(key('temporary-password'),password);
-    sessionStorage.setItem(key('temporary-expires'),String(Date.now()+24*60*60*1000));
-    sessionStorage.setItem(key('temporary-identifier'),identifier||verifiedEmail);
-    sessionStorage.removeItem(key('force-password-change'));
+    const preview=auth.recoveryPreview.issue(identifier);
+    if(!preview||preview.marker.identifier!==sentEmail.toLowerCase())return showToast('이 계정은 비밀번호 찾기 시연 데이터에 등록되어 있지 않습니다.');
+    try{sessionStorage.setItem(key('recovery-preview'),JSON.stringify(preview.marker));}
+    catch{return showToast('시연 상태를 저장하지 못했습니다. 다시 시도해 주세요.');}
+    $('#temporary-password').textContent=preview.password;
     reached=3;
     if (timerId) window.clearInterval(timerId);
     showStep(3);
   });
   $('#copy-temporary-password').addEventListener('click', async () => {
     try { await navigator.clipboard.writeText($('#temporary-password').textContent); showToast('임시 비밀번호를 복사했습니다.'); }
-    catch (error) { showToast('임시 비밀번호: ' + $('#temporary-password').textContent); }
+    catch { showToast('복사하지 못했습니다. 화면의 시연 비밀번호를 직접 입력해 주세요.'); }
   });
   window.addEventListener('beforeunload', () => { if (timerId) window.clearInterval(timerId); });
 
