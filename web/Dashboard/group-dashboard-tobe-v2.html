@@ -2,15 +2,15 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8"/>
-<script src="../_shared/common-logic.js?v=d77b14750704&amp;rev=15dd4911055c"></script>
-<link rel="stylesheet" href="../_shared/korean-layout.css?v=9e980f3cddea&amp;rev=495db444ef75"/>
+<script src="../_shared/common-logic.js?v=74af7d568cb5"></script>
+<link rel="stylesheet" href="../_shared/korean-layout.css?v=0a90d9baf224"/>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>대시보드 | MACHINE IQ</title>
-<script src="../_shared/customer-access.js?v=e12eedbcb072&amp;rev=e12eedbcb072"></script>
-<link rel="icon" type="image/x-icon" href="../_shared/favicon.ico"/>
+<script src="../_shared/customer-access.js?v=bfa9f7778e77"></script>
+<link rel="icon" type="image/x-icon" href="../_shared/favicon.ico?v=7ee3a7570075"/>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&amp;display=swap"/>
-<link rel="stylesheet" href="../_shared/gnb.css?v=b9f0ddfcf14c&amp;rev=d6e9d1b776a5"/>
+<link rel="stylesheet" href="../_shared/gnb.css?v=e42cb50fa2bc"/>
 <style>
 /* Wait for the current dashboard renderer before the first paint. */
 body:not(.dc-ready) #dashboardContent{visibility:hidden!important}
@@ -74,34 +74,37 @@ body.miq-content-dashboard[data-gnb="dash"][data-sub="group"]>.miq-target-select
 }
 .live-chip[hidden],.dashboard-updated[hidden]{display:none}
 </style>
-<link rel="stylesheet" href="../_shared/content-system.css?v=d8f94e7e5049&amp;rev=ae90e4581dc8"/>
-<link rel="stylesheet" href="../_shared/dashboard-deeplinks.css?v=b1960113c8ea&amp;rev=b1960113c8ea"/>
-<link rel="stylesheet" href="../_shared/chart-common.css?v=fc1c23dcf6af&amp;rev=fc1c23dcf6af"/>
-<link rel="stylesheet" href="../_shared/form-controls.css?v=6fda272acdcc&amp;rev=9debe1b59fae"/>
-<link rel="stylesheet" href="../_shared/dashboard-canvas-preview.css?v=37514fa526ff&amp;rev=01276470b128"/>
-<link rel="stylesheet" href="../_shared/dashboard-usage-variants-preview.css?v=3388b490a09b&amp;rev=3388b490a09b"/>
-<link rel="stylesheet" href="../_shared/dashboard-work-idle-compact.css?v=55ec63c18d2f&amp;rev=55ec63c18d2f"/>
-<link rel="stylesheet" href="../_shared/list-pagination.css?v=0069e48c1009&amp;rev=0069e48c1009">
-<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?v=eabe5a26bfe9&amp;rev=0e55e64ed211"/>
-<link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?v=1cffa21a9777&amp;rev=1cffa21a9777"/>
+<link rel="stylesheet" href="../_shared/content-system.css?v=4d4eadce3352"/>
+<link rel="stylesheet" href="../_shared/dashboard-deeplinks.css?v=580dedcb40f4"/>
+<link rel="stylesheet" href="../_shared/chart-common.css?v=c719d730077a"/>
+<link rel="stylesheet" href="../_shared/form-controls.css?v=ce0b5ee4f726"/>
+<link rel="stylesheet" href="../_shared/dashboard-canvas-preview.css?v=a516ba3330e7"/>
+<link rel="stylesheet" href="../_shared/dashboard-usage-variants-preview.css?v=3388b490a09b"/>
+<link rel="stylesheet" href="../_shared/dashboard-work-idle-compact.css?v=20535a4091c9"/>
+<link rel="stylesheet" href="../_shared/list-pagination.css?v=73e4044283e3">
+<link rel="stylesheet" data-current-shell href="../_shared/current-shell.css?v=f6d9b8bf76a1"/>
+<link rel="stylesheet" data-operations-navigation href="../_shared/operations-navigation.css?v=18f6d0f6b1db"/>
 <style>body.miq-current-shell>#gnb{min-height:64px}</style>
-<script defer blocking="render" src="../_mock-data/generated/fleet.generated.js?v=52fa65a2dce1&amp;rev=52fa65a2dce1"></script>
-<script defer blocking="render" src="../_mock-data/generated/observation-profiles.generated.js?v=1be92dd7a845&amp;rev=4054b4937190"></script>
-<script defer blocking="render" src="../_shared/vehicle-observations.js?v=550edc6b3b85&amp;rev=b5e24277418e"></script>
-<script defer blocking="render" src="../_shared/meeting-model.js?v=48be9a58ad27&amp;rev=48be9a58ad27"></script>
-<script defer blocking="render" src="../_shared/chart-common.js?v=28a8b1161c0e&amp;rev=28a8b1161c0e"></script>
-<script defer blocking="render" src="../_shared/list-pagination.js?v=4b500130528b&amp;rev=4b500130528b"></script>
-<script defer blocking="render" src="../_shared/nav.js?v=f5f9b1d00606&amp;rev=5ae862e16c37"></script>
-<script defer blocking="render" src="../_shared/dashboard-company-model.js?v=1600590975b7&amp;rev=1600590975b7"></script>
-<script defer blocking="render" src="../_shared/service-demo-data.js?v=dcd01d3f4b36&amp;rev=dcd01d3f4b36"></script>
-<script defer blocking="render" src="../_shared/service-records.js?v=057b92280fec&amp;rev=057b92280fec"></script>
-<script defer blocking="render" src="../_shared/report-series.js?v=c676889771d9&amp;rev=c676889771d9"></script>
-<script defer blocking="render" src="../_shared/summary-row-model.js?v=8ec5759511a3&amp;rev=8ec5759511a3"></script>
-<script defer blocking="render" src="../_shared/dashboard-current-metrics.js?v=88df0eb8ae84&amp;rev=88df0eb8ae84"></script>
-<script defer blocking="render" src="../_shared/dashboard-view-data.js?v=83c0306acac3&amp;rev=83c0306acac3"></script>
-<script defer blocking="render" src="../_shared/dashboard-work-idle-compact.js?v=cdb6613149c3&amp;rev=cdb6613149c3"></script>
+<script defer blocking="render" src="../_mock-data/generated/fleet.generated.js?v=0bfdb023c15f"></script>
+<script defer blocking="render" src="../_mock-data/generated/observation-profiles.generated.js?v=34cde445e84c"></script>
+<script defer blocking="render" src="../_shared/vehicle-observations.js?v=307780a5d01f"></script>
+<script defer blocking="render" src="../_shared/meeting-model.js?v=48be9a58ad27"></script>
+<script defer blocking="render" src="../_shared/chart-common.js?v=a229570827e1"></script>
+<script defer blocking="render" src="../_shared/list-pagination.js?v=7f1c605323d3"></script>
+<script defer blocking="render" src="../_shared/nav.js?v=fdc3fd828d88"></script>
+<script defer blocking="render" src="../_shared/dashboard-company-model.js?v=c112a72dd854"></script>
+<script defer blocking="render" src="../_shared/service-demo-data.js?v=d0d952a01900"></script>
+<script defer blocking="render" src="../_shared/service-records.js?v=057b92280fec"></script>
+<script defer blocking="render" src="../_shared/report-series.js?v=c676889771d9"></script>
+<script defer blocking="render" src="../_shared/summary-row-model.js?v=736f5db9446f"></script>
+<script defer blocking="render" src="../_shared/dashboard-current-metrics.js?v=88df0eb8ae84"></script>
+<script defer blocking="render" src="../_shared/dashboard-view-data.js?v=66ecace40523"></script>
+<link rel="stylesheet" href="../_shared/dashboard-two-tab-motion.css?v=4d5c55ec96db"/>
+<script defer src="../_shared/dashboard-two-tab-motion.js?v=7e01bfea4db6"></script>
+<link rel="stylesheet" href="../_shared/dashboard-two-tab.css?v=12662430636f"/>
+<script defer blocking="render" src="../_shared/dashboard-two-tab.js?v=880f554ea917"></script>
 </head>
-<body data-current-bootstrap="ready" data-screen-id="LQ-DASH-001" data-period-presets="dwm" class="miq-current-shell miq-content-system miq-content-dashboard miq-dashboard-widgets-preview" data-gnb="dash" data-sub="group" data-variant="tobe" data-base="../">
+<body data-current-bootstrap="ready" data-screen-id="MHMIQ-DASH-001" data-period-presets="dwm" class="miq-current-shell miq-content-system miq-content-dashboard miq-dashboard-widgets-preview dr-preview dr-grouped-preview" data-gnb="dash" data-sub="group" data-variant="tobe" data-base="../">
 
 <div id="gnb"></div>
 
