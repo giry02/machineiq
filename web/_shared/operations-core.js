@@ -1,4 +1,4 @@
-/* Isolated internal operations prototype. No existing management stores or
+/* Isolated Admin portal prototype. No existing management stores or
    server endpoints are changed. Role query is a preview gate, not server auth. */
 (function (root) {
   'use strict';
@@ -10,7 +10,7 @@
     });
   }
   function clone(value) { return JSON.parse(JSON.stringify(value)); }
-  function internal() { return new URLSearchParams(root.location.search).get('role') === 'internal'; }
+  function admin() { return !!root.MIQAdminContext && root.MIQAdminContext.active(); }
   function read(key, seed) {
     try {
       var stored = root.localStorage.getItem(prefix + key);
@@ -19,7 +19,7 @@
     return clone(Object.prototype.hasOwnProperty.call(memory, key) ? memory[key] : seed);
   }
   function write(key, value) {
-    if (!internal()) throw new Error('내부 사용자 전용 기능입니다.');
+    if (!admin()) throw new Error('어드민 전용 기능입니다.');
     memory[key] = clone(value);
     try { root.localStorage.setItem(prefix + key, JSON.stringify(value)); }
     catch (error) { notify('브라우저 저장 공간을 사용할 수 없어 현재 화면에서만 유지됩니다.'); }
@@ -51,7 +51,7 @@
     notify('조회 결과 ' + rows.length + '건을 내보냈습니다.');
   }
   function modal(options) {
-    if (!internal()) return;
+    if (!admin()) return;
     var previous = document.activeElement, id = 'opsModal' + (++modalSequence);
     var dim = document.createElement('div'); dim.className = 'dim open ops-modal';
     dim.style.zIndex = String(250 + modalSequence); MIQCommon.view.call(dim,"setAttribute",['data-ops-modal','true']);
@@ -255,10 +255,11 @@
   }
   function start() {
     var el = document.getElementById('opsContent');
-    if (!el || document.body.dataset.gnb !== 'ops') return;
-    if (!internal()) { MIQCommon.view.set(el,"innerHTML",''); return; }
+    if (!el || !root.MIQAdminContext || !root.MIQAdminContext.isMenuKey(document.body.dataset.gnb) || el.__miqOpsStarted) return;
+    if (!admin()) { MIQCommon.view.set(el,"innerHTML",''); return; }
     var render = registry[document.body.dataset.opsPage];
     if (render) {
+      el.__miqOpsStarted = true;
       render({el:el}); alignManagementControls(el); el.removeAttribute('aria-busy');
       new MutationObserver(function () { alignManagementControls(el); }).observe(el, {childList:true,subtree:true});
     }
@@ -266,6 +267,7 @@
   root.MIQOps = {register:register,esc:esc,read:read,write:write,notify:notify,exportCsv:exportCsv,modal:modal,confirm:confirm,grid:grid};
   if (typeof module === 'object' && module.exports) module.exports = {esc:esc,csvText:csvText};
   if (typeof document !== 'undefined') {
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, {once:true});
+    if (document.readyState !== 'complete') document.addEventListener('DOMContentLoaded', start, {once:true});
+    else start();
   }
 }(typeof window !== 'undefined' ? window : globalThis));

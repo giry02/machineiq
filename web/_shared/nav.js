@@ -76,18 +76,6 @@
         { key: 'equipreq', label: '차량신청관리', dir: 'Mgmt Vehicle Request', tobe: 'mgmt-vehicle-request-tobe.html', hiddenTobe: true }
       ] },
 
-    { key: 'ops', label: '운영관리', dir: 'Operations',
-      subs: [
-        { key: 'data', label: '차량 데이터 관리', tobe: 'operations-data.html' },
-        { key: 'equipment', label: '장비코드 관리', tobe: 'operations-equipment.html' },
-        { key: 'codes', label: '공통코드 관리', tobe: 'operations-codes.html' },
-        { key: 'languages', label: '다국어 관리', tobe: 'operations-languages.html' },
-        { key: 'notices', label: '공지사항 관리', tobe: 'operations-notices.html' },
-        { key: 'accounts', label: '내부 계정 관리', tobe: 'operations-accounts.html' },
-        { key: 'menus', label: '메뉴·접근권한 관리', tobe: 'operations-menus.html' },
-        { key: 'history', label: '메뉴 접속이력', tobe: 'operations-history.html' }
-      ] },
-
     { key: 'interest', label: '관심차량',
       subs: [
         { key: 'summary', label: '관심차량 현황', dir: 'Interest Vehicles', tobe: 'interest-vehicles-status-tobe.html' },
@@ -128,6 +116,10 @@
   var MANAGEMENT_ROLE_CODES = MANAGEMENT_ROLES.map(function (role) { return role.code; });
   var managementRoleQuery = new URLSearchParams(location.search).get('role');
   var MANAGEMENT_ROLE = roleRules.resolve(managementRoleQuery);
+  var adminContext = window.MIQAdminContext;
+  var ADMIN_ACTIVE = VARIANT === 'tobe' && !!adminContext && adminContext.active();
+  var ADMIN_PAGE = !!adminContext && adminContext.isMenuKey(ACT);
+  if (adminContext) MENU = MENU.concat(adminContext.menus());
   var MANAGEMENT_IDENTITIES = {
     internal: { account: '밥캣 운영 - 내부', operator: '김정수' },
     dealer_owner: { account: '중부딜러 - 대표', operator: '박민아' },
@@ -136,6 +128,7 @@
     customer_staff: { account: '세종물류 - 직원', operator: '오하늘' }
   };
   var MANAGEMENT_IDENTITY = MANAGEMENT_IDENTITIES[MANAGEMENT_ROLE];
+  if (ADMIN_ACTIVE) MANAGEMENT_IDENTITY = { account: '밥캣 운영 - 어드민', operator: MANAGEMENT_IDENTITY.operator };
   var registeredAccount = window.MIQCustomerAccess && window.MIQCustomerAccess.current(MANAGEMENT_ROLE);
   if (registeredAccount) {
     MANAGEMENT_IDENTITY = { account: (registeredAccount.company || registeredAccount.name) + ' - ' + (MANAGEMENT_ROLE === 'customer_owner' ? '대표' : '직원'), operator: registeredAccount.name };
@@ -153,6 +146,7 @@
   }
 
   body.dataset.managementRole = MANAGEMENT_ROLE;
+  if (ADMIN_ACTIVE) body.dataset.adminPortal = 'true';
   function isDealerManagementRole(role) { return roleRules.isDealer(role); }
   function canUseInterest(role) { return roleRules.canUseFavorites(role); }
   function managementRoleLabel(role) {
@@ -322,30 +316,22 @@
     if (!document.querySelector('link[data-current-shell]')) {
       var shellCss = document.createElement('link');
       shellCss.rel = 'stylesheet';
-      shellCss.href = BASE + '_shared/current-shell.css?v=fc90bc42e4ac&rev=font-black-20261012';
+      shellCss.href = BASE + '_shared/current-shell.css?rev=0e55e64ed211';
       MIQCommon.view.call(shellCss,"setAttribute",['data-current-shell','']);
       document.head.appendChild(shellCss);
-    }
-    if (VARIANT === 'tobe' && MANAGEMENT_ROLE === 'internal') {
-      body.classList.add('miq-has-operations');
-      if (!document.querySelector('link[data-operations-navigation]')) {
-      var opsNavCss = document.createElement('link');
-      opsNavCss.rel = 'stylesheet';
-      opsNavCss.href = BASE + '_shared/operations-navigation.css?rev=20260911-2';
-      document.head.appendChild(opsNavCss);
-      }
     }
   }
 
   /* MVP 정책 필터 */
   function menuVisible(m) {
     if (m.preLogin || m.userMenu) return false;          // 상단 메뉴 줄에는 노출하지 않음
-    if (m.key === 'ops') return VARIANT === 'tobe' && MANAGEMENT_ROLE === 'internal';
+    if (ADMIN_ACTIVE) return adminContext.isMenuKey(m.key);
+    if (adminContext && adminContext.isMenuKey(m.key)) return false;
     if (m.key === 'interest') return VARIANT === 'tobe' && canUseInterest(MANAGEMENT_ROLE);
     if (m.key === 'equip') return VARIANT === 'asis';    // TO-BE는 요약정보로 통합되어 상단 차량관리 제거
     return !(m.asisOnly && VARIANT !== 'asis');
   }
-  function subVisible(s) { return !(s.asisOnly && VARIANT !== 'asis') && !(s.tobeOnly && VARIANT !== 'tobe'); }
+  function subVisible(s) { return !s.pending && !(s.asisOnly && VARIANT !== 'asis') && !(s.tobeOnly && VARIANT !== 'tobe'); }
   function subHidden(s) { return (s.key === 'favorites' && !canUseInterest(MANAGEMENT_ROLE)) || !!s.hidden || (s.hiddenTobe && VARIANT !== 'asis'); }
   function subInDropdown(s) { return subVisible(s) && !subHidden(s); }
 
@@ -380,6 +366,7 @@
   }
 
   function contextualHref(menu, sub, target) {
+    if (ADMIN_ACTIVE) return adminContext.href(href(menu, sub), location.href);
     var url = new URL(href(menu, sub), location.href);
     if (VARIANT === 'tobe' && (menu.key === 'mgmt' || menu.key === 'ops' || menu.key === 'interest' && sub.key === 'favorites')) {
       url.searchParams.set('role', MANAGEMENT_ROLE);
@@ -390,6 +377,7 @@
   }
 
   function menuEntryHref(menu, sub) {
+    if (ADMIN_ACTIVE) return adminContext.href(href(menu, sub), location.href);
     if (VARIANT === 'tobe' && ACT === 'srvc' && menu.key === 'srvc') {
       return window.MIQCommon.navigation.serviceMenuHref(href(menu, sub), MANAGEMENT_ROLE, location.href, window.MIQ_SERVICE_QUERY);
     }
@@ -402,7 +390,7 @@
       if (VARIANT !== 'tobe') return;
       var anchor = event.target.closest('[data-miq-side-sub]');
       if (!anchor) return;
-      anchor.href = ACT === 'srvc'
+      anchor.href = ADMIN_ACTIVE ? adminContext.href(anchor.href, location.href) : ACT === 'srvc'
         ? window.MIQCommon.navigation.serviceMenuHref(anchor.href, MANAGEMENT_ROLE, location.href, window.MIQ_SERVICE_QUERY)
         : window.MIQCommon.navigation.menuHref(anchor.href, MANAGEMENT_ROLE, location.href);
       event.stopImmediatePropagation();
@@ -418,11 +406,15 @@
     return;
   }
 
-  // New operations pages are isolated from the existing management policy.
-  if (ACT === 'ops' && (VARIANT !== 'tobe' || MANAGEMENT_ROLE !== 'internal')) {
+  // Admin pages have a separate portal, without changing the five account roles.
+  if (ADMIN_PAGE && !ADMIN_ACTIVE) {
     var blockedOpsTarget = new URL(BASE + 'Dashboard/group-dashboard-tobe-v2.html', location.href);
     blockedOpsTarget.searchParams.set('role', MANAGEMENT_ROLE);
     location.replace(blockedOpsTarget.href);
+    return;
+  }
+  if (ADMIN_ACTIVE && !ADMIN_PAGE && ACT !== 'myacct') {
+    location.replace(adminContext.href(BASE + adminContext.landing, location.href));
     return;
   }
 
@@ -432,6 +424,7 @@
     var logo = '<img src="' + BASE + '_shared/machine-iq-material-handling-white.svg" alt="Bobcat MACHINE IQ MATERIAL HANDLING">';
     var logoHref = BASE + enc('Dashboard') + '/group-dashboard-' + VARIANT + (VARIANT === 'tobe' ? '-v2' : '') + '.html';
     if (VARIANT === 'tobe') logoHref += '?role=' + encodeURIComponent(MANAGEMENT_ROLE);
+    if (ADMIN_ACTIVE) logoHref = adminContext.href(BASE + adminContext.landing, location.href);
 
     var html = '<div class="gnb' + (VARIANT === 'asis' ? ' gnb--asis' : '') + '">' +
       '<a class="gnb__logo" href="' + logoHref + '">' + logo + '</a><nav class="gnb__menu">';
@@ -444,6 +437,7 @@
 
       var landingHref = href(m, landing);
       if (VARIANT === 'tobe') landingHref += '?role=' + encodeURIComponent(MANAGEMENT_ROLE);
+      if (ADMIN_ACTIVE) landingHref = adminContext.href(href(m, landing), location.href);
       html += '<div class="gnb__item' + (m.key === ACT ? ' active' : '') + '">' +
         '<a href="' + landingHref + '">' + m.label + '</a></div>';
     });
@@ -454,14 +448,15 @@
     MENU.forEach(function (m) { if (m.key === 'myacct') acct = m; });
     var acctHref = acct ? href(acct, acct.subs[0]) : '';
     if (acctHref && VARIANT === 'tobe') acctHref += '?role=' + encodeURIComponent(MANAGEMENT_ROLE);
+    if (acctHref && ADMIN_ACTIVE) acctHref = adminContext.href(acctHref, location.href);
 
     var managementRoleControl = '';
     if (VARIANT === 'tobe') {
       managementRoleControl = '<label class="gnb__role"><span>권한 설정</span>' +
         '<select id="account-role" data-account-role aria-label="화면 권한 설정">' +
         MANAGEMENT_ROLES.map(function (role) {
-          return '<option value="' + role.code + '"' + (role.code === MANAGEMENT_ROLE ? ' selected' : '') + '>' + role.label + '</option>';
-        }).join('') + '</select></label>';
+          return '<option value="' + role.code + '"' + (!ADMIN_ACTIVE && role.code === MANAGEMENT_ROLE ? ' selected' : '') + '>' + role.label + '</option>';
+        }).join('') + (adminContext ? '<option value="admin"' + (ADMIN_ACTIVE ? ' selected' : '') + '>' + adminContext.label + '</option>' : '') + '</select></label>';
     }
 
     html += '</nav><div class="gnb__right">' + managementRoleControl +
@@ -469,7 +464,7 @@
         '<select aria-label="언어 선택">'+"<option value=\"ko\" lang=\"ko\" dir=\"ltr\" translate=\"no\" selected>KO</option><option value=\"en\" lang=\"en\" dir=\"ltr\" translate=\"no\">English</option><option value=\"de\" lang=\"de\" dir=\"ltr\" translate=\"no\">Deutsch</option><option value=\"ar\" lang=\"ar\" dir=\"rtl\" translate=\"no\">العربية</option><option value=\"es\" lang=\"es\" dir=\"ltr\" translate=\"no\">Español</option><option value=\"fr\" lang=\"fr\" dir=\"ltr\" translate=\"no\">Français</option><option value=\"it\" lang=\"it\" dir=\"ltr\" translate=\"no\">Italiano</option><option value=\"ja\" lang=\"ja\" dir=\"ltr\" translate=\"no\">日本語</option>"+'</select></label>' +
       (acctHref ? '<a class="home gnb__account" href="' + acctHref + '"' + (VARIANT === 'tobe' ? ' data-account-modal aria-haspopup="dialog"' : '') + (ACT === 'myacct' ? ' style="background:rgba(255,255,255,.22)"' : '') +
         '>' + (VARIANT === 'tobe' ? MIQCommon.view.get(accountLabel,"innerHTML") : '세종물류 - 관리자') + '</a>' : '<span>세종물류 - 관리자</span>') +
-      '<a class="home gnb__logout" href="' + BASE + enc('Login') + '/login-' + VARIANT + '.html">로그아웃</a></div></div>';
+      '<a class="home gnb__logout" href="' + BASE + enc('Login') + '/login-' + VARIANT + '.html' + (ADMIN_ACTIVE ? '?portal=admin' : '') + '">로그아웃</a></div></div>';
 
     MIQCommon.view.set(mount,"outerHTML",html);
     var accountLink = document.querySelector('.gnb__account[data-account-modal]');
@@ -484,7 +479,7 @@
         if (accountModalLoading) return;
         accountModalLoading = true;
         var component = document.createElement('script');
-        component.src = BASE + '_shared/account-modal-component.js?rev=font-black-20261012';
+        component.src = BASE + '_shared/account-modal-component.js?rev=14d45cae21fc';
         component.dataset.base = BASE;
         component.addEventListener('load', function () {
           accountModalLoading = false;
@@ -501,8 +496,13 @@
     var managementRoleSelect = document.getElementById('account-role');
     if (managementRoleSelect) {
       managementRoleSelect.addEventListener('change', function () {
+        if (this.value === 'admin' && adminContext) {
+          location.href = adminContext.href(BASE + adminContext.landing, location.href);
+          return;
+        }
         var nextRole = roleRules.resolve(this.value);
         var nextUrl = new URL(location.href);
+        nextUrl.searchParams.delete('portal');
         if (ACT === 'mgmt') {
           nextUrl.search = '';
         } else {
@@ -514,9 +514,11 @@
           });
         }
         nextUrl.searchParams.set('role', nextRole);
-        if (ACT === 'ops' && nextRole !== 'internal') {
+        if (ADMIN_ACTIVE || ADMIN_PAGE) {
           nextUrl = new URL(BASE + 'Dashboard/group-dashboard-tobe-v2.html', location.href);
           nextUrl.searchParams.set('role', nextRole);
+          var nextLanguage = new URLSearchParams(location.search).get('lang');
+          if (nextLanguage) nextUrl.searchParams.set('lang', nextLanguage);
         }
         if (ACT === 'interest' && !canUseInterest(nextRole)) {
           nextUrl = new URL(BASE + enc('Vehicle Summary') + '/vehicle-summary-tobe-3.html', location.href);
@@ -1992,13 +1994,6 @@
           ['user', '사용자'], ['company', '업체'], ['group', '그룹'], ['vehicle', '차량']
         ]
       },
-      ops: {
-        title: '운영관리',
-        items: [['data', '차량 데이터 관리'], ['equipment', '장비코드 관리'],
-          ['codes', '공통코드 관리'], ['languages', '다국어 관리'],
-          ['notices', '공지사항 관리'], ['accounts', '내부 계정 관리'],
-          ['menus', '메뉴·접근권한 관리'], ['history', '메뉴 접속이력']]
-      },
       interest: {
         title: '관심차량',
         items: canUseInterest(MANAGEMENT_ROLE) ? [['summary', '관심차량 현황'], ['favorites', '관심차량 관리'], ['categories', '구분 관리']] : []
@@ -2008,6 +2003,10 @@
         items: [['rptstatus', '업체별 현황'], ['rptcompare', '업체별 비교'], ['rptheat', '업체별 히트맵']]
       }
     };
+
+    if (ADMIN_ACTIVE) adminContext.menus().forEach(function (menu) {
+      sideMenus[menu.key] = { title: menu.label, items: menu.subs.map(function (sub) { return [sub.key, sub.label]; }) };
+    });
 
     if (!aside && sideMenus[ACT]) {
       aside = document.createElement('aside');
@@ -2043,6 +2042,7 @@
         if(ACT==='rpt' && roleRules.isCustomer(MANAGEMENT_ROLE)){item=item.slice();item[1]=item[1].replace(/업체/g,'그룹');if(MANAGEMENT_ROLE==='customer_staff')item[1]=item[1].replace('그룹별 비교','내 그룹 현황');}
         var sub = menu.subs.filter(function (s) { return s.key === item[0]; })[0];
         if (!sub) return '';
+        if (sub.pending) return '<span class="miq-side-item" aria-disabled="true"><span>' + item[1] + ' <small>미정</small></span></span>';
         var badge = ACT === 'srvc' && Object.prototype.hasOwnProperty.call(serviceCounts, item[0])
           ? '<span class="miq-side-count">' + serviceCounts[item[0]] + '</span>'
           : '';
@@ -2090,11 +2090,28 @@
       MIQCommon.view.call(toggle,"setAttribute",['aria-label','좌측 메뉴 접기']);
       MIQCommon.view.call(toggle,"setAttribute",['aria-expanded','true']);
       MIQCommon.view.set(toggle,"innerHTML",'<span>‹</span>');
+      /* 좁은 창에서 문서를 가로로 이동해도 버튼은 실제 메뉴 경계를 따른다. */
+      function syncSideTogglePosition() {
+        if (VARIANT !== 'tobe') return;
+        var edge = layout.classList.contains('miq-side-collapsed')
+          ? layout.getBoundingClientRect().left
+          : aside.getBoundingClientRect().right;
+        toggle.style.left = edge + 'px';
+      }
+      var sideToggleFrame = 0;
+      function scheduleSideTogglePosition() {
+        if (sideToggleFrame) return;
+        sideToggleFrame = window.requestAnimationFrame(function () {
+          sideToggleFrame = 0;
+          syncSideTogglePosition();
+        });
+      }
       toggle.addEventListener('click', function () {
         var collapsed = layout.classList.toggle('miq-side-collapsed');
         MIQCommon.view.set(toggle,"innerHTML",'<span>' + (collapsed ? '›' : '‹') + '</span>');
         MIQCommon.view.call(toggle,"setAttribute",['aria-label',collapsed ? '좌측 메뉴 펴기' : '좌측 메뉴 접기']);
         MIQCommon.view.call(toggle,"setAttribute",['aria-expanded',collapsed ? 'false' : 'true']);
+        syncSideTogglePosition();
         window.requestAnimationFrame(function () {
           /* 창 크기는 그대로여도 본문 폭은 바뀐다. 동적 차트가 새 실폭으로 다시 그리도록 공통 신호를 보낸다. */
           window.dispatchEvent(new Event('resize'));
@@ -2104,6 +2121,9 @@
         });
       });
       layout.appendChild(toggle);
+      syncSideTogglePosition();
+      window.addEventListener('scroll', scheduleSideTogglePosition, { passive: true });
+      window.addEventListener('resize', scheduleSideTogglePosition);
     }
 
     if (!document.querySelector('.miq-page-foot')) {

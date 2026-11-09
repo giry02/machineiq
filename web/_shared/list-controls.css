@@ -17,7 +17,7 @@ body.miq-current-shell[data-variant="tobe"] :is(.miq-mgmt-taskbar__label,.ops-ta
   border-bottom:2px solid var(--mm-accent);color:var(--mm-accent);
   font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;white-space:nowrap
 }
-body.miq-current-shell[data-variant="tobe"]:is(.miq-section-mgmt,.miq-section-ops) :is(.miq-mgmt-taskbar>.miq-mgmt-filter-bar,.ops-task-filters){
+body.miq-current-shell[data-variant="tobe"]:is(.miq-section-mgmt,.miq-section-ops,.miq-section-admaccess,.miq-section-admstatus) :is(.miq-mgmt-taskbar>.miq-mgmt-filter-bar,.ops-task-filters){
   display:flex;align-items:center;gap:6px;min-width:0;margin:0 0 7px auto
 }
 body.miq-current-shell[data-variant="tobe"] :is(.ops-list-head>.ops-actions,.mm-request-batch){
