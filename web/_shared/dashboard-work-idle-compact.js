@@ -180,7 +180,7 @@
     });
     var result=MIQDashboardCurrent.efficiency(selectedFleet,w,MIQMeeting,MIQSummaryRow);
     var known=result.known>0,share=result.efficiency;
-    function hours(n){return known?n.toLocaleString('ko-KR',{minimumFractionDigits:1,maximumFractionDigits:1}):'—';}
+    function hours(n){return known?MIQCommon.numbers.integer(n,true):'—';}
     var percent=share===null?'—':Math.round(share),paint=share===null?'#eaf0f3':'conic-gradient(from 270deg,#ff3600 0 '+share+'%,#eaf0f3 '+share+'% 100%)';
     var chart='<div class="dwi-ring" style="background:'+paint+'" role="img" aria-label="운영효율 '+percent+'%"><div class="dwi-ring-center"><div><strong>'+percent+'</strong><small>%</small></div><span>가동시간 대비</span></div></div>';
     var details='<div class="dwi-metrics"><div class="dwi-row"><span class="dwi-label"><i class="dwi-dot is-work"></i>작업시간</span><span class="dwi-value"><strong>'+hours(result.work)+'</strong><small>H</small></span></div><div class="dwi-row"><span class="dwi-label"><i class="dwi-dot is-idle"></i>대기시간</span><span class="dwi-value"><strong>'+hours(result.idle)+'</strong><small>H</small></span></div><div class="dwi-row dwi-total"><span class="dwi-label">전체 가동시간</span><span class="dwi-value"><strong>'+hours(result.work+result.idle)+'</strong><small>H</small></span></div></div>';

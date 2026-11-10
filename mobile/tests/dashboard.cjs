@@ -13,12 +13,12 @@ const entry=read('index.html');
 function versionedAsset(file){
   const refs=[...entry.matchAll(/(?:src|href)="([^"?#]+)\?v=([^"]+)"/g)].filter(m=>m[1]==='./'+file);
   assert.equal(refs.length,1,'One active '+file);
-  assert(/^\d{8}-(?:r\d+|\d+)(?:[-\w]*)$/.test(refs[0][2]),'Versioned '+file);
+  assert(/^\d{8}-(?:r\d+|\d+|security-display)(?:[-\w]*)$/.test(refs[0][2]),'Versioned '+file);
 }
 for(const file of ['owner-dashboard-preview.css','home-view.js','model.js','web-contracts.generated.js'])versionedAsset(file);
 const release=JSON.parse(read('release.json')).revision.replace(/^(\d{4})-(\d{2})-(\d{2})/, '$1$2$3');
 assert(read('index.html').includes('customer.js?v='+release));
-assert(read('index.html').includes('customer.css?v='+release));
+assert(read('index.html').includes('customer.css?v=20261030-r147'),'Unchanged r147 CSS keeps its original cache tag');
 assert(!read('index.html').includes('owner-dashboard-preview.js'));
 if(fs.existsSync(path.join(app,'dashboard-backup-20260919.html')))assert(read('dashboard-backup-20260919.html').includes('./archive/dashboard-20260919/customer.js'));
 for(const name of ['auth.js','auth.css','signup-example.js','review.html','owner-dashboard-preview.js','group-cards-preview.js','group-cards-preview.css','lithium-status-model.js'])assert(!fs.existsSync(path.join(app,name)),'No retired source in active delivery: '+name);

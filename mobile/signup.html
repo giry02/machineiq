@@ -79,6 +79,12 @@
             <div class="signup-fields">
               <label class="signup-field"><span>국가 <em>*</em></span><select id="signup-country" name="country" data-required><option value="">국가를 선택하세요</option><option value="KR" selected>대한민국 (Korea)</option><option value="US">미국 (United States)</option><option value="CN">중국 (China)</option><option value="JP">일본 (Japan)</option><option value="DE">독일 (Germany)</option><option value="AU">호주 (Australia)</option><option value="GB">영국 (United Kingdom)</option><option value="FR">프랑스 (France)</option></select><small data-error-for="signup-country"></small></label>
               <div class="signup-field"><label for="signup-phone">전화번호 <em>*</em></label><div class="phone-control"><span id="signup-phone-prefix">+82</span><input id="signup-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="국가번호 제외 숫자" data-required></div><small data-error-for="signup-phone"></small></div>
+              <section class="signup-field" data-mobile-pass-preview data-state="before" data-verified="false" hidden aria-label="KR 휴대폰 본인확인 검토 시안">
+                <strong>KR 휴대폰 본인확인 · 검토 시안</strong>
+                <p class="field-help">선택 국가가 KR인 경우의 PASS 실패·취소·만료 표시입니다. 실제 인증창·문자 발송·성공 인증은 연결하지 않습니다. 검토 모드에서는 가입 신청을 제출하지 않습니다.</p>
+                <div class="signup-control-row signup-control-row--code"><button type="button" data-mobile-pass-result="failed">실패 시안</button><button type="button" data-mobile-pass-result="cancelled">취소 시안</button><button type="button" data-mobile-pass-result="expired">만료 시안</button></div>
+                <p class="field-status" data-mobile-pass-status role="status" aria-live="polite"></p>
+              </section>
               <label class="signup-field"><span>주 / 도</span><input id="signup-state" name="state" type="text" autocomplete="address-level1" placeholder="선택 입력"></label>
               <label class="signup-field"><span>도시 <em>*</em></span><input id="signup-city" name="city" type="text" autocomplete="address-level2" data-required><small data-error-for="signup-city"></small></label>
               <label class="signup-field"><span>상세주소 <em>*</em></span><input id="signup-address" name="address" type="text" autocomplete="street-address" placeholder="도로명, 건물명, 상세 위치" data-required><small data-error-for="signup-address"></small></label>
@@ -115,6 +121,7 @@
   <script src="./signup-header.js?v=20260921-r88"></script>
   <script src="./onboarding.js?v=20261019-r142"></script>
   <script src="./auth-common.js?v=20261014-r141"></script>
+  <script src="./security-preview.js?v=20261110-security-display"></script>
   <script src="./signup.js?v=20260924-r111"></script>
 </body>
 </html>

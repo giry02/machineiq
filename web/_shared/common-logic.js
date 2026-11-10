@@ -184,17 +184,41 @@
     return state;
   }
 
+  var privacyGraphemes = new Intl.Segmenter('und', { granularity: 'grapheme' });
+  function maskPersonName(value) {
+    var text = typeof value === 'string' ? value.trim() : '';
+    if (!text || text === '—' || text === '-') return text || '—';
+    var parts = Array.from(privacyGraphemes.segment(text), function (part) { return part.segment; });
+    if (parts.length === 1) return '*';
+    if (parts.length === 2) return parts[0] + '*';
+    return parts[0] + '*'.repeat(parts.length - 2) + parts[parts.length - 1];
+  }
+  function maskPhoneNumber(value) {
+    var text = typeof value === 'string' ? value.trim() : '';
+    if (!text || text === '—' || text === '-') return text || '—';
+    var digits = Array.from(text).filter(function (character) { return /[0-9*]/.test(character); });
+    if (!digits.length) return '—';
+    var count = Math.min(4, digits.length);
+    var start = digits.length >= 10 ? digits.length - 8 : Math.floor((digits.length - count) / 2);
+    var index = 0;
+    return text.replace(/[0-9*]/g, function (digit) {
+      var current = index++;
+      return current >= start && current < start + count ? '*' : digit;
+    });
+  }
+
   // Display only. Never feed rounded labels back into metrics, thresholds or coordinates.
   function integer(value, grouped) {
     if (value === null || value === undefined || value === '' || typeof value === 'boolean') return '-';
     var numeric = Number(value);
     if (!Number.isFinite(numeric)) return '-';
-    var rounded = Math.round(numeric);
+    var rounded = Math.sign(numeric) * Math.round(Math.abs(numeric));
     if (Object.is(rounded, -0)) rounded = 0;
     return grouped ? rounded.toLocaleString('ko-KR', { maximumFractionDigits: 0 }) : String(rounded);
   }
 
   return {
+    privacy: { maskPersonName: maskPersonName, maskPhoneNumber: maskPhoneNumber },
     numbers: { integer: integer },
     roles: {
       list: function () { return roles.map(function (role) { return { code: role.code, label: role.label }; }); },

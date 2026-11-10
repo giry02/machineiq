@@ -24,7 +24,7 @@
     unknown:{label:'미수신',icon:'circle-help',tone:'neutral'}
   };
   // DEMO display only. BE-001/002: production server supplies final numbers,\n  // rounding and unit conversion; do not port these fixture formatters as business rules.
-  const wholeNumber = value => Math.round(value).toLocaleString('ko-KR', {maximumFractionDigits:0});
+  const wholeNumber = value => W.common.numbers.integer(value,true);
   const DISPLAY = {
     number:(value,unit='')=>Number.isFinite(value)?wholeNumber(value)+unit:'-',
     duration:(minutes,compact=false)=>Number.isFinite(minutes)&&minutes>=0?(minutes=Math.round(minutes),true)&&(compact?`${Math.floor(minutes/60)}h ${minutes%60}m`:`${Math.floor(minutes/60)}시간 ${minutes%60}분`):'-',

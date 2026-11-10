@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>비밀번호 변경 · 90일 유예 검토 시안 · MACHINE IQ</title>
+    <link rel="icon" href="../../_shared/favicon.ico" />
+    <link rel="stylesheet" href="../../_shared/mockup.css" />
+    <link rel="stylesheet" href="../../_shared/prelogin-shell.css" />
+    <link rel="stylesheet" href="../../_shared/auth-account-enhancements.css" />
+    <link rel="stylesheet" href="../../_shared/form-controls.css" />
+    <script src="../../../mobile/security-preview.js" defer></script>
+    <script src="preview.js" defer></script>
+  </head>
+  <body data-shell="none" data-variant="tobe" data-screen-id="MHMIQ-AUTH-003-T01">
+    <div class="aae-shell">
+      <header class="miq-auth-header">
+        <a class="miq-auth-brand" href="../../Login/login-tobe.html" aria-label="기존 로그인 화면으로">
+          <img src="../../_shared/machine-iq-material-handling-white.svg" alt="Bobcat MACHINE IQ MATERIAL HANDLING" />
+        </a>
+      </header>
+      <main class="aae-main aae-main--compact">
+        <div class="aae-page-heading">
+          <h1>비밀번호 변경 안내</h1>
+          <p>로컬 검토 시안 · 실제 로그인이나 비밀번호 변경은 실행하지 않습니다.</p>
+        </div>
+        <section class="aae-card" aria-labelledby="passwordPreviewTitle">
+          <div class="aae-card__body">
+            <div class="aae-card__head">
+              <h2 class="aae-card__title" id="passwordPreviewTitle">새 비밀번호 설정</h2>
+              <p class="aae-card__desc">비밀번호 변경 주기가 되었습니다. 새 비밀번호를 설정해 주세요.</p>
+            </div>
+            <form class="aae-form" id="passwordDeferralPreview" novalidate>
+              <div class="aae-field">
+                <label class="aae-label" for="previewAccount">확인할 계정 구분 · 시안</label>
+                <select class="aae-select" id="previewAccount">
+                  <option value="user">일반 사용자 · 고객/딜러</option>
+                  <option value="admin">내부 관리자 · Admin/SERVICE</option>
+                </select>
+              </div>
+              <div class="aae-field">
+                <label class="aae-label" for="previewPassword">새 비밀번호</label>
+                <input class="aae-control" id="previewPassword" type="password" autocomplete="off" disabled aria-describedby="previewPasswordHelp" />
+                <span class="aae-help" id="previewPasswordHelp">기존 입력 디자인 참고용입니다. 비밀번호를 입력받거나 저장하지 않습니다.</span>
+              </div>
+              <div class="aae-field">
+                <label class="aae-label" for="previewPasswordConfirm">새 비밀번호 확인</label>
+                <input class="aae-control" id="previewPasswordConfirm" type="password" autocomplete="off" disabled />
+              </div>
+              <button class="aae-button aae-button--primary aae-button--wide" type="button" disabled>비밀번호 변경 · 시안</button>
+              <div class="aae-field" id="selectedDateField">
+                <label class="aae-label" for="selectedDate">미루기 선택일 · 시안</label>
+                <input class="aae-control" id="selectedDate" type="date" min="0001-01-01" max="9999-12-31" aria-describedby="deferralPolicy" />
+              </div>
+              <p class="aae-help" id="deferralPolicy">다음에 변경을 선택하면 선택일로부터 90일 후 다시 안내합니다.</p>
+              <div id="deferAction">
+                <button class="aae-button aae-button--wide" type="button" id="deferPreview">다음에 변경 · 시안</button>
+              </div>
+              <div class="aae-alert" id="deferralStatus" role="status" aria-live="polite" hidden></div>
+              <p class="aae-help">임시 비밀번호의 필수 변경은 이 시안의 유예 대상이 아닙니다.</p>
+              <p class="aae-help">선택일·예정일은 검토용입니다. 현재 서버의 기존 180일 정책·변경일·유예일은 변경하지 않습니다. 실제 정책 적용 완료 안내가 아닙니다.</p>
+            </form>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

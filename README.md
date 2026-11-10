@@ -1,5 +1,12 @@
 # MACHINE IQ 프로토타입
 
+## 2026-11-10 보안·숫자 표시 검토
+
+- WEB/고객 모바일 목록 마스킹과 업무수치 정수 반올림을 반영했습니다. 기존 화면 구성·원시 데이터·권한·집계는 유지합니다.
+- [PASS 앱·공식 문자(SMS) 상태별 시안](https://giry02.github.io/machineiq/web/requirements-review/registration-pass-20261017/review.html) · [WEB 90일 안내 시안](https://giry02.github.io/machineiq/web/requirements-review/password-deferral-20261110/)
+- [모바일 90일 안내 검토](https://giry02.github.io/machineiq/mobile/login.html?securityPreview=1) · [모바일 본인확인 검토](https://giry02.github.io/machineiq/mobile/signup.html?securityPreview=1)
+- 인증·90일 시안은 실제 공급자/서버에 연결되지 않습니다. [적용 범위·검증·남은 한계](docs/handoff/SECURITY_DISPLAY_GITHUB_20261110.md)를 확인하세요. 아래 과거 게시 기록과 APK/ZIP은 이번 검토본으로 재생성한 자료가 아닙니다.
+
 - 웹 실행: https://giry02.github.io/machineiq/web/
 - 웹 소스: `web/`
 - 웹 최신 반영: 2026-09-27. 한국어 화면, 회원가입/차량 등록 흐름, 공통 오류 화면 및 최신 지표 표시를 반영했습니다. 언어 선택 메뉴는 표시하며, GitHub 게시본에서는 다른 언어를 선택해도 화면·이메일은 한국어로 유지됩니다. 로컬 다국어 전환 기능은 그대로 유지합니다.

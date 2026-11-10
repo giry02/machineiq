@@ -1,5 +1,5 @@
 {
-  "revision": "2026-10-30-r147",
+  "revision": "2026-11-10-security-display",
   "entry": "login.html",
   "includeArchives": false,
   "mapMode": "embedded-google",
@@ -7,11 +7,11 @@
   "files": [
     {
       "path": "index.html",
-      "sha256": "262c760f7912bf118eba073b5bceb26ec476bceae0eefd89bec0f3620221662c"
+      "sha256": "278e0b3664ff4eee12e053e3d405dddbea2a194ee831172ea83b58b05cecdd2d"
     },
     {
       "path": "customer.js",
-      "sha256": "8460218f63c9c4e1eace2a1e136202d8e8b97478ba25a5454166d83371389239"
+      "sha256": "4ec563af95344e190b9c69341266c52e8107eb0738430d563bfe54a0aea1e956"
     },
     {
       "path": "customer.css",
@@ -31,7 +31,7 @@
     },
     {
       "path": "release.json",
-      "sha256": "a8f33f7faa4e9769c36f8b225939dea419833abdec8f083ad78b4bb6b3974f46"
+      "sha256": "8b3e83299fc41bc682ba27edfdd2df0e7456f2a710f2e70f3c2b4b9613f75afa"
     },
     {
       "path": "error-documents.js",
@@ -39,11 +39,11 @@
     },
     {
       "path": "model.js",
-      "sha256": "91c48b63c60be3e87a5f1dfb941f1e982f76c2ad33900e79ecaa8e9ff274836b"
+      "sha256": "ea13c716141db5ddb6543ceed8b218d768fcef48fd035d3055bec0ac4b247ea3"
     },
     {
       "path": "login.html",
-      "sha256": "3038a27cabc51a09d1e83d0da000b3a802dc977c6a6efa78080ae1bcefc2b110"
+      "sha256": "8fbe6e43032afc078e6182335f26d22b6dedbcc731cc7ed8c6ac949149f183d8"
     },
     {
       "path": "login.js",
@@ -51,7 +51,7 @@
     },
     {
       "path": "signup.html",
-      "sha256": "54713a00357a7f4caf85c1e512c63393eedc483df831655813213eb34f2a4981"
+      "sha256": "c4e01a57aac688c75368304e96fba9ed80d0188eba9547e4c3dcb3a7c1dab818"
     },
     {
       "path": "signup.js",
@@ -71,7 +71,7 @@
     },
     {
       "path": "web-contracts.generated.js",
-      "sha256": "f6a1352eed495f69cff6ac8d16e863b757f5aa5612e1106d3dfd31b29aaac1a7"
+      "sha256": "4d57848a7943c3a233e0678d685c1968f8706e46c4699e464452aa91ca1e84a3"
     },
     {
       "path": "demo-data.generated.js",
@@ -703,7 +703,7 @@
     },
     {
       "path": "tests/dashboard.cjs",
-      "sha256": "fe68c506be2abd9bb6b406317e34b2b7ff95a9c196850c362757dec5fbb585a0"
+      "sha256": "14ee2b820c3cc1f75a943846c980dc76258588163249ad4efe02b07859ec879a"
     },
     {
       "path": "tests/auth.cjs",
@@ -920,6 +920,18 @@
     {
       "path": "dormant-login.js",
       "sha256": "84f44b3e64a90539b8bda5682303cc9ebc41a23fb05eba731d8a3264c3a4632c"
+    },
+    {
+      "path": "security-preview.js",
+      "sha256": "f7033704c1f537b345226c29e9370d22e1539e955ebb4301662bb60bf0ff281c"
+    },
+    {
+      "path": "tests/security-display.cjs",
+      "sha256": "10f5f4609b56ca5e3339b78873a21b6414904c934af0b5a5231bc175fb6cd75c"
+    },
+    {
+      "path": "tests/security-display-browser.cjs",
+      "sha256": "980661a658171a4728d0fce568d0cae77ba4fba540818ce20aed677c6ba177b7"
     }
   ]
 }

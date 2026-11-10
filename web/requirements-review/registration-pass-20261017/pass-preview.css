@@ -1,0 +1,20 @@
+.birthdate-block,.signup-pass-block{margin:0 0 20px;padding:0 0 20px;border:0;border-bottom:1px solid var(--aae-line-soft);min-width:0}
+.birthdate-block legend{padding:0}
+.birthdate-layout,.signup-pass-layout{align-items:center}
+.birthdate-inputs{display:grid;grid-template-columns:minmax(120px,1.4fr) repeat(2,minmax(76px,1fr));gap:8px}
+.birthdate-control,.birthdate-guidance,.signup-pass-guidance{min-width:0}
+.birthdate-notice{margin:0;font-size:14px;line-height:20px;color:var(--aae-ink);font-weight:600}
+.birthdate-status,.signup-pass-status{min-height:18px;margin-top:4px;font-size:12px;line-height:18px;color:var(--aae-muted)}
+.birthdate-status.is-error,.signup-pass-status.is-error{color:var(--aae-danger)}
+.birthdate-status.is-success,.signup-pass-status.is-success{color:var(--aae-success)}
+.signup-pass-title{font-size:13px;line-height:18px;font-weight:600;margin:0 0 6px}
+.signup-pass-description{font-size:13px;line-height:20px;color:var(--aae-muted);margin:0 0 12px}
+.signup-auth-methods{border:0;margin:0;padding:0;min-width:0}
+.signup-auth-options{grid-template-columns:repeat(2,minmax(0,1fr))}
+.signup-channel-hint{min-height:36px;margin:8px 0 12px}
+.signup-pass-actions{display:flex;align-items:center;gap:8px}
+.signup-pass-guidance{padding-inline-start:0}
+.birthdate-details-only{margin:0;padding:0;border:0;min-width:0}
+.birthdate-details-only .aae-reg-footer{position:static}
+body[data-pass-preview] [hidden]{display:none!important}
+@media(max-width:760px){.birthdate-layout,.signup-pass-layout{gap:12px}.birthdate-inputs{grid-template-columns:minmax(100px,1.25fr) repeat(2,minmax(64px,1fr))}}

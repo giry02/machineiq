@@ -561,6 +561,16 @@
     if (!table) return;
     var tbody = table.tBodies[0];
     var userRows=Array.from(tbody.querySelectorAll('tr[data-owner]'));
+    var userPrivateValues = new WeakMap();
+    function maskUserRow(row, original) {
+      var value = original || userPrivateValues.get(row) || { name: MIQCommon.view.get(row.children[1], 'textContent').trim(), phone: MIQCommon.view.get(row.children[5], 'textContent').trim() };
+      userPrivateValues.set(row, value);
+      MIQCommon.view.set(row.children[1], 'textContent', MIQCommon.privacy.maskPersonName(value.name));
+      MIQCommon.view.set(row.children[5], 'textContent', MIQCommon.privacy.maskPhoneNumber(value.phone));
+      var group = row.querySelector('.group-select');
+      if (group) group.setAttribute('aria-label', MIQCommon.privacy.maskPersonName(value.name) + ' 그룹');
+    }
+    userRows.forEach(function (row) { maskUserRow(row); });
     var userPager=MIQ.createListPager(table.parentElement,{pageSize:20,presentation:'operations',unit:'건',onChange:applyFilters});
     var userRequestPager=MIQ.createListPager(document.getElementById('userRequestBody').closest('.tbl-wrap'),{pageSize:20,presentation:'operations',unit:'건',onChange:renderUserRequests});
     var filterBar = document.querySelector('.filter-bar');
@@ -717,8 +727,9 @@
     function searchableUserText(row) {
       /* 검색 안내에 명시한 ID·이름·연락처와 허용된 기본 소속만 사용한다.
          딜러에게 숨긴 고객 운영그룹이 통합검색으로 노출되지 않게 한다. */
-      return [row.dataset.owner, MIQCommon.view.get(row.children[1],"textContent").trim(), MIQCommon.view.get(row.children[2],"textContent").trim(),
-        MIQCommon.view.get(row.children[3],"textContent").trim(), MIQCommon.view.get(row.children[5],"textContent").trim()].join(' ');
+      var original = userPrivateValues.get(row);
+      return [row.dataset.owner, original.name, MIQCommon.view.get(row.children[2],"textContent").trim(),
+        MIQCommon.view.get(row.children[3],"textContent").trim(), original.phone].join(' ');
     }
     function applyFilters() {
       clearEmpty(tbody);
@@ -897,8 +908,8 @@
         var status = USER_REQUEST_STATUS[record.status] || USER_REQUEST_STATUS.REQ;
         var selectable = record.status === 'REQ';
         var checked = !!selectedUserRequests[record.id];
-        return '<tr data-user-request-id="' + esc(record.id) + '"><td class="c">' + (selectable ? '<input type="checkbox" data-user-request-select="' + esc(record.id) + '" aria-label="' + esc(record.name) + ' 신청 선택"' + (checked ? ' checked' : '') + '/>' : '<span class="mute">-</span>') + '</td>' +
-          '<td class="strong">' + esc(record.email) + '</td><td class="c"><span class="badge ' + status.cls + '" data-status-code="' + esc(record.status) + '" data-i18n-key="request.status.' + (record.status === 'APRV' ? 'approved' : record.status === 'RJCT' ? 'rejected' : 'pending') + '">' + status.label + '</span></td><td>' + esc(record.name) + '</td><td>' + esc(record.role) + '</td><td>' + esc(record.company) + '</td><td>' + esc(record.registered) + '</td><td>' + esc(record.processed || '-') + '</td><td>' + esc(record.processor || '-') + '</td><td class="c"><button class="btn btn--sm ' + (selectable ? 'btn--pri' : '') + '" type="button" ' + (selectable ? 'data-user-request-process' : 'data-user-request-detail') + '="' + esc(record.id) + '">' + (selectable ? '처리' : '상세') + '</button></td></tr>';
+        return '<tr data-user-request-id="' + esc(record.id) + '"><td class="c">' + (selectable ? '<input type="checkbox" data-user-request-select="' + esc(record.id) + '" aria-label="' + esc(MIQCommon.privacy.maskPersonName(record.name)) + ' 신청 선택"' + (checked ? ' checked' : '') + '/>' : '<span class="mute">-</span>') + '</td>' +
+          '<td class="strong">' + esc(record.email) + '</td><td class="c"><span class="badge ' + status.cls + '" data-status-code="' + esc(record.status) + '" data-i18n-key="request.status.' + (record.status === 'APRV' ? 'approved' : record.status === 'RJCT' ? 'rejected' : 'pending') + '">' + status.label + '</span></td><td>' + esc(MIQCommon.privacy.maskPersonName(record.name)) + '</td><td>' + esc(record.role) + '</td><td>' + esc(record.company) + '</td><td>' + esc(record.registered) + '</td><td>' + esc(record.processed || '-') + '</td><td>' + esc(MIQCommon.privacy.maskPersonName(record.processor || '-')) + '</td><td class="c"><button class="btn btn--sm ' + (selectable ? 'btn--pri' : '') + '" type="button" ' + (selectable ? 'data-user-request-process' : 'data-user-request-detail') + '="' + esc(record.id) + '">' + (selectable ? '처리' : '상세') + '</button></td></tr>';
       }).join('') : '<tr class="empty"><td colspan="10">조회 조건에 해당하는 계정 신청이 없습니다.</td></tr>');
       if (!filtered.length) userRequestPager.slice([]);
       MIQCommon.view.set(document.getElementById('userRequestAllCount'),"textContent",scopeAll.length);
@@ -924,6 +935,7 @@
       MIQCommon.view.set(tr,"innerHTML",'<td class="strong">' + esc(record.email) + '</td><td>' + esc(record.name) + '</td><td>' + esc(record.role) + '</td><td>' + esc(record.company) + '</td>' +
         '<td><select class="inp group-select" aria-label="' + esc(record.name) + ' 그룹">' + groupOptions + '</select><span class="mute role-view-only is-hidden">' + esc(group) + '</span></td>' +
         '<td>' + esc(record.phone || '-') + '</td><td>' + esc(record.registered) + '</td><td>' + esc(record.processed) + '</td><td class="c"><span class="mm-inline-actions"><button class="btn btn--sm btn--pri" data-group-mode>그룹 저장</button> <button class="btn btn--sm btn--danger" data-modal-open="delModal">삭제</button></span></td>');
+      maskUserRow(tr, { name: record.name, phone: record.phone || '-' });
       userRows.unshift(tr); tbody.insertBefore(tr, tbody.firstChild); normaliseCustomerGroup(tr); ensureVehicleLink(tr); tr.classList.add('mm-just-saved');
     }
     var userRequestModal = document.getElementById('userRequestModal');
@@ -1071,7 +1083,7 @@
       var button = event.target.closest('#userTable [data-modal-open="delModal"]');
       if (!button) return;
       deleting = button.closest('tr');
-      var name = MIQCommon.view.get(deleting.children[1],"textContent").trim(), email = MIQCommon.view.get(deleting.children[0],"textContent").trim();
+      var name = userPrivateValues.get(deleting).name, email = MIQCommon.view.get(deleting.children[0],"textContent").trim();
       var modal = document.getElementById('delModal');
       MIQCommon.view.set(modal.querySelector('.modal__body > div'),"innerHTML",'<b>' + esc(name) + ' (' + esc(email) + ')</b> 계정을 미사용 상태로 전환하시겠습니까?');
     });
@@ -1776,6 +1788,15 @@
   function initVehicle() {
     var tbody = document.getElementById('vehBody');
     if (!tbody) return;
+    var vehiclePrivateNames = new WeakMap();
+    function maskVehicleUser(row) {
+      var cell = row.children[9];
+      if (!cell || vehiclePrivateNames.has(row)) return;
+      var original = MIQCommon.view.get(cell, 'textContent').trim();
+      vehiclePrivateNames.set(row, original);
+      MIQCommon.view.set(cell, 'textContent', MIQCommon.privacy.maskPersonName(original || '-'));
+    }
+    tbody.querySelectorAll('tr[data-vin]').forEach(maskVehicleUser);
     var managedModalIds = ['reqModal', 'vehModal', 'aprvModal', 'requestBulkModal'];
     var managedModalReturnFocus = null;
     function managedModalFocusable(modal) {
@@ -1906,7 +1927,7 @@
       }
       syncTabStops(document.querySelector('.mm-vehicle-tabs'));
     }
-    function allRows() { tbody.querySelectorAll('tr[data-vin]').forEach(function(row){if(cachedVehicleRows.indexOf(row)<0)cachedVehicleRows.push(row)});return cachedVehicleRows; }
+    function allRows() { tbody.querySelectorAll('tr[data-vin]').forEach(function(row){maskVehicleUser(row);if(cachedVehicleRows.indexOf(row)<0)cachedVehicleRows.push(row)});return cachedVehicleRows; }
     function markInitialDealerStaffScope() {
       var dealerIndex = 0;
       allRows().forEach(function (row) {
@@ -1928,8 +1949,8 @@
     }
     function searchableVehicleText(row) {
       /* 권한으로 숨긴 고객 운영그룹·닉네임·사용자명은 검색 대상으로도 사용하지 않는다. */
-      return Array.prototype.map.call(row.children, function (cell) {
-        return cell.classList.contains('mm-role-hidden') ? '' : MIQCommon.view.get(cell,"textContent").trim();
+      return Array.prototype.map.call(row.children, function (cell, index) {
+        return cell.classList.contains('mm-role-hidden') ? '' : index === 9 ? vehiclePrivateNames.get(row) : MIQCommon.view.get(cell,"textContent").trim();
       }).join(' ');
     }
     function roleTotal() {
@@ -2173,7 +2194,7 @@
     }
     function requestPerson(name, personRole) {
       if (!name) return '<span class="mute">-</span>';
-      return '<span class="mm-request-person">' + esc(name) + '<small>' + esc(personRole || '') + '</small></span>';
+      return '<span class="mm-request-person">' + esc(MIQCommon.privacy.maskPersonName(name)) + '<small>' + esc(personRole || '') + '</small></span>';
     }
 
     function requestById(id) {

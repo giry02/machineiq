@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>회원가입 · PASS 앱 / 문자 본인확인 시안 · MACHINE IQ</title>
+<link rel="icon" href="assets/favicon.ico"/>
+<link rel="stylesheet" href="assets/mockup.css"/>
+<link rel="stylesheet" href="assets/prelogin-shell.css"/>
+<link rel="stylesheet" href="assets/auth-account-enhancements.css"/>
+<link rel="stylesheet" href="assets/form-controls.css"/>
+<link rel="stylesheet" href="pass-preview.css"/>
+</head>
+<body data-pass-preview="true" data-shell="none" data-variant="tobe" data-base="../" data-auth-page="registration" data-registration-mode="web" data-birthdate-preview="true">
+<div class="aae-shell">
+  <header class="miq-auth-header">
+    <a class="miq-auth-brand" href="../../Login/login-tobe.html?lang=ko" aria-label="Bobcat MACHINE IQ MATERIAL HANDLING 로그인"><img src="assets/machine-iq-material-handling-white.svg" alt="Bobcat MACHINE IQ MATERIAL HANDLING"/></a>
+    <div class="miq-auth-actions"><label class="miq-auth-language"><select class="pre__lang" id="signupLanguage" aria-label="언어 선택" title="언어 선택" translate="no"><option value="ko">한국어</option><option value="en">English</option><option value="de">Deutsch</option><option value="ar">العربية</option><option value="es">Español</option><option value="fr">Français</option><option value="it">Italiano</option><option value="ja">日本語</option></select></label><a class="miq-auth-login" href="../../Login/login-tobe.html?lang=ko">로그인</a></div>
+  </header>
+  <main class="aae-main">
+    <div class="aae-registration" data-registration-flow>
+      <div class="aae-page-heading">
+        <h1>회원가입</h1>
+        <p>계정 정보를 입력해 주세요. 차량은 회원가입 후 별도로 등록할 수 있습니다.</p>
+      </div>
+
+      <nav class="aae-reg-nav" aria-label="회원가입 단계">
+        <button type="button" data-registration-step="agreement" aria-current="step">1. 약관 동의</button>
+        <button type="button" data-registration-step="details" disabled>2. 정보 입력</button>
+      </nav>
+
+      <section id="registrationAgreement" aria-labelledby="registrationAgreementTitle">
+        <div class="aae-reg-section">
+          <h2 id="registrationAgreementTitle">약관 동의</h2>
+          <div class="aae-field"><label class="aae-label" for="identityCountry">국가</label><select class="aae-select" id="identityCountry"><option value="KR">대한민국 (Korea)</option><option value="US">미국 (United States)</option><option value="JP">일본 (Japan)</option><option value="DE">독일 (Germany)</option><option value="FR">프랑스 (France)</option></select></div><div id="registrationIdentitySlot"></div>
+          <div class="aae-agree-all">
+            <label class="aae-check"><input type="checkbox" id="registrationAgreeAll"/><span data-registration-agree-all-text translate="no" lang="ko" dir="ltr"></span></label>
+          </div>
+          <div class="aae-agreements" data-registration-terms></div>
+          <div class="aae-alert" id="agreementStatus" role="status" aria-live="polite" hidden></div>
+          <div class="aae-actions" style="margin-top:16px">
+            <button class="aae-button" type="button" data-registration-cancel>취소</button>
+            <button class="aae-button aae-button--primary" id="registrationContinue" type="button" disabled>동의하고 정보 입력</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="registrationDetails" aria-labelledby="registrationDetailsTitle" hidden>
+        <form id="registrationForm" novalidate><fieldset class="birthdate-details-only" disabled>
+          <div class="aae-reg-section">
+            <h2 id="registrationDetailsTitle" tabindex="-1">계정 정보</h2>
+            <div class="aae-reg-grid">
+              <div class="aae-field">
+                <label class="aae-label" for="registrationUserId">사용자 ID <span class="aae-required">*</span></label>
+                <div class="aae-control-row">
+                  <input class="aae-control" id="registrationUserId" name="userId" type="text" placeholder="이메일 형식 또는 아이디 (영어, 숫자 6자리 이상)" autocomplete="username" data-required="true"/>
+                  <button class="aae-button" id="registrationCheckId" type="button">중복확인</button>
+                </div>
+                <span class="aae-error" data-error-for="registrationUserId"></span>
+                <div class="aae-alert" id="registrationUserIdStatus" role="status" aria-live="polite" hidden></div>
+              </div>
+              <div class="aae-field">
+                <label class="aae-label" for="registrationName">이름 <span class="aae-required">*</span></label>
+                <input class="aae-control" id="registrationName" name="name" type="text" autocomplete="name" data-required="true"/>
+                <span class="aae-error" data-error-for="registrationName"></span>
+              </div>
+              <div class="aae-field">
+                <label class="aae-label" for="registrationEmail">인증 이메일 <span class="aae-required">*</span></label>
+                <div class="aae-control-row">
+                  <input class="aae-control" id="registrationEmail" name="email" type="email" autocomplete="email" data-required="true"/>
+                  <button class="aae-button" id="registrationSendEmail" type="button">코드 발송</button>
+                </div>
+                <span class="aae-error" data-error-for="registrationEmail"></span>
+              </div>
+              <div class="aae-field">
+                <label class="aae-label" for="registrationEmailCode">인증 코드 <span class="aae-required">*</span></label>
+                <div class="aae-control-row">
+                  <input class="aae-control" id="registrationEmailCode" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code" disabled/>
+                  <button class="aae-button" id="registrationVerifyEmail" type="button" disabled>확인</button>
+                  <button class="aae-button" id="registrationResendEmail" type="button" disabled>재발송</button>
+                </div>
+                <span class="aae-help">남은 시간 <strong id="registrationEmailTimer">03:00</strong></span>
+                <span class="aae-error" data-error-for="registrationEmailCode"></span>
+                <div class="aae-alert" id="registrationEmailStatus" role="status" aria-live="polite" hidden></div>
+              </div>
+              <div class="aae-field">
+                <label class="aae-label" for="registrationCountry">국가 <span class="aae-required">*</span></label>
+                <select class="aae-select" id="registrationCountry" name="country" data-required="true">
+                  <option value="">국가를 선택하세요</option><option value="KR" selected>대한민국 (Korea)</option><option value="US">미국 (United States)</option><option value="CN">중국 (China)</option><option value="JP">일본 (Japan)</option><option value="DE">독일 (Germany)</option><option value="AU">호주 (Australia)</option><option value="GB">영국 (United Kingdom)</option><option value="FR">프랑스 (France)</option>
+                </select>
+                <span class="aae-error" data-error-for="registrationCountry"></span>
+              </div>
+              <div class="aae-field">
+                <label class="aae-label" for="registrationPhone">전화번호 <span class="aae-required">*</span></label>
+                <div class="aae-tel"><span class="aae-tel__prefix" id="registrationTelPrefix">+82</span><input class="aae-control" id="registrationPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="국가번호 제외 숫자" data-required="true"/></div>
+                <span class="aae-error" data-error-for="registrationPhone"></span>
+              </div>
+              <div class="aae-field">
+                <label class="aae-label" for="registrationPassword">비밀번호 <span class="aae-required">*</span></label>
+                <div class="aae-control-wrap">
+                  <input class="aae-control" id="registrationPassword" name="password" type="password" autocomplete="new-password" data-required="true"/>
+                  <button class="aae-password-toggle" type="button" data-password-toggle="registrationPassword" aria-pressed="false">표시</button>
+                </div>
+                <span class="aae-help">12자 이상 · 영문 + 숫자 + 특수문자</span>
+                <span class="aae-error" data-error-for="registrationPassword"></span>
+              </div>
+              <div class="aae-field">
+                <label class="aae-label" for="registrationPasswordConfirm">비밀번호 확인 <span class="aae-required">*</span></label>
+                <div class="aae-control-wrap">
+                  <input class="aae-control" id="registrationPasswordConfirm" name="passwordConfirm" type="password" autocomplete="new-password" data-required="true"/>
+                  <button class="aae-password-toggle" type="button" data-password-toggle="registrationPasswordConfirm" aria-pressed="false">표시</button>
+                </div>
+                <span class="aae-error" data-error-for="registrationPasswordConfirm"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="aae-reg-section">
+            <h2>소속 · 역할</h2>
+            <div class="aae-reg-grid">
+              <fieldset class="aae-field aae-span-2" style="border:0;padding:0">
+                <legend class="aae-label">역할 / 구분 <span class="aae-required">*</span></legend>
+                <div class="aae-role-group">
+                  <label class="aae-role"><input type="radio" name="registrationRole" value="customer-owner" checked/>고객사 - 대표</label>
+                  <label class="aae-role"><input type="radio" name="registrationRole" value="customer-employee"/>고객사 - 직원</label>
+                  <label class="aae-role"><input type="radio" name="registrationRole" value="dealer-employee"/>딜러 - 직원</label>
+                </div>
+              </fieldset>
+              <div class="aae-field" data-registration-roles="dealer-employee" hidden>
+                <label class="aae-label" for="registrationRegion">지역 <span class="aae-required">*</span></label>
+                <input class="aae-control" id="registrationRegion" name="region" data-required="true" readonly disabled placeholder="국가 선택 시 자동 설정"/>
+                <span class="aae-error" data-error-for="registrationRegion"></span>
+              </div>
+              <div class="aae-field" data-registration-roles="dealer-employee" hidden>
+                <label class="aae-label" for="registrationDealer">소속 딜러 <span class="aae-required">*</span></label>
+                <select class="aae-select" id="registrationDealer" name="dealer" data-required="true" disabled><option value="">딜러를 선택하세요</option></select>
+                <span class="aae-help" id="registrationDealerHelp">국가를 먼저 선택해 주세요.</span>
+                <span class="aae-error" data-error-for="registrationDealer"></span>
+              </div>
+              <div class="aae-field" data-registration-roles="customer-owner,customer-employee">
+                <label class="aae-label" for="registrationCompany"><span id="registrationCompanyLabel">신규 업체명</span> <span class="aae-required">*</span></label>
+                <div class="aae-autocomplete">
+                  <input class="aae-control" id="registrationCompany" name="company" type="text" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="registrationCompanyList" aria-expanded="false" data-required="true"/>
+                  <div class="aae-autocomplete-list" id="registrationCompanyList" role="listbox" hidden></div>
+                </div>
+                <span class="aae-help" id="registrationCompanyHelp"></span>
+                <span class="aae-error" data-error-for="registrationCompany"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="aae-alert" id="registrationStatus" role="status" aria-live="polite" hidden></div>
+          <div class="aae-reg-footer">
+            <button class="aae-button" type="button" data-registration-cancel>취소</button>
+            <button class="aae-button aae-button--primary" id="registrationSubmit" type="submit">회원가입</button>
+          </div>
+        </fieldset></form>
+      </section>
+    </div>
+  </main>
+</div>
+
+<template id="passIdentityTemplate"><section class="signup-pass-block" aria-labelledby="signupPassTitle" data-custom-copy>
+  <div class="aae-reg-grid signup-pass-layout">
+    <div><h3 class="signup-pass-title" id="signupPassTitle">휴대폰 본인확인 <span class="aae-required">*</span></h3><p class="signup-pass-description">PASS 앱 또는 문자(SMS)로 본인확인을 진행해 주세요.</p>
+      <fieldset class="signup-auth-methods" aria-describedby="phoneChannelHint"><legend class="aae-sr-only">휴대폰 본인확인 방법 선택</legend><div class="aae-role-group signup-auth-options"><label class="aae-role"><input type="radio" name="phoneIdentityChannel" value="pass-app" checked/>PASS 앱으로 인증</label><label class="aae-role"><input type="radio" name="phoneIdentityChannel" value="sms"/>문자(SMS)로 인증</label></div></fieldset>
+      <p class="aae-help signup-channel-hint" id="phoneChannelHint"></p><div class="signup-pass-actions"><button class="aae-button aae-button--primary" type="button" id="startPass">PASS 앱 인증 시작</button><button class="aae-button" type="button" id="cancelPass" hidden>취소</button></div></div>
+    <div class="signup-pass-guidance"><p class="birthdate-notice">만 14세 이상만 회원가입이 가능합니다.</p><p class="signup-pass-status" id="passStatus" role="status" aria-live="polite"></p></div>
+  </div>
+</section></template><template id="birthdateIdentityTemplate"><div data-custom-copy>          <fieldset class="birthdate-block" aria-describedby="birthdateNotice birthdateStatus">
+            <legend class="aae-label">생년월일 <span class="aae-required" aria-label="필수">*</span></legend>
+            <div class="aae-reg-grid birthdate-layout">
+            <div class="birthdate-inputs">
+              <div class="birthdate-control"><label class="aae-sr-only" for="birthYear">출생 연도</label><input class="aae-control" id="birthYear" type="text" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="연도 (YYYY)" aria-required="true" aria-describedby="birthdateNotice birthdateStatus"/></div>
+              <div class="birthdate-control"><label class="aae-sr-only" for="birthMonth">출생 월</label><select class="aae-select" id="birthMonth" autocomplete="off" aria-required="true" aria-describedby="birthdateNotice birthdateStatus"><option value="">월</option><option value="1">1월</option><option value="2">2월</option><option value="3">3월</option><option value="4">4월</option><option value="5">5월</option><option value="6">6월</option><option value="7">7월</option><option value="8">8월</option><option value="9">9월</option><option value="10">10월</option><option value="11">11월</option><option value="12">12월</option></select></div>
+              <div class="birthdate-control"><label class="aae-sr-only" for="birthDay">출생 일</label><select class="aae-select" id="birthDay" autocomplete="off" aria-required="true" aria-describedby="birthdateNotice birthdateStatus"><option value="">일</option><option value="1">1일</option><option value="2">2일</option><option value="3">3일</option><option value="4">4일</option><option value="5">5일</option><option value="6">6일</option><option value="7">7일</option><option value="8">8일</option><option value="9">9일</option><option value="10">10일</option><option value="11">11일</option><option value="12">12일</option><option value="13">13일</option><option value="14">14일</option><option value="15">15일</option><option value="16">16일</option><option value="17">17일</option><option value="18">18일</option><option value="19">19일</option><option value="20">20일</option><option value="21">21일</option><option value="22">22일</option><option value="23">23일</option><option value="24">24일</option><option value="25">25일</option><option value="26">26일</option><option value="27">27일</option><option value="28">28일</option><option value="29">29일</option><option value="30">30일</option><option value="31">31일</option></select></div>
+            </div>
+            <div class="birthdate-guidance">
+            <p class="birthdate-notice" id="birthdateNotice">만 14세 이상만 회원가입이 가능합니다.</p>
+            <p class="birthdate-status" id="birthdateStatus" role="status" aria-live="polite"></p>
+            </div>
+            </div>
+          </fieldset></div></template>
+<script src="copy.js"></script>
+<script src="assets/registration-terms-data.js"></script>
+<script src="assets/registration-terms.js"></script>
+<script src="age-rule.js"></script>
+<script src="pass-model.js"></script>
+<script src="phone-copy.js"></script>
+<script src="pass-preview.js"></script>
+</body>
+</html>

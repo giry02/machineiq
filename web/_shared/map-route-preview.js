@@ -31,7 +31,7 @@
     svg.appendChild(element('polyline', { points:points.map(function(p){return xy(p).join(',');}).join(' '),fill:'none',stroke:'#ff3600','stroke-width':2 }));
     var unique = points.filter(function(p,i){return i===0||i===points.length-1||points.findIndex(function(v){return v.lat===p.lat&&v.lng===p.lng;})===i;});
     unique.forEach(function(p,i){var pos=xy(p),start=i===0,end=i===unique.length-1;var dot=element('circle',{cx:pos[0],cy:pos[1],r:start||end?7:4,fill:start?'#158737':end?'#ff3600':'#8aaabe',stroke:'#fff','stroke-width':2,tabindex:0,role:'button','aria-label':p.gpsDatetime+' · '+p.lat.toFixed(5)+', '+p.lng.toFixed(5)});
-      var detail=p.gpsDatetime+' · 위도 '+p.lat.toFixed(5)+' · 경도 '+p.lng.toFixed(5)+' · 속도 '+(p.speed==null?'-':p.speed+' km/h')+' · 충격 '+(p.shock==null?'-':p.shock+'건');
+      var detail=p.gpsDatetime+' · 위도 '+p.lat.toFixed(5)+' · 경도 '+p.lng.toFixed(5)+' · 속도 '+(p.speed==null?'-':MIQCommon.numbers.integer(p.speed)+' km/h')+' · 충격 '+(p.shock==null?'-':MIQCommon.numbers.integer(p.shock)+'건');
       dot.appendChild(element('title',{},detail));
       function show(){MIQCommon.view.set(info,"textContent",detail);}
       dot.addEventListener('click',show);dot.addEventListener('focus',show);svg.appendChild(dot);
