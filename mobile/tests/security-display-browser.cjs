@@ -58,12 +58,13 @@ const layouts={},baselineFile=path.join(output,'baseline-layout.json');
         await page.screenshot({path:path.join(output,phase,'password-reminder-'+width+'.png'),fullPage:true});
         await page.goto(origin+'/signup.html?role=customer_staff');
         assert(await page.locator('[data-mobile-pass-preview]').isHidden());
-        await page.getByRole('link',{name:'본인인증 시안 보기'}).click();
-        await page.locator('[data-mobile-pass-review-note]').waitFor();
-        assert.equal(new URL(page.url()).searchParams.get('securityPreview'),'1');
-        assert.equal(new URL(page.url()).searchParams.get('role'),'customer_staff');
-        assert(await page.locator('[data-mobile-pass-review-note]').isVisible());
-        assert(await page.locator('[data-mobile-pass-entry]').isHidden());
+        const identity=page.getByRole('button',{name:'본인인증',exact:true});
+        assert(await identity.isVisible());
+        assert(await identity.isDisabled(),'NICE is not connected yet');
+        assert.equal(await page.getByRole('link',{name:'본인인증 시안 보기'}).count(),0);
+        await page.locator('#signup-agree-all').check();
+        assert(await identity.isDisabled(),'Agreement does not activate the unconnected NICE button');
+        await page.goto(origin+'/signup.html?securityPreview=1&role=customer_staff');
         await page.locator('#signup-agree-all').check();await page.locator('#signup-continue').click();
         assert(await page.locator('input[name="signupRole"][value="customer-employee"]').isChecked());
         assert(await page.locator('#signup-form').evaluate(form=>{const event=new Event('submit',{bubbles:true,cancelable:true});form.dispatchEvent(event);return event.defaultPrevented;}),'Review blocks local mock signup');
@@ -78,16 +79,11 @@ const layouts={},baselineFile=path.join(output,'baseline-layout.json');
         await page.locator('#signup-phone').fill('01012345678');assert.equal(await page.locator('[data-mobile-pass-preview]').getAttribute('data-state'),'before');
         assert.equal(await page.locator('[data-mobile-pass-preview]').getAttribute('data-verified'),'false');
         await page.screenshot({path:path.join(output,phase,'pass-'+width+'.png'),fullPage:true});
-        await page.locator('[data-signup-step="agreement"]').click();
-        await page.getByRole('link',{name:'기존 회원가입으로 돌아가기'}).click();
-        await page.getByRole('link',{name:'본인인증 시안 보기'}).waitFor();
-        assert.equal(new URL(page.url()).searchParams.has('securityPreview'),false);
-        assert.equal(new URL(page.url()).searchParams.get('role'),'customer_staff');
       }
       assert.deepEqual(errors,[],'No uncaught browser errors');assert.deepEqual(writes,[],'No non-GET requests');
       await context.close();
     }
     if(baseline)fs.writeFileSync(baselineFile,JSON.stringify(layouts,null,2)+'\n');
-    console.log('PASS mobile security '+phase+': 390/320px, 10 base layouts, '+(baseline?'baseline captured':'default auth pixels/role scopes/masking/90-day/signup review entry/KR failure-only checks')+', no writes. '+output);
+    console.log('PASS mobile security '+phase+': 390/320px, 10 base layouts, '+(baseline?'baseline captured':'default auth pixels/role scopes/masking/90-day/unconnected NICE button/KR failure-only checks')+', no writes. '+output);
   }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}
 })().catch(error=>{console.error(error);process.exitCode=1;server.close();});

@@ -51,7 +51,7 @@
     },
     {
       "path": "signup.html",
-      "sha256": "57601482cc717368624fef467f29a7d082e6a9ec49873b44bd64bda0b0f6c8eb"
+      "sha256": "fc60b8c2eeba0c55a9ea49f1437d302731ed962ccdef3a5880df97a697062c61"
     },
     {
       "path": "signup.js",
@@ -131,7 +131,7 @@
     },
     {
       "path": "shared/signup.css",
-      "sha256": "d78a64d24806f00a72d3bff1cfb44fec1e32cc7ac52b9f36457c68bc2c054a7c"
+      "sha256": "3c7c86fa80d75fc7b9e4de0060f1423488cda23711aed07877e4af4e0ce90a29"
     },
     {
       "path": "shared/find-password.css",
@@ -923,7 +923,7 @@
     },
     {
       "path": "security-preview.js",
-      "sha256": "996a05825591b6c5dd89eff53706dad97f72233bde677ae605e3d265246f7920"
+      "sha256": "f7033704c1f537b345226c29e9370d22e1539e955ebb4301662bb60bf0ff281c"
     },
     {
       "path": "tests/security-display.cjs",
@@ -931,7 +931,7 @@
     },
     {
       "path": "tests/security-display-browser.cjs",
-      "sha256": "7ae76b24d7847b9de633ff5bae40fe7e265773c3258fc2da396532980cca62dd"
+      "sha256": "5f316e1b0993e8beb75145f4ceb8dee0d49d6b62c5497a4c017d77cdb98c6e1a"
     }
   ]
 }

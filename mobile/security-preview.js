@@ -22,16 +22,7 @@
     return Object.freeze({required:country==='KR',state:country==='KR'&&Object.hasOwn(passMessages,result)?result:'before',verified:false});
   }
   function bind(document,search){
-    const params=new URLSearchParams(search);
-    const role=params.get('role');
-    if(role==='customer_owner'||role==='customer_staff'){
-      document.querySelectorAll('[data-mobile-pass-link]').forEach(link=>{
-        const url=new URL(link.href);
-        url.searchParams.set('role',role);
-        link.href=url.href;
-      });
-    }
-    if(params.get('securityPreview')!=='1')return;
+    if(new URLSearchParams(search).get('securityPreview')!=='1')return;
     // Keep review actions separate from the existing local mock login/signup handlers.
     for(const selector of ['#mobile-login-form','#forced-password-form','#signup-form'])document.querySelector(selector)?.addEventListener('submit',event=>{
       event.preventDefault();event.stopImmediatePropagation();
@@ -48,9 +39,6 @@
     }
     const panel=document.querySelector('[data-mobile-pass-preview]'),country=document.querySelector('#signup-country');
     if(!panel||!country)return;
-    const entry=document.querySelector('[data-mobile-pass-entry]'),note=document.querySelector('[data-mobile-pass-review-note]');
-    if(entry)entry.hidden=true;
-    if(note)note.hidden=false;
     function render(result){
       const value=passState(country.value,result);
       panel.hidden=!value.required;panel.dataset.state=value.state;panel.dataset.verified='false';
