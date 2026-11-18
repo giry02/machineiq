@@ -1,5 +1,5 @@
 {
-  "revision": "2026-11-10-security-display",
+  "revision": "2026-11-18-r148-report-roster",
   "entry": "login.html",
   "includeArchives": false,
   "mapMode": "embedded-google",
@@ -7,11 +7,11 @@
   "files": [
     {
       "path": "index.html",
-      "sha256": "278e0b3664ff4eee12e053e3d405dddbea2a194ee831172ea83b58b05cecdd2d"
+      "sha256": "817fc825a381bd6b13bb3e30165b815beabc840515945590d616db40d8a16e96"
     },
     {
       "path": "customer.js",
-      "sha256": "4ec563af95344e190b9c69341266c52e8107eb0738430d563bfe54a0aea1e956"
+      "sha256": "6b5a20929eeff7ba36541c38375b320924d84d03161a654b3f582db3a841fa6f"
     },
     {
       "path": "customer.css",
@@ -31,7 +31,7 @@
     },
     {
       "path": "release.json",
-      "sha256": "8b3e83299fc41bc682ba27edfdd2df0e7456f2a710f2e70f3c2b4b9613f75afa"
+      "sha256": "26a2d0b87873d97d2ae822db5f3916a172260938f832c6ddfb1392e289bc8653"
     },
     {
       "path": "error-documents.js",
