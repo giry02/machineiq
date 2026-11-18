@@ -22,6 +22,8 @@ button { cursor:pointer; }
 .signup-stage__heading > small, .signup-complete > small { color:var(--linq-color-brand); font-size:var(--linq-font-caption); font-weight:800; letter-spacing:.08em; }
 .signup-stage__heading h1, .signup-complete h1 { margin:4px 0 7px; color:var(--linq-color-text); font-size:var(--linq-font-page); line-height:30px; letter-spacing:-.04em; }
 .signup-stage__heading p, .signup-complete > p { margin:0; color:var(--linq-color-text-muted); font-size:var(--linq-font-control); line-height:var(--linq-line-body); }
+.signup-stage__heading .signup-pass-link { margin-top:8px; }
+.signup-pass-link a { color:var(--linq-color-primary-fill); text-underline-offset:3px; }
 .agreement-all { margin-bottom:10px; padding:15px 14px; border:1px solid var(--linq-color-brand-border); border-radius:var(--linq-radius-card); background:var(--linq-color-brand-soft); }
 .signup-check { display:flex; align-items:flex-start; gap:10px; min-width:0; cursor:pointer; }
 .signup-check input { flex:0 0 auto; width:20px; height:20px; margin:1px 0 0; accent-color:var(--linq-color-brand); }
