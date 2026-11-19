@@ -2131,7 +2131,7 @@
       foot.className = 'miq-page-foot';
       MIQCommon.view.set(foot,"innerHTML",'<div class="miq-page-foot__brand"><img src="' + BASE + '_shared/bobcat-logo-white.svg" alt="Bobcat"></div>' +
         '<div class="miq-page-foot__links"><button type="button" data-miq-legal="terms" aria-haspopup="dialog">이용약관</button><button type="button" data-miq-legal="location" aria-haspopup="dialog">위치정보 및 위치기반서비스 이용약관</button><button type="button" data-miq-legal="privacy" aria-haspopup="dialog">개인(위치)정보 처리방침</button><button type="button" data-miq-legal="license" aria-haspopup="dialog">오픈소스 고지</button>' +
-        '<small>©2024 Bobcat Company. ALL RIGHTS RESERVED.</small></div>' +
+        '<small>©2027 Bobcat Company. ALL RIGHTS RESERVED.</small></div>' +
         '<div class="miq-page-foot__help"><strong>HELP</strong><span>help.machineiq@doosan.com</span><small>최종접속 : 2026-08-31 21:00</small></div>');
       document.body.appendChild(foot);
       var legalLoading;
