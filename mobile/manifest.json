@@ -43,7 +43,7 @@
     },
     {
       "path": "login.html",
-      "sha256": "8fbe6e43032afc078e6182335f26d22b6dedbcc731cc7ed8c6ac949149f183d8"
+      "sha256": "3f0501e5ca5a08781ca90fce17604d4c53967416003a37d02fc66973d64c0522"
     },
     {
       "path": "login.js",
@@ -63,7 +63,7 @@
     },
     {
       "path": "find-password.html",
-      "sha256": "f16ed6be11349b790c42ec20e78e4a43def2e6e6d89c9276e5e269b7b7666a91"
+      "sha256": "f568c257d3d19ceafa5a91cf7126de46c2d8196edcfaeb689e3c5f5f06f90ab1"
     },
     {
       "path": "find-password.js",
