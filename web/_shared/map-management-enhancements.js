@@ -230,7 +230,7 @@
     toolbar.className = 'mm-map-toolbar' + (routeMode ? ' is-route' : '');
     MIQCommon.view.set(toolbar,"innerHTML",'<div class="mm-map-toolbar__modes" role="group" aria-label="지도 표시 모드">' +
         '<button type="button" data-mm-map-mode="position" class="' + (routeMode ? '' : 'is-active') + '">현재 위치</button>' +
-        '<button type="button" data-mm-map-mode="route" class="' + (routeMode ? 'is-active' : '') + '">차량 경로 조회</button>' +
+        '<button type="button" data-mm-map-mode="route" class="' + (routeMode ? 'is-active' : '') + '">위치 이력</button>' +
       '</div>' +
       '<div class="mm-map-toolbar__date" role="group" aria-label="이동 경로 조회 기간">' +
         '<label class="mm-route-vehicle">차량 <select data-mm-route-vehicle aria-label="경로 조회 차량"><option value="">차량 선택</option></select></label>' +
@@ -238,11 +238,11 @@
           '<button type="button" data-mm-route-period="d">일</button><button type="button" data-mm-route-period="w">주</button><button type="button" data-mm-route-period="m">월</button>' +
         '</div><input type="date" aria-label="경로 시작일" data-mm-route-from value="' + routeFrom + '"> ~ ' +
         '<input type="date" aria-label="경로 종료일" data-mm-route-to value="' + routeTo + '">' +
-        '<button type="button" class="btn-search" data-mm-route-search>경로 조회</button>' +
+        '<button type="button" class="btn-search" data-mm-route-search>조회</button>' +
         '<span class="mm-route-legend"><i class="start"></i>시작 <i class="end"></i>종료</span>' +
       '</div>' +
       '<div class="mm-map-toolbar__filters" data-mm-map-filters></div>' +
-      '<span class="mm-map-toolbar__hint" data-mm-map-hint>아래 장비목록의 차대번호를 누르면 지도에서 차량이 선택됩니다.</span>');
+      '<span class="mm-map-toolbar__hint" data-mm-map-hint' + (routeMode ? ' hidden' : '') + '>' + (routeMode ? '' : '아래 장비목록의 차대번호를 누르면 지도에서 차량이 선택됩니다.') + '</span>');
     map.parentNode.insertBefore(toolbar, map);
 
     function rowFault(row) {
@@ -345,9 +345,9 @@
       syncRouteVehicles(rows,vin);
       if(routeMode&&(query.get('routeVin')||'')!==vin)setQuery({routeVin:vin||null});
       if (window.MIQGoogleMap) MIQGoogleMap.sync({ visibleVins: visible, selectedVin: vin, routeMode: routeMode, from: routeFrom, to: routeTo, requestId: routeRequestId });
-      MIQCommon.view.set(toolbar.querySelector('[data-mm-map-hint]'),"textContent",routeMode && vin
-        ? vin + ' · ' + routeFrom + (routeFrom === routeTo ? '' : ' ~ ' + routeTo) + ' 이동 경로'
-        : routeMode?'차량과 기간을 선택한 뒤 경로를 조회하세요.':'아래 장비목록의 차대번호를 누르면 지도에서 차량이 선택됩니다.');
+      var hint = toolbar.querySelector('[data-mm-map-hint]');
+      hint.hidden = routeMode;
+      MIQCommon.view.set(hint,"textContent",routeMode ? '' : '아래 장비목록의 차대번호를 누르면 지도에서 차량이 선택됩니다.');
     }    function paintFilterChips() {
       var box = toolbar.querySelector('[data-mm-map-filters]');
       var items = [];
