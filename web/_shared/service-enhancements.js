@@ -691,13 +691,10 @@
     dialog = document.createElement('dialog');
     dialog.className = 'service-dialog';
     document.body.appendChild(dialog);
-    dialog.addEventListener('cancel', function () { body.classList.remove('is-printing-error'); });
-    dialog.addEventListener('close', function () { body.classList.remove('is-printing-error'); });
     return dialog;
   }
 
   function closeDialog(dialog) {
-    body.classList.remove('is-printing-error');
     if (typeof dialog.close === 'function' && dialog.open) dialog.close();
     else dialog.removeAttribute('open');
   }
@@ -815,59 +812,6 @@
     });
   }
 
-  function errorDetails(button) {
-    var row = button.closest('tr');
-    var info = rowInfo(row);
-    var cells = row.cells;
-    var code = cells[4].querySelector('.errcode__main').childNodes[0].nodeValue.trim();
-    var level = cells[4].querySelector('.level') ? MIQCommon.view.get(cells[4].querySelector('.level'),"textContent").trim() : '-';
-    var sub = cells[4].querySelector('.errcode__sub') ? MIQCommon.view.get(cells[4].querySelector('.errcode__sub'),"textContent").trim() : '-';
-    return {
-      info: info,
-      state: MIQCommon.view.get(cells[2],"textContent").trim(),
-      type: MIQCommon.view.get(cells[3],"textContent").trim(),
-      code: code,
-      level: level,
-      sub: sub,
-      description: MIQCommon.view.get(cells[5],"textContent").trim(),
-      date: MIQCommon.view.get(cells[6],"textContent").replace(/\s+/g, ' ').trim()
-    };
-  }
-
-  function openErrorPrint(button) {
-    var d = errorDetails(button);
-    var dialog = openDialog({
-      title: '에러 조치 정보',
-      screenId: 'LQ-SVC-004-P01',
-      confirmLabel: '인쇄 / PDF 저장',
-      body: MIQServiceErrors.documentHtml(d),
-      onConfirm: function (form, dialog) {
-        body.classList.add('is-printing-error');
-        window.print();
-        window.setTimeout(function () { body.classList.remove('is-printing-error'); }, 0);
-        return false;
-      }
-    });
-    var identity = dialog.querySelector('.service-dialog__summary > strong');
-    if (identity) {
-      makeVinLink(identity, d.info);
-      identity.appendChild(document.createTextNode(' · ' + d.info.model));
-    }
-  }
-
-  function enhanceErrorActions() {
-    if (page !== 'error') return;
-    rows.forEach(function (row) { Array.prototype.forEach.call(row.querySelectorAll('span.pdf'), function (span) {
-      var button = document.createElement('button');
-      button.type = 'button';
-      button.className = span.className;
-      MIQCommon.view.call(button,"setAttribute",['data-error-pdf','']);
-      MIQCommon.view.call(button,"setAttribute",['aria-label',rowInfo(span.closest('tr')).vin + ' 에러 조치 정보 열기']);
-      MIQCommon.view.set(button,"textContent",'PDF');
-      span.replaceWith(button);
-    }); });
-  }
-
   function applyUrlState() {
     var params = new URLSearchParams(location.search);
     filterState.companyId = (accountPolicy.group && accountPolicy.companyId) || params.get('companyId') || '';
@@ -964,13 +908,6 @@
     }
   });
   document.addEventListener('click', function (event) {
-    var errorButton = event.target.closest('[data-error-pdf]');
-    if (errorButton) {
-      event.preventDefault();
-      openErrorPrint(errorButton);
-    }
-  });
-  document.addEventListener('click', function (event) {
     var reset = event.target.closest('#reset-selected');
     if (reset && page === 'supply') {
       event.preventDefault();
@@ -988,7 +925,6 @@
   fitServiceColumns();
   enhanceVinLinks();
   enhanceSorting();
-  enhanceErrorActions();
   applyUrlState();
   enhanceVinLinks();
   sortRows();

@@ -219,6 +219,7 @@ body.miq-service-enhanced .pdf {
   color: var(--service-brand-dark);
   cursor: pointer;
 }
+body.miq-service-enhanced a.pdf { text-decoration: none; font-family: inherit; line-height: normal; }
 body.miq-service-enhanced .pdf:hover { border-color: var(--service-brand); background: #fff5f3; }
 
 .service-live {
@@ -310,11 +311,4 @@ body.miq-service-enhanced :is(button,a,input,select,textarea):focus-visible:not(
   body.miq-service-enhanced *,
   body.miq-service-enhanced *::before,
   body.miq-service-enhanced *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
-}
-
-@media print {
-  body.miq-service-enhanced.is-printing-error > *:not(.service-dialog[open]) { display: none !important; }
-  body.miq-service-enhanced.is-printing-error .service-dialog[open] { position: static; display: block; width: 100%; max-height: none; border: 0; box-shadow: none; }
-  body.miq-service-enhanced.is-printing-error .service-dialog__head button,
-  body.miq-service-enhanced.is-printing-error .service-dialog__foot { display: none !important; }
 }

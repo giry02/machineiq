@@ -4,7 +4,6 @@
   if(!section)return;
   var body=section.querySelector('tbody'),count=section.querySelector('[data-error-count]'),current=[],sortKey='dateTime',direction=-1;
   var columns=['errorState','category','code','description','dateTime'];
-  var dialog=document.getElementById('vehicleErrorDocument');
   function paint(){
     var rows=current.slice().sort(function(a,b){return String(a[sortKey]||'').localeCompare(String(b[sortKey]||''),'ko',{numeric:true})*direction;});
     MIQCommon.view.set(count,"textContent",rows.length);
@@ -19,11 +18,5 @@
   section.addEventListener('click',function(event){
     var sort=event.target.closest('[data-error-sort-button]');
     if(sort){var key=sort.closest('th').dataset.errorSort;if(columns.indexOf(key)<0)return;direction=sortKey===key?-direction:1;sortKey=key;paint();return;}
-    var pdf=event.target.closest('[data-error-pdf]');if(!pdf)return;
-    var row=current[Number(pdf.closest('tr').dataset.errorIndex)];if(!row)return;
-    MIQCommon.view.set(dialog.querySelector('.service-dialog__body'),"innerHTML",MIQServiceErrors.documentHtml(MIQServiceErrors.details(row)));
-    dialog.showModal();
   });
-  dialog.querySelectorAll('[data-error-close]').forEach(function(button){button.addEventListener('click',function(){dialog.close();});});
-  dialog.querySelector('[data-error-print]').addEventListener('click',function(){document.body.classList.add('is-printing-vehicle-error');window.print();document.body.classList.remove('is-printing-vehicle-error');});
 })();
